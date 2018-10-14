@@ -1,0 +1,7 @@
+namespace mibdv {
+
+constexpr char APPLICATION_NAME[] = "@PROJECT_NAME@";
+constexpr char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
+constexpr char ORGANIZATION[] = "@ORGANIZATION@";
+
+}
