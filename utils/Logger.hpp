@@ -4,13 +4,33 @@
 #include <QDebug>
 #include <QString>
 #include <QMessageLogger>
+#include <QFile>
+#include <QStandardPaths>
+#include <QtGlobal>
+#include <QDir>
 
-namespace mibdv {
+#include "configure.h"
+#include "fstream"
+
+namespace PROGRAM_NAMESPACE {
 
 class Logger {
 
+    friend inline void messageHandlerFunction(QtMsgType type, const QMessageLogContext& context, const QString& msg);
+
+private:
+    std::ofstream file;
+
 private:
     Logger();
+
+    ~Logger();
+
+    void messageHandler(QtMsgType type,
+                        const QMessageLogContext &context,
+                        const QString &msg);
+    void rotateLog();
+
 
 public:
     Logger(const Logger& l) = delete;
@@ -27,6 +47,8 @@ public:
     [[noreturn]] void fatal(const char* msg, ...) const;
 
 };
+
+//void messageHandlerFunction(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
 #ifdef FLAG_DEBUG
 #define traceEnter Logger::instance().enter(QT_MESSAGELOG_FUNC)

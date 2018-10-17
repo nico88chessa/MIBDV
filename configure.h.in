@@ -1,7 +1,19 @@
-namespace mibdv {
+#ifndef __CONFIGURE__
+#define __CONFIGURE__
+
+#define PROGRAM_NAMESPACE @PROGRAM_NAMESPACE@
+#define __MAYBE_UNUSED __attribute__((unused))
+
+namespace PROGRAM_NAMESPACE {
 
 constexpr char APPLICATION_NAME[] = "@PROJECT_NAME@";
 constexpr char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
 constexpr char ORGANIZATION[] = "@ORGANIZATION@";
 
+constexpr char LOG_PATH[] = "@LOG_PATH@";
+
+constexpr int MAX_NUM_LOG_FILES = 5;
+
 }
+
+#endif
