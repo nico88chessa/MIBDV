@@ -3,19 +3,18 @@
 #include <QSettings>
 #include <QStandardPaths>
 
+#include "GalilCNController.hpp"
+
 #include <Logger.hpp>
+#include <Settings.hpp>
 
 #include "configure.h"
 
-int main(int argc, char** argv) {
+int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
 
-    qDebug() << QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-    qDebug() << QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
-    qDebug() << QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
-    qDebug() << QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
-
+    traceInfo() << "Start applicativo" << APPLICATION_NAME;
     traceEnter;
 
     traceDebug() << "ciaomiao" << "due";
@@ -27,9 +26,12 @@ int main(int argc, char** argv) {
 
     traceExit;
 
-//    QSettings prova(QSettings::IniFormat, QSettings::UserScope, ORGANIZATION, APPLICATION_NAME);
+    GalilCNController test;
+    test.connect("192.168.1.19");
 
-    traceDebug() << APPLICATION_NAME;
+    Settings::instance();
+
+    traceExit;
 
     return 0;
 

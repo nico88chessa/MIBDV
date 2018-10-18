@@ -19,7 +19,6 @@ Logger::Logger() {
 
     auto prefixPath = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).at(0);
 
-
     auto logPath = prefixPath + "/" + LOG_PATH + "/";
     auto filePath = QString(logPath+APPLICATION_NAME+"-%1.log").arg(0);
 
@@ -39,7 +38,7 @@ Logger::~Logger() {
 
 }
 
-void Logger::messageHandler(QtMsgType type, const QMessageLogContext& context __MAYBE_UNUSED, const QString& msg) {
+void Logger::messageHandler(QtMsgType type, MAYBE_UNUSED const QMessageLogContext& context, const QString& msg) {
 
     QByteArray localMsg = msg.toLocal8Bit();
     QByteArray localTime = QDateTime::currentDateTime().toString(TIME_FORMAT).toLocal8Bit();
@@ -98,11 +97,11 @@ Logger& Logger::instance() {
 }
 
 void Logger::enter(const char* functionName) const {
-    qDebug() << functionName << "ENTER";
+    qDebug() << "ENTER" << functionName;
 }
 
 void Logger::exit(const char* functionName) const {
-    qDebug() << functionName << "EXIT";
+    qDebug() << "EXIT" << functionName;
 }
 
 QDebug Logger::debug() const {

@@ -1,8 +1,8 @@
-#ifndef __CONFIGURE__
-#define __CONFIGURE__
+#ifndef CONFIGURE_IN_H
+#define CONFIGURE_IN_H
 
 #define PROGRAM_NAMESPACE @PROGRAM_NAMESPACE@
-#define __MAYBE_UNUSED __attribute__((unused))
+#define MAYBE_UNUSED __attribute__((unused))
 
 namespace PROGRAM_NAMESPACE {
 
