@@ -1,5 +1,6 @@
 SET(ITEMS
     GalilCNController
+    GalilPLCController
     GalilCNControllerUtils
     )
 

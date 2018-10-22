@@ -46,23 +46,23 @@ void Logger::messageHandler(QtMsgType type, MAYBE_UNUSED const QMessageLogContex
     // fprintf(stderr, "%s DEBUG: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
     switch (type) {
     case QtDebugMsg:
-        file << qPrintable(QString("%0 DEBUG: %1\n").arg(localTime.constData()).arg(localMsg.constData()));
+        file << qPrintable(QString("%0 DEBUG %1\n").arg(localTime.constData()).arg(localMsg.constData()));
         file.flush();
         break;
     case QtInfoMsg:
-        file << qPrintable(QString("%0 INFO: %1\n").arg(localTime.constData()).arg(localMsg.constData()));
+        file << qPrintable(QString("%0 INFO %1\n").arg(localTime.constData()).arg(localMsg.constData()));
         file.flush();
         break;
     case QtWarningMsg:
-        file << qPrintable(QString("%0 WARN: %1\n").arg(localTime.constData()).arg(localMsg.constData()));
+        file << qPrintable(QString("%0 WARN %1\n").arg(localTime.constData()).arg(localMsg.constData()));
         file.flush();
         break;
     case QtCriticalMsg:
-        file << qPrintable(QString("%0 CRITICAL: %1\n").arg(localTime.constData()).arg(localMsg.constData()));
+        file << qPrintable(QString("%0 CRITICAL %1\n").arg(localTime.constData()).arg(localMsg.constData()));
         file.flush();
         break;
     case QtFatalMsg:
-        file << qPrintable(QString("%0 FATAL: %1\n").arg(localTime.constData()).arg(localMsg.constData()));
+        file << qPrintable(QString("%0 FATAL %1\n").arg(localTime.constData()).arg(localMsg.constData()));
         file.flush();
         break;
     }

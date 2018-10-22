@@ -6,14 +6,10 @@ GalilCNControllerUtils::GalilCNControllerUtils() { }
 
 QString GalilCNControllerUtils::getErrorString(int error) {
 
-    traceEnter;
-
     constexpr GSize size = G_SMALL_BUFFER;
     char description[size];
 
     GError(error, description, size);
-
-    traceExit;
 
     return QString(description);
 

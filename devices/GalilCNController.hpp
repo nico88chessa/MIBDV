@@ -20,6 +20,7 @@ class GalilCNController {
     using posType = int;
     using spdType = double;
     using accType = double;
+    using anlType = double;
 
 public:
     enum class Axis { X, Y, Z, W };
@@ -54,13 +55,6 @@ private:
         AXIS_IN_MOTION
     };
 
-private:
-    inline GCon handle() { return *this->handler.data(); }
-    inline void writeError(int errorCode);
-    inline void writeErrorIfExists(int errorCode);
-    bool getInputs(int bank, int& bankStatus);
-    bool tellSwitches(Axis a, int& value);
-
 public:
     GalilCNController();
     ~GalilCNController();
@@ -72,7 +66,7 @@ public:
     bool getRecord(GDataRecord2103& record);
     bool getDigitalInput(int input, int& inputStatus);
     bool getDigitalOutput(int output, int& outputStatus);
-    bool getAnalogInput(int analogInput, int& analogInputStatus);
+    bool getAnalogInput(int analogInput, anlType& analogInputStatus);
     bool getPosition(Axis a, posType& pos);
     bool isAxisInMotion(Axis a, bool& inMotion);
     bool isAxisPositionError(Axis a, bool& isPositionError);
@@ -94,6 +88,13 @@ public:
     bool startMoveAxis(Axis a);
     bool moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
     bool setPosition(Axis a, posType pos);
+
+private:
+    inline GCon handle() { return *this->handler.data(); }
+    inline void writeError(int errorCode);
+    inline void writeErrorIfExists(int errorCode);
+    bool getInputs(int bank, int& bankStatus);
+    bool tellSwitches(Axis a, int& value);
 
 };
 

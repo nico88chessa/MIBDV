@@ -2,74 +2,9 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-void GalilCNController::writeError(int errorCode) {
-
-    traceErr() << "chiamata funzione getInputs fallita; codice errore:" << errorCode;
-    traceErr() << "descrizione errore:" << GalilCNControllerUtils::getErrorString(errorCode);
-
-}
-
-void GalilCNController::writeErrorIfExists(int errorCode) {
-
-    if (errorCode != G_NO_ERROR)
-        writeError(errorCode);
-
-}
-
-bool GalilCNController::getInputs(int bank, int& bankStatus) {
-
-    traceEnter;
-
-    if (!isInitialized) {
-        traceErr() << "Il controller non e' stato inizializzato";
-        return false;
-    }
-
-    if (bank<0 || bank>6) {
-        traceErr() << "La funzione get inputs accetta un valore compreso fra 0 e 6";
-        return false;
-    }
-
-    QString command = "TI " + QString::number(bank);
-    traceDebug() << "Invio comando:" << command;
-#ifdef FLAG_CN_PRESENT
-    GReturn result = GCmdI(handle(), command.toStdString().c_str(), &bankStatus);
-#else
-    GReturn result = G_NO_ERROR;
-#endif
-    writeErrorIfExists(result);
-
-
-    traceExit;
-
-    return result == G_NO_ERROR;
-
-}
-
-bool GalilCNController::tellSwitches(GalilCNController::Axis a, int& value) {
-
-    traceEnter;
-
-    QString axisLetter(GalilCNController::letterFromAxis(a));
-    QString command = "TS" + axisLetter;
-
-    traceDebug() << "Invio comando:" << command;
-#ifdef FLAG_CN_PRESENT
-    GReturn result = GCmdI(handle(), command.toStdString().data(), &value);
-#else
-    GReturn result = G_NO_ERROR;
-#endif
-
-    writeErrorIfExists(result);
-
-    traceExit;
-
-    return result == G_NO_ERROR;
-
-}
-
 GalilCNController::GalilCNController() :
-    handler(nullptr), numDigitalInput(0), numDigitalOutput(0) {
+    handler(nullptr), isInitialized(false),
+    numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0) {
 
     traceEnter;
     traceExit;
@@ -92,6 +27,26 @@ GalilCNController::~GalilCNController() {
 
 }
 
+bool GalilCNController::getRecord(GDataRecord2103& record) {
+
+    traceEnter;
+
+    GDataRecord recordUnion;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GRecord(handle(), &recordUnion, G_QR);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+    record = recordUnion.dmc2103;
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
 void GalilCNController::setupController(int numDigitalInput, int numDigitalOutput, int numAnalogInput) {
 
     traceEnter;
@@ -102,6 +57,8 @@ void GalilCNController::setupController(int numDigitalInput, int numDigitalOutpu
     this->numDigitalInput = numDigitalInput;
     this->numDigitalOutput = numDigitalOutput;
     this->numAnalogInput = numAnalogInput;
+
+    isInitialized = true;
 
     traceExit;
 
@@ -131,26 +88,7 @@ bool GalilCNController::connect(const QString& ip) {
         writeError(result);
     }
 
-    traceExit;
-
-    return result == G_NO_ERROR;;
-
-}
-
-bool GalilCNController::getRecord(GDataRecord2103& record) {
-
-    traceEnter;
-
-    GDataRecord recordUnion;
-#ifdef FLAG_CN_PRESENT
-    GReturn result = GRecord(handle(), &recordUnion, G_QR);
-#else
-    GReturn result = G_NO_ERROR;
-#endif
-    record = recordUnion.dmc2103;
-
-    writeErrorIfExists(result);
-
+    traceInfo() << "Galil CN: connessione avvenuta";
     traceExit;
 
     return result == G_NO_ERROR;
@@ -162,12 +100,12 @@ bool GalilCNController::getDigitalInput(int input, int& inputStatus) {
     traceEnter;
 
     if (!isInitialized) {
-        traceErr() << "Il controller non e' stato inizializzato";
+        traceErr() << "Galil CN: il controller non e' stato inizializzato";
         return false;
     }
 
     if (input<1 || input>numDigitalInput) {
-        traceErr() << "Input richiesto fuori dal range del device";
+        traceErr() << "Galil CN: input richiesto fuori dal range del device";
         return false;
     }
 
@@ -191,12 +129,12 @@ bool GalilCNController::getDigitalOutput(int output, int& outputStatus) {
     traceEnter;
 
     if (!isInitialized) {
-        traceErr() << "Il controller non e' stato inizializzato";
+        traceErr() << "Galil CN: il controller non e' stato inizializzato";
         return false;
     }
 
     if (output<1 || output>numDigitalOutput) {
-        traceErr() << "Output richiesto fuori dal range del device";
+        traceErr() << "Galil CN: output richiesto fuori dal range del device";
         return false;
     }
 
@@ -216,24 +154,24 @@ bool GalilCNController::getDigitalOutput(int output, int& outputStatus) {
 
 }
 
-bool GalilCNController::getAnalogInput(int analogInput, int& analogInputStatus) {
+bool GalilCNController::getAnalogInput(int analogInput, anlType& analogInputStatus) {
 
     traceEnter;
 
     if (!isInitialized) {
-        traceErr() << "Il controller non e' stato inizializzato";
+        traceErr() << "Galil CN: il controller non e' stato inizializzato";
         return false;
     }
 
     if (analogInput<1 || analogInput>numAnalogInput) {
-        traceErr() << "Output richiesto fuori dal range del device";
+        traceErr() << "Galil CN: output richiesto fuori dal range del device";
         return false;
     }
 
     QString command = QString("MG @AN[%1]").arg(analogInput);
     traceDebug() << "Invio comando:" << command;
 #ifdef FLAG_CN_PRESENT
-    GReturn result = GCmdI(handle(), command.toStdString().data(), &analogInputStatus);
+    GReturn result = GCmdD(handle(), command.toStdString().data(), &analogInputStatus);
 #else
     GReturn result = G_NO_ERROR;
 #endif
@@ -413,12 +351,12 @@ bool GalilCNController::setDigitalOutput(int output, bool value) {
     traceEnter;
 
     if (!isInitialized) {
-        traceErr() << "Il controller non e' stato inizializzato";
+        traceErr() << "Galil CN: il controller non e' stato inizializzato";
         return false;
     }
 
     if (output<1 || output>numDigitalOutput) {
-        traceErr() << "Input richiesto fuori dal range del device";
+        traceErr() << "Galil CN: input richiesto fuori dal range del device";
         return false;
     }
 
@@ -659,7 +597,7 @@ bool GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accTy
         return false;
 
     QString axisLetter(GalilCNController::letterFromAxis(a));
-    QString command = QString("PA%1 %2").arg(axisLetter).arg(pos);
+    QString command = QString("PA%1 = %2").arg(axisLetter).arg(pos);
     traceDebug() << "Invio comando:" << command;
 #ifdef FLAG_CN_PRESENT
     GReturn result = GCmd(handle(), command.toStdString().data());
@@ -680,10 +618,76 @@ bool GalilCNController::setPosition(GalilCNController::Axis a, GalilCNController
     traceEnter;
 
     QString axisLetter(GalilCNController::letterFromAxis(a));
-    QString command = QString("DP%1 %2").arg(axisLetter).arg(pos);
+    QString command = QString("DP%1 = %2").arg(axisLetter).arg(pos);
     traceDebug() << "Invio comando:" << command;
 #ifdef FLAG_CN_PRESENT
     GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+void GalilCNController::writeError(int errorCode) {
+
+    traceErr() << "Galil CN: codice errore:" << errorCode;
+    traceErr() << "Galil CN: descrizione errore:" << GalilCNControllerUtils::getErrorString(errorCode);
+
+}
+
+void GalilCNController::writeErrorIfExists(int errorCode) {
+
+    if (errorCode != G_NO_ERROR)
+        writeError(errorCode);
+
+}
+
+bool GalilCNController::getInputs(int bank, int& bankStatus) {
+
+    traceEnter;
+
+    if (!isInitialized) {
+        traceErr() << "Galil CN: il controller non e' stato inizializzato";
+        return false;
+    }
+
+    if (bank<0 || bank>6) {
+        traceErr() << "Galil CN: la funzione get inputs accetta un valore compreso fra 0 e 6";
+        return false;
+    }
+
+    QString command = "TI " + QString::number(bank);
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmdI(handle(), command.toStdString().c_str(), &bankStatus);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+    writeErrorIfExists(result);
+
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::tellSwitches(GalilCNController::Axis a, int& value) {
+
+    traceEnter;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = "TS" + axisLetter;
+
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmdI(handle(), command.toStdString().data(), &value);
 #else
     GReturn result = G_NO_ERROR;
 #endif
