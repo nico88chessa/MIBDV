@@ -27,7 +27,14 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     traceExit;
 
     GalilCNController test;
-    test.connect("192.168.1.19");
+    test.connect("169.254.12.10");
+
+    GDataRecord2103 record;
+    test.getRecord(record);
+
+    int inputStatus;
+    for (int i=0; i<9; ++i)
+        test.getInput(i, inputStatus);
 
     Settings::instance();
 

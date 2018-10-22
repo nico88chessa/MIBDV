@@ -11,11 +11,15 @@
 #include <utils/Logger.hpp>
 #include <devices/GalilCNControllerUtils.hpp>
 
+namespace PROGRAM_NAMESPACE {
+
 class GalilCNController {
     using Ptr = GalilCNController *;
     using ConstPtr = const GalilCNController *;
 
-    using positionType = double;
+    using posType = int;
+    using spdType = double;
+    using accType = double;
 
 public:
     enum class Axis { X, Y, Z, W };
@@ -53,8 +57,9 @@ private:
 private:
     inline GCon handle() { return *this->handler.data(); }
     inline void writeError(int errorCode);
+    inline void writeErrorIfExists(int errorCode);
     bool getInputs(int bank, int& bankStatus);
-    bool tellSwitched(Axis a, int& value);
+    bool tellSwitches(Axis a, int& value);
 
 public:
     GalilCNController();
@@ -68,7 +73,7 @@ public:
     bool getDigitalInput(int input, int& inputStatus);
     bool getDigitalOutput(int output, int& outputStatus);
     bool getAnalogInput(int analogInput, int& analogInputStatus);
-    bool getPosition(Axis a, positionType& pos);
+    bool getPosition(Axis a, posType& pos);
     bool isAxisInMotion(Axis a, bool& inMotion);
     bool isAxisPositionError(Axis a, bool& isPositionError);
     bool isMotorOff(Axis a, bool& isMotorOff);
@@ -77,7 +82,21 @@ public:
     bool isHomeAxis(Axis a, bool& isHome);
     bool checkAbort(bool& isAbort);
     bool setDigitalOutput(int output, bool value);
+    bool setSpeeds(Axis a, spdType speed);
+    bool setAccelerations(Axis a, accType acc, accType dec);
+    bool setMoveParameters(Axis a, spdType speed, accType acc, accType dec);
+    bool stopAxis(Axis a);
+    bool homingX(spdType speed, accType acc, accType dec);
+    bool homingY(spdType speed, accType acc, accType dec);
+    bool homingZ(spdType speed, accType acc, accType dec);
+    bool homingW(spdType speed, accType acc, accType dec);
+    bool home(Axis a, spdType speed, accType acc, accType dec);
+    bool startMoveAxis(Axis a);
+    bool moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
+    bool setPosition(Axis a, posType pos);
 
 };
+
+}
 
 #endif // GALILCNCONTROLLER_HPP

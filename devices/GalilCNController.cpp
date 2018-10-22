@@ -4,7 +4,15 @@ using namespace PROGRAM_NAMESPACE;
 
 void GalilCNController::writeError(int errorCode) {
 
-    traceErr() << "Descrizione errore:" << GalilCNControllerUtils::getErrorString(errorCode);
+    traceErr() << "chiamata funzione getInputs fallita; codice errore:" << errorCode;
+    traceErr() << "descrizione errore:" << GalilCNControllerUtils::getErrorString(errorCode);
+
+}
+
+void GalilCNController::writeErrorIfExists(int errorCode) {
+
+    if (errorCode != G_NO_ERROR)
+        writeError(errorCode);
 
 }
 
@@ -24,10 +32,13 @@ bool GalilCNController::getInputs(int bank, int& bankStatus) {
 
     QString command = "TI " + QString::number(bank);
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().c_str(), &bankStatus);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+    writeErrorIfExists(result);
 
-    if (result != G_NO_ERROR)
-        writeError(result);
 
     traceExit;
 
@@ -35,7 +46,7 @@ bool GalilCNController::getInputs(int bank, int& bankStatus) {
 
 }
 
-bool GalilCNController::tellSwitched(GalilCNController::Axis a, int& value) {
+bool GalilCNController::tellSwitches(GalilCNController::Axis a, int& value) {
 
     traceEnter;
 
@@ -43,10 +54,13 @@ bool GalilCNController::tellSwitched(GalilCNController::Axis a, int& value) {
     QString command = "TS" + axisLetter;
 
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().data(), &value);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     traceExit;
 
@@ -102,12 +116,12 @@ bool GalilCNController::connect(const QString& ip) {
     else
         handler.reset(new GCon);
 
-//    QString str = ip + " -d";
     GReturn result = GOpen(ip.toStdString().data(), handler.data());
+//    QString str = ip + " -d";
 //    GReturn result = GOpen(str.toStdString().data(), handle.data());
 
     /**
-     * NOTE NIC 2018/10/18
+     * NOTE NIC 2018/10/18 - metodo connect
      * se non riesco a connettermi al Galil, allora devo resettare il puntatore;
      * altrimenti nel distruttore viene lanciata un'eccezione
      **/
@@ -128,11 +142,14 @@ bool GalilCNController::getRecord(GDataRecord2103& record) {
     traceEnter;
 
     GDataRecord recordUnion;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GRecord(handle(), &recordUnion, G_QR);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
     record = recordUnion.dmc2103;
 
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     traceExit;
 
@@ -185,10 +202,13 @@ bool GalilCNController::getDigitalOutput(int output, int& outputStatus) {
 
     QString command = QString("MG @OUT[%1]").arg(output);
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().data(), &outputStatus);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     traceExit;
 
@@ -212,10 +232,13 @@ bool GalilCNController::getAnalogInput(int analogInput, int& analogInputStatus) 
 
     QString command = QString("MG @AN[%1]").arg(analogInput);
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().data(), &analogInputStatus);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     traceExit;
 
@@ -223,7 +246,7 @@ bool GalilCNController::getAnalogInput(int analogInput, int& analogInputStatus) 
 
 }
 
-bool GalilCNController::getPosition(GalilCNController::Axis a, GalilCNController::positionType& pos) {
+bool GalilCNController::getPosition(GalilCNController::Axis a, GalilCNController::posType& pos) {
 
     traceEnter;
 
@@ -232,7 +255,11 @@ bool GalilCNController::getPosition(GalilCNController::Axis a, GalilCNController
     int motorType;
 
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().data(), &motorType);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
     if (result != G_NO_ERROR){
         writeError(result);
@@ -247,10 +274,13 @@ bool GalilCNController::getPosition(GalilCNController::Axis a, GalilCNController
         command = "RP" + axisLetter; // step motor
 
     traceDebug() << "Invio comando:" << command;
-    result = GCmdD(handle(), command.toStdString().data(), &pos);
+#ifdef FLAG_CN_PRESENT
+    result = GCmdI(handle(), command.toStdString().data(), &pos);
+#else
+    result = G_NO_ERROR;
+#endif
 
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     traceDebug() << "Posizione asse" << axisLetter << ":" << pos;
 
@@ -265,7 +295,7 @@ bool GalilCNController::isAxisInMotion(GalilCNController::Axis a, bool& inMotion
     traceEnter;
 
     int value = 0;
-    if (!tellSwitched(a, value))
+    if (!tellSwitches(a, value))
         return false;
 
     inMotion = value & (0x01 << static_cast<int>(SwitchBitMask::AXIS_IN_MOTION));
@@ -281,7 +311,7 @@ bool GalilCNController::isAxisPositionError(GalilCNController::Axis a, bool& isP
     traceEnter;
 
     int value = 0;
-    if (!tellSwitched(a, value))
+    if (!tellSwitches(a, value))
         return false;
 
     isPositionError = value & (0x01 << static_cast<int>(SwitchBitMask::POSITION_ERROR_EXCEEDS_ERROR_LIMIT));
@@ -297,7 +327,7 @@ bool GalilCNController::isMotorOff(GalilCNController::Axis a, bool& isMotorOff) 
     traceEnter;
 
     int value = 0;
-    if (!tellSwitched(a, value))
+    if (!tellSwitches(a, value))
         return false;
 
     isMotorOff = value & (0x01 << static_cast<int>(SwitchBitMask::MOTOR_OFF));
@@ -313,7 +343,7 @@ bool GalilCNController::isForwardLimit(GalilCNController::Axis a, bool& isForwar
     traceEnter;
 
     int value = 0;
-    if (!tellSwitched(a, value))
+    if (!tellSwitches(a, value))
         return false;
 
     isForwardLimit = value & (0x01 << static_cast<int>(SwitchBitMask::FORWARD_LIMIT_SWITCH_INACTIVE));
@@ -329,7 +359,7 @@ bool GalilCNController::isBackwardLimit(GalilCNController::Axis a, bool& isForwa
     traceEnter;
 
     int value = 0;
-    if (!tellSwitched(a, value))
+    if (!tellSwitches(a, value))
         return false;
 
     isForwardLimit = value & (0x01 << static_cast<int>(SwitchBitMask::FORWARD_LIMIT_SWITCH_INACTIVE));
@@ -345,7 +375,7 @@ bool GalilCNController::isHomeAxis(GalilCNController::Axis a, bool& isHome) {
     traceEnter;
 
     int value = 0;
-    if (!tellSwitched(a, value))
+    if (!tellSwitches(a, value))
         return false;
 
     isHome = value & (0x01 << static_cast<int>(SwitchBitMask::HOME_SWITCH_STATUS));
@@ -363,11 +393,13 @@ bool GalilCNController::checkAbort(bool& isAbort) {
     QString command = "MG _AB";
     int value;
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().data(), &value);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
-
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     isAbort = value == 1;
 
@@ -394,12 +426,272 @@ bool GalilCNController::setDigitalOutput(int output, bool value) {
     command.append(QString::number(output));
 
     traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
     GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
-    if (result != G_NO_ERROR)
-        writeError(result);
+    writeErrorIfExists(result);
 
     traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::setSpeeds(GalilCNController::Axis a, GalilCNController::spdType speed) {
+
+    traceEnter;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = QString("SP%1 = %2").arg(axisLetter).arg(speed);
+
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::setAccelerations(GalilCNController::Axis a, GalilCNController::accType acc, GalilCNController::accType dec) {
+
+    traceEnter;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = QString("AC%1 = %2").arg(axisLetter).arg(acc);
+
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    if (result != G_NO_ERROR) {
+        writeError(result);
+        return false;
+    }
+
+    command = QString("DC%1 = %2").arg(axisLetter).arg(dec);
+    traceDebug() << "Invio comando:" << command;
+
+#ifdef FLAG_CN_PRESENT
+    result = GCmd(handle(), command.toStdString().data());
+#else
+    result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::setMoveParameters(GalilCNController::Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+
+    traceEnter;
+
+    if (!this->setSpeeds(a, speed)) return false;
+    if (!this->setAccelerations(a, acc, dec)) return false;
+
+    traceExit;
+
+    return true;
+
+}
+
+bool GalilCNController::stopAxis(GalilCNController::Axis a) {
+
+    traceEnter;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = QString("ST%1").arg(axisLetter);
+
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::homingX(GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+
+    traceEnter;
+
+    Axis a = Axis::X;
+    if (!this->setMoveParameters(a, speed, acc, dec))
+        return false;
+
+    QString command = QString("FE%1").arg(GalilCNController::letterFromAxis(a));
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::homingY(GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+
+    traceEnter;
+
+    Axis a = Axis::X;
+    if (!this->setMoveParameters(a, speed, acc, dec))
+        return false;
+
+    QString command = QString("HM%1").arg(GalilCNController::letterFromAxis(a));
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::homingZ(GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+
+    traceEnter;
+
+    Axis a = Axis::Z;
+    if (!this->setMoveParameters(a, speed, acc, dec))
+        return false;
+
+    QString command = QString("HM%1").arg(GalilCNController::letterFromAxis(a));
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::homingW(MAYBE_UNUSED GalilCNController::spdType speed, MAYBE_UNUSED GalilCNController::accType acc, MAYBE_UNUSED GalilCNController::accType dec) {
+
+    traceEnter;
+    // per ora il quarto asse non fa nulla
+    traceExit;
+
+    return true;
+
+}
+
+bool GalilCNController::home(GalilCNController::Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+
+    traceEnter;
+
+    bool result;
+    switch (a) {
+        case Axis::X: result = homingX(speed, acc, dec); break;
+        case Axis::Y: result = homingY(speed, acc, dec); break;
+        case Axis::Z: result = homingZ(speed, acc, dec); break;
+        case Axis::W: result = homingW(speed, acc, dec); break;
+    }
+    traceExit;
+
+    return result;
+
+}
+
+bool GalilCNController::startMoveAxis(GalilCNController::Axis a) {
+
+    traceEnter;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = QString("BG%1").arg(axisLetter);
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec) {
+
+    traceEnter;
+
+    if (!this->setMoveParameters(a, speed, acc, dec))
+        return false;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = QString("PA%1 %2").arg(axisLetter).arg(pos);
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
+    return result == G_NO_ERROR;
+
+}
+
+bool GalilCNController::setPosition(GalilCNController::Axis a, GalilCNController::posType pos) {
+
+    traceEnter;
+
+    QString axisLetter(GalilCNController::letterFromAxis(a));
+    QString command = QString("DP%1 %2").arg(axisLetter).arg(pos);
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
+
     return result == G_NO_ERROR;
 
 }
