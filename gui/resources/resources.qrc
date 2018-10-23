@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/mibdv">
+        <file alias="prova">icons/baseline_settings_black_24dp.png</file>
+    </qresource>
+</RCC>

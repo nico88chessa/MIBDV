@@ -1,0 +1,9 @@
+QWidget {
+    qproperty-focusPolicy: NoFocus;
+}
+
+QPushButton {
+    /*background-image: url(:/mibdv/prova);
+    background-repeat: no-repeat;
+    background-position: middle middle;*/
+}

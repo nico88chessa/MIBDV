@@ -8,6 +8,7 @@ SET(ORGANIZATION "DV")
 SET(LOG_PATH ${ORGANIZATION}/${PROJECT_NAME}/logs)
 STRING(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOW)
 SET(PROGRAM_NAMESPACE ${PROJECT_NAME_LOW})
+SET(STYLESHEET_PATH "${PROJECT_SOURCE_DIR}/gui/resources/qss") # solo per sviluppo
 
 # variabili di impostazione ambiente
 SET(FLAG_DEBUG_OPTION CACHE BOOL "Modalita' debug")
@@ -125,6 +126,7 @@ SET(PROJECT_QSS_PATH "" CACHE INTERNAL "path of qss files") # questo serve per s
 SET(PROJECT_FOLDERS
     "${PROJECT_SOURCE_DIR}/utils"
     "${PROJECT_SOURCE_DIR}/devices"
+    "${PROJECT_SOURCE_DIR}/gui"
 )
 
 FOREACH(item ${PROJECT_FOLDERS})

@@ -12,6 +12,8 @@ constexpr char ORGANIZATION[] = "@ORGANIZATION@";
 
 constexpr char LOG_PATH[] = "@LOG_PATH@";
 
+constexpr char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
+
 constexpr int MAX_NUM_LOG_FILES = 5;
 
 }
