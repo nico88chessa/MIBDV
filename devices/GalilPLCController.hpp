@@ -10,10 +10,11 @@
 #include <configure.h>
 #include <utils/Logger.hpp>
 #include <devices/GalilCNControllerUtils.hpp>
+#include <AbstractDevice.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilPLCController {
+class GalilPLCController : public AbstractDevice<GDataRecord47000_ENC> {
     using Ptr = GalilPLCController *;
     using ConstPtr = const GalilPLCController *;
 
@@ -22,6 +23,7 @@ class GalilPLCController {
 private:
     QScopedPointer<GCon> handler;
     bool isInitialized;
+    bool connected;
     int numDigitalInput;
     int numDigitalOutput;
     int numAnalogInput;
@@ -30,8 +32,8 @@ private:
 
 public:
     GalilPLCController();
-    ~GalilPLCController();
-    bool getRecord(GDataRecord47000_ENC& status);
+    virtual ~GalilPLCController();
+    bool getRecord(GDataRecord47000_ENC& status) const;
 
     void setupController(int numDigitalInput,
                          int numDigitalOutput,
@@ -41,13 +43,24 @@ public:
     bool getDigitalOutput(int output, int& outputStatus);
     bool getAnalogInput(int analogInput, anlType& analogInputStatus);
     bool setDigitalOutput(int output, bool value);
+    bool getTCCode(int& tcCode) const;
+    bool isConnected() const;
+    GDataRecord47000_ENC getStatus() const;
 
 private:
-    inline GCon handle() { return *this->handler.data(); }
-    inline void writeError(int errorCode);
-    inline void writeErrorIfExists(int errorCode);
+    inline GCon handle() const { return *this->handler.data(); }
+    inline void writeError(int errorCode) const;
+    inline void writeErrorIfExists(int errorCode) const;
     bool getInputs(int bank, int& bankStatus);
 
+};
+
+// type traits
+
+template <>
+struct isDevice<GalilPLCController> {
+    static constexpr bool value = true;
+    using statusType = GDataRecord47000_ENC;
 };
 
 }

@@ -16,7 +16,9 @@ class GalilCNControllerUtils {
 public:
     GalilCNControllerUtils();
 
-    static QString getErrorString(int error);
+    static QString getErrorDescription(int error);
+
+    static QString getTCDescription(int rcCode);
 };
 
 }

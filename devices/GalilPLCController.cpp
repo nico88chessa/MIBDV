@@ -3,7 +3,7 @@
 using namespace PROGRAM_NAMESPACE;
 
 GalilPLCController::GalilPLCController() :
-    handler(nullptr), isInitialized(false),
+    handler(nullptr), isInitialized(false), connected(false),
     numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0) {
 
     traceEnter;
@@ -27,7 +27,7 @@ GalilPLCController::~GalilPLCController() {
 
 }
 
-bool GalilPLCController::getRecord(GDataRecord47000_ENC& record) {
+bool GalilPLCController::getRecord(GDataRecord47000_ENC& record) const {
 
     traceEnter;
 
@@ -88,6 +88,8 @@ bool GalilPLCController::connect(const QString& ip) {
         writeError(result);
     }
 
+    this->connected = true;
+    traceInfo() << "Galil PLC: connessione avvenuta";
     traceExit;
 
     return result == G_NO_ERROR;
@@ -215,14 +217,51 @@ bool GalilPLCController::setDigitalOutput(int output, bool value) {
 
 }
 
-void GalilPLCController::writeError(int errorCode) {
+bool GalilPLCController::isConnected() const {
 
-    traceErr() << "Galil PLC: codice errore:" << errorCode;
-    traceErr() << "Galil PLC: descrizione errore:" << GalilCNControllerUtils::getErrorString(errorCode);
+    traceEnter;
+    traceExit;
+    return this->connected;
 
 }
 
-void GalilPLCController::writeErrorIfExists(int errorCode) {
+bool GalilPLCController::getTCCode(int& tcCode) const {
+
+    QString command = QString("TC 0");
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmdI(handle(), command.toStdString().data(), &tcCode);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+    writeErrorIfExists(result);
+
+    return result == G_NO_ERROR;
+
+}
+
+GDataRecord47000_ENC GalilPLCController::getStatus() const {
+
+    GDataRecord47000_ENC record;
+    writeErrorIfExists(this->getRecord(record));
+    return record;
+
+}
+
+void GalilPLCController::writeError(int errorCode) const {
+
+    traceErr() << "Galil PLC: codice errore:" << errorCode;
+    traceErr() << "Galil PLC: descrizione errore:" << GalilCNControllerUtils::getErrorDescription(errorCode);
+
+    if (errorCode == G_BAD_RESPONSE_QUESTION_MARK) {
+        int tcCode;
+        this->getTCCode(tcCode);
+        traceErr() << "Galil PLC: dettagli errore:" << GalilCNControllerUtils::getTCDescription(tcCode);
+    };
+
+}
+
+void GalilPLCController::writeErrorIfExists(int errorCode) const {
 
     if (errorCode != G_NO_ERROR)
         writeError(errorCode);

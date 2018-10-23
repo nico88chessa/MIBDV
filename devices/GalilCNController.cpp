@@ -3,7 +3,7 @@
 using namespace PROGRAM_NAMESPACE;
 
 GalilCNController::GalilCNController() :
-    handler(nullptr), isInitialized(false),
+    handler(nullptr), isInitialized(false), connected(false),
     numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0) {
 
     traceEnter;
@@ -27,7 +27,7 @@ GalilCNController::~GalilCNController() {
 
 }
 
-bool GalilCNController::getRecord(GDataRecord2103& record) {
+bool GalilCNController::getRecord(GDataRecord2103& record) const {
 
     traceEnter;
 
@@ -88,6 +88,7 @@ bool GalilCNController::connect(const QString& ip) {
         writeError(result);
     }
 
+    this->connected = true;
     traceInfo() << "Galil CN: connessione avvenuta";
     traceExit;
 
@@ -634,14 +635,51 @@ bool GalilCNController::setPosition(GalilCNController::Axis a, GalilCNController
 
 }
 
-void GalilCNController::writeError(int errorCode) {
+bool GalilCNController::isConnected() const {
 
-    traceErr() << "Galil CN: codice errore:" << errorCode;
-    traceErr() << "Galil CN: descrizione errore:" << GalilCNControllerUtils::getErrorString(errorCode);
+    traceEnter;
+    traceExit;
+    return this->connected;
 
 }
 
-void GalilCNController::writeErrorIfExists(int errorCode) {
+bool GalilCNController::getTCCode(int& tcCode) const {
+
+    QString command = QString("TC 0");
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmdI(handle(), command.toStdString().data(), &tcCode);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+    writeErrorIfExists(result);
+
+    return result == G_NO_ERROR;
+
+}
+
+GDataRecord2103 GalilCNController::getStatus() const {
+
+    GDataRecord2103 record;
+    writeErrorIfExists(this->getRecord(record));
+    return record;
+
+}
+
+void GalilCNController::writeError(int errorCode) const {
+
+    traceErr() << "Galil CN: codice errore:" << errorCode;
+    traceErr() << "Galil PLC: descrizione errore:" << GalilCNControllerUtils::getErrorDescription(errorCode);
+
+    if (errorCode == G_BAD_RESPONSE_QUESTION_MARK) {
+        int tcCode;
+        this->getTCCode(tcCode);
+        traceErr() << "Galil PLC: dettagli errore:" << GalilCNControllerUtils::getTCDescription(tcCode);
+    };
+
+}
+
+void GalilCNController::writeErrorIfExists(int errorCode) const {
 
     if (errorCode != G_NO_ERROR)
         writeError(errorCode);

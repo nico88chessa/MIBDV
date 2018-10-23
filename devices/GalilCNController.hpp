@@ -10,10 +10,11 @@
 #include <configure.h>
 #include <utils/Logger.hpp>
 #include <devices/GalilCNControllerUtils.hpp>
+#include <devices/AbstractDevice.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNController {
+class GalilCNController : public AbstractDevice<GDataRecord2103> {
     using Ptr = GalilCNController *;
     using ConstPtr = const GalilCNController *;
 
@@ -28,6 +29,7 @@ public:
 private:
     QScopedPointer<GCon> handler;
     bool isInitialized;
+    bool connected;
     int numDigitalInput;
     int numDigitalOutput;
     int numAnalogInput;
@@ -57,13 +59,13 @@ private:
 
 public:
     GalilCNController();
-    ~GalilCNController();
+    virtual ~GalilCNController();
 
     void setupController(int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput);
     bool connect(const QString& ip);
-    bool getRecord(GDataRecord2103& record);
+    bool getRecord(GDataRecord2103& record) const;
     bool getDigitalInput(int input, int& inputStatus);
     bool getDigitalOutput(int output, int& outputStatus);
     bool getAnalogInput(int analogInput, anlType& analogInputStatus);
@@ -88,14 +90,26 @@ public:
     bool startMoveAxis(Axis a);
     bool moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
     bool setPosition(Axis a, posType pos);
+    bool getTCCode(int& tcCode) const;
+    bool isConnected() const;
+    GDataRecord2103 getStatus() const;
 
 private:
-    inline GCon handle() { return *this->handler.data(); }
-    inline void writeError(int errorCode);
-    inline void writeErrorIfExists(int errorCode);
+    inline GCon handle() const { return *this->handler.data(); }
+    inline void writeError(int errorCode) const;
+    inline void writeErrorIfExists(int errorCode) const;
     bool getInputs(int bank, int& bankStatus);
     bool tellSwitches(Axis a, int& value);
 
+
+};
+
+// type traits
+
+template <>
+struct isDevice<GalilCNController> {
+    static constexpr bool value = true;
+    using statusType = GDataRecord2103;
 };
 
 }

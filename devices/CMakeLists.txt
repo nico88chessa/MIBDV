@@ -1,4 +1,5 @@
 SET(ITEMS
+    AbstractDevice
     GalilCNController
     GalilPLCController
     GalilCNControllerUtils
