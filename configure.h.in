@@ -14,6 +14,8 @@ constexpr char LOG_PATH[] = "@LOG_PATH@";
 
 constexpr char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
 
+constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16;
+
 constexpr int MAX_NUM_LOG_FILES = 5;
 
 }

@@ -10,11 +10,11 @@
 #include <configure.h>
 #include <utils/Logger.hpp>
 #include <devices/GalilControllerUtils.hpp>
-#include <AbstractDevice.hpp>
+#include "AbstractPLC.hpp"
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilPLCController : public AbstractDevice<GDataRecord47000_ENC> {
+class GalilPLCController : public AbstractPLC<GDataRecord47000_ENC, int> {
     using Ptr = GalilPLCController *;
     using ConstPtr = const GalilPLCController *;
 
@@ -33,29 +33,36 @@ private:
 public:
     GalilPLCController();
     virtual ~GalilPLCController();
-    bool getRecord(GDataRecord47000_ENC& status) const;
+    int getRecord(GDataRecord47000_ENC& status) const;
 
     void setupController(int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput);
     bool connect(const QString& ip);
-    bool getDigitalInput(int input, int& inputStatus);
-    bool getDigitalOutput(int output, int& outputStatus);
-    bool getAnalogInput(int analogInput, anlType& analogInputStatus);
-    bool setDigitalOutput(int output, bool value);
-    bool getTCCode(int& tcCode) const;
+    virtual int getDigitalInput(int input, int& inputStatus);
+    virtual int getDigitalOutput(int output, int& outputStatus);
+    virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
+    virtual int setDigitalOutput(int output, bool value);
+    int getTCCode(int& tcCode) const;
     bool isConnected() const;
-    GDataRecord47000_ENC getStatus() const;
+    virtual GDataRecord47000_ENC getStatus() const;
 
 private:
     inline GCon handle() const { return *this->handler.data(); }
     inline void writeError(int errorCode) const;
     inline void writeErrorIfExists(int errorCode) const;
-    bool getInputs(int bank, int& bankStatus);
+    int getInputs(int bank, int& bankStatus);
 
 };
 
 // type traits
+
+template <>
+struct isPLC<GalilPLCController> {
+    static constexpr bool value = true;
+    using statusType = GDataRecord47000_ENC;
+    using errorType = int;
+};
 
 template <>
 struct isDevice<GalilPLCController> {

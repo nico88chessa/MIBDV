@@ -10,21 +10,21 @@
 #include <configure.h>
 #include <utils/Logger.hpp>
 #include <devices/GalilControllerUtils.hpp>
-#include <devices/AbstractDevice.hpp>
+#include <devices/AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNController : public AbstractDevice<GDataRecord2103> {
+class GalilCNController : public AbstractCN<GDataRecord2103, int> {
     using Ptr = GalilCNController *;
     using ConstPtr = const GalilCNController *;
 
-    using posType = int;
-    using spdType = double;
-    using accType = double;
-    using anlType = double;
+//    using posType = int;
+//    using spdType = double;
+//    using accType = double;
+//    using anlType = double;
 
-public:
-    enum class Axis { X, Y, Z, W };
+//public:
+//    enum class Axis { X, Y, Z, W };
 
 private:
     QScopedPointer<GCon> handler;
@@ -65,46 +65,53 @@ public:
                          int numDigitalOutput,
                          int numAnalogInput);
     bool connect(const QString& ip);
-    bool getRecord(GDataRecord2103& record) const;
-    bool getDigitalInput(int input, int& inputStatus);
-    bool getDigitalOutput(int output, int& outputStatus);
-    bool getAnalogInput(int analogInput, anlType& analogInputStatus);
-    bool getPosition(Axis a, posType& pos);
-    bool isAxisInMotion(Axis a, bool& inMotion);
-    bool isAxisPositionError(Axis a, bool& isPositionError);
-    bool isMotorOff(Axis a, bool& isMotorOff);
-    bool isForwardLimit(Axis a, bool& isForwardLimit);
-    bool isBackwardLimit(Axis a, bool& isForwardLimit);
-    bool isHomeAxis(Axis a, bool& isHome);
+    int getRecord(GDataRecord2103& record) const;
+    virtual int getDigitalInput(int input, int& inputStatus);
+    virtual int getDigitalOutput(int output, int& outputStatus);
+    virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
+    virtual int getPosition(Axis a, posType& pos);
+    virtual int isAxisInMotion(Axis a, bool& inMotion);
+    virtual int isAxisPositionError(Axis a, bool& isPositionError);
+    virtual int isMotorOff(Axis a, bool& isMotorOff);
+    virtual int isForwardLimit(Axis a, bool& isForwardLimit);
+    virtual int isBackwardLimit(Axis a, bool& isForwardLimit);
+    virtual int isHomeAxis(Axis a, bool& isHome);
     bool checkAbort(bool& isAbort);
-    bool setDigitalOutput(int output, bool value);
-    bool setSpeeds(Axis a, spdType speed);
-    bool setAccelerations(Axis a, accType acc, accType dec);
-    bool setMoveParameters(Axis a, spdType speed, accType acc, accType dec);
-    bool stopAxis(Axis a);
-    bool homingX(spdType speed, accType acc, accType dec);
-    bool homingY(spdType speed, accType acc, accType dec);
-    bool homingZ(spdType speed, accType acc, accType dec);
-    bool homingW(spdType speed, accType acc, accType dec);
-    bool home(Axis a, spdType speed, accType acc, accType dec);
-    bool startMoveAxis(Axis a);
-    bool moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
-    bool setPosition(Axis a, posType pos);
-    bool getTCCode(int& tcCode) const;
+    virtual int setDigitalOutput(int output, bool value);
+    virtual int setSpeeds(Axis a, spdType speed);
+    virtual int setAccelerations(Axis a, accType acc, accType dec);
+    virtual int setMoveParameters(Axis a, spdType speed, accType acc, accType dec);
+    virtual int stopAxis(Axis a);
+    virtual int homingX(spdType speed, accType acc, accType dec);
+    virtual int homingY(spdType speed, accType acc, accType dec);
+    virtual int homingZ(spdType speed, accType acc, accType dec);
+    virtual int homingW(spdType speed, accType acc, accType dec);
+    virtual int home(Axis a, spdType speed, accType acc, accType dec);
+    virtual int startMoveAxis(Axis a);
+    virtual int moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
+    virtual int setPosition(Axis a, posType pos);
+    int getTCCode(int& tcCode) const;
     bool isConnected() const;
-    GDataRecord2103 getStatus() const;
+    virtual GDataRecord2103 getStatus() const;
 
 private:
     inline GCon handle() const { return *this->handler.data(); }
     inline void writeError(int errorCode) const;
     inline void writeErrorIfExists(int errorCode) const;
-    bool getInputs(int bank, int& bankStatus);
-    bool tellSwitches(Axis a, int& value);
+    int getInputs(int bank, int& bankStatus);
+    int tellSwitches(Axis a, int& value);
 
 
 };
 
 // type traits
+
+template <>
+struct isCN<GalilCNController> {
+    static constexpr bool value = true;
+    using statusType = GDataRecord2103;
+    using errorType = int;
+};
 
 template <>
 struct isDevice<GalilCNController> {

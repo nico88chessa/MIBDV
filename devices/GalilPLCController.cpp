@@ -27,7 +27,7 @@ GalilPLCController::~GalilPLCController() {
 
 }
 
-bool GalilPLCController::getRecord(GDataRecord47000_ENC& record) const {
+int GalilPLCController::getRecord(GDataRecord47000_ENC& record) const {
 
     traceEnter;
 
@@ -43,7 +43,7 @@ bool GalilPLCController::getRecord(GDataRecord47000_ENC& record) const {
 
     traceExit;
 
-    return result == G_NO_ERROR;
+    return result;
 
 }
 
@@ -83,6 +83,7 @@ bool GalilPLCController::connect(const QString& ip) {
      * altrimenti nel distruttore viene lanciata un'eccezione
      **/
 
+
     if (result != G_NO_ERROR) {
         handler.reset();
         writeError(result);
@@ -96,23 +97,22 @@ bool GalilPLCController::connect(const QString& ip) {
 
 }
 
-bool GalilPLCController::getDigitalInput(int input, int& inputStatus) {
+int GalilPLCController::getDigitalInput(int input, int& inputStatus) {
 
     traceEnter;
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
-        return false;
+        return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
     if (input<1 || input>numDigitalInput) {
         traceErr() << "Galil PLC: input richiesto fuori dal range del device";
-        return false;
+        return G_CUSTOM_PLC_DIGITAL_INPUT_OUT_OF_RANGE;
     }
 
     int bankStatus;
-    if (!getInputs((input-1)/NUM_IO_PER_BANK, bankStatus))
-        return false;
+    int result = getInputs((input-1)/NUM_IO_PER_BANK, bankStatus);
 
     traceDebug() << "La funzione getInputs ha tornato il valore:" << bankStatus;
     inputStatus = (bankStatus & (0x01 << (input - 1))) >> (input - 1);
@@ -121,22 +121,22 @@ bool GalilPLCController::getDigitalInput(int input, int& inputStatus) {
 
     traceExit;
 
-    return true;
+    return result;
 
 }
 
-bool GalilPLCController::getDigitalOutput(int output, int& outputStatus) {
+int GalilPLCController::getDigitalOutput(int output, int& outputStatus) {
 
     traceEnter;
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
-        return false;
+        return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
     if (output<1 || output>numDigitalOutput) {
         traceErr() << "Galil PLC: output richiesto fuori dal range del device";
-        return false;
+        return G_CUSTOM_PLC_DIGITAL_OUTPUT_OUT_OF_RANGE;
     }
 
     QString command = QString("MG @OUT[%1]").arg(output);
@@ -151,22 +151,22 @@ bool GalilPLCController::getDigitalOutput(int output, int& outputStatus) {
 
     traceExit;
 
-    return result == G_NO_ERROR;
+    return result;
 
 }
 
-bool GalilPLCController::getAnalogInput(int analogInput, anlType& analogInputStatus) {
+int GalilPLCController::getAnalogInput(int analogInput, anlType& analogInputStatus) {
 
     traceEnter;
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
-        return false;
+        return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
     if (analogInput<1 || analogInput>numAnalogInput) {
         traceErr() << "Galil PLC: output richiesto fuori dal range del device";
-        return false;
+        return G_CUSTOM_PLC_ANALOGIC_INPUT_OUT_OF_RANGE;
     }
 
     QString command = QString("MG @AN[%1]").arg(analogInput);
@@ -181,22 +181,22 @@ bool GalilPLCController::getAnalogInput(int analogInput, anlType& analogInputSta
 
     traceExit;
 
-    return result == G_NO_ERROR;
+    return result;
 
 }
 
-bool GalilPLCController::setDigitalOutput(int output, bool value) {
+int GalilPLCController::setDigitalOutput(int output, bool value) {
 
     traceEnter;
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
-        return false;
+        return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
     if (output<1 || output>numDigitalOutput) {
         traceErr() << "Galil PLC: input richiesto fuori dal range del device";
-        return false;
+        return G_CUSTOM_PLC_DIGITAL_OUTPUT_OUT_OF_RANGE;
     }
 
     QString command = value ? "SB " : "CB ";
@@ -213,7 +213,7 @@ bool GalilPLCController::setDigitalOutput(int output, bool value) {
 
     traceExit;
 
-    return result == G_NO_ERROR;
+    return result;
 
 }
 
@@ -225,7 +225,7 @@ bool GalilPLCController::isConnected() const {
 
 }
 
-bool GalilPLCController::getTCCode(int& tcCode) const {
+int GalilPLCController::getTCCode(int& tcCode) const {
 
     QString command = QString("TC 0");
     traceDebug() << "Invio comando:" << command;
@@ -236,7 +236,7 @@ bool GalilPLCController::getTCCode(int& tcCode) const {
 #endif
     writeErrorIfExists(result);
 
-    return result == G_NO_ERROR;
+    return result;
 
 }
 
@@ -268,18 +268,18 @@ void GalilPLCController::writeErrorIfExists(int errorCode) const {
 
 }
 
-bool GalilPLCController::getInputs(int bank, int& bankStatus) {
+int GalilPLCController::getInputs(int bank, int& bankStatus) {
 
     traceEnter;
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
-        return false;
+        return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
     if (bank<0 || bank>6) {
         traceErr() << "Galil PLC: la funzione get inputs accetta un valore compreso fra 0 e 6";
-        return false;
+        return G_CUSTOM_PLC_DIGITAL_INPUT_OUT_OF_RANGE;
     }
 
     QString command = "TI " + QString::number(bank);
@@ -294,6 +294,6 @@ bool GalilPLCController::getInputs(int bank, int& bankStatus) {
 
     traceExit;
 
-    return result == G_NO_ERROR;
+    return result;
 
 }

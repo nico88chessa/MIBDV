@@ -2,7 +2,26 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-GalilControllerUtils::GalilControllerUtils() { }
+QString GalilControllerUtils::decodeError(int error) {
+
+    QString value = "";
+    value = getErrorDescription(error);
+
+    if (QString("internal error").compare(value) == 0)
+        value = "";
+
+    if (value.isEmpty())
+        value = getTCDescription(error);
+
+    if (value.isEmpty())
+        value = getCustomErrorDescription(error);
+
+    if (value.isEmpty())
+        value = "Error unknown";
+
+    return value;
+
+}
 
 QString GalilControllerUtils::getErrorDescription(int error) {
 
@@ -139,9 +158,27 @@ QString GalilControllerUtils::getTCDescription(int rcCode) {
         case 134: value = "All motors must be in MO for this command"; break;
         case 135: value = "Motor must be in MO"; break;
         case 164: value = "Exceeded maximum sequence length, BGS or BGT is required"; break;
-        default: value = "Errore sconosciuto"; break;
+        default: value = ""; break;
     }
 
+    return value;
+
+}
+
+QString GalilControllerUtils::getCustomErrorDescription(int errorCode) {
+
+    QString value = "";
+    switch (errorCode) {
+        case G_CUSTOM_CN_NON_INIZIALIZZATO: value = "CN has not been initialized"; break;
+        case G_CUSTOM_CN_DIGITAL_INPUT_OUT_OF_RANGE: value = "CN digital input out of range"; break;
+        case G_CUSTOM_CN_DIGITAL_OUTPUT_OUT_OF_RANGE: value = "CN digital output out of range"; break;
+        case G_CUSTOM_CN_ANALOGIC_INPUT_OUT_OF_RANGE: value = "CN analogic input out of range"; break;
+        case G_CUSTOM_PLC_NON_INIZIALIZZATO: value = "PLC has not been initialized"; break;
+        case G_CUSTOM_PLC_DIGITAL_INPUT_OUT_OF_RANGE: value = "PLC digital input out of range"; break;
+        case G_CUSTOM_PLC_DIGITAL_OUTPUT_OUT_OF_RANGE: value = "PLC digital output out of range"; break;
+        case G_CUSTOM_PLC_ANALOGIC_INPUT_OUT_OF_RANGE: value = "PLC analogic input out of range"; break;
+        default: value = ""; break;
+    }
     return value;
 
 }

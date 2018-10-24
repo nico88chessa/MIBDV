@@ -12,9 +12,7 @@ class AbstractDevice {
     using ConstPtr = const AbstractDevice*;
 
 public:
-
     virtual bool isConnected() const = 0;
-
     virtual S getStatus() const = 0;
 
 };
