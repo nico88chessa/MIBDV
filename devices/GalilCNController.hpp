@@ -9,7 +9,7 @@
 
 #include <configure.h>
 #include <utils/Logger.hpp>
-#include <devices/GalilCNControllerUtils.hpp>
+#include <devices/GalilControllerUtils.hpp>
 #include <devices/AbstractDevice.hpp>
 
 namespace PROGRAM_NAMESPACE {

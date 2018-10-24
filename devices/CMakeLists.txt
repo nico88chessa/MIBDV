@@ -2,7 +2,7 @@ SET(ITEMS
     AbstractDevice
     GalilCNController
     GalilPLCController
-    GalilCNControllerUtils
+    GalilControllerUtils
     )
 
 FOREACH(ITEM ${ITEMS})

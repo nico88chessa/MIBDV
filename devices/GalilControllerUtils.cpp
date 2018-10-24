@@ -1,10 +1,10 @@
-#include "GalilCNControllerUtils.hpp"
+#include "GalilControllerUtils.hpp"
 
 using namespace PROGRAM_NAMESPACE;
 
-GalilCNControllerUtils::GalilCNControllerUtils() { }
+GalilControllerUtils::GalilControllerUtils() { }
 
-QString GalilCNControllerUtils::getErrorDescription(int error) {
+QString GalilControllerUtils::getErrorDescription(int error) {
 
     constexpr GSize size = G_SMALL_BUFFER;
     char description[size];
@@ -46,7 +46,7 @@ QString GalilCNControllerUtils::getErrorDescription(int error) {
 
 }
 
-QString GalilCNControllerUtils::getTCDescription(int rcCode) {
+QString GalilControllerUtils::getTCDescription(int rcCode) {
 
     QString value = "";
     switch (rcCode) {

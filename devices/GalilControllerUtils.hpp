@@ -1,5 +1,5 @@
-#ifndef GALILCNCONTROLLERUTILS_HPP
-#define GALILCNCONTROLLERUTILS_HPP
+#ifndef GALILCONTROLLERUTILS_HPP
+#define GALILCONTROLLERUTILS_HPP
 
 #include <gclibo.h>
 #include <gclib_errors.h>
@@ -11,10 +11,10 @@
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNControllerUtils {
+class GalilControllerUtils {
 
 public:
-    GalilCNControllerUtils();
+    GalilControllerUtils();
 
     static QString getErrorDescription(int error);
 
@@ -23,4 +23,4 @@ public:
 
 }
 
-#endif // GALILCNCONTROLLERUTILS_HPP
+#endif // GALILCONTROLLERUTILS_HPP

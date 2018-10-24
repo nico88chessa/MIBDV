@@ -251,12 +251,12 @@ GDataRecord47000_ENC GalilPLCController::getStatus() const {
 void GalilPLCController::writeError(int errorCode) const {
 
     traceErr() << "Galil PLC: codice errore:" << errorCode;
-    traceErr() << "Galil PLC: descrizione errore:" << GalilCNControllerUtils::getErrorDescription(errorCode);
+    traceErr() << "Galil PLC: descrizione errore:" << GalilControllerUtils::getErrorDescription(errorCode);
 
     if (errorCode == G_BAD_RESPONSE_QUESTION_MARK) {
         int tcCode;
         this->getTCCode(tcCode);
-        traceErr() << "Galil PLC: dettagli errore:" << GalilCNControllerUtils::getTCDescription(tcCode);
+        traceErr() << "Galil PLC: dettagli errore:" << GalilControllerUtils::getTCDescription(tcCode);
     };
 
 }
