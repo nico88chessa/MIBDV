@@ -143,3 +143,4 @@ Settings& Settings::instance() {
     return instance;
 
 }
+

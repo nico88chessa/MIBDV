@@ -8,7 +8,7 @@
 #include <QScopedPointer>
 
 #include <configure.h>
-#include <utils/Logger.hpp>
+#include <Logger.hpp>
 #include <devices/GalilControllerUtils.hpp>
 #include "AbstractPLC.hpp"
 

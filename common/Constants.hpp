@@ -6,6 +6,20 @@
 namespace PROGRAM_NAMESPACE {
 
 using real = float;
+using analogicReal = double;
+
+enum class DeviceType {
+    CN,
+    PLC,
+};
+
+enum class ElementType {
+    POWER,
+    CYCLE,
+    NOT_VALID,
+};
+
+constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16;
 
 namespace settings {
 

@@ -124,7 +124,8 @@ SET(UPDATE_TS CACHE BOOL "") # questo lo setto qui cosi poi lo posso modificare 
 SET(PROJECT_QSS_PATH "" CACHE INTERNAL "path of qss files") # questo serve per sviluppare il CSS a runtime senza usare il file .qrc (binario)
 
 SET(PROJECT_FOLDERS
-    "${PROJECT_SOURCE_DIR}/utils"
+    "${PROJECT_SOURCE_DIR}/data"
+    "${PROJECT_SOURCE_DIR}/common"
     "${PROJECT_SOURCE_DIR}/devices"
     "${PROJECT_SOURCE_DIR}/gui"
 )

@@ -1,13 +1,8 @@
 SET(ITEMS
-    AbstractDevice
-    AbstractPLC
-    AbstractCN
-    GalilCNController
-    GalilPLCController
-    GalilControllerUtils
     DigitalInput
     DigitalOutput
     AnalogicInput
+    Error
     )
 
 FOREACH(ITEM ${ITEMS})

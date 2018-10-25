@@ -2,6 +2,7 @@ SET(ITEMS
     "Logger"
     "Settings"
     "Constants"
+    "ErrorSignaler"
     )
 
 FOREACH(ITEM ${ITEMS})

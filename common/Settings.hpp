@@ -3,10 +3,14 @@
 
 #include <QSettings>
 #include <QString>
+#include <QList>
 
 #include <configure.h>
 #include <Constants.hpp>
 #include <Logger.hpp>
+#include <data/DigitalInput.hpp>
+#include <data/DigitalOutput.hpp>
+#include <data/AnalogicInput.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -58,6 +62,10 @@ public:
     real getAxisZOperativeAccMms2() const { return axisZOperativeAccMms2; }
     real getAxisZOperativeDecMms2() const { return axisZOperativeDecMms2; }
 
+    QList<DigitalInput> getDigitalInputs() const { return digitalInputs; }
+    QList<DigitalOutput> getDigitalOutputs() const { return digitalOutputs; }
+    QList<AnalogicInput> getAnalogicInputs() const { return analogicInputs; }
+
 private:
     int axisXStepPerMm;
     int axisXMinPosMm;
@@ -91,6 +99,10 @@ private:
     real axisZOperativeSpeedMms;
     real axisZOperativeAccMms2;
     real axisZOperativeDecMms2;
+
+    QList<DigitalInput> digitalInputs;
+    QList<DigitalOutput> digitalOutputs;
+    QList<AnalogicInput> analogicInputs;
 
 };
 

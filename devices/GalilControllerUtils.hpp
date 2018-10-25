@@ -5,6 +5,7 @@
 #include <gclib_errors.h>
 
 #include <configure.h>
+#include <Constants.hpp>
 #include <Logger.hpp>
 
 #include <QString>
