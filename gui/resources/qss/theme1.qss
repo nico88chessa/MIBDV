@@ -3,7 +3,8 @@ QWidget {
 }
 
 QPushButton {
-    /*background-image: url(:/mibdv/prova);
+/*    background-image: url(:/mibdv/prova);*/
     background-repeat: no-repeat;
-    background-position: middle middle;*/
+    background-position: middle middle;
+    border-color: black;
 }
