@@ -3,6 +3,7 @@ SET(ITEMS
     "Settings"
     "Constants"
     "ErrorSignaler"
+    "ErrorManager"
     )
 
 FOREACH(ITEM ${ITEMS})

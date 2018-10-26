@@ -21,6 +21,8 @@ public:
     using Ptr = Error*;
     using ConstPtr = Error*;
 
+    friend inline bool operator==(const Error& lhs, const Error& rhs);
+
 private:
     // TODO NIC 25/10/2018: vedere come creare gli errori
     int deviceKey;
@@ -40,6 +42,11 @@ public:
 
 };
 
+bool operator==(const Error& lhs, const Error& rhs) {
+    return (lhs.errorId == rhs.errorId) &&
+           (lhs.deviceKey == rhs.deviceKey);
+
+}
 
 }
 

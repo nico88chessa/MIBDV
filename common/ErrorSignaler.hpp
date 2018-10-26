@@ -16,18 +16,20 @@ public:
     using Ptr = ErrorSignaler*;
     using ConstPtr = ErrorSignaler*;
 
-protected:
+private:
     QList<Error> errors;
 
 public:
     explicit ErrorSignaler(QObject* parent = nullptr);
 
-    virtual void addError(const Error& err) = 0;
-    virtual void addErrors(const QList<Error>& errors) = 0;
-    virtual void removeError(const Error& err) = 0;
+    virtual void addError(const Error& err, bool notify = true);
+    virtual void addErrors(const QList<Error>& errors);
+    virtual void removeError(const Error& err);
+    virtual void removeAllErrors();
 
 protected:
     virtual void notifyErrors();
+    virtual bool isErrorPresent(const Error& err);
 
 signals:
     void signalErrorListUpdate(QList<Error> list);

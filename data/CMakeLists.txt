@@ -3,6 +3,8 @@ SET(ITEMS
     DigitalOutput
     AnalogicInput
     Error
+    GalilCNStatus
+    GalilPLCStatus
     )
 
 FOREACH(ITEM ${ITEMS})
