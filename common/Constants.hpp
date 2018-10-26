@@ -8,6 +8,11 @@ namespace PROGRAM_NAMESPACE {
 using real = float;
 using analogicReal = double;
 
+enum class DeviceKey : int {
+    GALIL_CN,
+    GALIL_PLC
+};
+
 enum class DeviceType {
     CN,
     PLC,

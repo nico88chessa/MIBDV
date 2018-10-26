@@ -15,16 +15,11 @@
 namespace PROGRAM_NAMESPACE {
 
 class GalilCNController : public AbstractCN<GDataRecord2103, int> {
+public:
     using Ptr = GalilCNController *;
     using ConstPtr = const GalilCNController *;
 
-//    using posType = int;
-//    using spdType = double;
-//    using accType = double;
-//    using anlType = double;
-
-//public:
-//    enum class Axis { X, Y, Z, W };
+    static constexpr DeviceKey deviceKey = DeviceKey::GALIL_CN;
 
 private:
     QScopedPointer<GCon> handler;

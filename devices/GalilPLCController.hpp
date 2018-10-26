@@ -15,8 +15,11 @@
 namespace PROGRAM_NAMESPACE {
 
 class GalilPLCController : public AbstractPLC<GDataRecord47000_ENC, int> {
+public:
     using Ptr = GalilPLCController *;
     using ConstPtr = const GalilPLCController *;
+
+    static constexpr DeviceKey deviceKey = DeviceKey::GALIL_PLC;
 
     using anlType = double;
 

@@ -15,6 +15,7 @@
 namespace PROGRAM_NAMESPACE {
 
 class Settings {
+public:
     using Ptr = Settings*;
     using ConstPtr = const Settings*;
 

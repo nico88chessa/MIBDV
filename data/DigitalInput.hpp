@@ -9,6 +9,7 @@
 namespace PROGRAM_NAMESPACE {
 
 class DigitalInput {
+public:
     using Ptr = DigitalInput*;
     using ConstPtr = const DigitalInput*;
 

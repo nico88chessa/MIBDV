@@ -12,6 +12,7 @@ namespace PROGRAM_NAMESPACE {
 class ErrorSignaler : public QObject {
     Q_OBJECT
 
+public:
     using Ptr = ErrorSignaler*;
     using ConstPtr = ErrorSignaler*;
 
@@ -19,14 +20,14 @@ protected:
     QList<Error> errors;
 
 public:
-    explicit ErrorSignaler(QObject* parent = nullptr) : QObject(parent) { }
+    explicit ErrorSignaler(QObject* parent = nullptr);
 
     virtual void addError(const Error& err) = 0;
     virtual void addErrors(const QList<Error>& errors) = 0;
     virtual void removeError(const Error& err) = 0;
 
 protected:
-    virtual void notifyErrors() { emit signalErrorListUpdate(errors); }
+    virtual void notifyErrors();
 
 signals:
     void signalErrorListUpdate(QList<Error> list);

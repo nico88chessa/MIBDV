@@ -9,6 +9,7 @@
 namespace PROGRAM_NAMESPACE {
 
 class AnalogicInput {
+public:
     using Ptr = AnalogicInput*;
     using ConstPtr = const AnalogicInput*;
 

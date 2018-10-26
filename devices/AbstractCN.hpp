@@ -8,7 +8,7 @@ namespace PROGRAM_NAMESPACE {
 
 template <typename S, typename E>
 class AbstractCN : public AbstractDevice<S> {
-
+public:
     using Ptr = AbstractCN*;
     using ConstPtr = const AbstractCN*;
 
