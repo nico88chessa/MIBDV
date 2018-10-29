@@ -17,20 +17,20 @@ private:
     QString name;
     int channel;
     bool invertLogic;
-    DeviceType device;
+    DeviceKey device;
     bool isAlarm;
-    ElementType elementType;
+    IOType elementType;
 
 public:
     DigitalInput(QString name, int channel, bool invertLogic,
-                 DeviceType device, bool isAlarm, ElementType elementType);
+                 DeviceKey device, bool isAlarm, IOType elementType);
 
     QString getName() const;
     int getChannel() const;
     bool getInvertLogic() const;
-    DeviceType getDevice() const;
+    DeviceKey getDevice() const;
     bool getIsAlarm() const;
-    ElementType getElementType() const;
+    IOType getElementType() const;
 };
 
 }

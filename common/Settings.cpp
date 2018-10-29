@@ -54,6 +54,48 @@ void Settings::loadValuesFromFile() {
     axisZOperativeAccMms2 = settings.value(AXIS_Z_OPERATIVE_ACC_MMS2, AXIS_Z_OPERATIVE_ACC_MMS2_DFLT).value<real>();
     axisZOperativeDecMms2 = settings.value(AXIS_Z_OPERATIVE_DEC_MMS2, AXIS_Z_OPERATIVE_DEC_MMS2_DFLT).value<real>();
 
+    // lettura input digitali
+    settings.beginGroup("DigitalInput");
+    for (int s = static_cast<int>(IOType::POWER); s<static_cast<int>(IOType::LASER_POWER); ++s) {
+        auto name = settings.value(DIGITAL_INPUT_NAME, Utils::getIODescription(static_cast<IOType>(s))).value<QString>();
+        auto type = settings.value(DIGITAL_INPUT_TYPE, Utils::getStringFromIOType(static_cast<IOType>(s))).value<QString>();
+        auto channel = settings.value(DIGITAL_INPUT_CHANNEL, -1).value<int>();
+        auto invertLogic = settings.value(DIGITAL_INPUT_INVERT_LOGIC, false).value<bool>();
+        auto device = settings.value(DIGITAL_INPUT_DEVICE, static_cast<int>(DeviceKey::GALIL_CN)).value<int>();
+        auto isAlarm = settings.value(DIGITAL_INPUT_IS_ALARM, false).value<bool>();
+        DigitalInput input(name, channel, invertLogic, static_cast<DeviceKey>(device), isAlarm, static_cast<IOType>(s));
+    }
+    settings.endGroup();
+
+    // lettura output digitali
+    settings.beginGroup("DigitalOutput");
+    for (int s = static_cast<int>(IOType::LASER_POWER); s<static_cast<int>(IOType::ANAL_AUTOFOCUS_DISTANCE); ++s) {
+        settings.value(DIGITAL_OUTPUT_NAME, Utils::getIODescription(static_cast<IOType>(s))).value<QString>();
+        settings.value(DIGITAL_OUTPUT_TYPE, Utils::getStringFromIOType(static_cast<IOType>(s))).value<QString>();
+        settings.value(DIGITAL_OUTPUT_CHANNEL, -1).value<int>();
+        settings.value(DIGITAL_OUTPUT_INVERT_LOGIC, false).value<bool>();
+        settings.value(DIGITAL_OUTPUT_DEVICE, static_cast<int>(DeviceKey::GALIL_CN)).value<int>();
+        settings.value(DIGITAL_OUTPUT_IS_ALARM, false).value<bool>();
+    }
+    settings.endGroup();
+
+    // lettura input analogici
+    settings.beginGroup("AnalogicInput");
+    for (int s = static_cast<int>(IOType::LASER_POWER); s<static_cast<int>(IOType::ANAL_AUTOFOCUS_DISTANCE); ++s) {
+        settings.value(ANALOGC_INPUT_NAME, Utils::getIODescription(static_cast<IOType>(s))).value<QString>();
+        settings.value(ANALOGC_INPUT_TYPE, Utils::getStringFromIOType(static_cast<IOType>(s))).value<QString>();
+        settings.value(ANALOGC_INPUT_CHANNEL, -1).value<int>();
+        settings.value(ANALOGC_INPUT_DEVICE, static_cast<int>(DeviceKey::GALIL_PLC)).value<int>();
+        settings.value(ANALOGC_INPUT_IS_ALARM, false).value<bool>();
+        settings.value(ANALOGC_INPUT_GAIN, 1).value<real>();
+        settings.value(ANALOGC_INPUT_OFFSET, 1).value<real>();
+        settings.value(ANALOGC_INPUT_UNIT, "").value<QString>();
+        settings.value(ANALOGC_INPUT_LOWER_LIMIT, 0).value<real>();
+        settings.value(ANALOGC_INPUT_UPPER_LIMIT, 0).value<real>();
+        settings.value(ANALOGC_INPUT_HYSTERESIS, 1.0).value<real>();
+    }
+    settings.endGroup();
+
     traceDebug() << "axisXStepPerMm:" << axisXStepPerMm;
     traceDebug() << "axisXMinPosMm:" << axisXMinPosMm;
     traceDebug() << "axisXMaxPosMm:" << axisXMaxPosMm;

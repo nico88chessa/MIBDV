@@ -9,6 +9,7 @@ SET(ITEMS
     DigitalOutput
     AnalogicInput
     GalilCNInspector
+    IOManager
     )
 
 FOREACH(ITEM ${ITEMS})

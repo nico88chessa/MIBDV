@@ -9,19 +9,43 @@ using real = float;
 using analogicReal = double;
 
 enum class DeviceKey : int {
-    GALIL_CN,
+    NONE = -1,
+    GALIL_CN = 1,
     GALIL_PLC
 };
 
-enum class DeviceType {
-    CN,
-    PLC,
-};
+//enum class DeviceType {
+//    CN,
+//    PLC,
+//};
 
-enum class ElementType {
-    POWER,
-    CYCLE,
-    NOT_VALID,
+enum class IOType : int {
+    NOT_VALID = -1,
+    POWER = 1,                              // digital input
+    CYCLE,                              // digital input
+    EMERGENCY_MUSHROOM,                 // digital input
+    DOOR,                               // digital input
+    BYPASS_SECURITY,                    // digital input
+    WATER,                              // digital input
+    MARK_IN_PROGRESS,                   // digital input
+    SCANNER_READY,                      // digital input
+    SCANNER_ERROR,                      // digital input
+    LASER_POWER,                        // digital output
+    COMPRESSED_AIR_1,                   // digital output
+    COMPRESSED_AIR_2,                   // digital output
+    BRUSH_1,                            // digital output
+    BRUSH_2,                            // digital output
+    SUCTION,                            // digital output
+    ENABLE_AIR_FOR_FLUID,               // digital output
+    ENABLE_FLUID,                       // digital output
+    POWER_SCAN,                         // digital output
+    START_SCAN,                         // digital output
+    STOP_SCAN,                          // digital output
+    RED_LIGHT,                          // digital output
+    GREEN_LIGHT,                        // digital output
+    ANAL_AUTOFOCUS_DISTANCE,            // analogic input
+    ANAL_SUCTION_DEPRESSURE,            // analogic input
+    ANAL_AIR_PRESSURE                   // analogic input
 };
 
 constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16;
@@ -61,6 +85,32 @@ constexpr char AXIS_Z_MANUAL_DEC_MMS2[] = "AxisZ/ManualDecMms2";
 constexpr char AXIS_Z_OPERATIVE_SPEED_MMS[] = "AxisZ/OperativeSpeedMms";
 constexpr char AXIS_Z_OPERATIVE_ACC_MMS2[] = "AxisZ/OperativeAccMms2";
 constexpr char AXIS_Z_OPERATIVE_DEC_MMS2[] = "AxisZ/OperativeDecMms2";
+
+constexpr char DIGITAL_INPUT_TYPE[] = "Type";
+constexpr char DIGITAL_INPUT_NAME[] = "Name";
+constexpr char DIGITAL_INPUT_CHANNEL[] = "Channel";
+constexpr char DIGITAL_INPUT_INVERT_LOGIC[] = "InvertLogic";
+constexpr char DIGITAL_INPUT_DEVICE[] = "Device";
+constexpr char DIGITAL_INPUT_IS_ALARM[] = "IsAlarm";
+
+constexpr char DIGITAL_OUTPUT_TYPE[] = "Type";
+constexpr char DIGITAL_OUTPUT_NAME[] = "Name";
+constexpr char DIGITAL_OUTPUT_CHANNEL[] = "Channel";
+constexpr char DIGITAL_OUTPUT_INVERT_LOGIC[] = "InvertLogic";
+constexpr char DIGITAL_OUTPUT_DEVICE[] = "Device";
+constexpr char DIGITAL_OUTPUT_IS_ALARM[] = "IsAlarm";
+
+constexpr char ANALOGC_INPUT_TYPE[] = "Type";
+constexpr char ANALOGC_INPUT_NAME[] = "Name";
+constexpr char ANALOGC_INPUT_CHANNEL[] = "Channel";
+constexpr char ANALOGC_INPUT_DEVICE[] = "Device";
+constexpr char ANALOGC_INPUT_IS_ALARM[] = "IsAlarm";
+constexpr char ANALOGC_INPUT_GAIN[] = "Gain";
+constexpr char ANALOGC_INPUT_OFFSET[] = "Offset";
+constexpr char ANALOGC_INPUT_UNIT[] = "Unit";
+constexpr char ANALOGC_INPUT_LOWER_LIMIT[] = "LowerLimit";
+constexpr char ANALOGC_INPUT_UPPER_LIMIT[] = "UpperLimit";
+constexpr char ANALOGC_INPUT_HYSTERESIS[] = "Hysteresis";
 
 constexpr int AXIS_X_STEP_PER_MM_DFLT = 1;
 constexpr int AXIS_X_MIN_POS_MM_DFLT = 2;

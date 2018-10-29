@@ -3,7 +3,7 @@
 
 #include <QSettings>
 #include <QString>
-#include <QList>
+#include <QHash>
 
 #include <configure.h>
 #include <Constants.hpp>
@@ -11,6 +11,7 @@
 #include <data/DigitalInput.hpp>
 #include <data/DigitalOutput.hpp>
 #include <data/AnalogicInput.hpp>
+#include <Utils.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -63,11 +64,12 @@ public:
     real getAxisZOperativeAccMms2() const { return axisZOperativeAccMms2; }
     real getAxisZOperativeDecMms2() const { return axisZOperativeDecMms2; }
 
-    QList<DigitalInput> getDigitalInputs() const { return digitalInputs; }
-    QList<DigitalOutput> getDigitalOutputs() const { return digitalOutputs; }
-    QList<AnalogicInput> getAnalogicInputs() const { return analogicInputs; }
+    QHash<IOType, DigitalInput> getDigitalInputs() const { return digitalInputs; }
+    QHash<IOType, DigitalOutput> getDigitalOutputs() const { return digitalOutputs; }
+    QHash<IOType, AnalogicInput> getAnalogicInputs() const { return analogicInputs; }
 
 private:
+    // ASSE X
     int axisXStepPerMm;
     int axisXMinPosMm;
     int axisXMaxPosMm;
@@ -79,6 +81,7 @@ private:
     real axisXOperativeAccMms2;
     real axisXOperativeDecMms2;
 
+    // ASSE Y
     int axisYStepPerMm;
     int axisYMinPosMm;
     int axisYMaxPosMm;
@@ -90,6 +93,7 @@ private:
     real axisYOperativeAccMms2;
     real axisYOperativeDecMms2;
 
+    // ASSE Z
     int axisZStepPerMm;
     int axisZMinPosMm;
     int axisZMaxPosMm;
@@ -101,9 +105,10 @@ private:
     real axisZOperativeAccMms2;
     real axisZOperativeDecMms2;
 
-    QList<DigitalInput> digitalInputs;
-    QList<DigitalOutput> digitalOutputs;
-    QList<AnalogicInput> analogicInputs;
+    // IO
+    QHash<IOType, DigitalInput> digitalInputs;
+    QHash<IOType, DigitalOutput> digitalOutputs;
+    QHash<IOType, AnalogicInput> analogicInputs;
 
 };
 

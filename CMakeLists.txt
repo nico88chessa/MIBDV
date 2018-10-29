@@ -117,7 +117,7 @@ SET(PROJECT_SOURCES "" CACHE INTERNAL "sources of project")
 SET(PROJECT_HEADERS "" CACHE INTERNAL "header of project")
 SET(PROJECT_UI_FILES "" CACHE INTERNAL "UI files of project")
 SET(PROJECT_QSS_FILES "" CACHE INTERNAL "qss stylesheet project")
-SET(PROJECT_RCC_FILES "" CACHE INTERNAL "rcc project files")
+SET(PROJECT_QRC_FILES "" CACHE INTERNAL "qrc project files")
 SET(PROJECT_TS_FILES "" CACHE INTERNAL "ts project files")
 SET(PROJECT_QM_FILES "" CACHE INTERNAL "qm project files")
 SET(UPDATE_TS CACHE BOOL "") # questo lo setto qui cosi poi lo posso modificare da QtCreator
@@ -153,7 +153,7 @@ IF(UPDATE_TS)
         QT5_CREATE_TRANSLATION(${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_UI_FILES} main.cpp ${TS_ITEM})
     ENDFOREACH(TS_ITEM)
 
-    SET(PROJECT_QRC_FILES "") # questo serve per evitare problemi di compilazione RCC con CMAKE_AUTORCC ON
+    #SET(PROJECT_QRC_FILES "") # questo serve per evitare problemi di compilazione RCC con CMAKE_AUTORCC ON
 
 ELSE(UPDATE_TS)
 

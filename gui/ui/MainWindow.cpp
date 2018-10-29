@@ -49,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setFixedSize(this->width(), this->height());
     this->setupSignalsAndSlots();
 
+    inspector.startProcess();
+
+    errorManager.subscribeObject(inspector);
 
     this->setupStyleSheets();
 

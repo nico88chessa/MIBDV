@@ -4,6 +4,8 @@ SET(ITEMS
     "Constants"
     "ErrorSignaler"
     "ErrorManager"
+    "CommonTraits"
+    "Utils"
     )
 
 FOREACH(ITEM ${ITEMS})

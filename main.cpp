@@ -1,45 +1,130 @@
 #include <QApplication>
+
+#include <gui/ui/MainWindow.hpp>
+
 #include <QDebug>
 #include <QSettings>
 #include <QStandardPaths>
 
+#include "configure.h"
 #include "GalilCNController.hpp"
+#include "GalilPLCController.hpp"
+#include "GalilCNInspector.hpp"
 
 #include <Logger.hpp>
 #include <Settings.hpp>
-
-#include "configure.h"
+#include <ErrorManager.hpp>
+#include "CommonTraits.hpp"
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
+    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
-    traceInfo() << "Start applicativo" << APPLICATION_NAME;
-    traceEnter;
+    QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);
+    QCoreApplication::setApplicationName(PROGRAM_NAMESPACE::APPLICATION_NAME);
+    QCoreApplication::setApplicationVersion(PROGRAM_NAMESPACE::APPLICATION_VERSION);
 
-    traceDebug() << "ciaomiao" << "due";
+//    MainWindow mainWindow;
+//    mainWindow.show();
 
-    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
-    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
-    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
+    traceDebug() << deviceKeyTraits<DeviceKey::GALIL_PLC>::value;
+    traceDebug() << deviceKeyTraits<DeviceKey::GALIL_CN>::value;
 
-    traceExit;
+    deviceKeyTraits<DeviceKey::GALIL_CN>::type prova;
 
-    GalilCNController test;
-    test.connect("169.254.12.10");
 
-    GDataRecord2103 record;
-    test.getRecord(record);
-
-    int inputStatus;
-    for (int i=0; i<9; ++i)
-        test.getInput(i, inputStatus);
-
-    Settings::instance();
-
-    traceExit;
-
-    return 0;
+    return app.exec();
 
 }
+
+
+//int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
+
+//    using namespace PROGRAM_NAMESPACE;
+
+//    GalilControllerUtils::decodeError(G_CUSTOM_CN_DIGITAL_INPUT_OUT_OF_RANGE);
+
+//    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+//    traceEnter;
+
+
+//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
+//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
+
+//    traceExit;
+
+//    GalilCNController test;
+//    traceDebug() << isDevice<AbstractDevice<GDataRecord2103> >::value;
+//    traceDebug() << isDevice<GalilCNController>::value;
+//    traceDebug() << isDevice<GalilPLCController>::value;
+
+//    GalilCNInspector inspector;
+//    ErrorManager errorManager;
+//    errorManager.subscribeObject(inspector);
+
+//    test.connect("169.254.12.10");
+//    test.setupController(16, 16, 8);
+
+//    static_assert(isDevice<decltype (test)>::value, "non sono un  device");
+//    using status = isDevice<decltype (test)>::statusType;
+//    status a;
+//    a = test.getStatus();
+
+//    traceDebug() << "isCN:" << isCN<int>::value;
+//    traceDebug() << "isCN:" << isCN<GalilCNController>::value;
+//    traceDebug() << "isCN:" << isCN<GalilPLCController>::value;
+
+//    traceDebug() << "isPLC:" << isPLC<int>::value;
+//    traceDebug() << "isPLC:" << isPLC<GalilCNController>::value;
+//    traceDebug() << "isPLC:" << isPLC<GalilPLCController>::value;
+
+//    int st;
+//    double v;
+//    for (int i=0; i<16; ++i) {
+//        test.getDigitalInput(i+1, st);
+//        traceDebug() << i+1 << ":" << st;
+//    }
+//    for (int i=0; i<16; ++i) {
+//        test.getDigitalOutput(i+1, st);
+//        traceDebug() << i+1 << ":" << st;
+//    }
+//    for (int i=0; i<8; ++i) {
+//        test.getAnalogInput(i+1, v);
+//        traceDebug() << i+1 << ":" << v;
+//    }
+
+//    bool b;
+//    test.getPosition(GalilCNController::Axis::X, st); traceInfo() << st;
+//    test.isAxisInMotion(GalilCNController::Axis::X, b); traceInfo() << b;
+//    test.isAxisPositionError(GalilCNController::Axis::X, b); traceInfo() << b;
+//    test.isMotorOff(GalilCNController::Axis::X, b); traceInfo() << b;
+//    test.isForwardLimit(GalilCNController::Axis::X, b); traceInfo() << b;
+//    test.isBackwardLimit(GalilCNController::Axis::X, b); traceInfo() << b;
+//    test.isHomeAxis(GalilCNController::Axis::X, b); traceInfo() << b;
+//    test.checkAbort(b); traceInfo() << b;
+//    test.setDigitalOutput(5, true);
+//    test.setSpeeds(GalilCNController::Axis::X, 10);
+//    test.setAccelerations(GalilCNController::Axis::X, 2048, 3072);
+//    test.setMoveParameters(GalilCNController::Axis::X, 10, 2048, 3072);
+//    test.stopAxis(GalilCNController::Axis::X);
+//    test.homingX(1024, 2048, 3072);
+//    test.homingY(1024, 2048, 3072);
+//    test.homingZ(1024, 2048, 3072);
+//    test.homingW(1024, 2048, 3072);
+//    test.home(GalilCNController::Axis::X, 1024, 2048, 3072);
+//    test.setPosition(GalilCNController::Axis::X, 0);
+//    test.moveToPosition(GalilCNController::Axis::X, 10000, 1024, 2048, 3072);
+//    test.startMoveAxis(GalilCNController::Axis::X);
+
+//    Settings::instance();
+
+//    traceExit;
+
+//    return 0;
+
+//}
+

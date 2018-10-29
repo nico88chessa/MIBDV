@@ -5,6 +5,9 @@
 
 #include "UnmovableWindow.hpp"
 #include <Logger.hpp>
+#include <ErrorManager.hpp>
+
+#include <GalilCNInspector.hpp>
 
 
 namespace Ui {
@@ -17,6 +20,10 @@ class MainWindow : public UnmovableWindow
 
 private:
     Ui::MainWindow *ui;
+
+    PROGRAM_NAMESPACE::ErrorManager errorManager;
+    PROGRAM_NAMESPACE::GalilCNInspector inspector;
+
 public:
 
 private:
@@ -28,9 +35,6 @@ public:
 
 private slots:
     void setupStyleSheets() const;
-
-
-
 
 };
 

@@ -4,7 +4,7 @@ using namespace PROGRAM_NAMESPACE;
 
 DigitalInput::DigitalInput(
         QString name, int channel, bool invertLogic,
-        DeviceType device, bool isAlarm, ElementType elementType) :
+        DeviceKey device, bool isAlarm, IOType elementType) :
     name(name), channel(channel), invertLogic(invertLogic),
     device(device), isAlarm(isAlarm), elementType(elementType) { }
 
@@ -14,9 +14,9 @@ int DigitalInput::getChannel() const { return channel; }
 
 bool DigitalInput::getInvertLogic() const { return invertLogic; }
 
-DeviceType DigitalInput::getDevice() const { return device; }
+DeviceKey DigitalInput::getDevice() const { return device; }
 
 bool DigitalInput::getIsAlarm() const { return isAlarm; }
 
-ElementType DigitalInput::getElementType() const { return elementType; }
+IOType DigitalInput::getElementType() const { return elementType; }
 
