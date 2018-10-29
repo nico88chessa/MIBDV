@@ -1,8 +1,95 @@
 QPushButton {
     border-width: 1px;
     border-style: solid;
+    border-radius: 4px;
     min-width: 64px;
-    max-width: 128px;
     min-height: 36px;
-    border-radius: 18px;
+    max-height: 36px;
+    padding: 0px 36px;
+    font-size: 14px;
+    font-weight: bold;
 }
+
+QListWidget {
+    font-size: 16px;
+    font-weight: normal;
+    border: none;
+}
+
+QListView::item {
+    min-height: 48px;
+    padding: 0px 16px;
+}
+
+QTreeView {
+    font-size: 16px;
+    font-weight: normal;
+    border: none;
+    qproperty-indentation: 0;
+    qproperty-animated: true;
+    qproperty-iconSize: 20px 20px;
+    show-decoration-selected: 0;
+}
+
+QTreeWidget QAbstractItemView {
+/*    border: 20px solid blue;*/
+/*    selection-background-color: red;*/
+}
+
+QTreeView::item:open:icon {
+/*    padding-left: 10px;*/
+/*    margin-left: 10px;*/
+/*    min-height: 48px;*/
+    image: url(:/mibdv/prova);
+/*    padding-left: 90;*/
+}
+/*QTreeView::icon:close {*/
+/*    padding-left: 10px;*/
+/*    margin-left: 10px;*/
+/*    min-height: 48px;*/
+/*    image: none;*/
+/*}*/
+
+/*QTreeView::item:closed {
+    padding-left: 10px;
+    margin-left: 10px;
+    min-height: 48px;
+    image: url(:/mibdv/prova);
+}*/
+
+QTreeView::branch {
+/*    image: url(:/mibdv/prova);*/
+    border-top: 10px solid green;
+    border-bottom: 10px solid red;
+    qproperty-indentation: 200;
+/*    margin-right: 10px;*/
+}
+
+/*QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: 1;
+    border-color: red;
+    color: red;
+    qproperty-indentation: 5;
+}*/
+/*
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: 0;
+    color: red;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: 0;
+    color: red;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    color: red;
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+    border-image: none;
+    color: red;
+}*/

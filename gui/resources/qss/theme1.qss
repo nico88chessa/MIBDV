@@ -1,5 +1,6 @@
 QWidget {
     qproperty-focusPolicy: NoFocus;
+    font-family: Roboto;
 }
 
 QPushButton {
@@ -7,4 +8,18 @@ QPushButton {
     background-repeat: no-repeat;
     background-position: middle middle;
     border-color: black;
+}
+
+QListWidget {
+    background-color: white;
+}
+
+QListView::item {
+    border: none;
+}
+
+QTreeView::branch {
+    background: red;
+    padding: 0px;
+    margin: 0px:
 }
