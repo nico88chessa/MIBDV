@@ -22,31 +22,36 @@ enum class DeviceKey : int {
 enum class IOType : int {
     NOT_VALID = -1,
     POWER = 1,                              // digital input
-    CYCLE,                              // digital input
-    EMERGENCY_MUSHROOM,                 // digital input
-    DOOR,                               // digital input
-    BYPASS_SECURITY,                    // digital input
-    WATER,                              // digital input
-    MARK_IN_PROGRESS,                   // digital input
-    SCANNER_READY,                      // digital input
-    SCANNER_ERROR,                      // digital input
-    LASER_POWER,                        // digital output
-    COMPRESSED_AIR_1,                   // digital output
-    COMPRESSED_AIR_2,                   // digital output
-    BRUSH_1,                            // digital output
-    BRUSH_2,                            // digital output
-    SUCTION,                            // digital output
-    ENABLE_AIR_FOR_FLUID,               // digital output
-    ENABLE_FLUID,                       // digital output
-    POWER_SCAN,                         // digital output
-    START_SCAN,                         // digital output
-    STOP_SCAN,                          // digital output
-    RED_LIGHT,                          // digital output
-    GREEN_LIGHT,                        // digital output
-    ANAL_AUTOFOCUS_DISTANCE,            // analogic input
-    ANAL_SUCTION_DEPRESSURE,            // analogic input
-    ANAL_AIR_PRESSURE                   // analogic input
+    CYCLE,                                  // digital input
+    EMERGENCY_MUSHROOM,                     // digital input
+    DOOR,                                   // digital input
+    BYPASS_SECURITY,                        // digital input
+    WATER,                                  // digital input
+    MARK_IN_PROGRESS,                       // digital input
+    SCANNER_READY,                          // digital input
+    SCANNER_ERROR,                          // digital input
+    GENERIC_INPUT,                          // generic input
+    LASER_POWER,                            // digital output
+    COMPRESSED_AIR_1,                       // digital output
+    COMPRESSED_AIR_2,                       // digital output
+    BRUSH_1,                                // digital output
+    BRUSH_2,                                // digital output
+    SUCTION,                                // digital output
+    ENABLE_AIR_FOR_FLUID,                   // digital output
+    ENABLE_FLUID,                           // digital output
+    POWER_SCAN,                             // digital output
+    START_SCAN,                             // digital output
+    STOP_SCAN,                              // digital output
+    RED_LIGHT,                              // digital output
+    GREEN_LIGHT                             // digital output
+//    ANAL_AUTOFOCUS_DISTANCE,                // analogic input generic
+//    ANAL_SUCTION_DEPRESSURE,                // analogic input generic
+//    ANAL_AIR_PRESSURE                       // analogic input generic
 };
+
+//inline bool operator<(const IOType left, const IOType right) {
+//    return static_cast<int>(left) < static_cast<int>(right);
+//}
 
 constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16;
 

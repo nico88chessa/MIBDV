@@ -4,11 +4,11 @@ using namespace PROGRAM_NAMESPACE;
 
 AnalogicInput::AnalogicInput(
         QString name, int channel, DeviceKey device,
-        bool isAlarm, IOType elementType, analogicReal gain,
+        bool isAlarm, /*IOType elementType, */analogicReal gain,
         analogicReal offset, QString unit, analogicReal lowerLimit,
         analogicReal upperLimit, analogicReal hysteresys) :
         name(name), channel(channel), device(device),
-        isAlarm(isAlarm), elementType(elementType), gain(gain),
+        isAlarm(isAlarm), /*elementType(elementType), */gain(gain),
         offset(offset), unit(unit), lowerLimit(lowerLimit),
         upperLimit(upperLimit), hysteresys(hysteresys) { }
 
@@ -20,7 +20,7 @@ DeviceKey AnalogicInput::getDevice() const { return device; }
 
 bool AnalogicInput::getIsAlarm() const { return isAlarm; }
 
-IOType AnalogicInput::getElementType() const { return elementType; }
+//IOType AnalogicInput::getElementType() const { return elementType; }
 
 analogicReal AnalogicInput::getGain() const { return gain; }
 

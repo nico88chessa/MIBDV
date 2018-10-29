@@ -36,9 +36,9 @@ public:
             case IOType::STOP_SCAN: return QT_TR_NOOP("Stop Scan");
             case IOType::RED_LIGHT: return QT_TR_NOOP("Red Light");
             case IOType::GREEN_LIGHT: return QT_TR_NOOP("Green Light");
-            case IOType::ANAL_AUTOFOCUS_DISTANCE: return QT_TR_NOOP("Autofocus Distance");
-            case IOType::ANAL_SUCTION_DEPRESSURE: return QT_TR_NOOP("Suction Depressure");
-            case IOType::ANAL_AIR_PRESSURE: return QT_TR_NOOP("Air Pressure");
+//            case IOType::ANAL_AUTOFOCUS_DISTANCE: return QT_TR_NOOP("Autofocus Distance");
+//            case IOType::ANAL_SUCTION_DEPRESSURE: return QT_TR_NOOP("Suction Depressure");
+//            case IOType::ANAL_AIR_PRESSURE: return QT_TR_NOOP("Air Pressure");
         }
 
         return "";
@@ -70,9 +70,9 @@ public:
             case IOType::STOP_SCAN: return "STOP_SCAN";
             case IOType::RED_LIGHT: return "RED_LIGHT";
             case IOType::GREEN_LIGHT: return "GREEN_LIGHT";
-            case IOType::ANAL_AUTOFOCUS_DISTANCE: return "ANAL_AUTOFOCUS_DISTANCE";
-            case IOType::ANAL_SUCTION_DEPRESSURE: return "ANAL_SUCTION_DEPRESSURE";
-            case IOType::ANAL_AIR_PRESSURE: return "ANAL_AIR_PRESSURE";
+//            case IOType::ANAL_AUTOFOCUS_DISTANCE: return "ANAL_AUTOFOCUS_DISTANCE";
+//            case IOType::ANAL_SUCTION_DEPRESSURE: return "ANAL_SUCTION_DEPRESSURE";
+//            case IOType::ANAL_AIR_PRESSURE: return "ANAL_AIR_PRESSURE";
         }
 
         return "";
@@ -124,12 +124,12 @@ public:
             return IOType::RED_LIGHT;
         if (str.compare("GREEN_LIGHT", Qt::CaseInsensitive)==0)
             return IOType::GREEN_LIGHT;
-        if (str.compare("ANAL_AUTOFOCUS_DISTANCE", Qt::CaseInsensitive)==0)
-            return IOType::ANAL_AUTOFOCUS_DISTANCE;
-        if (str.compare("ANAL_SUCTION_DEPRESSURE", Qt::CaseInsensitive)==0)
-            return IOType::ANAL_SUCTION_DEPRESSURE;
-        if (str.compare("ANAL_AIR_PRESSUR", Qt::CaseInsensitive)==0)
-            return IOType::ANAL_AIR_PRESSURE;
+//        if (str.compare("ANAL_AUTOFOCUS_DISTANCE", Qt::CaseInsensitive)==0)
+//            return IOType::ANAL_AUTOFOCUS_DISTANCE;
+//        if (str.compare("ANAL_SUCTION_DEPRESSURE", Qt::CaseInsensitive)==0)
+//            return IOType::ANAL_SUCTION_DEPRESSURE;
+//        if (str.compare("ANAL_AIR_PRESSUR", Qt::CaseInsensitive)==0)
+//            return IOType::ANAL_AIR_PRESSURE;
         return IOType::NOT_VALID;
 
     }

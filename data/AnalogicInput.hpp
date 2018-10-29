@@ -24,12 +24,12 @@ private:
     analogicReal lowerLimit;
     analogicReal upperLimit;
     analogicReal hysteresys;
-    IOType elementType;
+//    IOType elementType;
 
 public:
     AnalogicInput(
             QString name, int channel, DeviceKey device,
-            bool isAlarm, IOType elementType, analogicReal gain,
+            bool isAlarm, /*IOType elementType, */analogicReal gain,
             analogicReal offset, QString unit, analogicReal lowerLimit,
             analogicReal upperLimit, analogicReal hysteresys);
 
@@ -37,7 +37,7 @@ public:
     int getChannel() const;
     DeviceKey getDevice() const;
     bool getIsAlarm() const;
-    IOType getElementType() const;
+//    IOType getElementType() const;
     analogicReal getGain() const;
     analogicReal getOffset() const;
     QString getUnit() const;

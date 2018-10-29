@@ -3,7 +3,7 @@
 
 #include <QSettings>
 #include <QString>
-#include <QHash>
+#include <QMap>
 
 #include <configure.h>
 #include <Constants.hpp>
@@ -64,9 +64,9 @@ public:
     real getAxisZOperativeAccMms2() const { return axisZOperativeAccMms2; }
     real getAxisZOperativeDecMms2() const { return axisZOperativeDecMms2; }
 
-    QHash<IOType, DigitalInput> getDigitalInputs() const { return digitalInputs; }
-    QHash<IOType, DigitalOutput> getDigitalOutputs() const { return digitalOutputs; }
-    QHash<IOType, AnalogicInput> getAnalogicInputs() const { return analogicInputs; }
+    const QMap<IOType, DigitalInput>& getDigitalInputs() const { return digitalInputs; }
+    const QMap<IOType, DigitalOutput>& getDigitalOutputs() const { return digitalOutputs; }
+    const QMap<IOType, AnalogicInput>& getAnalogicInputs() const { return analogicInputs; }
 
 private:
     // ASSE X
@@ -106,9 +106,9 @@ private:
     real axisZOperativeDecMms2;
 
     // IO
-    QHash<IOType, DigitalInput> digitalInputs;
-    QHash<IOType, DigitalOutput> digitalOutputs;
-    QHash<IOType, AnalogicInput> analogicInputs;
+    QMap<IOType, DigitalInput> digitalInputs;
+    QMap<IOType, DigitalOutput> digitalOutputs;
+    QMap<IOType, AnalogicInput> analogicInputs;
 
 };
 

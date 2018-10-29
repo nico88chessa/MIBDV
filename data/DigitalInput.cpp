@@ -2,6 +2,10 @@
 
 using namespace PROGRAM_NAMESPACE;
 
+DigitalInput::DigitalInput() : DigitalInput(
+                                   "", -1, false,
+                                   DeviceKey::NONE, false, IOType::NOT_VALID) { }
+
 DigitalInput::DigitalInput(
         QString name, int channel, bool invertLogic,
         DeviceKey device, bool isAlarm, IOType elementType) :

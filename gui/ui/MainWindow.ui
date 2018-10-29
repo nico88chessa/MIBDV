@@ -43,43 +43,121 @@
            <item>
             <widget class="QPushButton" name="buttonSettings">
              <property name="text">
-              <string>Settings</string>
+              <string>SETTINGS</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="buttonPrint">
              <property name="text">
-              <string>Print</string>
+              <string>PRINT</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="buttonManual">
              <property name="text">
-              <string>Manual</string>
+              <string>MANUAL</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="buttonInfo">
              <property name="text">
-              <string>Info</string>
+              <string>INFO</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="buttonProfile">
              <property name="text">
-              <string>Profile</string>
+              <string>PROFILE</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="buttonRefreshStyle">
              <property name="text">
-              <string>Refresh Style</string>
+              <string>REFRESH STYLE</string>
              </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Prova Testo</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTreeWidget" name="treeWidget">
+             <column>
+              <property name="text">
+               <string>Uno</string>
+              </property>
+             </column>
+             <item>
+              <property name="text">
+               <string>Prova 1</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/mibdv/prova</normaloff>:/mibdv/prova</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Prova 2</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resources/resources.qrc">
+                <normaloff>:/mibdv/prova</normaloff>:/mibdv/prova</iconset>
+              </property>
+              <item>
+               <property name="text">
+                <string>Prova 2a</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Prova 2b</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Prova 3b</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Prova 3ba</string>
+                </property>
+               </item>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>Prova3</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListWidget" name="listWidget">
+             <item>
+              <property name="text">
+               <string>Single-line item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Single-line item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Single-line item</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
@@ -100,7 +178,7 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="0" column="2">
        <widget class="QFrame" name="panelFrame">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -110,11 +188,27 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </item>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
