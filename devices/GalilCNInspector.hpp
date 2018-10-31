@@ -46,7 +46,7 @@ public slots:
 signals:
     void connectedSignal();
     void disconnectedSignal();
-    void statusSignal(GDataRecord2103);
+    void statusSignal(GalilCNStatusBean);
 
     void processStartSignal();
 

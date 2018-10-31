@@ -5,6 +5,7 @@ SET(ITEMS
     Error
     GalilCNStatus
     GalilPLCStatus
+    CommonTraits
     )
 
 FOREACH(ITEM ${ITEMS})

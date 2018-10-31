@@ -8,7 +8,7 @@
 
 namespace PROGRAM_NAMESPACE {
 
-// TODO NIC 26/10/2018: capire come gestire gli errori
+// TODO NIC 26/10/2018 - capire come gestire gli errori
 enum class ErrorType {
     INFO,
     WARNING,
@@ -24,7 +24,7 @@ public:
     friend inline bool operator==(const Error& lhs, const Error& rhs);
 
 private:
-    // TODO NIC 25/10/2018: vedere come creare gli errori
+    // TODO NIC 25/10/2018 - vedere come creare gli errori
     int deviceKey;
     int errorId;
     QString errorDescription;

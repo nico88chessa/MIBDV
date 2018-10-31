@@ -1,8 +1,11 @@
 #ifndef GALILCNSTATUSBEAN_HPP
 #define GALILCNSTATUSBEAN_HPP
 
+#include <QMetaType>
+
 #include <Constants.hpp>
 #include <configure.h>
+#include <devices/GalilControllerUtils.hpp>
 
 #include <gclib_record.h>
 
@@ -40,23 +43,8 @@ private:
     unsigned char errorCode;
 
     // digital IO
-    bool digitalInput1;
-    bool digitalInput2;
-    bool digitalInput3;
-    bool digitalInput4;
-    bool digitalInput5;
-    bool digitalInput6;
-    bool digitalInput7;
-    bool digitalInput8;
-
-    bool digitalOutput1;
-    bool digitalOutput2;
-    bool digitalOutput3;
-    bool digitalOutput4;
-    bool digitalOutput5;
-    bool digitalOutput6;
-    bool digitalOutput7;
-    bool digitalOutput8;
+    bool digitalInputs[GALIL_CN_DIGITAL_INPUTS];
+    bool digitalOutputs[GALIL_CN_DIGITAL_OUTPUTS];
 
     /*** ASSE A ***/
 
@@ -169,7 +157,15 @@ private:
     unsigned short axisCAnalogIn;
 
 public:
-    GalilCNStatusBean(const GDataRecord2103& rec) {
+    explicit GalilCNStatusBean() { }
+
+    /**
+     * NOTE NIC 31/10/2018: questa e' una copy-initialization;
+     * tuttavia nel compilatore gcc viene ottmizzata come una direct-initialization
+     * metto explicit per forzare l'uso del tipo GalilCNStatusBean;
+     * vedere \ref GalilCNController::getRecord
+     */
+    explicit GalilCNStatusBean(const GDataRecord2103& rec) {
 
         programRunning = rec.general_status & BIT_MASK_7;
         waitingInputFromINCommand = rec.general_status & BIT_MASK_2;
@@ -177,23 +173,23 @@ public:
         echoOn = rec.general_status & BIT_MASK_0;
         errorCode = rec.error_code;
 
-        digitalInput1 = rec.input_bank_0 & BIT_MASK_0;
-        digitalInput2 = rec.input_bank_0 & BIT_MASK_1;
-        digitalInput3 = rec.input_bank_0 & BIT_MASK_2;
-        digitalInput4 = rec.input_bank_0 & BIT_MASK_3;
-        digitalInput5 = rec.input_bank_0 & BIT_MASK_4;
-        digitalInput6 = rec.input_bank_0 & BIT_MASK_5;
-        digitalInput7 = rec.input_bank_0 & BIT_MASK_6;
-        digitalInput8 = rec.input_bank_0 & BIT_MASK_7;
+        digitalInputs[0] = rec.input_bank_0 & BIT_MASK_0;
+        digitalInputs[1] = rec.input_bank_0 & BIT_MASK_1;
+        digitalInputs[2] = rec.input_bank_0 & BIT_MASK_2;
+        digitalInputs[3] = rec.input_bank_0 & BIT_MASK_3;
+        digitalInputs[4] = rec.input_bank_0 & BIT_MASK_4;
+        digitalInputs[5] = rec.input_bank_0 & BIT_MASK_5;
+        digitalInputs[6] = rec.input_bank_0 & BIT_MASK_6;
+        digitalInputs[7] = rec.input_bank_0 & BIT_MASK_7;
 
-        digitalOutput1 = rec.output_bank_0 & BIT_MASK_0;
-        digitalOutput2 = rec.output_bank_0 & BIT_MASK_1;
-        digitalOutput3 = rec.output_bank_0 & BIT_MASK_2;
-        digitalOutput4 = rec.output_bank_0 & BIT_MASK_3;
-        digitalOutput5 = rec.output_bank_0 & BIT_MASK_4;
-        digitalOutput6 = rec.output_bank_0 & BIT_MASK_5;
-        digitalOutput7 = rec.output_bank_0 & BIT_MASK_6;
-        digitalOutput8 = rec.output_bank_0 & BIT_MASK_7;
+        digitalOutputs[0] = rec.output_bank_0 & BIT_MASK_0;
+        digitalOutputs[1] = rec.output_bank_0 & BIT_MASK_1;
+        digitalOutputs[2] = rec.output_bank_0 & BIT_MASK_2;
+        digitalOutputs[3] = rec.output_bank_0 & BIT_MASK_3;
+        digitalOutputs[4] = rec.output_bank_0 & BIT_MASK_4;
+        digitalOutputs[5] = rec.output_bank_0 & BIT_MASK_5;
+        digitalOutputs[6] = rec.output_bank_0 & BIT_MASK_6;
+        digitalOutputs[7] = rec.output_bank_0 & BIT_MASK_7;
 
         axisALatchOccured = rec.axis_a_switches & BIT_MASK_7;
         axisAStateLatchInput = rec.axis_a_switches & BIT_MASK_6;
@@ -294,21 +290,6 @@ public:
     bool getTraceOn() const { return traceOn; }
     bool getEchoOn() const { return echoOn; }
     unsigned char getErrorCode() const { return errorCode; }
-    bool getDigitalInput2() const { return digitalInput2; }
-    bool getDigitalInput3() const { return digitalInput3; }
-    bool getDigitalInput4() const { return digitalInput4; }
-    bool getDigitalInput5() const { return digitalInput5; }
-    bool getDigitalInput6() const { return digitalInput6; }
-    bool getDigitalInput7() const { return digitalInput7; }
-    bool getDigitalInput8() const { return digitalInput8; }
-    bool getDigitalOutput1() const { return digitalOutput1; }
-    bool getDigitalOutput2() const { return digitalOutput2; }
-    bool getDigitalOutput3() const { return digitalOutput3; }
-    bool getDigitalOutput4() const { return digitalOutput4; }
-    bool getDigitalOutput5() const { return digitalOutput5; }
-    bool getDigitalOutput6() const { return digitalOutput6; }
-    bool getDigitalOutput7() const { return digitalOutput7; }
-    bool getDigitalOutput8() const { return digitalOutput8; }
     bool getAxisALatchOccured() const { return axisALatchOccured; }
     bool getAxisAStateLatchInput() const { return axisAStateLatchInput; }
     bool getAxisAForwardLimit() const { return axisAForwardLimit; }
@@ -401,10 +382,19 @@ public:
     int getAxisCVelocity() const { return axisCVelocity; }
     short getAxisCTorque() const { return axisCTorque; }
     unsigned short getAxisCAnalogIn() const { return axisCAnalogIn; }
-    bool getDigitalInput1() const { return digitalInput1; }
+    bool getDigitalInput(int i) const {
+        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
+        return digitalInputs[i];
+    }
+    bool getDigitalOutput(int i) const {
+        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
+        return digitalOutputs[i];
+    }
 
 };
 
 }
+
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::GalilCNStatusBean)
 
 #endif // GALILCNSTATUSBEAN_HPP

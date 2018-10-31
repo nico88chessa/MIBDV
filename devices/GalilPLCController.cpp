@@ -27,7 +27,7 @@ GalilPLCController::~GalilPLCController() {
 
 }
 
-int GalilPLCController::getRecord(GDataRecord47000_ENC& record) const {
+int GalilPLCController::getRecord(GalilPLCStatusBean& record) const {
 
     traceEnter;
 
@@ -37,7 +37,7 @@ int GalilPLCController::getRecord(GDataRecord47000_ENC& record) const {
 #else
     GReturn result = G_NO_ERROR;
 #endif
-    record = recordUnion.rio47000;
+    record = GalilPLCStatusBean(recordUnion.rio47000);
 
     writeErrorIfExists(result);
 
@@ -240,9 +240,9 @@ int GalilPLCController::getTCCode(int& tcCode) const {
 
 }
 
-GDataRecord47000_ENC GalilPLCController::getStatus() const {
+GalilPLCStatusBean GalilPLCController::getStatus() const {
 
-    GDataRecord47000_ENC record;
+    GalilPLCStatusBean record;
     writeErrorIfExists(this->getRecord(record));
     return record;
 

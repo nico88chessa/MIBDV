@@ -8,6 +8,8 @@ namespace PROGRAM_NAMESPACE {
 class GalilCNController;
 class GalilPLCController;
 
+// type traits
+
 template <DeviceKey>
 struct deviceKeyTraits {
     static constexpr bool value = false;

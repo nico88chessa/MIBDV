@@ -9,12 +9,13 @@
 
 #include <configure.h>
 #include <Logger.hpp>
+#include <data/GalilCNStatusBean.hpp>
 #include <devices/GalilControllerUtils.hpp>
 #include <devices/AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNController : public AbstractCN<GDataRecord2103, int> {
+class GalilCNController : public AbstractCN<GalilCNStatusBean, int> {
 public:
     using Ptr = GalilCNController *;
     using ConstPtr = const GalilCNController *;
@@ -60,7 +61,7 @@ public:
                          int numDigitalOutput,
                          int numAnalogInput);
     bool connect(const QString& ip);
-    int getRecord(GDataRecord2103& record) const;
+    int getRecord(GalilCNStatusBean& record) const;
     virtual int getDigitalInput(int input, int& inputStatus);
     virtual int getDigitalOutput(int output, int& outputStatus);
     virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
@@ -87,7 +88,7 @@ public:
     virtual int setPosition(Axis a, posType pos);
     int getTCCode(int& tcCode) const;
     bool isConnected() const;
-    virtual GDataRecord2103 getStatus() const;
+    virtual GalilCNStatusBean getStatus() const;
 
 private:
     inline GCon handle() const { return *this->handler.data(); }
@@ -104,14 +105,14 @@ private:
 template <>
 struct isCN<GalilCNController> {
     static constexpr bool value = true;
-    using statusType = GDataRecord2103;
+    using statusType = GalilCNStatusBean;
     using errorType = int;
 };
 
 template <>
 struct isDevice<GalilCNController> {
     static constexpr bool value = true;
-    using statusType = GDataRecord2103;
+    using statusType = GalilCNStatusBean;
 };
 
 }

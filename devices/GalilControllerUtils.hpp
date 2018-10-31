@@ -12,6 +12,14 @@
 
 namespace PROGRAM_NAMESPACE {
 
+static constexpr int GALIL_CN_DIGITAL_INPUTS = 8;
+static constexpr int GALIL_CN_DIGITAL_OUTPUTS = 8;
+
+static constexpr int GALIL_PLC_DIGITAL_INPUTS = 16;
+static constexpr int GALIL_PLC_DIGITAL_OUTPUTS = 16;
+static constexpr int GALIL_PLC_ANALOG_INPUTS = 8;
+static constexpr int GALIL_PLC_ANALOG_OUTPUTS = 8;
+
 static constexpr int G_CUSTOM_CN_NON_INIZIALIZZATO = PROGRAM_ERR_START_CODE + 1;
 static constexpr int G_CUSTOM_CN_DIGITAL_INPUT_OUT_OF_RANGE = PROGRAM_ERR_START_CODE + 2;
 static constexpr int G_CUSTOM_CN_DIGITAL_OUTPUT_OUT_OF_RANGE = PROGRAM_ERR_START_CODE + 3;

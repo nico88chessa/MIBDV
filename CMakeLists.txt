@@ -167,6 +167,7 @@ ENDIF(UPDATE_TS)
 ADD_EXECUTABLE(${PROJECT_NAME}-${MIBDV_VERSION}
     main.cpp
     ${PROJECT_SOURCES}
+    ${PROJECT_HEADERS} # utilizzato per il parsing delle note
     ${PROJECT_UI_FILES}
     ${PROJECT_QSS_FILES}
     ${PROJECT_QM_FILES}

@@ -10,11 +10,12 @@
 #include <configure.h>
 #include <Logger.hpp>
 #include <devices/GalilControllerUtils.hpp>
+#include <data/GalilPLCStatusBean.hpp>
 #include "AbstractPLC.hpp"
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilPLCController : public AbstractPLC<GDataRecord47000_ENC, int> {
+class GalilPLCController : public AbstractPLC<GalilPLCStatusBean, int> {
 public:
     using Ptr = GalilPLCController *;
     using ConstPtr = const GalilPLCController *;
@@ -36,7 +37,7 @@ private:
 public:
     GalilPLCController();
     virtual ~GalilPLCController();
-    int getRecord(GDataRecord47000_ENC& status) const;
+    int getRecord(GalilPLCStatusBean& status) const;
 
     void setupController(int numDigitalInput,
                          int numDigitalOutput,
@@ -48,7 +49,7 @@ public:
     virtual int setDigitalOutput(int output, bool value);
     int getTCCode(int& tcCode) const;
     bool isConnected() const;
-    virtual GDataRecord47000_ENC getStatus() const;
+    virtual GalilPLCStatusBean getStatus() const;
 
 private:
     inline GCon handle() const { return *this->handler.data(); }
@@ -63,14 +64,14 @@ private:
 template <>
 struct isPLC<GalilPLCController> {
     static constexpr bool value = true;
-    using statusType = GDataRecord47000_ENC;
+    using statusType = GalilPLCStatusBean;
     using errorType = int;
 };
 
 template <>
 struct isDevice<GalilPLCController> {
     static constexpr bool value = true;
-    using statusType = GDataRecord47000_ENC;
+    using statusType = GalilPLCStatusBean;
 };
 
 }

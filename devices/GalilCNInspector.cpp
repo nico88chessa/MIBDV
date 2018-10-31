@@ -21,9 +21,8 @@ GalilCNInspector::~GalilCNInspector() {
 
 void GalilCNInspector::process() {
 
-    GDataRecord2103 status;
-//    GDataRecord2103 status = controller.getStatus();
-//    GalilCNStatusBean bean(status);
+    GalilCNStatusBean status;
+//    GalilCNStatusBean status = controller.getStatus();
     auto statusPlc = controllerPlc.getStatus();
     GalilPLCStatusBean bean2(statusPlc);
 
@@ -65,39 +64,42 @@ void GalilCNInspector::process() {
 //                    static_cast<int>(bean.getAxisCHomeInput()) << "-" <<
 //                    static_cast<int>(bean.getAxisCSMJumperInstalled());
 
-    traceDebug() << "input:" << static_cast<int>(bean2.getDigitalInput1()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput2()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput3()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput4()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput5()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput6()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput7()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput8()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput9()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput10()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput11()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput12()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput13()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput14()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput15()) << "-" <<
-                    static_cast<int>(bean2.getDigitalInput16());
 
-    traceDebug() << "output:" << static_cast<int>(bean2.getDigitalOutput1()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput2()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput3()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput4()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput5()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput6()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput7()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput8()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput9()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput10()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput11()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput12()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput13()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput14()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput15()) << "-" <<
-                    static_cast<int>(bean2.getDigitalOutput16());
+    traceDebug() << "input:" <<
+                    static_cast<int>(bean2.getDigitalInput(0)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(1)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(2)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(3)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(4)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(5)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(6)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(7)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(8)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(9)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(10)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(11)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(12)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(13)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(14)) << "-" <<
+                    static_cast<int>(bean2.getDigitalInput(15));
+
+    traceDebug() << "output:" <<
+                    static_cast<int>(bean2.getDigitalOutput(0)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(1)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(2)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(3)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(4)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(5)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(6)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(7)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(8)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(9)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(10)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(11)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(12)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(13)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(14)) << "-" <<
+                    static_cast<int>(bean2.getDigitalOutput(15));
 
 
 

@@ -1,11 +1,10 @@
 SET(ITEMS
-    "Logger"
-    "Settings"
-    "Constants"
-    "ErrorSignaler"
-    "ErrorManager"
-    "CommonTraits"
-    "Utils"
+    Logger
+    Settings
+    Constants
+    ErrorSignaler
+    ErrorManager
+    Utils
     )
 
 FOREACH(ITEM ${ITEMS})

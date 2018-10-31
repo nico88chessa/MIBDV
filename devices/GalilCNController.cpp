@@ -26,7 +26,7 @@ GalilCNController::~GalilCNController() {
 
 }
 
-int GalilCNController::getRecord(GDataRecord2103& record) const {
+int GalilCNController::getRecord(GalilCNStatusBean& record) const {
 
     traceEnter;
 
@@ -36,7 +36,7 @@ int GalilCNController::getRecord(GDataRecord2103& record) const {
 #else
     GReturn result = G_NO_ERROR;
 #endif
-    record = recordUnion.dmc2103;
+    record = GalilCNStatusBean(recordUnion.dmc2103);
 
     writeErrorIfExists(result);
 
@@ -648,9 +648,9 @@ int GalilCNController::getTCCode(int& tcCode) const {
 
 }
 
-GDataRecord2103 GalilCNController::getStatus() const {
+GalilCNStatusBean GalilCNController::getStatus() const {
 
-    GDataRecord2103 record;
+    GalilCNStatusBean record;
     writeErrorIfExists(this->getRecord(record));
     return record;
 
