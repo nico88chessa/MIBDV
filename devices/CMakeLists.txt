@@ -2,13 +2,10 @@ SET(ITEMS
     AbstractDevice
     AbstractPLC
     AbstractCN
-    GalilCNController
-    GalilPLCController
     GalilControllerUtils
-    DigitalInput
-    DigitalOutput
-    AnalogicInput
+    GalilCNController
     GalilCNInspector
+    GalilPLCController
     IOManager
     )
 

@@ -166,7 +166,7 @@ int GalilPLCController::getAnalogInput(int analogInput, anlType& analogInputStat
 
     if (analogInput<1 || analogInput>numAnalogInput) {
         traceErr() << "Galil PLC: output richiesto fuori dal range del device";
-        return G_CUSTOM_PLC_ANALOGIC_INPUT_OUT_OF_RANGE;
+        return G_CUSTOM_PLC_ANALOG_INPUT_OUT_OF_RANGE;
     }
 
     QString command = QString("MG @AN[%1]").arg(analogInput);

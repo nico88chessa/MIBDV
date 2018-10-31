@@ -10,7 +10,7 @@ class Utils {
 
 public:
 
-    static QString getIODescription(IOType type) {
+    static inline QString getIODescription(IOType type) {
 
         switch (type) {
             case IOType::NOT_VALID: break;
@@ -23,6 +23,7 @@ public:
             case IOType::MARK_IN_PROGRESS: return QT_TR_NOOP("Mark In Progress");
             case IOType::SCANNER_READY: return QT_TR_NOOP("Scanner Ready");
             case IOType::SCANNER_ERROR: return QT_TR_NOOP("Scanner Error");
+            case IOType::GENERIC_INPUT: return QT_TR_NOOP("Generic Input");
             case IOType::LASER_POWER: return QT_TR_NOOP("Laser Power");
             case IOType::COMPRESSED_AIR_1: return QT_TR_NOOP("Compressed Air 1");
             case IOType::COMPRESSED_AIR_2: return QT_TR_NOOP("Compressed Air 2");
@@ -36,15 +37,14 @@ public:
             case IOType::STOP_SCAN: return QT_TR_NOOP("Stop Scan");
             case IOType::RED_LIGHT: return QT_TR_NOOP("Red Light");
             case IOType::GREEN_LIGHT: return QT_TR_NOOP("Green Light");
-//            case IOType::ANAL_AUTOFOCUS_DISTANCE: return QT_TR_NOOP("Autofocus Distance");
-//            case IOType::ANAL_SUCTION_DEPRESSURE: return QT_TR_NOOP("Suction Depressure");
-//            case IOType::ANAL_AIR_PRESSURE: return QT_TR_NOOP("Air Pressure");
+            case IOType::GENERIC_ANALOG_INPUT: return QT_TR_NOOP("Analog Input");
         }
 
         return "";
+
     }
 
-    static QString getStringFromIOType(IOType type) {
+    static inline QString getStringFromIOType(IOType type) {
 
         switch (type) {
             case IOType::NOT_VALID: break;
@@ -57,6 +57,7 @@ public:
             case IOType::MARK_IN_PROGRESS: return "MARK_IN_PROGRESS";
             case IOType::SCANNER_READY: return "SCANNER_READY";
             case IOType::SCANNER_ERROR: return "SCANNER_ERROR";
+            case IOType::GENERIC_INPUT: return "GENERIC_INPUT";
             case IOType::LASER_POWER: return "LASER_POWER";
             case IOType::COMPRESSED_AIR_1: return "COMPRESSED_AIR_1";
             case IOType::COMPRESSED_AIR_2: return "COMPRESSED_AIR_2";
@@ -70,15 +71,14 @@ public:
             case IOType::STOP_SCAN: return "STOP_SCAN";
             case IOType::RED_LIGHT: return "RED_LIGHT";
             case IOType::GREEN_LIGHT: return "GREEN_LIGHT";
-//            case IOType::ANAL_AUTOFOCUS_DISTANCE: return "ANAL_AUTOFOCUS_DISTANCE";
-//            case IOType::ANAL_SUCTION_DEPRESSURE: return "ANAL_SUCTION_DEPRESSURE";
-//            case IOType::ANAL_AIR_PRESSURE: return "ANAL_AIR_PRESSURE";
+            case IOType::GENERIC_ANALOG_INPUT: return "GENERIC_ANALOG_INPUT";
         }
 
         return "";
+
     }
 
-    static IOType getIOTypeFromString(const QString& str) {
+    static inline IOType getIOTypeFromString(const QString& str) {
 
         if (str.compare("POWER", Qt::CaseInsensitive)==0)
             return IOType::POWER;
@@ -98,6 +98,8 @@ public:
             return IOType::SCANNER_READY;
         if (str.compare("SCANNER_ERROR", Qt::CaseInsensitive)==0)
             return IOType::SCANNER_ERROR;
+        if (str.compare("GENERIC_INPUT", Qt::CaseInsensitive)==0)
+            return IOType::GENERIC_INPUT;
         if (str.compare("LASER_POWER", Qt::CaseInsensitive)==0)
             return IOType::LASER_POWER;
         if (str.compare("COMPRESSED_AIR_1", Qt::CaseInsensitive)==0)
@@ -124,17 +126,13 @@ public:
             return IOType::RED_LIGHT;
         if (str.compare("GREEN_LIGHT", Qt::CaseInsensitive)==0)
             return IOType::GREEN_LIGHT;
-//        if (str.compare("ANAL_AUTOFOCUS_DISTANCE", Qt::CaseInsensitive)==0)
-//            return IOType::ANAL_AUTOFOCUS_DISTANCE;
-//        if (str.compare("ANAL_SUCTION_DEPRESSURE", Qt::CaseInsensitive)==0)
-//            return IOType::ANAL_SUCTION_DEPRESSURE;
-//        if (str.compare("ANAL_AIR_PRESSUR", Qt::CaseInsensitive)==0)
-//            return IOType::ANAL_AIR_PRESSURE;
+        if (str.compare("GENERIC_ANALOG_INPUT", Qt::CaseInsensitive)==0)
+            return IOType::GENERIC_ANALOG_INPUT;
         return IOType::NOT_VALID;
 
     }
 
-    static QString getDeviceKeyStr(DeviceKey device) {
+    static inline QString getStringFromDeviceKey(DeviceKey device) {
 
         switch (device) {
             case DeviceKey::NONE: break;
@@ -143,6 +141,18 @@ public:
         }
 
         return "";
+
+    }
+
+    static inline DeviceKey getDeviceKeyFromString(const QString& str) {
+
+        if (str.compare("GALIL_CN", Qt::CaseInsensitive)==0)
+            return DeviceKey::GALIL_CN;
+        if (str.compare("GALIL_PLC", Qt::CaseInsensitive)==0)
+            return DeviceKey::GALIL_PLC;
+
+        return DeviceKey::NONE;
+
     }
 
 };

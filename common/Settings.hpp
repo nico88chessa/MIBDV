@@ -10,10 +10,11 @@
 #include <Logger.hpp>
 #include <data/DigitalInput.hpp>
 #include <data/DigitalOutput.hpp>
-#include <data/AnalogicInput.hpp>
+#include <data/AnalogInput.hpp>
 #include <Utils.hpp>
 
 namespace PROGRAM_NAMESPACE {
+
 
 class Settings {
 public:
@@ -21,15 +22,26 @@ public:
     using ConstPtr = const Settings*;
 
 private:
+    static constexpr char ARRAY_DIGITAL_INPUT[] = "DigitalInput";
+    static constexpr char ARRAY_DIGITAL_OUTPUT[] = "DigitalOutput";
+    static constexpr char ARRAY_ANALOG_INPUT[] = "AnalogInput";
+
+private:
     Settings();
     ~Settings() { }
 
     void loadValuesFromFile();
     void writeValuesToFile();
+    bool validateDigitalInput(const DigitalInput& i) const;
+    bool validateDigitalOutput(const DigitalOutput& i) const;
+    bool validateAnalogInput(const AnalogInput& i) const;
 
 public:
     Settings(const Settings&) = delete;
     void operator=(const Settings&) = delete;
+    void operator=(Settings&&) = delete;
+
+    bool validateSettings() const;
 
     static Settings& instance();
 
@@ -66,7 +78,7 @@ public:
 
     const QMap<IOType, DigitalInput>& getDigitalInputs() const { return digitalInputs; }
     const QMap<IOType, DigitalOutput>& getDigitalOutputs() const { return digitalOutputs; }
-    const QMap<IOType, AnalogicInput>& getAnalogicInputs() const { return analogicInputs; }
+    const QMap<IOType, AnalogInput>& getAnalogInputs() const { return analogInputs; }
 
 private:
     // ASSE X
@@ -108,7 +120,7 @@ private:
     // IO
     QMap<IOType, DigitalInput> digitalInputs;
     QMap<IOType, DigitalOutput> digitalOutputs;
-    QMap<IOType, AnalogicInput> analogicInputs;
+    QMap<IOType, AnalogInput> analogInputs;
 
 };
 

@@ -6,22 +6,17 @@
 namespace PROGRAM_NAMESPACE {
 
 using real = float;
-using analogicReal = double;
+using analogReal = double;
 
 enum class DeviceKey : int {
     NONE = -1,
-    GALIL_CN = 1,
+    GALIL_CN = 0,
     GALIL_PLC
 };
 
-//enum class DeviceType {
-//    CN,
-//    PLC,
-//};
-
 enum class IOType : int {
     NOT_VALID = -1,
-    POWER = 1,                              // digital input
+    POWER = 0,                              // digital input
     CYCLE,                                  // digital input
     EMERGENCY_MUSHROOM,                     // digital input
     DOOR,                                   // digital input
@@ -30,7 +25,7 @@ enum class IOType : int {
     MARK_IN_PROGRESS,                       // digital input
     SCANNER_READY,                          // digital input
     SCANNER_ERROR,                          // digital input
-    GENERIC_INPUT,                          // generic input
+    GENERIC_INPUT,                          // generic digital input
     LASER_POWER,                            // digital output
     COMPRESSED_AIR_1,                       // digital output
     COMPRESSED_AIR_2,                       // digital output
@@ -43,10 +38,8 @@ enum class IOType : int {
     START_SCAN,                             // digital output
     STOP_SCAN,                              // digital output
     RED_LIGHT,                              // digital output
-    GREEN_LIGHT                             // digital output
-//    ANAL_AUTOFOCUS_DISTANCE,                // analogic input generic
-//    ANAL_SUCTION_DEPRESSURE,                // analogic input generic
-//    ANAL_AIR_PRESSURE                       // analogic input generic
+    GREEN_LIGHT,                            // digital output
+    GENERIC_ANALOG_INPUT,                   // generic analog input
 };
 
 //inline bool operator<(const IOType left, const IOType right) {
@@ -105,17 +98,16 @@ constexpr char DIGITAL_OUTPUT_INVERT_LOGIC[] = "InvertLogic";
 constexpr char DIGITAL_OUTPUT_DEVICE[] = "Device";
 constexpr char DIGITAL_OUTPUT_IS_ALARM[] = "IsAlarm";
 
-constexpr char ANALOGC_INPUT_TYPE[] = "Type";
-constexpr char ANALOGC_INPUT_NAME[] = "Name";
-constexpr char ANALOGC_INPUT_CHANNEL[] = "Channel";
-constexpr char ANALOGC_INPUT_DEVICE[] = "Device";
-constexpr char ANALOGC_INPUT_IS_ALARM[] = "IsAlarm";
-constexpr char ANALOGC_INPUT_GAIN[] = "Gain";
-constexpr char ANALOGC_INPUT_OFFSET[] = "Offset";
-constexpr char ANALOGC_INPUT_UNIT[] = "Unit";
-constexpr char ANALOGC_INPUT_LOWER_LIMIT[] = "LowerLimit";
-constexpr char ANALOGC_INPUT_UPPER_LIMIT[] = "UpperLimit";
-constexpr char ANALOGC_INPUT_HYSTERESIS[] = "Hysteresis";
+constexpr char ANALOG_INPUT_NAME[] = "Name";
+constexpr char ANALOG_INPUT_CHANNEL[] = "Channel";
+constexpr char ANALOG_INPUT_DEVICE[] = "Device";
+constexpr char ANALOG_INPUT_IS_ALARM[] = "IsAlarm";
+constexpr char ANALOG_INPUT_GAIN[] = "Gain";
+constexpr char ANALOG_INPUT_OFFSET[] = "Offset";
+constexpr char ANALOG_INPUT_UNIT[] = "Unit";
+constexpr char ANALOG_INPUT_LOWER_LIMIT[] = "LowerLimit";
+constexpr char ANALOG_INPUT_UPPER_LIMIT[] = "UpperLimit";
+constexpr char ANALOG_INPUT_HYSTERESIS[] = "Hysteresis";
 
 constexpr int AXIS_X_STEP_PER_MM_DFLT = 1;
 constexpr int AXIS_X_MIN_POS_MM_DFLT = 2;

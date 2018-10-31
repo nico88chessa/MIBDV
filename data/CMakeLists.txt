@@ -1,7 +1,7 @@
 SET(ITEMS
     DigitalInput
     DigitalOutput
-    AnalogicInput
+    AnalogInput
     Error
     GalilCNStatus
     GalilPLCStatus

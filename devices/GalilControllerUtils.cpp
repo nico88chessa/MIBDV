@@ -172,11 +172,11 @@ QString GalilControllerUtils::getCustomErrorDescription(int errorCode) {
         case G_CUSTOM_CN_NON_INIZIALIZZATO: value = "CN has not been initialized"; break;
         case G_CUSTOM_CN_DIGITAL_INPUT_OUT_OF_RANGE: value = "CN digital input out of range"; break;
         case G_CUSTOM_CN_DIGITAL_OUTPUT_OUT_OF_RANGE: value = "CN digital output out of range"; break;
-        case G_CUSTOM_CN_ANALOGIC_INPUT_OUT_OF_RANGE: value = "CN analogic input out of range"; break;
+        case G_CUSTOM_CN_ANALOG_INPUT_OUT_OF_RANGE: value = "CN analog input out of range"; break;
         case G_CUSTOM_PLC_NON_INIZIALIZZATO: value = "PLC has not been initialized"; break;
         case G_CUSTOM_PLC_DIGITAL_INPUT_OUT_OF_RANGE: value = "PLC digital input out of range"; break;
         case G_CUSTOM_PLC_DIGITAL_OUTPUT_OUT_OF_RANGE: value = "PLC digital output out of range"; break;
-        case G_CUSTOM_PLC_ANALOGIC_INPUT_OUT_OF_RANGE: value = "PLC analogic input out of range"; break;
+        case G_CUSTOM_PLC_ANALOG_INPUT_OUT_OF_RANGE: value = "PLC analog input out of range"; break;
         default: value = ""; break;
     }
     return value;

@@ -164,7 +164,7 @@ int GalilCNController::getAnalogInput(int analogInput, anlType& analogInputStatu
 
     if (analogInput<1 || analogInput>numAnalogInput) {
         traceErr() << "Galil CN: output richiesto fuori dal range del device";
-        return G_CUSTOM_CN_ANALOGIC_INPUT_OUT_OF_RANGE;
+        return G_CUSTOM_CN_ANALOG_INPUT_OUT_OF_RANGE;
     }
 
     QString command = QString("MG @AN[%1]").arg(analogInput);

@@ -2,6 +2,10 @@
 
 using namespace PROGRAM_NAMESPACE;
 
+DigitalOutput::DigitalOutput() :
+    DigitalOutput("", -1, false,
+                  DeviceKey::NONE, false, IOType::NOT_VALID) { }
+
 DigitalOutput::DigitalOutput(
         QString name, int channel, bool invertLogic,
         DeviceKey device, bool isAlarm, IOType elementType) :

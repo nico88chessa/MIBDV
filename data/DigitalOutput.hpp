@@ -22,6 +22,7 @@ private:
     IOType elementType;
 
 public:
+    DigitalOutput();
     DigitalOutput(QString name, int channel, bool invertLogic,
                   DeviceKey device, bool isAlarm, IOType elementType);
 
