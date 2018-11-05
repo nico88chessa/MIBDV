@@ -18,8 +18,6 @@
 #include <Settings.hpp>
 #include <Logger.hpp>
 
-
-
 namespace PROGRAM_NAMESPACE {
 
 class IOManager : public QObject {
@@ -49,24 +47,24 @@ public:
     }
 
 private:
-    template<DeviceKey D>
-    void updateStatus(const QVariant& status) {
+//    template<DeviceKey D>
+//    void updateStatus(const QVariant& status) {
 
-        static_assert(deviceKeyTraits<D>::value, "Tipo di DeviceKey non valido");
-        using deviceType = typename deviceKeyTraits<D>::type;
-        static_assert(isDevice<deviceType>::value, "DeviceKey non e' associato ad alcun device noto");
-        using statusType = typename isDevice<deviceType>::statusType;
+//        static_assert(deviceKeyTraits<D>::value, "Tipo di DeviceKey non valido");
+//        using deviceType = typename deviceKeyTraits<D>::type;
+//        static_assert(isDevice<deviceType>::value, "DeviceKey non e' associato ad alcun device noto");
+//        using statusType = typename isDevice<deviceType>::statusType;
 
-        statusType s = status.value<statusType>();
+//        statusType s = status.value<statusType>();
 
-    }
+//    }
 
     bool setDigitalOutput(IOType type, bool value);
 
 public slots:
     bool setDigitalOutput(IOType type);
     bool unsetDigitalOutput(IOType type);
-    void setStatus(DeviceKey k, const QVariant& status);
+//    void setStatus(DeviceKey k, const QVariant& status);
 
 
 signals:

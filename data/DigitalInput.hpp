@@ -32,7 +32,20 @@ public:
     DeviceKey getDevice() const;
     bool getIsAlarm() const;
     IOType getElementType() const;
+
+    friend inline bool operator==(const DigitalInput& l, const DigitalInput& r);
+    friend inline bool operator<(const DigitalInput& l, const DigitalInput& r);
+
 };
+
+bool operator==(const DigitalInput& l, const DigitalInput& r) {
+    return (l.device == r.device) && (l.channel == r.channel);
+}
+
+bool operator<(const DigitalInput& l, const DigitalInput& r) {
+    return (l.device < r.device) || (
+                (l.device == r.device) && (l.channel < r.channel));
+}
 
 }
 

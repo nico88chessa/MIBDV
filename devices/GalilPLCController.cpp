@@ -78,7 +78,7 @@ bool GalilPLCController::connect(const QString& ip) {
 //    GReturn result = GOpen(str.toStdString().data(), handle.data());
 
     /**
-     * NOTE NIC 2018/10/18 - metodo connect
+     * NOTE NIC 18/10/2018 - metodo connect
      * se non riesco a connettermi al Galil, allora devo resettare il puntatore;
      * altrimenti nel distruttore viene lanciata un'eccezione
      **/

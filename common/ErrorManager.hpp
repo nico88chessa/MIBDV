@@ -36,9 +36,12 @@ public:
     void subscribeObject(T& object) {
 
         traceEnter;
+
         static_assert (hasErrorSignaler<T>::value, "subscribeObject: oggetto non valido");
         connect(object.errorSignaler.data(), &ErrorSignaler::signalErrorListUpdate, this, &ErrorManager::errorListHandler);
+
         traceExit;
+
     }
 
     template <typename T>

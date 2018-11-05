@@ -5,7 +5,7 @@ using namespace PROGRAM_NAMESPACE;
 GalilCNInspector::GalilCNInspector(QObject* parent) : QObject(parent),
     errorSignaler(new ErrorSignaler()) {
 
-    // TODO NIC 26/10/2018 - correggere con parametri in file di configurazione
+    // TODO NIC 26/10/2018 - parametrizzare in file di configurazione
     refreshTimer.setInterval(1000);
 
     connect(&refreshTimer, &QTimer::timeout, this, &GalilCNInspector::process);
@@ -128,7 +128,7 @@ void GalilCNInspector::startProcess() {
 
     traceEnter;
 
-    // TODO NIC 26/10/2018 - correggere con parametri in file di configurazione
+    // TODO NIC 26/10/2018 - parametrizzare in file di configurazione
 //    controller.setupController(8, 8, 0);
 //    QString ip = "169.254.12.10";
     int reconnectTimeMs = 1000;

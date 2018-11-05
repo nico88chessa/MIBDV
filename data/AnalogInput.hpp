@@ -46,7 +46,20 @@ public:
     analogReal getUpperLimit() const;
     analogReal getHysteresys() const;
     IOType getElementType() const;
+
+    friend inline bool operator==(const AnalogInput& l, const AnalogInput& r);
+    friend inline bool operator<(const AnalogInput& l, const AnalogInput& r);
+
 };
+
+bool operator==(const AnalogInput& l, const AnalogInput& r) {
+    return (l.device == r.device) && (l.channel == r.channel);
+}
+
+bool operator<(const AnalogInput& l, const AnalogInput& r) {
+    return (l.device < r.device) || (
+                (l.device == r.device) && (l.channel < r.channel));
+}
 
 }
 

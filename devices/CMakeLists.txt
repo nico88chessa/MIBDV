@@ -7,6 +7,7 @@ SET(ITEMS
     GalilCNInspector
     GalilPLCController
     IOManager
+    IOInspector
     )
 
 FOREACH(ITEM ${ITEMS})

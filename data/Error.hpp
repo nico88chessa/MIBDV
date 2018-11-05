@@ -21,8 +21,6 @@ public:
     using Ptr = Error*;
     using ConstPtr = Error*;
 
-    friend inline bool operator==(const Error& lhs, const Error& rhs);
-
 private:
     // TODO NIC 25/10/2018 - vedere come creare gli errori
     int deviceKey;
@@ -39,6 +37,8 @@ public:
     QString getErrorDescription() const { return errorDescription; }
     ErrorType getErrorType() const { return errorType; }
     int getDeviceKey() const { return deviceKey; }
+
+    friend inline bool operator==(const Error& lhs, const Error& rhs);
 
 };
 

@@ -33,7 +33,19 @@ public:
     bool getIsAlarm() const;
     IOType getElementType() const;
 
+    friend inline bool operator==(const DigitalOutput& l, const DigitalOutput& r);
+    friend inline bool operator<(const DigitalOutput& l, const DigitalOutput& r);
+
 };
+
+bool operator==(const DigitalOutput& l, const DigitalOutput& r) {
+    return (l.device == r.device) && (l.channel == r.channel);
+}
+
+bool operator<(const DigitalOutput& l, const DigitalOutput& r) {
+    return (l.device < r.device) || (
+                (l.device == r.device) && (l.channel < r.channel));
+}
 
 }
 

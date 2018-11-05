@@ -99,18 +99,18 @@ bool IOManager::unsetDigitalOutput(IOType type) {
 
 }
 
-void IOManager::setStatus(DeviceKey k, const QVariant& status) {
+//void IOManager::setStatus(DeviceKey k, const QVariant& status) {
 
-    traceEnter;
+//    traceEnter;
 
-    switch (k) {
-        case DeviceKey::GALIL_CN: this->updateStatus<DeviceKey::GALIL_CN>(status); break;
-        case DeviceKey::GALIL_PLC: this->updateStatus<DeviceKey::GALIL_PLC>(status); break;
-        case DeviceKey::NONE: break;
-    }
+//    switch (k) {
+//        case DeviceKey::GALIL_CN: this->updateStatus<DeviceKey::GALIL_CN>(status); break;
+//        case DeviceKey::GALIL_PLC: this->updateStatus<DeviceKey::GALIL_PLC>(status); break;
+//        case DeviceKey::NONE: break;
+//    }
 
-    traceExit;
+//    traceExit;
 
-    return;
+//    return;
 
-}
+//}
