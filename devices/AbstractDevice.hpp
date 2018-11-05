@@ -5,17 +5,28 @@
 
 namespace PROGRAM_NAMESPACE {
 
+class IAbstractDevice {
+public:
+    using Ptr = IAbstractDevice*;
+    using ConstPtr = const IAbstractDevice*;
+
+public:
+    virtual bool isConnected() const = 0;
+    virtual ~IAbstractDevice();
+
+};
+
 template <typename S>
-class AbstractDevice {
+class AbstractDevice : public IAbstractDevice {
 public:
     using Ptr = AbstractDevice*;
     using ConstPtr = const AbstractDevice*;
 
 public:
-    virtual bool isConnected() const = 0;
     virtual S getStatus() const = 0;
 
 };
+
 
 // type traits
 
