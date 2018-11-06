@@ -32,7 +32,7 @@ private:
     QMap<DigitalOutput, bool> digitalOutputStatus;
 
     QMap<IOType, AnalogInput> analogInputs;
-    QMap<AnalogInput, analogReal> analogicInputStatus;
+    QMap<AnalogInput, analogReal> analogInputStatus;
 
     QTimer signalTimer;
     bool needSignaler;
@@ -65,8 +65,7 @@ private:
 signals:
     void digitalInputsStateSignal(const QMap<DigitalInput, bool>& digitalInputs);
     void digitalOutputsStateSignal(const QMap<DigitalOutput, bool>& digitalOutputs);
-    void analogicInputsStateSignal(const QMap<AnalogInput, analogReal>& analogicInputs);
-
+    void analogInputsStateSignal(const QMap<AnalogInput, analogReal>& analogInputs);
 
 public slots:
     void updateIOStatus(DeviceKey k, const QVariant& status);

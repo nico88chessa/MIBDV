@@ -144,9 +144,11 @@ constexpr char ANALOG_INPUT_HYSTERESIS[] = "Hysteresis";
 
 constexpr char MACHINE_CN_TYPE[] = "Machine/CNType";
 constexpr char MACHINE_PLC_TYPE[] = "Machine/PLCType";
+constexpr char MACHINE_IO_REFRESH_INTERVAL_MS[] = "Machine/IORefreshIntervalMs";
 
 constexpr DeviceKey MACHINE_CN_TYPE_DFLT = DeviceKey::NONE;
 constexpr DeviceKey MACHINE_PLC_TYPE_DFLT = DeviceKey::NONE;
+constexpr int MACHINE_IO_REFRESH_INTERVAL_MS_DFLT = 1000;
 
 constexpr char GALIL_CN_CONNECTION_TIMEOUT_MS[] = "GalilCN/ConnectionTimeoutMs";
 constexpr char GALIL_CN_STATUS_REFRESH_INTERVAL_MS[] = "GalilCN/StatusRefreshIntervalMs";

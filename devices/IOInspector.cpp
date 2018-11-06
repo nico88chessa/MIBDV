@@ -13,9 +13,11 @@ IOInspector::IOInspector(QObject *parent) : QObject(parent), needSignaler(false)
         digitalInputStatus.insert(di, false);
 
     for (auto ai: analogInputs.values())
-        analogicInputStatus.insert(ai, 0);
+        analogInputStatus.insert(ai, 0);
 
-    signalTimer.setInterval(100); // TODO NIC 05/11/2018 - parametrizzare in file di configurazione
+    Settings& s = Settings::instance();
+
+    signalTimer.setInterval(s.getMachineIORefreshIntervalMs());
     connect(&signalTimer, &QTimer::timeout, this, &IOInspector::signalStatusTimeout);
     signalTimer.start();
 }
@@ -62,10 +64,10 @@ void IOInspector::updateStatus(const GalilPLCStatusBean& status) {
         }
     }
 
-    for (auto anIn: analogicInputStatus.keys()) {
+    for (auto anIn: analogInputStatus.keys()) {
         if (anIn.getDevice() == DeviceKey::GALIL_PLC) {
             analogReal value = status.getAnalogInput(anIn.getChannel());
-            analogicInputStatus.value(anIn, value);
+            analogInputStatus.value(anIn, value);
         }
     }
 
@@ -96,7 +98,7 @@ void IOInspector::signalStatusTimeout() {
     if (this->needSignaler) {
         emit digitalInputsStateSignal(digitalInputStatus);
         emit digitalOutputsStateSignal(digitalOutputStatus);
-        emit analogicInputsStateSignal(analogicInputStatus);
+        emit analogInputsStateSignal(analogInputStatus);
     }
     needSignaler = false;
 

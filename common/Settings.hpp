@@ -89,6 +89,12 @@ public:
     int getGalilPLCCheckConnectionIntervalMs() const { return galilPLCCheckConnectionIntervalMs; }
     QString getGalilPLCIpAddress() const { return galilPLCIpAddress; }
 
+    DeviceKey getMachineCNType() const { return machineCNType; }
+    DeviceKey getMachinePLCType() const { return machinePLCType; }
+    int getMachineIORefreshIntervalMs() const { return machineIORefreshIntervalMs; }
+
+
+
 private:
     // ASSE X
     int axisXStepPerMm;
@@ -132,8 +138,9 @@ private:
     QMap<IOType, AnalogInput> analogInputs;
 
     // MACHINE
-    DeviceKey cnType;
-    DeviceKey plcType;
+    DeviceKey machineCNType;
+    DeviceKey machinePLCType;
+    int machineIORefreshIntervalMs;
 
     // GALIL CN PARAMETERS
     int galilCNConnectionTimeoutMs;
