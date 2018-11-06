@@ -62,6 +62,17 @@ constexpr char AXIS_X_OPERATIVE_SPEED_MMS[] = "AxisX/OperativeSpeedMms";
 constexpr char AXIS_X_OPERATIVE_ACC_MMS2[] = "AxisX/OperativeAccMms2";
 constexpr char AXIS_X_OPERATIVE_DEC_MMS2[] = "AxisX/OperativeDecMms2";
 
+constexpr int AXIS_X_STEP_PER_MM_DFLT = 1;
+constexpr int AXIS_X_MIN_POS_MM_DFLT = 2;
+constexpr int AXIS_X_MAX_POS_MM_DFLT = 3;
+constexpr real AXIS_X_BASE_OFFSET_MM_DFLT = 4;
+constexpr real AXIS_X_MANUAL_SPEED_MMS_DFLT = 5;
+constexpr real AXIS_X_MANUAL_ACC_MMS2_DFLT = 6;
+constexpr real AXIS_X_MANUAL_DEC_MMS2_DFLT = 7;
+constexpr real AXIS_X_OPERATIVE_SPEED_MMS_DFLT = 8;
+constexpr real AXIS_X_OPERATIVE_ACC_MMS2_DFLT = 9;
+constexpr real AXIS_X_OPERATIVE_DEC_MMS2_DFLT = 10;
+
 constexpr char AXIS_Y_STEP_PER_MM[] = "AxisY/StepPerMm";
 constexpr char AXIS_Y_MIN_POS_MM[] = "AxisY/MinPosMm";
 constexpr char AXIS_Y_MAX_POS_MM[] = "AxisY/MaxPosMm";
@@ -73,6 +84,17 @@ constexpr char AXIS_Y_OPERATIVE_SPEED_MMS[] = "AxisY/OperativeSpeedMms";
 constexpr char AXIS_Y_OPERATIVE_ACC_MMS2[] = "AxisY/OperativeAccMms2";
 constexpr char AXIS_Y_OPERATIVE_DEC_MMS2[] = "AxisY/OperativeDecMms2";
 
+constexpr int AXIS_Y_STEP_PER_MM_DFLT = 12;
+constexpr int AXIS_Y_MIN_POS_MM_DFLT = 13;
+constexpr int AXIS_Y_MAX_POS_MM_DFLT = 14;
+constexpr real AXIS_Y_BASE_OFFSET_MM_DFLT = 15;
+constexpr real AXIS_Y_MANUAL_SPEED_MMS_DFLT = 16;
+constexpr real AXIS_Y_MANUAL_ACC_MMS2_DFLT = 17;
+constexpr real AXIS_Y_MANUAL_DEC_MMS2_DFLT = 18;
+constexpr real AXIS_Y_OPERATIVE_SPEED_MMS_DFLT = 19;
+constexpr real AXIS_Y_OPERATIVE_ACC_MMS2_DFLT = 20;
+constexpr real AXIS_Y_OPERATIVE_DEC_MMS2_DFLT = 21;
+
 constexpr char AXIS_Z_STEP_PER_MM[] = "AxisZ/StepPerMm";
 constexpr char AXIS_Z_MIN_POS_MM[] = "AxisZ/MinPosMm";
 constexpr char AXIS_Z_MAX_POS_MM[] = "AxisZ/MaxPosMm";
@@ -83,6 +105,17 @@ constexpr char AXIS_Z_MANUAL_DEC_MMS2[] = "AxisZ/ManualDecMms2";
 constexpr char AXIS_Z_OPERATIVE_SPEED_MMS[] = "AxisZ/OperativeSpeedMms";
 constexpr char AXIS_Z_OPERATIVE_ACC_MMS2[] = "AxisZ/OperativeAccMms2";
 constexpr char AXIS_Z_OPERATIVE_DEC_MMS2[] = "AxisZ/OperativeDecMms2";
+
+constexpr int AXIS_Z_STEP_PER_MM_DFLT = 23;
+constexpr int AXIS_Z_MIN_POS_MM_DFLT = 24;
+constexpr int AXIS_Z_MAX_POS_MM_DFLT = 25;
+constexpr real AXIS_Z_BASE_OFFSET_MM_DFLT = 26;
+constexpr real AXIS_Z_MANUAL_SPEED_MMS_DFLT = 27;
+constexpr real AXIS_Z_MANUAL_ACC_MMS2_DFLT = 28;
+constexpr real AXIS_Z_MANUAL_DEC_MMS2_DFLT = 29;
+constexpr real AXIS_Z_OPERATIVE_SPEED_MMS_DFLT = 30;
+constexpr real AXIS_Z_OPERATIVE_ACC_MMS2_DFLT = 31;
+constexpr real AXIS_Z_OPERATIVE_DEC_MMS2_DFLT = 32;
 
 constexpr char DIGITAL_INPUT_TYPE[] = "Type";
 constexpr char DIGITAL_INPUT_NAME[] = "Name";
@@ -109,38 +142,32 @@ constexpr char ANALOG_INPUT_LOWER_LIMIT[] = "LowerLimit";
 constexpr char ANALOG_INPUT_UPPER_LIMIT[] = "UpperLimit";
 constexpr char ANALOG_INPUT_HYSTERESIS[] = "Hysteresis";
 
-constexpr int AXIS_X_STEP_PER_MM_DFLT = 1;
-constexpr int AXIS_X_MIN_POS_MM_DFLT = 2;
-constexpr int AXIS_X_MAX_POS_MM_DFLT = 3;
-constexpr real AXIS_X_BASE_OFFSET_MM_DFLT = 4;
-constexpr real AXIS_X_MANUAL_SPEED_MMS_DFLT = 5;
-constexpr real AXIS_X_MANUAL_ACC_MMS2_DFLT = 6;
-constexpr real AXIS_X_MANUAL_DEC_MMS2_DFLT = 7;
-constexpr real AXIS_X_OPERATIVE_SPEED_MMS_DFLT = 8;
-constexpr real AXIS_X_OPERATIVE_ACC_MMS2_DFLT = 9;
-constexpr real AXIS_X_OPERATIVE_DEC_MMS2_DFLT = 10;
+constexpr char MACHINE_CN_TYPE[] = "Machine/CNType";
+constexpr char MACHINE_PLC_TYPE[] = "Machine/PLCType";
 
-constexpr int AXIS_Y_STEP_PER_MM_DFLT = 12;
-constexpr int AXIS_Y_MIN_POS_MM_DFLT = 13;
-constexpr int AXIS_Y_MAX_POS_MM_DFLT = 14;
-constexpr real AXIS_Y_BASE_OFFSET_MM_DFLT = 15;
-constexpr real AXIS_Y_MANUAL_SPEED_MMS_DFLT = 16;
-constexpr real AXIS_Y_MANUAL_ACC_MMS2_DFLT = 17;
-constexpr real AXIS_Y_MANUAL_DEC_MMS2_DFLT = 18;
-constexpr real AXIS_Y_OPERATIVE_SPEED_MMS_DFLT = 19;
-constexpr real AXIS_Y_OPERATIVE_ACC_MMS2_DFLT = 20;
-constexpr real AXIS_Y_OPERATIVE_DEC_MMS2_DFLT = 21;
+constexpr DeviceKey MACHINE_CN_TYPE_DFLT = DeviceKey::NONE;
+constexpr DeviceKey MACHINE_PLC_TYPE_DFLT = DeviceKey::NONE;
 
-constexpr int AXIS_Z_STEP_PER_MM_DFLT = 23;
-constexpr int AXIS_Z_MIN_POS_MM_DFLT = 24;
-constexpr int AXIS_Z_MAX_POS_MM_DFLT = 25;
-constexpr real AXIS_Z_BASE_OFFSET_MM_DFLT = 26;
-constexpr real AXIS_Z_MANUAL_SPEED_MMS_DFLT = 27;
-constexpr real AXIS_Z_MANUAL_ACC_MMS2_DFLT = 28;
-constexpr real AXIS_Z_MANUAL_DEC_MMS2_DFLT = 29;
-constexpr real AXIS_Z_OPERATIVE_SPEED_MMS_DFLT = 30;
-constexpr real AXIS_Z_OPERATIVE_ACC_MMS2_DFLT = 31;
-constexpr real AXIS_Z_OPERATIVE_DEC_MMS2_DFLT = 32;
+constexpr char GALIL_CN_CONNECTION_TIMEOUT_MS[] = "GalilCN/ConnectionTimeoutMs";
+constexpr char GALIL_CN_STATUS_REFRESH_INTERVAL_MS[] = "GalilCN/StatusRefreshIntervalMs";
+constexpr char GALIL_CN_CHECK_CONNECTION_INTERVAL_MS[] = "GalilCN/CheckConnectionIntervalMs";
+constexpr char GALIL_CN_IP_ADDRESS[] = "GalilCN/IpAddress";
+
+constexpr char GALIL_PLC_CONNECTION_TIMEOUT_MS[] = "GalilPLC/ConnectionTimeoutMs";
+constexpr char GALIL_PLC_STATUS_REFRESH_INTERVAL_MS[] = "GalilPLC/StatusRefreshIntervalMs";
+constexpr char GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS[] = "GalilPLC/CheckConnectionIntervalMs";
+constexpr char GALIL_PLC_IP_ADDRESS[] = "GalilPLC/IpAddress";
+
+constexpr int GALIL_CN_CONNECTION_TIMEOUT_MS_DFLT = 1000;
+constexpr int GALIL_CN_STATUS_REFRESH_INTERVAL_MS_DFLT = 100;
+constexpr int GALIL_CN_CHECK_CONNECTION_INTERVAL_MS_DFLT = 1000;
+constexpr char GALIL_CN_IP_ADDRESS_DFLT[] = "169.254.12.10";
+
+constexpr int GALIL_PLC_CONNECTION_TIMEOUT_MS_DFLT = 1000;
+constexpr int GALIL_PLC_STATUS_REFRESH_INTERVAL_MS_DFLT = 100;
+constexpr int GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS_DFLT = 1000;
+constexpr char GALIL_PLC_IP_ADDRESS_DFLT[] = "169.254.12.11";
+
 
 }
 

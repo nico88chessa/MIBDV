@@ -80,6 +80,15 @@ public:
     const QMap<IOType, DigitalOutput>& getDigitalOutputs() const { return digitalOutputs; }
     const QMap<IOType, AnalogInput>& getAnalogInputs() const { return analogInputs; }
 
+    int getGalilCNConnectionTimeoutMs() const { return galilCNConnectionTimeoutMs; }
+    int getGalilCNStatusRefreshIntervalMs() const { return galilCNStatusRefreshIntervalMs; }
+    int getGalilCNCheckConnectionIntervalMs() const { return galilCNCheckConnectionIntervalMs; }
+    QString getGalilCNIpAddress() const { return galilCNIpAddress; }
+    int getGalilPLCConnectionTimeoutMs() const { return galilPLCConnectionTimeoutMs; }
+    int getGalilPLCStatusRefreshIntervalMs() const { return galilPLCStatusRefreshIntervalMs; }
+    int getGalilPLCCheckConnectionIntervalMs() const { return galilPLCCheckConnectionIntervalMs; }
+    QString getGalilPLCIpAddress() const { return galilPLCIpAddress; }
+
 private:
     // ASSE X
     int axisXStepPerMm;
@@ -121,6 +130,22 @@ private:
     QMap<IOType, DigitalInput> digitalInputs;
     QMap<IOType, DigitalOutput> digitalOutputs;
     QMap<IOType, AnalogInput> analogInputs;
+
+    // MACHINE
+    DeviceKey cnType;
+    DeviceKey plcType;
+
+    // GALIL CN PARAMETERS
+    int galilCNConnectionTimeoutMs;
+    int galilCNStatusRefreshIntervalMs;
+    int galilCNCheckConnectionIntervalMs;
+    QString galilCNIpAddress;
+
+    // GALIL PLC PARAMETERS
+    int galilPLCConnectionTimeoutMs;
+    int galilPLCStatusRefreshIntervalMs;
+    int galilPLCCheckConnectionIntervalMs;
+    QString galilPLCIpAddress;
 
 };
 

@@ -140,7 +140,7 @@ public:
             case DeviceKey::GALIL_PLC: return "GALIL_PLC";
         }
 
-        return "";
+        return "NONE";
 
     }
 

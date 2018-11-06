@@ -158,6 +158,27 @@ void Settings::loadValuesFromFile() {
     }
     settings.endArray();
 
+    // inizio lettura parametri di macchina
+
+    cnType = Utils::getDeviceKeyFromString(settings.value(MACHINE_CN_TYPE, Utils::getStringFromDeviceKey(MACHINE_CN_TYPE_DFLT)).value<QString>());
+    plcType = Utils::getDeviceKeyFromString(settings.value(MACHINE_PLC_TYPE, Utils::getStringFromDeviceKey(MACHINE_PLC_TYPE_DFLT)).value<QString>());
+
+    // se il cn e' di tipo galil, carico i parametri del galil)
+    if (DeviceKey::GALIL_CN == cnType) {
+        galilCNConnectionTimeoutMs = settings.value(GALIL_CN_CONNECTION_TIMEOUT_MS, GALIL_CN_CONNECTION_TIMEOUT_MS_DFLT).value<int>();
+        galilCNStatusRefreshIntervalMs = settings.value(GALIL_CN_STATUS_REFRESH_INTERVAL_MS, GALIL_CN_STATUS_REFRESH_INTERVAL_MS_DFLT).value<int>();
+        galilCNCheckConnectionIntervalMs = settings.value(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS, GALIL_CN_CHECK_CONNECTION_INTERVAL_MS_DFLT).value<int>();
+        galilCNIpAddress = settings.value(GALIL_CN_IP_ADDRESS, GALIL_CN_IP_ADDRESS_DFLT).value<QString>();
+    }
+
+    // se il plc e' di tipo galil, carico i parametri del galil)
+    if (DeviceKey::GALIL_PLC == plcType) {
+        galilPLCConnectionTimeoutMs = settings.value(GALIL_PLC_CONNECTION_TIMEOUT_MS, GALIL_PLC_CONNECTION_TIMEOUT_MS_DFLT).value<int>();
+        galilPLCStatusRefreshIntervalMs = settings.value(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS, GALIL_PLC_STATUS_REFRESH_INTERVAL_MS_DFLT).value<int>();
+        galilPLCCheckConnectionIntervalMs = settings.value(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS, GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS_DFLT).value<int>();
+        galilPLCIpAddress = settings.value(GALIL_PLC_IP_ADDRESS, GALIL_PLC_IP_ADDRESS_DFLT).value<QString>();
+    }
+
     traceDebug() << "axisXStepPerMm:" << axisXStepPerMm;
     traceDebug() << "axisXMinPosMm:" << axisXMinPosMm;
     traceDebug() << "axisXMaxPosMm:" << axisXMaxPosMm;
@@ -282,6 +303,35 @@ void Settings::writeValuesToFile() {
         settings.setValue(ANALOG_INPUT_UPPER_LIMIT, sample.getUpperLimit());
         settings.setValue(ANALOG_INPUT_HYSTERESIS, sample.getHysteresys());
         settings.endArray();
+    }
+
+    settings.setValue(MACHINE_CN_TYPE, Utils::getStringFromDeviceKey(cnType));
+    settings.setValue(MACHINE_PLC_TYPE, Utils::getStringFromDeviceKey(plcType));
+
+    // se il cn e' di tipo galil, carico i parametri del galil)
+    if (DeviceKey::GALIL_CN == cnType) {
+        settings.setValue(GALIL_CN_CONNECTION_TIMEOUT_MS, galilCNConnectionTimeoutMs);
+        settings.setValue(GALIL_CN_STATUS_REFRESH_INTERVAL_MS, galilCNStatusRefreshIntervalMs);
+        settings.setValue(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS, galilCNCheckConnectionIntervalMs);
+        settings.setValue(GALIL_CN_IP_ADDRESS, galilCNIpAddress);
+    } else {
+        settings.remove(GALIL_CN_CONNECTION_TIMEOUT_MS);
+        settings.remove(GALIL_CN_STATUS_REFRESH_INTERVAL_MS);
+        settings.remove(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS);
+        settings.remove(GALIL_CN_IP_ADDRESS);
+    }
+
+    // se il plc e' di tipo galil, carico i parametri del galil)
+    if (DeviceKey::GALIL_PLC == plcType) {
+        settings.setValue(GALIL_PLC_CONNECTION_TIMEOUT_MS, galilPLCConnectionTimeoutMs);
+        settings.setValue(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS, galilPLCStatusRefreshIntervalMs);
+        settings.setValue(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS, galilPLCCheckConnectionIntervalMs);
+        settings.setValue(GALIL_PLC_IP_ADDRESS, galilPLCIpAddress);
+    } else {
+        settings.remove(GALIL_PLC_CONNECTION_TIMEOUT_MS);
+        settings.remove(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS);
+        settings.remove(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS);
+        settings.remove(GALIL_PLC_IP_ADDRESS);
     }
 
     settings.sync();
