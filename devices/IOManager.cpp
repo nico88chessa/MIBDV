@@ -11,58 +11,6 @@ IOManager::IOManager(QObject *parent) : QObject(parent) {
 
 }
 
-bool IOManager::setDigitalOutput(IOType type, bool value) {
-
-    traceEnter;
-
-    if (!digitalOutputs.contains(type)) {
-        traceErr() << "Output" << Utils::getStringFromIOType(type) << "non e' presente";
-        return false;
-    }
-
-    auto digitalOutput = digitalOutputs.value(type);
-
-    DeviceKey deviceToUse = digitalOutput.getDevice();
-
-    if (!devices.contains(deviceToUse)) {
-        traceErr() << "Nessun device presente per l'output" << Utils::getStringFromIOType(type);
-        return false;
-    }
-
-    QWeakPointer<IAbstractDevice> iDevice = devices.value(deviceToUse);
-    IAbstractDevice::Ptr device = iDevice.data();
-
-    if (!device) {
-        traceErr() << "Il device dell'output" << Utils::getStringFromIOType(type) \
-                   << "non e'' stato inizializzato o e'' stato eliminato";
-        return false;
-    }
-
-    switch (deviceToUse) {
-        case DeviceKey::GALIL_CN: {
-            auto d = static_cast<GalilCNController::Ptr>(device);
-            if (d->setDigitalOutput(digitalOutput.getChannel(), value) != G_NO_ERROR) {
-                traceErr() << "Errore nel setting dell'uscita digitale del CN";
-                return false;
-            }
-            }
-            break;
-        case DeviceKey::GALIL_PLC: {
-            auto d = static_cast<GalilPLCController::Ptr>(device);
-            if (d->setDigitalOutput(digitalOutput.getChannel(), value) != G_NO_ERROR) {
-                traceErr() << "Errore nel setting dell'uscita digitale del PLC";
-                return false;
-            };
-            }
-            break;
-        default: break;
-    }
-
-    traceExit;
-    return true;
-
-}
-
 bool IOManager::setDigitalOutput(IOType type) {
 
     traceEnter;
@@ -72,9 +20,24 @@ bool IOManager::setDigitalOutput(IOType type) {
         return false;
     }
 
+    auto digitalOutput = digitalOutputs.value(type);
+    DeviceKey deviceToUse = digitalOutput.getDevice();
+    int channel = digitalOutput.getChannel();
     bool isInvertLogic = digitalOutputs.value(type).getInvertLogic();
     bool value = isInvertLogic ? false : true;
-    bool result = this->setDigitalOutput(type, value);
+
+    traceInfo() << "Imposto uscita digitale" << channel << "del device" << Utils::getStringFromDeviceKey(deviceToUse) << "a" << value;
+
+    bool result = false;
+    switch (deviceToUse) {
+        case DeviceKey::GALIL_CN:
+            result = this->setDigitalOutput<deviceKeyTraits<DeviceKey::GALIL_CN>::type>(deviceToUse, channel, value);
+            break;
+        case DeviceKey::GALIL_PLC:
+            result = this->setDigitalOutput<deviceKeyTraits<DeviceKey::GALIL_PLC>::type>(deviceToUse, channel, value);
+            break;
+        default: break;
+    }
 
     traceExit;
     return result;
@@ -90,9 +53,24 @@ bool IOManager::unsetDigitalOutput(IOType type) {
         return false;
     }
 
+    auto digitalOutput = digitalOutputs.value(type);
+    DeviceKey deviceToUse = digitalOutput.getDevice();
+    int channel = digitalOutput.getChannel();
     bool isInvertLogic = digitalOutputs.value(type).getInvertLogic();
     bool value = isInvertLogic ? true : false;
-    bool result = this->setDigitalOutput(type, value);
+
+    traceInfo() << "Imposto uscita digitale" << channel << "del device" << Utils::getStringFromDeviceKey(deviceToUse) << "a" << value;
+
+    bool result = false;
+    switch (deviceToUse) {
+        case DeviceKey::GALIL_CN:
+            result = this->setDigitalOutput<deviceKeyTraits<DeviceKey::GALIL_CN>::type>(deviceToUse, channel, value);
+            break;
+        case DeviceKey::GALIL_PLC:
+            result = this->setDigitalOutput<deviceKeyTraits<DeviceKey::GALIL_PLC>::type>(deviceToUse, channel, value);
+            break;
+        default: break;
+    }
 
     traceExit;
     return result;

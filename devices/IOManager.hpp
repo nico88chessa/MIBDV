@@ -47,24 +47,52 @@ public:
     }
 
 private:
-//    template<DeviceKey D>
-//    void updateStatus(const QVariant& status) {
 
-//        static_assert(deviceKeyTraits<D>::value, "Tipo di DeviceKey non valido");
-//        using deviceType = typename deviceKeyTraits<D>::type;
-//        static_assert(isDevice<deviceType>::value, "DeviceKey non e' associato ad alcun device noto");
-//        using statusType = typename isDevice<deviceType>::statusType;
+    template<typename T>
+    bool setDigitalOutput(DeviceKey deviceKey, int channel, bool value) {
 
-//        statusType s = status.value<statusType>();
+        traceEnter;
 
-//    }
+        static_assert(isPLC<T>::value || isCN<T>::value, "Il device deve essere un CN o un PLC");
 
-    bool setDigitalOutput(IOType type, bool value);
+        QWeakPointer<IAbstractDevice> iDevice = devices.value(deviceKey);
+        IAbstractDevice::Ptr device = iDevice.data();
+
+        if (!device) {
+            traceErr() << "Il device dell'output" << Utils::getStringFromDeviceKey(deviceKey) \
+                       << "non e'' stato inizializzato o e'' stato eliminato";
+            return false;
+        }
+
+        if (isCN<T>::value) {
+            using status = typename isCN<T>::statusType;
+            using errorType = typename isCN<T>::errorType;
+            auto d = static_cast<typename AbstractCN<status, errorType>::Ptr>(device);
+            errorType e = d->setDigitalOutput(channel, value);
+            if (d->isError(e)) {
+                traceErr() << "Errore nel setting dell'uscita digitale del CN";
+                return false;
+            }
+
+        } else if (isPLC<T>::value) {
+            using status = typename isPLC<T>::statusType;
+            using errorType = typename isPLC<T>::errorType;
+            auto d = static_cast<typename AbstractPLC<status, errorType>::Ptr>(device);
+            errorType e = d->setDigitalOutput(channel, value);
+            if (d->isError(e)) {
+                traceErr() << "Errore nel setting dell'uscita digitale del PLC";
+                return false;
+            }
+        }
+
+        traceExit;
+        return true;
+
+    }
 
 public slots:
     bool setDigitalOutput(IOType type);
     bool unsetDigitalOutput(IOType type);
-//    void setStatus(DeviceKey k, const QVariant& status);
 
 
 signals:

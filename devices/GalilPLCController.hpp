@@ -50,6 +50,7 @@ public:
     int getTCCode(int& tcCode) const;
     bool isConnected() const;
     virtual GalilPLCStatusBean getStatus() const;
+    virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
 
 private:
     inline GCon handle() const { return *this->handler.data(); }

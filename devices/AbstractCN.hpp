@@ -45,6 +45,7 @@ public:
     virtual E startMoveAxis(Axis a) = 0;
     virtual E moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec) = 0;
     virtual E setPosition(Axis a, posType pos) = 0;
+    virtual bool isError(E errorCode) = 0;
 
 };
 

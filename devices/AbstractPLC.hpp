@@ -16,10 +16,11 @@ public:
     using anlType = double;
 
 public:
-    E getDigitalInput(int input, int& inputStatus);
-    E getDigitalOutput(int output, int& outputStatus);
-    E getAnalogInput(int analogInput, anlType& analogInputStatus);
-    E setDigitalOutput(int output, bool value);
+    virtual E getDigitalInput(int input, int& inputStatus) = 0;
+    virtual E getDigitalOutput(int output, int& outputStatus) = 0;
+    virtual E getAnalogInput(int analogInput, anlType& analogInputStatus) = 0;
+    virtual E setDigitalOutput(int output, bool value) = 0;
+    virtual bool isError(E errorCode) = 0;
 
 };
 

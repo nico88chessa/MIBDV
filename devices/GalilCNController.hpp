@@ -89,6 +89,7 @@ public:
     int getTCCode(int& tcCode) const;
     bool isConnected() const;
     virtual GalilCNStatusBean getStatus() const;
+    virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
 
 private:
     inline GCon handle() const { return *this->handler.data(); }
@@ -96,7 +97,6 @@ private:
     inline void writeErrorIfExists(int errorCode) const;
     int getInputs(int bank, int& bankStatus);
     int tellSwitches(Axis a, int& value);
-
 
 };
 
