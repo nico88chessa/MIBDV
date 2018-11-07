@@ -37,7 +37,7 @@ private:
 public:
     GalilPLCController();
     virtual ~GalilPLCController();
-    int getRecord(GalilPLCStatusBean& status) const;
+    int getRecord(GalilPLCStatusBean& status);
 
     void setupController(int numDigitalInput,
                          int numDigitalOutput,
@@ -47,16 +47,18 @@ public:
     virtual int getDigitalOutput(int output, int& outputStatus);
     virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
     virtual int setDigitalOutput(int output, bool value);
-    int getTCCode(int& tcCode) const;
+    int getTCCode(int& tcCode);
     bool isConnected() const;
-    virtual GalilPLCStatusBean getStatus() const;
+    virtual GalilPLCStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
 
 private:
+    int disconnect();
     inline GCon handle() const { return *this->handler.data(); }
-    inline void writeError(int errorCode) const;
-    inline void writeErrorIfExists(int errorCode) const;
+    inline void writeError(int errorCode);
+    inline void writeErrorIfExists(int errorCode);
     int getInputs(int bank, int& bankStatus);
+    inline void setConnected(bool value) { connected = value; }
 
 };
 

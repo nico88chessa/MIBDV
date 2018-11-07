@@ -3,10 +3,18 @@
 using namespace PROGRAM_NAMESPACE;
 
 GalilPLCController::GalilPLCController() :
-    handler(nullptr), isInitialized(false), connected(false),
+    handler(new GCon), isInitialized(false), connected(false),
     numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0) {
 
     traceEnter;
+
+    /* NOTE NIC 07/11/2018 - handler inizializzato alla creazione dell'istanza
+     * IMPORTANTE: istanzio un puntatore non valido, verra' validato alla creazione
+     * della connessione; se la creazione della connessione al Galil non va a buon
+     * fine, il puntatore e' ancora non valido (se lo uso in una chiamata ad una
+     * funzione del galil, viene generato un segmentation fault)
+     */
+
     traceExit;
 
 }
@@ -14,22 +22,19 @@ GalilPLCController::GalilPLCController() :
 GalilPLCController::~GalilPLCController() {
 
     traceEnter;
-
-    GReturn result = G_NO_ERROR;
-
-    if (!this->handler.isNull())
-        result = GClose(handle());
-
-    if (result != G_NO_ERROR)
-        writeError(result);
-
+    this->disconnect();
     traceExit;
 
 }
 
-int GalilPLCController::getRecord(GalilPLCStatusBean& record) const {
+int GalilPLCController::getRecord(GalilPLCStatusBean& record) {
 
     traceEnter;
+
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
 
     GDataRecord recordUnion;
 #ifdef FLAG_PLC_PRESENT
@@ -68,29 +73,31 @@ bool GalilPLCController::connect(const QString& ip) {
 
     traceEnter;
 
-    if (!this->handler.isNull())
+    if (isConnected())
         return true;
-    else
-        handler.reset(new GCon);
 
-    GReturn result = GOpen(ip.toStdString().data(), handler.data());
-//    QString str = ip + " -d";
-//    GReturn result = GOpen(str.toStdString().data(), handle.data());
+    // TODO NIC 07/11/2018 - parametrizzare da file di configurazione
+    int timeout = 1000;
+    QString command = ip + QString(" -t %1").arg(timeout);
+
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GOpen(command.toStdString().data(), handler.data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
 
     /**
-     * NOTE NIC 18/10/2018 - metodo connect
-     * se non riesco a connettermi al Galil, allora devo resettare il puntatore;
-     * altrimenti nel distruttore viene lanciata un'eccezione
+     * NOTE NIC 07/11/2018 - metodo connect
+     * se non riesco a connettermi al Galil, allora il puntatore non viene inizializzato;
+     * quindi non e' utilizzabile
      **/
 
 
-    if (result != G_NO_ERROR) {
-        handler.reset();
-        writeError(result);
+    if (result == G_NO_ERROR) {
+        this->setConnected(true);
+        traceInfo() << "Galil PLC: connessione avvenuta";
     }
 
-    this->connected = true;
-    traceInfo() << "Galil PLC: connessione avvenuta";
     traceExit;
 
     return result == G_NO_ERROR;
@@ -101,21 +108,26 @@ int GalilPLCController::getDigitalInput(int input, int& inputStatus) {
 
     traceEnter;
 
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
+
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
         return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
-    if (input<1 || input>numDigitalInput) {
+    if (input<0 || input>numDigitalInput) {
         traceErr() << "Galil PLC: input richiesto fuori dal range del device";
         return G_CUSTOM_PLC_DIGITAL_INPUT_OUT_OF_RANGE;
     }
 
     int bankStatus;
-    int result = getInputs((input-1)/NUM_IO_PER_BANK, bankStatus);
+    int result = getInputs(input/NUM_IO_PER_BANK, bankStatus);
 
     traceDebug() << "La funzione getInputs ha tornato il valore:" << bankStatus;
-    inputStatus = (bankStatus & (0x01 << (input - 1))) >> (input - 1);
+    inputStatus = (bankStatus & (0x01 << input)) >> input;
 
     traceDebug() << "Input" << input << ":" << inputStatus;
 
@@ -129,12 +141,17 @@ int GalilPLCController::getDigitalOutput(int output, int& outputStatus) {
 
     traceEnter;
 
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
+
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
         return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
-    if (output<1 || output>numDigitalOutput) {
+    if (output<0 || output>numDigitalOutput) {
         traceErr() << "Galil PLC: output richiesto fuori dal range del device";
         return G_CUSTOM_PLC_DIGITAL_OUTPUT_OUT_OF_RANGE;
     }
@@ -158,6 +175,11 @@ int GalilPLCController::getDigitalOutput(int output, int& outputStatus) {
 int GalilPLCController::getAnalogInput(int analogInput, anlType& analogInputStatus) {
 
     traceEnter;
+
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
@@ -189,12 +211,17 @@ int GalilPLCController::setDigitalOutput(int output, bool value) {
 
     traceEnter;
 
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
+
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
         return G_CUSTOM_PLC_NON_INIZIALIZZATO;
     }
 
-    if (output<1 || output>numDigitalOutput) {
+    if (output<0 || output>numDigitalOutput) {
         traceErr() << "Galil PLC: input richiesto fuori dal range del device";
         return G_CUSTOM_PLC_DIGITAL_OUTPUT_OUT_OF_RANGE;
     }
@@ -225,7 +252,14 @@ bool GalilPLCController::isConnected() const {
 
 }
 
-int GalilPLCController::getTCCode(int& tcCode) const {
+int GalilPLCController::getTCCode(int& tcCode) {
+
+    traceEnter;
+
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
 
     QString command = QString("TC 0");
     traceDebug() << "Invio comando:" << command;
@@ -236,11 +270,13 @@ int GalilPLCController::getTCCode(int& tcCode) const {
 #endif
     writeErrorIfExists(result);
 
+    traceExit;
+
     return result;
 
 }
 
-GalilPLCStatusBean GalilPLCController::getStatus() const {
+GalilPLCStatusBean GalilPLCController::getStatus() {
 
     GalilPLCStatusBean record;
     writeErrorIfExists(this->getRecord(record));
@@ -248,20 +284,26 @@ GalilPLCStatusBean GalilPLCController::getStatus() const {
 
 }
 
-void GalilPLCController::writeError(int errorCode) const {
+void GalilPLCController::writeError(int errorCode) {
 
     traceErr() << "Galil PLC: codice errore:" << errorCode;
     traceErr() << "Galil PLC: descrizione errore:" << GalilControllerUtils::getErrorDescription(errorCode);
 
     if (errorCode == G_BAD_RESPONSE_QUESTION_MARK) {
+
         int tcCode;
         this->getTCCode(tcCode);
         traceErr() << "Galil PLC: dettagli errore:" << GalilControllerUtils::getTCDescription(tcCode);
-    };
+
+    } else if (errorCode == G_TIMEOUT)
+        /* NOTE NIC 07/11/2018 - mi accorgo se il CN e' connesso dopo l'invio di comando;
+         * il dispositivo non e' connesso se il comando da errore di timeout (1100)
+         */
+        this->disconnect();
 
 }
 
-void GalilPLCController::writeErrorIfExists(int errorCode) const {
+void GalilPLCController::writeErrorIfExists(int errorCode) {
 
     if (errorCode != G_NO_ERROR)
         writeError(errorCode);
@@ -271,6 +313,11 @@ void GalilPLCController::writeErrorIfExists(int errorCode) const {
 int GalilPLCController::getInputs(int bank, int& bankStatus) {
 
     traceEnter;
+
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
 
     if (!isInitialized) {
         traceErr() << "Galil PLC: il controller non e' stato inizializzato";
@@ -294,6 +341,30 @@ int GalilPLCController::getInputs(int bank, int& bankStatus) {
 
     traceExit;
 
+    return result;
+
+}
+
+int GalilPLCController::disconnect() {
+
+    traceEnter;
+
+    if (!this->isConnected()) {
+        traceInfo() << "Galil CN: connessione non presente; nessuna sconnessione da effettuare";
+        return G_NO_ERROR;
+    }
+
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GClose(handle());
+    if (result == G_NO_ERROR)
+        this->setConnected(false);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    traceExit;
     return result;
 
 }

@@ -23,7 +23,7 @@ public:
     using ConstPtr = const AbstractDevice*;
 
 public:
-    virtual S getStatus() const = 0;
+    virtual S getStatus() = 0;
 
 };
 

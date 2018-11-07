@@ -61,7 +61,7 @@ public:
                          int numDigitalOutput,
                          int numAnalogInput);
     bool connect(const QString& ip);
-    int getRecord(GalilCNStatusBean& record) const;
+    int getRecord(GalilCNStatusBean& record);
     virtual int getDigitalInput(int input, int& inputStatus);
     virtual int getDigitalOutput(int output, int& outputStatus);
     virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
@@ -86,17 +86,19 @@ public:
     virtual int startMoveAxis(Axis a);
     virtual int moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
     virtual int setPosition(Axis a, posType pos);
-    int getTCCode(int& tcCode) const;
+    int getTCCode(int& tcCode);
     bool isConnected() const;
-    virtual GalilCNStatusBean getStatus() const;
+    virtual GalilCNStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
 
 private:
+    int disconnect();
     inline GCon handle() const { return *this->handler.data(); }
-    inline void writeError(int errorCode) const;
-    inline void writeErrorIfExists(int errorCode) const;
+    inline void writeError(int errorCode);
+    inline void writeErrorIfExists(int errorCode);
     int getInputs(int bank, int& bankStatus);
     int tellSwitches(Axis a, int& value);
+    inline void setConnected(bool value) { connected = value; }
 
 };
 
