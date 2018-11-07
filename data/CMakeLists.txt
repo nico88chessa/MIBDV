@@ -3,8 +3,8 @@ SET(ITEMS
     DigitalOutput
     AnalogInput
     Error
-    GalilCNStatus
-    GalilPLCStatus
+    GalilCNStatusBean
+    GalilPLCStatusBean
     CommonTraits
     )
 
