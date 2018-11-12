@@ -1,6 +1,16 @@
 <RCC>
     <qresource prefix="/mibdv">
-        <file alias="prova">icons/baseline_settings_black_24dp.png</file>
+        <file alias="settings">icons/baseline_settings_black_24dp.png</file>
+        <file alias="expand-less">icons/baseline_expand_less_black_24dp.png</file>
+        <file alias="expand-more">icons/baseline_expand_more_black_24dp.png</file>
+        <file alias="arrow-drop-down">icons/baseline_arrow_drop_down_black_24dp.png</file>
+        <file alias="radiobutton-checked">icons/baseline_radio_button_checked_black_24dp.png</file>
+        <file alias="radiobutton-unchecked">icons/baseline_radio_button_unchecked_black_24dp.png</file>
+        <file alias="checkbox-on">icons/baseline_check_box_black_24dp.png</file>
+        <file alias="checkbox-off">icons/baseline_check_box_outline_blank_black_24dp.png</file>
+        <file alias="toggle-off">icons/baseline_toggle_off_black_24dp.png</file>
+        <file alias="toggle-on">icons/baseline_toggle_on_black_24dp.png</file>
+        <file alias="arrow-drop-up">icons/baseline_arrow_drop_up_black_24dp.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>
