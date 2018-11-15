@@ -1,5 +1,5 @@
 SET(ITEMS
-    MDTextline
+    MDLineEdit
     MDSwitchLine
     MDListWidget
     MDComboBox

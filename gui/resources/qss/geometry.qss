@@ -1,11 +1,12 @@
 /******************/
-/* MDTextLine
+/* MDLineEdit
 /******************/
 
-.MDTextline {
+.MDLineEdit {
     font-size: 16px;
     padding: 36px 0px 8px;
     max-height: 54px;
+    min-height: 18px;
     margin: 0px 12px 8px;
     qproperty-labelX: 14;
     qproperty-labelY: 28;
@@ -15,7 +16,8 @@
     border-bottom-style: solid;
 }
 
-.MDTextline::focus {
+.MDLineEdit::focus {
+    padding: 36px 0px 7px;
     border-bottom-width: 2px;
 }
 
@@ -28,24 +30,23 @@
 
 .MDComboBox {
     font-size: 16px;
-    border: none;
     min-width: 88px;
+    min-height: 18px;
     padding: 8px 0px 8px 0px;
-    margin: 28px 0px 0px 0px;
+    margin: 28px 0px 8px 0px;
     qproperty-labelLeft: 0;
     qproperty-labelTop: 16;
-    qproperty-spacing: 100px;
     qproperty-labelTextWidth: 12;
-/*    border-bottom: 1px solid blue;*/
+    background-clip: content;
+    border: none;
     border-bottom-width: 1px;
     border-bottom-style: solid;
-    /*background-color: white;*/
-    background-clip: margin;
 }
 
 .MDComboBox::on {
-    border-bottom-width: 1px;
+    border-bottom-width: 2px;
     border-bottom-style: solid;
+    padding: 8px 0px 7px 0px;
 }
 
 .MDComboBox::drop-down {
@@ -62,19 +63,21 @@
     border: none;
     background-clip: margin;
     padding: 8px 0px;
-    /*border-width: 1px;
-    border-style: solid;*/
+    border-width: 1px;
+    border-style: solid;
     outline: 0;
 }
 
 .MDComboBox::on QAbstractItemView {
-    border-top-width: 2px;
-    border-top-style: solid;
+    border: none;
+    border-width: 1px;
+    border-style: solid;
+
 }
 
 .MDComboBox QAbstractItemView::item {
-    min-height: 32px;
     border: none;
+    min-height: 32px;
     padding: 0px 0px 0px 0px;
 }
 
@@ -305,6 +308,129 @@ MDListWidget MDCustomItem {
     qproperty-iconPaddingRight: 16;
     qproperty-focusPolicy: NoFocus;
 }
+
+
+
+
+/***********************/
+/* QTabWidget - QTabBar
+/***********************/
+
+
+QTabBar {
+/*    qproperty-drawBase: true;*/
+    border: none;
+    background-color: transparent;
+}
+
+QTabWidget {
+    border: none;
+}
+
+QTabWidget::pane {
+    border-top: none;
+}
+
+QTabWidget::tab-bar {
+    left: 0px;
+}
+
+QTabBar::tab {
+    font-size: 14px;
+    font-weight: 500;
+    background-color: transparent;
+    background-origin: margin;
+    min-width: 160px;
+    min-height: 48px;
+    padding: 0px 12px;
+    border: none;
+    border-radius: 0px;
+/*    color: darkgray;*/
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+}
+
+QTabBar::tab:selected {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+}
+
+QTabBar::tab:!selected {
+    /*margin-top: 2px;*/
+}
+
+
+
+
+/************************/
+/* QScrollbar
+/************************/
+
+QScrollBar {
+    width: 20px;
+}
+
+
+QScrollBar:vertical {
+    border: 2px solid transparent;
+}
+
+QScrollBar::handle:vertical {
+    background: green;
+}
+
+QScrollBar::sub-page:vertical {
+    background-color: lightGray;
+}
+
+QScrollBar::add-page:vertical {
+    background-color: lightGray;
+}
+
+QScrollBar::add-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/*
+QScrollBar:horizontal {
+    border: 2px solid grey;
+    height: 15px;
+    margin: 0px 20px 0 20px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 40px;
+}
+
+QScrollBar::add-line:horizontal {
+    border: 2px solid grey;
+    width: 20px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+    border: 2px solid grey;
+    width: 20px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}*/
+
+
+
+
+
+
+
+
+
+
+
 
 /*********************
 

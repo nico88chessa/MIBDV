@@ -1,5 +1,5 @@
 QMainWindow {
-/*    background-color: white;*/
+    background-color: white;
 }
 
 QWidget {
@@ -11,17 +11,17 @@ QWidget {
 
 
 /******************/
-/* MDTextLine
+/* MDLineEdit
 /******************/
 
-.MDTextline {
+.MDLineEdit {
     /*color: red;*/
     qproperty-labelFocusColor: green;
     background-color: transparent;
     border-bottom-color: green;
 }
 
-.MDTextline::focus {
+.MDLineEdit::focus {
     color: green;
 }
 
@@ -39,7 +39,6 @@ QWidget {
 }
 
 .MDComboBox::on {
-    border-bottom-color: red;
     color: green;
 }
 
@@ -47,13 +46,12 @@ QWidget {
 }
 
 .MDComboBox QAbstractItemView {
-    /*border-color: red;*/
     background-color: white;
     /*selection-background-color: red;*/
 }
 
 .MDComboBox::on QAbstractItemView {
-    border-top-color: green;
+    border-color: green;
 }
 
 .MDComboBox QAbstractItemView::item {
@@ -210,9 +208,9 @@ MDSwitchLine {
 /*    border: 1px solid red;*/
 /*    background-color: yellow;*/
 /*    border: 1px solid red;*/
-    qproperty-circleColor: rgba(10, 200, 200, 190);
-    qproperty-circleOnColor: rgba(10, 100, 100, 90);
-    qproperty-circleBorderColor: rgba(10, 100, 100, 190);
+    qproperty-circleColor: transparent;
+    qproperty-circleOnColor: green;
+    qproperty-circleBorderColor: black;
 }
 
 MDSwitchLine::indicator {
@@ -245,6 +243,46 @@ MDListWidget::item:hover {
 MDListWidget::item:selected {
     background-color: green;
 }
+
+
+
+
+/***********************/
+/* QTabWidget - QTabBar
+/***********************/
+
+QTabBar {
+    background-color: transparent;
+}
+
+QTabWidget {
+}
+
+QTabWidget::pane {
+    background-color: transparent;
+}
+
+QTabWidget::tab-bar {
+}
+
+QTabBar::tab {
+    background-color: transparent;
+    color: darkgray;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background: transparent;
+    color: black;
+}
+
+QTabBar::tab:selected {
+    border-bottom-color: green;
+}
+
+QTabBar::tab:!selected {
+    /*margin-top: 2px;*/
+}
+
 
 
 /*

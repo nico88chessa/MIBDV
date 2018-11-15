@@ -1,9 +1,9 @@
-#ifndef MDTEXTLINE_HPP
-#define MDTEXTLINE_HPP
+#ifndef MDLINEEDIT_HPP
+#define MDLINEEDIT_HPP
 
 #include <QLineEdit>
 
-class MDTextline : public QLineEdit {
+class MDLineEdit : public QLineEdit {
     Q_OBJECT
 
     Q_PROPERTY(int labelX READ getLabelX WRITE setLabelX)
@@ -13,8 +13,8 @@ class MDTextline : public QLineEdit {
     Q_PROPERTY(QColor labelFocusColor READ getLabelFocusColor WRITE setLabelFocusColor)
 
 public:
-    using Ptr = MDTextline*;
-    using ConstPtr = const MDTextline*;
+    using Ptr = MDLineEdit*;
+    using ConstPtr = const MDLineEdit*;
 
 private:
     int labelY;
@@ -24,7 +24,7 @@ private:
     QColor labelFocusColor;
 
 public:
-    explicit MDTextline(QWidget* parent = nullptr);
+    explicit MDLineEdit(QWidget* parent = nullptr);
 
 
     int getLabelX() const;
@@ -46,4 +46,4 @@ protected:
     void paintEvent(QPaintEvent* event);
 };
 
-#endif // MDTEXTLINE_HPP
+#endif // MDLINEEDIT_HPP

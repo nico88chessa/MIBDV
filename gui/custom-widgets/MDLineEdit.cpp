@@ -1,35 +1,35 @@
-#include "MDTextline.hpp"
+#include "MDLineEdit.hpp"
 
 #include <QStylePainter>
 
 
-int MDTextline::getLabelX() const { return labelX; }
+int MDLineEdit::getLabelX() const { return labelX; }
 
-void MDTextline::setLabelX(int value) { labelX = value; }
+void MDLineEdit::setLabelX(int value) { labelX = value; }
 
-int MDTextline::getLabelY() const { return labelY; }
+int MDLineEdit::getLabelY() const { return labelY; }
 
-void MDTextline::setLabelY(int value) { labelY = value; }
+void MDLineEdit::setLabelY(int value) { labelY = value; }
 
-int MDTextline::getLabelTextWidth() const { return labelTextWidth; }
+int MDLineEdit::getLabelTextWidth() const { return labelTextWidth; }
 
-void MDTextline::setLabelTextWidth(int value) { labelTextWidth = value; }
+void MDLineEdit::setLabelTextWidth(int value) { labelTextWidth = value; }
 
-QColor MDTextline::getLabelColor() const { return labelColor; }
+QColor MDLineEdit::getLabelColor() const { return labelColor; }
 
-void MDTextline::setLabelColor(const QColor& value) { labelColor = value; }
+void MDLineEdit::setLabelColor(const QColor& value) { labelColor = value; }
 
-QColor MDTextline::getLabelFocusColor() const { return labelFocusColor; }
+QColor MDLineEdit::getLabelFocusColor() const { return labelFocusColor; }
 
-void MDTextline::setLabelFocusColor(const QColor& value) { labelFocusColor = value; }
+void MDLineEdit::setLabelFocusColor(const QColor& value) { labelFocusColor = value; }
 
-MDTextline::MDTextline(QWidget* parent) :
+MDLineEdit::MDLineEdit(QWidget* parent) :
     QLineEdit(parent) {
 
 }
 
 
-void MDTextline::paintEvent(QPaintEvent* event) {
+void MDLineEdit::paintEvent(QPaintEvent* event) {
 
     QLineEdit::paintEvent(event);
 
