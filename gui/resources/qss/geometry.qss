@@ -1,4 +1,511 @@
-QPushButton {
-    max-width: 200px;
-    min-width: 100px;
+/******************/
+/* MDLineEdit
+/******************/
+
+.MDLineEdit {
+    font-size: 16px;
+    padding: 36px 0px 8px;
+    max-height: 54px;
+    min-height: 18px;
+    margin: 0px 12px 8px;
+    qproperty-labelX: 14;
+    qproperty-labelY: 28;
+    qproperty-labelTextWidth: 12;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
 }
+
+.MDLineEdit::focus {
+    padding: 36px 0px 7px;
+    border-bottom-width: 2px;
+}
+
+
+
+
+/******************/
+/* MDComboBox
+/******************/
+
+.MDComboBox {
+    font-size: 16px;
+    min-width: 88px;
+    min-height: 18px;
+    padding: 8px 0px 8px 0px;
+    margin: 28px 0px 8px 0px;
+    qproperty-labelLeft: 0;
+    qproperty-labelTop: 16;
+    qproperty-labelTextWidth: 12;
+    background-clip: content;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+.MDComboBox::on {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+    padding: 8px 0px 7px 0px;
+}
+
+.MDComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    /*width: 24px;
+    height: 24px;*/
+    padding-right: 16px;
+    border: none;
+}
+
+.MDComboBox QAbstractItemView {
+    font-size: 16px;
+    border: none;
+    background-clip: margin;
+    padding: 8px 0px;
+    border-width: 1px;
+    border-style: solid;
+    outline: 0;
+}
+
+.MDComboBox::on QAbstractItemView {
+    border: none;
+    border-width: 1px;
+    border-style: solid;
+
+}
+
+.MDComboBox QAbstractItemView::item {
+    border: none;
+    min-height: 32px;
+    padding: 0px 0px 0px 0px;
+}
+
+.MDComboBox QAbstractItemView::item::hover {
+}
+
+.MDComboBox::down-arrow {
+    width: 24px;
+    height: 24px;
+}
+
+.MDComboBox::down-arrow:on {
+    /*top: 1px;
+    left: 1px;*/
+}
+
+
+
+
+/*******************************************/
+/* QSlider
+/*******************************************/
+
+QSlider {
+    qproperty-focusPolicy: StrongFocus;
+}
+
+QSlider::groove:horizontal {
+    border: none;
+    height: 2px;
+}
+
+QSlider::handle:horizontal {
+    width: 12px;
+    margin: -5px 0;
+    border: none;
+    border-radius: 6px;
+}
+
+QSlider::add-page:horizontal {
+}
+
+QSlider::sub-page:horizontal {
+}
+
+
+QSlider::groove:vertical {
+    border: none;
+    width: 2px;
+}
+
+QSlider::handle:vertical {
+    border: none;
+    height: 12px;
+    margin: 0 -5px;
+    border-radius: 6px;
+}
+
+QSlider::add-page:vertical {
+}
+
+QSlider::sub-page:vertical {
+}
+
+
+
+
+/******************/
+/* QComboBox
+/******************/
+
+.QComboBox {
+    padding-left: 12px;
+    margin: 8px 8px 8px 0px;
+    font-weight: 400;
+    font-size: 15px;
+    border: none;
+    background-clip: margin;
+
+}
+
+
+/* vista del menu a discesa */
+.QComboBox QAbstractItemView {
+    padding: 8px 0px 8px 0x;
+    border-style: solid;
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+    background-clip: margin;
+}
+
+/* item del menu a discesa */
+.QComboBox::item {
+    border: none;
+    padding: 0px 0px 0px 12px;
+    border-left: 10px solid red;
+    min-height: 18px;
+    max-height: 18px;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.QComboBox::drop-down {
+    margin: 0px 16px 0px 0px;
+    border-left-width: 1px;
+}
+
+.QComboBox::down-arrow {
+    width: 24px;
+    height: 24px;
+}
+
+
+
+/******************/
+/* QPushButton
+/******************/
+
+QPushButton {
+    padding: 0px 36px;
+    margin: 6px 8px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    min-width: 64px;
+    min-height: 32px;
+    max-height: 32px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+
+/******************/
+/* QLabel
+/******************/
+
+QLabel {
+    padding: 10px;
+}
+
+
+
+/******************/
+/* QRadioButton
+/******************/
+
+QRadioButton {
+    padding: 4px 16px;
+    font-size: 13px;
+}
+
+QRadioButton::indicator {
+    padding-right: 20px;
+    width: 24px;
+    height: 24px;
+}
+
+
+
+/******************/
+/* QCheckBox
+/******************/
+
+QCheckBox {
+    padding: 4px 16px;
+    font-size: 13px;
+}
+
+QCheckBox::indicator {
+    padding-right: 20px;
+    width: 24px;
+    height: 24px;
+}
+
+
+
+/******************/
+/* MDSwitchLine
+/******************/
+
+MDSwitchLine {
+    qproperty-focusPolicy: NoFocus;
+    padding: 0px 16px;
+    font-size: 13px;
+    qproperty-circleRadiuos: 10;
+    qproperty-circleLeftPadding: 16;
+    qproperty-circleRightPadding: 16;
+    qproperty-circleBorderWidth: 2;
+    qproperty-layoutDirection: RightToLeft;
+}
+
+MDSwitchLine:hover {
+/*    background-color: blue;*/
+}
+
+MDSwitchLine::indicator {
+/*    border: 1px solid red;*/
+    padding: 0px;
+    width: 48px;
+    height: 48px;
+}
+
+
+
+/******************/
+/* MDListWidget
+/******************/
+
+MDListWidget {
+    qproperty-focusPolicy: NoFocus;
+}
+
+MDListWidget::item {
+    padding: 0px 16px;
+    min-height: 48px;
+    background-clip: margin;
+    qproperty-focusPolicy: NoFocus;
+}
+
+MDListWidget MDCustomItem {
+    font-size: 16px;
+    qproperty-iconWidth:  40;
+    qproperty-iconHeight: 40;
+    qproperty-iconPaddingRight: 16;
+    qproperty-focusPolicy: NoFocus;
+}
+
+
+
+
+/***********************/
+/* QTabWidget - QTabBar
+/***********************/
+
+
+QTabBar {
+/*    qproperty-drawBase: true;*/
+    border: none;
+    background-color: transparent;
+}
+
+QTabWidget {
+    border: none;
+}
+
+QTabWidget::pane {
+    border-top: none;
+}
+
+QTabWidget::tab-bar {
+    left: 0px;
+}
+
+QTabBar::tab {
+    font-size: 14px;
+    font-weight: 500;
+    background-color: transparent;
+    background-origin: margin;
+    min-width: 160px;
+    min-height: 48px;
+    padding: 0px 12px;
+    border: none;
+    border-radius: 0px;
+/*    color: darkgray;*/
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+}
+
+QTabBar::tab:selected {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+}
+
+QTabBar::tab:!selected {
+    /*margin-top: 2px;*/
+}
+
+
+
+
+/************************/
+/* QScrollbar
+/************************/
+
+QScrollBar {
+    width: 20px;
+}
+
+
+QScrollBar:vertical {
+    border: 2px solid transparent;
+}
+
+QScrollBar::handle:vertical {
+    background: green;
+}
+
+QScrollBar::sub-page:vertical {
+    background-color: lightGray;
+}
+
+QScrollBar::add-page:vertical {
+    background-color: lightGray;
+}
+
+QScrollBar::add-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/*
+QScrollBar:horizontal {
+    border: 2px solid grey;
+    height: 15px;
+    margin: 0px 20px 0 20px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 40px;
+}
+
+QScrollBar::add-line:horizontal {
+    border: 2px solid grey;
+    width: 20px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+    border: 2px solid grey;
+    width: 20px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+/*********************
+
+QTreeView {
+    qproperty-focusPolicy: NoFocus;
+    font-size: 16px;
+    font-weight: 400;
+    border: none;
+    qproperty-indentation: 0;
+    qproperty-animated: true;
+    show-decoration-selected: 0;
+    qproperty-headerHidden: true;
+}
+
+QTreeWidget QAbstractItemView {
+    qproperty-focusPolicy: NoFocus;
+}
+
+QTreeView::item:selected {
+    color: red;
+}
+
+QTreeView::item {
+    padding: 8px 16px;
+    image-position: right;
+}
+
+QTreeView::item:has-children:open {
+    image: url(:/mibdv/expand-less);
+}
+
+QTreeView::item:has-children:closed {
+    image: url(:/mibdv/expand-more);
+}
+
+QTreeView::item:!has-children {
+    image: none;
+}
+************************/
+
+/*
+QTreeView::branch {
+    image: url(:/mibdv/prova);
+    border-top: 10px solid green;
+    border-bottom: 10px solid red;
+    qproperty-indentation: 200;
+    margin-right: 10px;
+}
+
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: 1;
+    border-color: red;
+    color: red;
+    qproperty-indentation: 5;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: 0;
+    color: red;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: 0;
+    color: red;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    border-image: none;
+    color: red;
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+    border-image: none;
+    color: red;
+}*/
+
