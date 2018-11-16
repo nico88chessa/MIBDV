@@ -18,9 +18,7 @@ void MDListItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
 }
 */
-MDListWidget::MDListWidget(QObject* parent) {
-
-    Q_UNUSED(parent);
+MDListWidget::MDListWidget(QWidget* parent) : QListWidget(parent) {
 
 //    this->setItemDelegate(new MDListItemDelegate());
 

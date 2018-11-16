@@ -77,7 +77,7 @@ public:
 
 public:
 
-    explicit MDListWidget(QObject* parent = Q_NULLPTR);
+    explicit MDListWidget(QWidget* parent = Q_NULLPTR);
 
 
 };

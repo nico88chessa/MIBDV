@@ -1,5 +1,6 @@
 SET(ITEMS
     geometry
+    app-geometry
     theme1
     )
 

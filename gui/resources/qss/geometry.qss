@@ -290,21 +290,26 @@ MDSwitchLine::indicator {
 /* MDListWidget
 /******************/
 
-MDListWidget {
+.MDListWidget {
     qproperty-focusPolicy: NoFocus;
+    font-size: 16px;
 }
 
-MDListWidget::item {
+.MDListWidget::item:hover {
+    padding: 0px;
+}
+
+.MDListWidget::item {
     padding: 0px 16px;
     min-height: 48px;
     background-clip: margin;
     qproperty-focusPolicy: NoFocus;
 }
 
-MDListWidget MDCustomItem {
+.MDListWidget MDCustomItem {
     font-size: 16px;
-    qproperty-iconWidth:  40;
-    qproperty-iconHeight: 40;
+    qproperty-iconWidth: 24;
+    qproperty-iconHeight: 24;
     qproperty-iconPaddingRight: 16;
     qproperty-focusPolicy: NoFocus;
 }

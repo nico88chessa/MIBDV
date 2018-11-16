@@ -28,6 +28,7 @@ public:
 
 private:
     void setupSignalsAndSlots() const;
+    void initWidgets();
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

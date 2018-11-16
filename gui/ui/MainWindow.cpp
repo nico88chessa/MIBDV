@@ -13,24 +13,47 @@ void MainWindow::setupSignalsAndSlots() const {
 
 }
 
+void MainWindow::initWidgets() {
+
+
+    MDCustomItem::Ptr alerts = new MDCustomItem("Alerts", ":/mibdv/alert");
+    MDCustomItem::Ptr alerts2 = new MDCustomItem("Alerts", ":/mibdv/pan");
+
+    QListWidgetItem* item = new QListWidgetItem();
+    ui->listItem->addItem(item);
+    ui->listItem->setItemWidget(item, alerts);
+
+    QListWidgetItem* item2 = new QListWidgetItem();
+    ui->listItem->addItem(item2);
+    ui->listItem->setItemWidget(item2, alerts2);
+
+}
+
 void MainWindow::setupStyleSheets() const {
 
     using namespace PROGRAM_NAMESPACE;
 
     traceEnter;
 
+    ui->top->layout()->setAlignment(Qt::AlignBottom);
+
     // TODO NIC 23/10/2018 - gestire fogli di stile
     QApplication* app = static_cast<QApplication*>(QApplication::instance());
+    app->setStyleSheet(styleSheet());
 
-    QFile file(QString(STYLESHEET_PATH)+"geometry.qss");
-    file.open(QFile::ReadOnly);
-    QByteArray content = file.readAll();
+    QFile mdGeomStyle(QString(STYLESHEET_PATH)+"geometry.qss");
+    mdGeomStyle.open(QFile::ReadOnly);
+    QByteArray mdGeomStr = mdGeomStyle.readAll();
 
-    app->setStyleSheet(content);
+    QFile appGeom(QString(STYLESHEET_PATH)+"app-geometry.qss");
+    appGeom.open(QFile::ReadOnly);
+    QByteArray geomStr = appGeom.readAll();
 
-    QFile file2(QString(STYLESHEET_PATH)+"theme1.qss");
-    file2.open(QFile::ReadOnly);
-    content += file2.readAll();
+    QFile theme(QString(STYLESHEET_PATH)+"theme1.qss");
+    theme.open(QFile::ReadOnly);
+    QByteArray themeStr = theme.readAll();
+
+    QString content = mdGeomStr + geomStr + themeStr;
 
     app->setStyleSheet(content);
 
@@ -47,11 +70,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
+
+    this->initWidgets();
     this->setupSignalsAndSlots();
 
-    inspector.startProcess();
+//    inspector.startProcess();
 
-    errorManager.subscribeObject(inspector);
+//    errorManager.subscribeObject(inspector);
+
 
     this->setupStyleSheets();
 
