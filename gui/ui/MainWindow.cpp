@@ -13,19 +13,46 @@ void MainWindow::setupSignalsAndSlots() const {
 
 }
 
-void MainWindow::initWidgets() {
+void MainWindow::initPanels() {
+
+    traceEnter;
+
+    initLeftPanel();
+    initContentPanel();
+
+    traceExit;
+
+}
+
+void MainWindow::initLeftPanel() {
+
+    traceEnter;
+
+    MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/mibdv/alert");
+    MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/mibdv/io");
+    MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":mibdv/motion");
+
+    QListWidgetItem* alertItem = new QListWidgetItem();
+    QListWidgetItem* ioItem = new QListWidgetItem();
+    QListWidgetItem* motionItem = new QListWidgetItem();
+
+    ui->listItem->addItem(alertItem);
+    ui->listItem->addItem(ioItem);
+    ui->listItem->addItem(motionItem);
+    ui->listItem->setItemWidget(alertItem, alert);
+    ui->listItem->setItemWidget(ioItem, io);
+    ui->listItem->setItemWidget(motionItem, motion);
 
 
-    MDCustomItem::Ptr alerts = new MDCustomItem("Alerts", ":/mibdv/alert");
-    MDCustomItem::Ptr alerts2 = new MDCustomItem("Alerts", ":/mibdv/pan");
+    traceExit;
 
-    QListWidgetItem* item = new QListWidgetItem();
-    ui->listItem->addItem(item);
-    ui->listItem->setItemWidget(item, alerts);
+}
 
-    QListWidgetItem* item2 = new QListWidgetItem();
-    ui->listItem->addItem(item2);
-    ui->listItem->setItemWidget(item2, alerts2);
+void MainWindow::initContentPanel() {
+
+    traceEnter;
+
+    traceExit;
 
 }
 
@@ -71,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
 
-    this->initWidgets();
+    this->initPanels();
     this->setupSignalsAndSlots();
 
 //    inspector.startProcess();

@@ -9,6 +9,8 @@
 
 #include <GalilCNInspector.hpp>
 
+#include <gui/resources/lang/lang.hpp>
+
 
 namespace Ui {
 class MainWindow;
@@ -28,7 +30,9 @@ public:
 
 private:
     void setupSignalsAndSlots() const;
-    void initWidgets();
+    void initPanels();
+    void initLeftPanel();
+    void initContentPanel();
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

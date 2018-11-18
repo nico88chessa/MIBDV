@@ -1,12 +1,16 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include <Constants.hpp>
+#include <QtCore>
 #include <QString>
+
+#include <Constants.hpp>
+#include <gui/resources/lang/lang.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
 class Utils {
+    Q_DECLARE_TR_FUNCTIONS(Utils);
 
 public:
 
@@ -14,30 +18,30 @@ public:
 
         switch (type) {
             case IOType::NOT_VALID: break;
-            case IOType::POWER: return QT_TR_NOOP("Power");
-            case IOType::CYCLE: return QT_TR_NOOP("Cycle");
-            case IOType::EMERGENCY_MUSHROOM: return QT_TR_NOOP("Emergency Mushroom");
-            case IOType::DOOR: return QT_TR_NOOP("Door");
-            case IOType::BYPASS_SECURITY: return QT_TR_NOOP("Bypass Security");
-            case IOType::WATER: return QT_TR_NOOP("Water");
-            case IOType::MARK_IN_PROGRESS: return QT_TR_NOOP("Mark In Progress");
-            case IOType::SCANNER_READY: return QT_TR_NOOP("Scanner Ready");
-            case IOType::SCANNER_ERROR: return QT_TR_NOOP("Scanner Error");
-            case IOType::GENERIC_INPUT: return QT_TR_NOOP("Generic Input");
-            case IOType::LASER_POWER: return QT_TR_NOOP("Laser Power");
-            case IOType::COMPRESSED_AIR_1: return QT_TR_NOOP("Compressed Air 1");
-            case IOType::COMPRESSED_AIR_2: return QT_TR_NOOP("Compressed Air 2");
-            case IOType::BRUSH_1: return QT_TR_NOOP("Brush 1");
-            case IOType::BRUSH_2: return QT_TR_NOOP("Brush 2");
-            case IOType::SUCTION: return QT_TR_NOOP("Suction");
-            case IOType::ENABLE_AIR_FOR_FLUID: return QT_TR_NOOP("Enable Air For Fluid");
-            case IOType::ENABLE_FLUID: return QT_TR_NOOP("Enable Fluid");
-            case IOType::POWER_SCAN: return QT_TR_NOOP("Power Scan");
-            case IOType::START_SCAN: return QT_TR_NOOP("Start Scan");
-            case IOType::STOP_SCAN: return QT_TR_NOOP("Stop Scan");
-            case IOType::RED_LIGHT: return QT_TR_NOOP("Red Light");
-            case IOType::GREEN_LIGHT: return QT_TR_NOOP("Green Light");
-            case IOType::GENERIC_ANALOG_INPUT: return QT_TR_NOOP("Analog Input");
+            case IOType::POWER: return tr(UTILS_IOTYPE_POWER);
+            case IOType::CYCLE: return tr(UTILS_IOTYPE_CYCLE);
+            case IOType::EMERGENCY_MUSHROOM: return tr(UTILS_IOTYPE_EMERGENCY_MUSHROOM);
+            case IOType::DOOR: return tr(UTILS_IOTYPE_DOOR);
+            case IOType::BYPASS_SECURITY: return tr(UTILS_IOTYPE_BYPASS_SECURITY);
+            case IOType::WATER: return tr(UTILS_IOTYPE_WATER);
+            case IOType::MARK_IN_PROGRESS: return tr(UTILS_IOTYPE_MARK_IN_PROGRESS);
+            case IOType::SCANNER_READY: return tr(UTILS_IOTYPE_SCANNER_READY);
+            case IOType::SCANNER_ERROR: return tr(UTILS_IOTYPE_SCANNER_ERROR);
+            case IOType::GENERIC_INPUT: return tr(UTILS_IOTYPE_GENERIC_INPUT);
+            case IOType::LASER_POWER: return tr(UTILS_IOTYPE_LASER_POWER);
+            case IOType::COMPRESSED_AIR_1: return tr(UTILS_IOTYPE_COMPRESSED_AIR_1);
+            case IOType::COMPRESSED_AIR_2: return tr(UTILS_IOTYPE_COMPRESSED_AIR_2);
+            case IOType::BRUSH_1: return tr(UTILS_IOTYPE_BRUSH_1);
+            case IOType::BRUSH_2: return tr(UTILS_IOTYPE_BRUSH_2);
+            case IOType::SUCTION: return tr(UTILS_IOTYPE_SUCTION);
+            case IOType::ENABLE_AIR_FOR_FLUID: return tr(UTILS_IOTYPE_ENABLE_AIR_FOR_FLUID);
+            case IOType::ENABLE_FLUID: return tr(UTILS_IOTYPE_ENABLE_FLUID);
+            case IOType::POWER_SCAN: return tr(UTILS_IOTYPE_POWER_SCAN);
+            case IOType::START_SCAN: return tr(UTILS_IOTYPE_START_SCAN);
+            case IOType::STOP_SCAN: return tr(UTILS_IOTYPE_STOP_SCAN);
+            case IOType::RED_LIGHT: return tr(UTILS_IOTYPE_RED_LIGHT);
+            case IOType::GREEN_LIGHT: return tr(UTILS_IOTYPE_GREEN_LIGHT);
+            case IOType::GENERIC_ANALOG_INPUT: return tr(UTILS_IOTYPE_GENERIC_ANALOG_INPUT);
         }
 
         return "";

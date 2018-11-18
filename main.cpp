@@ -1,39 +1,43 @@
 #include <QApplication>
+#include <QFontDatabase>
 
-#include <gui/ui/MainWindow.hpp>
-
-#include <QDebug>
-#include <QSettings>
-#include <QStandardPaths>
-
-#include "configure.h"
-#include "GalilCNController.hpp"
-#include "GalilPLCController.hpp"
-#include "GalilCNInspector.hpp"
-
-#include <Logger.hpp>
 #include <Settings.hpp>
-#include <ErrorManager.hpp>
-#include "CommonTraits.hpp"
+#include <gui/ui/MainWindow.hpp>
+#include <Logger.hpp>
+
+
+void loadCustomFont() {
+    int id = 0;
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Black");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-BlackItalic");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Bold");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-BoldItalic");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Italic");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-LightItalic");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Medium");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-MediumItalic");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Regular");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Thin");
+    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-ThinItalic");
+}
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
+    Settings& set = Settings::instance();
+
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);
     QCoreApplication::setApplicationName(PROGRAM_NAMESPACE::APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(PROGRAM_NAMESPACE::APPLICATION_VERSION);
 
-//    MainWindow mainWindow;
-//    mainWindow.show();
+    loadCustomFont();
 
-    traceDebug() << deviceKeyTraits<DeviceKey::GALIL_PLC>::value;
-    traceDebug() << deviceKeyTraits<DeviceKey::GALIL_CN>::value;
-
-    deviceKeyTraits<DeviceKey::GALIL_CN>::type prova;
-
+    MainWindow mainWindow;
+    mainWindow.show();
 
     return app.exec();
 

@@ -77,6 +77,7 @@ void Settings::loadValuesFromFile() {
     settings.endArray();
 
     // per gli input obbligatori, controllo che siano presenti
+    // FIXME non usare getIoDescription perche' usato per la UI
     if (!digitalInputs.contains(IOType::POWER))
         this->digitalInputs[IOType::POWER] = DigitalInput(Utils::getIODescription(IOType::POWER), -1, false, DeviceKey::GALIL_CN, false, IOType::POWER);
     if (!digitalInputs.contains(IOType::CYCLE))
