@@ -1,6 +1,7 @@
 SET(ITEMS
     MainWindow
     UnmovableWindow
+    MotionFrame
     )
 
 FOREACH(ITEM ${ITEMS})

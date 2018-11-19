@@ -14,6 +14,8 @@
         <file alias="alert">icons/baseline_add_alert_black_24dp.png</file>
         <file alias="pan">icons/baseline_pan_tool_black_24dp.png</file>
         <file alias="io">icons/baseline_input_black_24dp.png</file>
+        <file alias="pause">icons/baseline_pause_circle_filled_black_24dp.png</file>
+        <file alias="play">icons/baseline_play_circle_filled_black_24dp.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>

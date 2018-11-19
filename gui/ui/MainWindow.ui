@@ -38,13 +38,10 @@
         <height>0</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_3">
+      <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -58,48 +55,58 @@
         <number>0</number>
        </property>
        <property name="spacing">
-        <number>4</number>
+        <number>0</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="contentLayout">
-         <property name="leftMargin">
-          <number>6</number>
+        <widget class="QStackedWidget" name="stackedWidget">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
-         <property name="topMargin">
-          <number>6</number>
+         <property name="lineWidth">
+          <number>0</number>
          </property>
-         <property name="rightMargin">
-          <number>6</number>
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
-         <item row="0" column="0">
-          <widget class="QStackedWidget" name="stackedWidget">
-           <widget class="QWidget" name="page"/>
-           <widget class="QWidget" name="page_2"/>
+         <widget class="QWidget" name="page">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <widget class="MotionFrame" name="frame">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>824</width>
+             <height>668</height>
+            </rect>
+           </property>
           </widget>
-         </item>
-        </layout>
+         </widget>
+         <widget class="QWidget" name="page_2"/>
+        </widget>
        </item>
       </layout>
      </widget>
     </item>
     <item row="1" column="0">
      <widget class="QFrame" name="left">
-      <property name="minimumSize">
+      <property name="maximumSize">
        <size>
-        <width>100</width>
-        <height>0</height>
+        <width>200</width>
+        <height>16777215</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -113,11 +120,14 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="leftLayout">
-         <item>
-          <widget class="MDListWidget" name="listItem"/>
-         </item>
-        </layout>
+        <widget class="MDListWidget" name="listItem">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -127,16 +137,10 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>100</height>
+        <height>64</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -153,52 +157,48 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="topLayout">
-         <item>
-          <widget class="QLabel" name="labelTitle">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/resources.qrc">
-             <normaloff>:/mibdv/settings</normaloff>:/mibdv/settings</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonRefreshStyle">
-           <property name="text">
-            <string>RS</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QLabel" name="labelTitle">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>858</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/resources.qrc">
+           <normaloff>:/mibdv/settings</normaloff>:/mibdv/settings</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonRefreshStyle">
+         <property name="text">
+          <string>RS</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -211,6 +211,12 @@
    <class>MDListWidget</class>
    <extends>QListWidget</extends>
    <header>gui/custom-widgets/MDListWidget.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>MotionFrame</class>
+   <extends>QFrame</extends>
+   <header>gui/ui/MotionFrame.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
