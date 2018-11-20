@@ -6,6 +6,7 @@
 namespace PROGRAM_NAMESPACE {
 
 using real = float;
+using realHR = double; // real high resolution
 using analogReal = double;
 
 enum class DeviceKey : int {
@@ -150,24 +151,46 @@ constexpr DeviceKey MACHINE_CN_TYPE_DFLT = DeviceKey::NONE;
 constexpr DeviceKey MACHINE_PLC_TYPE_DFLT = DeviceKey::NONE;
 constexpr int MACHINE_IO_REFRESH_INTERVAL_MS_DFLT = 1000;
 
+constexpr char GALIL_CN_PREFIX[] = "GalilCN";
 constexpr char GALIL_CN_CONNECTION_TIMEOUT_MS[] = "GalilCN/ConnectionTimeoutMs";
 constexpr char GALIL_CN_STATUS_REFRESH_INTERVAL_MS[] = "GalilCN/StatusRefreshIntervalMs";
 constexpr char GALIL_CN_CHECK_CONNECTION_INTERVAL_MS[] = "GalilCN/CheckConnectionIntervalMs";
+constexpr char GALIL_CN_RECONNECTION_INTERVAL_MS[] = "GalilCN/ReconnectionIntervalMs";
+constexpr char GALIL_CN_NUMBER_DIGITAL_INPUT[] = "GalilCN/NumberDigitalInput";
+constexpr char GALIL_CN_NUMBER_DIGITAL_OUTPUT[] = "GalilCN/NumberDigitalOutput";
+constexpr char GALIL_CN_NUMBER_ANALOG_INPUT[] = "GalilCN/NumberAnalogcInput";
+constexpr char GALIL_CN_NUMBER_ANALOG_OUTPUT[] = "GalilCN/NumberAnalogcOutput";
 constexpr char GALIL_CN_IP_ADDRESS[] = "GalilCN/IpAddress";
-
-constexpr char GALIL_PLC_CONNECTION_TIMEOUT_MS[] = "GalilPLC/ConnectionTimeoutMs";
-constexpr char GALIL_PLC_STATUS_REFRESH_INTERVAL_MS[] = "GalilPLC/StatusRefreshIntervalMs";
-constexpr char GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS[] = "GalilPLC/CheckConnectionIntervalMs";
-constexpr char GALIL_PLC_IP_ADDRESS[] = "GalilPLC/IpAddress";
 
 constexpr int GALIL_CN_CONNECTION_TIMEOUT_MS_DFLT = 1000;
 constexpr int GALIL_CN_STATUS_REFRESH_INTERVAL_MS_DFLT = 100;
 constexpr int GALIL_CN_CHECK_CONNECTION_INTERVAL_MS_DFLT = 1000;
+constexpr int GALIL_CN_RECONNECTION_INTERVAL_MS_DFLT = 10000;
+constexpr int GALIL_CN_NUMBER_DIGITAL_INPUT_DFLT = 8;
+constexpr int GALIL_CN_NUMBER_DIGITAL_OUTPUT_DFLT = 8;
+constexpr int GALIL_CN_NUMBER_ANALOG_INPUT_DFLT = 0;
+constexpr int GALIL_CN_NUMBER_ANALOG_OUTPUT_DFLT = 0;
 constexpr char GALIL_CN_IP_ADDRESS_DFLT[] = "169.254.12.10";
+
+constexpr char GALIL_PLC_PREFIX[] = "GalilPLC";
+constexpr char GALIL_PLC_CONNECTION_TIMEOUT_MS[] = "GalilPLC/ConnectionTimeoutMs";
+constexpr char GALIL_PLC_STATUS_REFRESH_INTERVAL_MS[] = "GalilPLC/StatusRefreshIntervalMs";
+constexpr char GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS[] = "GalilPLC/CheckConnectionIntervalMs";
+constexpr char GALIL_PLC_RECONNECTION_INTERVAL_MS[] = "GalilPLC/ReconnectionIntervalMs";
+constexpr char GALIL_PLC_NUMBER_DIGITAL_INPUT[] = "GalilPLC/NumberDigitalInput";
+constexpr char GALIL_PLC_NUMBER_DIGITAL_OUTPUT[] = "GalilPLC/NumberDigitalOutput";
+constexpr char GALIL_PLC_NUMBER_ANALOG_INPUT[] = "GalilPLC/NumberAnalogcInput";
+constexpr char GALIL_PLC_NUMBER_ANALOG_OUTPUT[] = "GalilPLC/NumberAnalogcOutput";
+constexpr char GALIL_PLC_IP_ADDRESS[] = "GalilPLC/IpAddress";
 
 constexpr int GALIL_PLC_CONNECTION_TIMEOUT_MS_DFLT = 1000;
 constexpr int GALIL_PLC_STATUS_REFRESH_INTERVAL_MS_DFLT = 100;
 constexpr int GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS_DFLT = 1000;
+constexpr int GALIL_PLC_RECONNECTION_INTERVAL_MS_DFLT = 10000;
+constexpr int GALIL_PLC_NUMBER_DIGITAL_INPUT_DFLT = 16;
+constexpr int GALIL_PLC_NUMBER_DIGITAL_OUTPUT_DFLT = 16;
+constexpr int GALIL_PLC_NUMBER_ANALOG_INPUT_DFLT = 8;
+constexpr int GALIL_PLC_NUMBER_ANALOG_OUTPUT_DFLT = 0;
 constexpr char GALIL_PLC_IP_ADDRESS_DFLT[] = "169.254.12.11";
 
 

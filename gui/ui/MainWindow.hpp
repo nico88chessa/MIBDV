@@ -2,14 +2,14 @@
 #define MAINWINDOW_HPP
 
 #include <QFile>
+#include <QScopedPointer>
+
+#include <gui/resources/lang/lang.hpp>
 
 #include "UnmovableWindow.hpp"
 #include <Logger.hpp>
 #include <ErrorManager.hpp>
-
 #include <GalilCNInspector.hpp>
-
-#include <gui/resources/lang/lang.hpp>
 
 
 namespace Ui {
@@ -23,8 +23,8 @@ class MainWindow : public UnmovableWindow
 private:
     Ui::MainWindow *ui;
 
-    PROGRAM_NAMESPACE::ErrorManager errorManager;
-    PROGRAM_NAMESPACE::GalilCNInspector inspector;
+    QScopedPointer<PROGRAM_NAMESPACE::ErrorManager> errorManager;
+    QScopedPointer<PROGRAM_NAMESPACE::GalilCNInspector> galilCNInspector;
 
 public:
 
@@ -33,6 +33,11 @@ private:
     void initPanels();
     void initLeftPanel();
     void initContentPanel();
+
+    void initDevices();
+
+    void startGalilCNInspector();
+    void stopGalilCNInspector();
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

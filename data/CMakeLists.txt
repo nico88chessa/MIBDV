@@ -6,6 +6,7 @@ SET(ITEMS
     GalilCNStatusBean
     GalilPLCStatusBean
     CommonTraits
+    MotionBean
     )
 
 FOREACH(ITEM ${ITEMS})

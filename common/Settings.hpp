@@ -83,10 +83,21 @@ public:
     int getGalilCNConnectionTimeoutMs() const { return galilCNConnectionTimeoutMs; }
     int getGalilCNStatusRefreshIntervalMs() const { return galilCNStatusRefreshIntervalMs; }
     int getGalilCNCheckConnectionIntervalMs() const { return galilCNCheckConnectionIntervalMs; }
+    int getGalilCNReconnectionIntervalMs() const { return galilCNReconnectionIntervalMs; }
+    int getGalilCNNumberDigitalInput() const { return galilCNNumberDigitalInput; }
+    int getGalilCNNumberDigitalOutput() const { return galilCNNumberDigitalOutput; }
+    int getGalilCNNumberAnalogInput() const { return galilCNNumberAnalogInput; }
+    int getGalilCNNumberAnalogOutput() const { return galilCNNumberAnalogOutput; }
     QString getGalilCNIpAddress() const { return galilCNIpAddress; }
+
     int getGalilPLCConnectionTimeoutMs() const { return galilPLCConnectionTimeoutMs; }
     int getGalilPLCStatusRefreshIntervalMs() const { return galilPLCStatusRefreshIntervalMs; }
     int getGalilPLCCheckConnectionIntervalMs() const { return galilPLCCheckConnectionIntervalMs; }
+    int getGalilPLCReconnectionIntervalMs() const { return galilPLCReconnectionIntervalMs; }
+    int getGalilPLCNumberDigitalInput() const { return galilPLCNumberDigitalInput; }
+    int getGalilPLCNumberDigitalOutput() const { return galilPLCNumberDigitalOutput; }
+    int getGalilPLCNumberAnalogInput() const { return galilPLCNumberAnalogInput; }
+    int getGalilPLCNumberAnalogOutput() const { return galilPLCNumberAnalogOutput; }
     QString getGalilPLCIpAddress() const { return galilPLCIpAddress; }
 
     DeviceKey getMachineCNType() const { return machineCNType; }
@@ -146,12 +157,22 @@ private:
     int galilCNConnectionTimeoutMs;
     int galilCNStatusRefreshIntervalMs;
     int galilCNCheckConnectionIntervalMs;
+    int galilCNReconnectionIntervalMs;
+    int galilCNNumberDigitalInput;
+    int galilCNNumberDigitalOutput;
+    int galilCNNumberAnalogInput;
+    int galilCNNumberAnalogOutput;
     QString galilCNIpAddress;
 
     // GALIL PLC PARAMETERS
     int galilPLCConnectionTimeoutMs;
     int galilPLCStatusRefreshIntervalMs;
     int galilPLCCheckConnectionIntervalMs;
+    int galilPLCReconnectionIntervalMs;
+    int galilPLCNumberDigitalInput;
+    int galilPLCNumberDigitalOutput;
+    int galilPLCNumberAnalogInput;
+    int galilPLCNumberAnalogOutput;
     QString galilPLCIpAddress;
 
 };

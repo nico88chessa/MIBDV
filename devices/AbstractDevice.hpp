@@ -12,7 +12,7 @@ public:
 
 public:
     virtual bool isConnected() const = 0;
-    virtual ~IAbstractDevice();
+    virtual ~IAbstractDevice() { }
 
 };
 

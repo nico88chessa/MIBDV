@@ -112,6 +112,10 @@ QDebug Logger::info() const {
     return qInfo();
 }
 
+QDebug Logger::warn() const {
+    return qWarning();
+}
+
 QDebug Logger::error() const {
     return qCritical();
 }

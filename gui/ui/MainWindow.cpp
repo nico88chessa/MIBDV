@@ -56,6 +56,35 @@ void MainWindow::initContentPanel() {
 
 }
 
+void MainWindow::initDevices() {
+
+    traceEnter;
+
+    errorManager.reset(new ErrorManager());
+    galilCNInspector.reset(new GalilCNInspector());
+
+    errorManager->subscribeObject(*galilCNInspector);
+
+    traceExit;
+
+}
+
+void MainWindow::startGalilCNInspector() {
+
+    traceEnter;
+
+    traceExit;
+
+}
+
+void MainWindow::stopGalilCNInspector() {
+
+    traceEnter;
+
+    traceExit;
+
+}
+
 void MainWindow::setupStyleSheets() const {
 
     using namespace PROGRAM_NAMESPACE;
@@ -89,7 +118,8 @@ void MainWindow::setupStyleSheets() const {
 }
 
 MainWindow::MainWindow(QWidget *parent) :
-    UnmovableWindow(parent), ui(new Ui::MainWindow) {
+    UnmovableWindow(parent), ui(new Ui::MainWindow),
+    errorManager(nullptr), galilCNInspector(nullptr) {
 
     traceEnter;
 

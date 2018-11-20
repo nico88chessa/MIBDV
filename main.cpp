@@ -7,8 +7,10 @@
 
 
 void loadCustomFont() {
-    int id = 0;
-    id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Black");
+
+    PROGRAM_NAMESPACE::traceEnter;
+
+    int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Black");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-BlackItalic");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Bold");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-BoldItalic");
@@ -20,14 +22,16 @@ void loadCustomFont() {
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Regular");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Thin");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-ThinItalic");
+
+    PROGRAM_NAMESPACE::traceDebug() << "Caricati" << id << " fonts Roboto";
+
+    PROGRAM_NAMESPACE::traceExit;
 }
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
-
-    Settings& set = Settings::instance();
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);

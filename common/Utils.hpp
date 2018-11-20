@@ -10,7 +10,7 @@
 namespace PROGRAM_NAMESPACE {
 
 class Utils {
-    Q_DECLARE_TR_FUNCTIONS(Utils);
+    Q_DECLARE_TR_FUNCTIONS(Utils)
 
 public:
 

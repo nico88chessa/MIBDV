@@ -15,6 +15,7 @@
 #include <GalilPLCStatusBean.hpp>
 #include <ErrorSignaler.hpp>
 #include <ErrorManager.hpp>
+#include <Settings.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -26,8 +27,10 @@ public:
     using ConstPtr = GalilCNInspector*;
 
 private:
-    GalilCNController controller;
-    GalilPLCController controllerPlc;
+    int reconnectionIntervalMs;
+    QString ipAddress;
+
+    QScopedPointer<GalilCNController> controller;
     QTimer refreshTimer;
     DECL_ERROR_SIGNALER_FRIENDS(GalilCNInspector)
 
@@ -37,6 +40,7 @@ public:
 
 private slots:
     void process();
+    void handleDisconnection();
 
 public slots:
     void restartProcess();
@@ -49,7 +53,6 @@ signals:
     void statusSignal(GalilCNStatusBean);
 
     void processStartSignal();
-
     void processStopSignal();
 
 protected:

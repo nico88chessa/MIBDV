@@ -170,6 +170,11 @@ void Settings::loadValuesFromFile() {
         galilCNConnectionTimeoutMs = settings.value(GALIL_CN_CONNECTION_TIMEOUT_MS, GALIL_CN_CONNECTION_TIMEOUT_MS_DFLT).value<int>();
         galilCNStatusRefreshIntervalMs = settings.value(GALIL_CN_STATUS_REFRESH_INTERVAL_MS, GALIL_CN_STATUS_REFRESH_INTERVAL_MS_DFLT).value<int>();
         galilCNCheckConnectionIntervalMs = settings.value(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS, GALIL_CN_CHECK_CONNECTION_INTERVAL_MS_DFLT).value<int>();
+        galilCNReconnectionIntervalMs = settings.value(GALIL_CN_RECONNECTION_INTERVAL_MS, GALIL_CN_RECONNECTION_INTERVAL_MS_DFLT).value<int>();
+        galilCNNumberDigitalInput = settings.value(GALIL_CN_NUMBER_DIGITAL_INPUT, GALIL_CN_NUMBER_DIGITAL_INPUT_DFLT).value<int>();
+        galilCNNumberDigitalOutput = settings.value(GALIL_CN_NUMBER_DIGITAL_OUTPUT, GALIL_CN_NUMBER_DIGITAL_OUTPUT_DFLT).value<int>();
+        galilCNNumberAnalogInput = settings.value(GALIL_CN_NUMBER_ANALOG_INPUT, GALIL_CN_NUMBER_ANALOG_INPUT_DFLT).value<int>();
+        galilCNNumberAnalogOutput = settings.value(GALIL_CN_NUMBER_ANALOG_OUTPUT, GALIL_CN_NUMBER_ANALOG_OUTPUT_DFLT).value<int>();
         galilCNIpAddress = settings.value(GALIL_CN_IP_ADDRESS, GALIL_CN_IP_ADDRESS_DFLT).value<QString>();
     }
 
@@ -178,6 +183,11 @@ void Settings::loadValuesFromFile() {
         galilPLCConnectionTimeoutMs = settings.value(GALIL_PLC_CONNECTION_TIMEOUT_MS, GALIL_PLC_CONNECTION_TIMEOUT_MS_DFLT).value<int>();
         galilPLCStatusRefreshIntervalMs = settings.value(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS, GALIL_PLC_STATUS_REFRESH_INTERVAL_MS_DFLT).value<int>();
         galilPLCCheckConnectionIntervalMs = settings.value(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS, GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS_DFLT).value<int>();
+        galilPLCReconnectionIntervalMs = settings.value(GALIL_PLC_RECONNECTION_INTERVAL_MS, GALIL_PLC_RECONNECTION_INTERVAL_MS_DFLT).value<int>();
+        galilPLCNumberDigitalInput = settings.value(GALIL_PLC_NUMBER_DIGITAL_INPUT, GALIL_PLC_NUMBER_DIGITAL_INPUT_DFLT).value<int>();
+        galilPLCNumberDigitalOutput = settings.value(GALIL_PLC_NUMBER_DIGITAL_OUTPUT, GALIL_PLC_NUMBER_DIGITAL_OUTPUT_DFLT).value<int>();
+        galilPLCNumberAnalogInput = settings.value(GALIL_PLC_NUMBER_ANALOG_INPUT, GALIL_PLC_NUMBER_ANALOG_INPUT_DFLT).value<int>();
+        galilPLCNumberAnalogOutput = settings.value(GALIL_PLC_NUMBER_ANALOG_OUTPUT, GALIL_PLC_NUMBER_ANALOG_OUTPUT_DFLT).value<int>();
         galilPLCIpAddress = settings.value(GALIL_PLC_IP_ADDRESS, GALIL_PLC_IP_ADDRESS_DFLT).value<QString>();
     }
 
@@ -317,12 +327,13 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_CN_STATUS_REFRESH_INTERVAL_MS, galilCNStatusRefreshIntervalMs);
         settings.setValue(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS, galilCNCheckConnectionIntervalMs);
         settings.setValue(GALIL_CN_IP_ADDRESS, galilCNIpAddress);
-    } else {
-        settings.remove(GALIL_CN_CONNECTION_TIMEOUT_MS);
-        settings.remove(GALIL_CN_STATUS_REFRESH_INTERVAL_MS);
-        settings.remove(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS);
-        settings.remove(GALIL_CN_IP_ADDRESS);
-    }
+        settings.setValue(GALIL_CN_NUMBER_DIGITAL_INPUT, galilCNNumberDigitalInput);
+        settings.setValue(GALIL_CN_NUMBER_DIGITAL_OUTPUT, galilCNNumberDigitalOutput);
+        settings.setValue(GALIL_CN_NUMBER_ANALOG_INPUT, galilCNNumberAnalogInput);
+        settings.setValue(GALIL_CN_NUMBER_ANALOG_OUTPUT, galilCNNumberAnalogOutput);
+    } else
+        settings.remove(GALIL_CN_PREFIX);
+
 
     // se il plc e' di tipo galil, carico i parametri del galil)
     if (DeviceKey::GALIL_PLC == machinePLCType) {
@@ -330,12 +341,12 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS, galilPLCStatusRefreshIntervalMs);
         settings.setValue(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS, galilPLCCheckConnectionIntervalMs);
         settings.setValue(GALIL_PLC_IP_ADDRESS, galilPLCIpAddress);
-    } else {
-        settings.remove(GALIL_PLC_CONNECTION_TIMEOUT_MS);
-        settings.remove(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS);
-        settings.remove(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS);
-        settings.remove(GALIL_PLC_IP_ADDRESS);
-    }
+        settings.setValue(GALIL_PLC_NUMBER_DIGITAL_INPUT, galilPLCNumberDigitalInput);
+        settings.setValue(GALIL_PLC_NUMBER_DIGITAL_OUTPUT, galilPLCNumberDigitalOutput);
+        settings.setValue(GALIL_PLC_NUMBER_ANALOG_INPUT, galilPLCNumberAnalogInput);
+        settings.setValue(GALIL_PLC_NUMBER_ANALOG_OUTPUT, galilPLCNumberAnalogOutput);
+    } else
+        settings.remove(GALIL_PLC_PREFIX);
 
     settings.sync();
 
@@ -508,4 +519,3 @@ Settings& Settings::instance() {
     return instance;
 
 }
-
