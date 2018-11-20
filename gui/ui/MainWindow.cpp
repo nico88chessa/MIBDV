@@ -3,6 +3,43 @@
 
 using namespace PROGRAM_NAMESPACE;
 
+MainWindow::MainWindow(QWidget *parent) :
+    UnmovableWindow(parent), ui(new Ui::MainWindow),
+    errorManager(nullptr), galilCNInspector(nullptr) {
+
+    traceEnter;
+
+    ui->setupUi(this);
+
+    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setFixedSize(this->width(), this->height());
+
+    this->initPanels();
+    this->setupSignalsAndSlots();
+
+    Settings& s = Settings::instance();
+
+//    inspector.startProcess();
+
+//    errorManager.subscribeObject(inspector);
+
+
+    this->setupStyleSheets();
+
+    traceExit;
+
+}
+
+MainWindow::~MainWindow() {
+
+    traceEnter;
+
+    delete ui;
+
+    traceExit;
+
+}
+
 void MainWindow::setupSignalsAndSlots() const {
 
     traceEnter;
@@ -117,37 +154,3 @@ void MainWindow::setupStyleSheets() const {
 
 }
 
-MainWindow::MainWindow(QWidget *parent) :
-    UnmovableWindow(parent), ui(new Ui::MainWindow),
-    errorManager(nullptr), galilCNInspector(nullptr) {
-
-    traceEnter;
-
-    ui->setupUi(this);
-
-    this->setWindowFlags(Qt::FramelessWindowHint);
-    this->setFixedSize(this->width(), this->height());
-
-    this->initPanels();
-    this->setupSignalsAndSlots();
-
-//    inspector.startProcess();
-
-//    errorManager.subscribeObject(inspector);
-
-
-    this->setupStyleSheets();
-
-    traceExit;
-
-}
-
-MainWindow::~MainWindow() {
-
-    traceEnter;
-
-    delete ui;
-
-    traceExit;
-
-}

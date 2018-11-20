@@ -23,8 +23,12 @@ QColor MDLineEdit::getLabelFocusColor() const { return labelFocusColor; }
 
 void MDLineEdit::setLabelFocusColor(const QColor& value) { labelFocusColor = value; }
 
+QString MDLineEdit::getLabel() const { return label; }
+
+void MDLineEdit::setLabel(const QString& value) { label = value; }
+
 MDLineEdit::MDLineEdit(QWidget* parent) :
-    QLineEdit(parent) {
+    QLineEdit(parent), label("") {
 
 }
 
@@ -50,7 +54,7 @@ void MDLineEdit::paintEvent(QPaintEvent* event) {
     font.setPixelSize(getLabelTextWidth());
     p.setFont(font);
 
-    p.drawText(QPoint(this->getLabelX(), getLabelY()), tr("Qt by\nThe Qt Company"));
+    p.drawText(QPoint(this->getLabelX(), getLabelY()), label);
 
 //    int l, t, r, b;
 //    this->getContentsMargins(&l, &t, &r, &b);

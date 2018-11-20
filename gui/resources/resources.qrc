@@ -16,6 +16,8 @@
         <file alias="io">icons/baseline_input_black_24dp.png</file>
         <file alias="pause">icons/baseline_pause_circle_filled_black_24dp.png</file>
         <file alias="play">icons/baseline_play_circle_filled_black_24dp.png</file>
+        <file alias="lens">icons/baseline_lens_black_24dp.png</file>
+        <file alias="panorama">icons/baseline_panorama_fish_eye_black_24dp.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>

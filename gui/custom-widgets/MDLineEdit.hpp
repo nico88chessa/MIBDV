@@ -11,6 +11,8 @@ class MDLineEdit : public QLineEdit {
     Q_PROPERTY(int labelTextWidth READ getLabelTextWidth WRITE setLabelTextWidth)
     Q_PROPERTY(QColor labelColor READ getLabelColor WRITE setLabelColor)
     Q_PROPERTY(QColor labelFocusColor READ getLabelFocusColor WRITE setLabelFocusColor)
+    Q_PROPERTY(QString label READ getLabel WRITE setLabel)
+
 
 public:
     using Ptr = MDLineEdit*;
@@ -22,6 +24,7 @@ private:
     int labelTextWidth;
     QColor labelColor;
     QColor labelFocusColor;
+    QString label;
 
 public:
     explicit MDLineEdit(QWidget* parent = nullptr);
@@ -41,6 +44,9 @@ public:
 
     QColor getLabelFocusColor() const;
     void setLabelFocusColor(const QColor& value);
+
+    QString getLabel() const;
+    void setLabel(const QString& value);
 
 protected:
     void paintEvent(QPaintEvent* event);
