@@ -157,7 +157,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="labelTitle">
+        <widget class="QLabel" name="lTitle">
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -177,7 +177,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="pb">
          <property name="text">
           <string/>
          </property>
@@ -194,7 +194,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="buttonRefreshStyle">
+        <widget class="QPushButton" name="pbRefreshStyle">
          <property name="text">
           <string>RS</string>
          </property>
@@ -220,7 +220,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>

@@ -66,58 +66,7 @@
         <property name="verticalSpacing">
          <number>0</number>
         </property>
-        <item row="5" column="0">
-         <widget class="QRadioButton" name="radioButton_2">
-          <property name="text">
-           <string>Reverse Limit</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QRadioButton" name="radioButton_6">
-          <property name="text">
-           <string>Forward Limit</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="buttonMoveY">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="buttonStopY">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="7" column="2">
+        <item row="9" column="2">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <spacer name="horizontalSpacer_3">
@@ -133,14 +82,14 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonMoveZ">
+           <widget class="QPushButton" name="pbMoveZ">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonStopZ">
+           <widget class="QPushButton" name="pbStopZ">
             <property name="text">
              <string/>
             </property>
@@ -148,8 +97,53 @@
           </item>
          </layout>
         </item>
+        <item row="9" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbMoveY">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbStopY">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="1">
+         <widget class="MDLineEdit" name="leAxisYPosition">
+          <property name="label" stdset="0">
+           <string>Position</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="MDLineEdit" name="leAxisXPosition">
+          <property name="label" stdset="0">
+           <string>Position</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="2">
-         <widget class="QLabel" name="labelAxisZ">
+         <widget class="QLabel" name="lAxisZ">
           <property name="text">
            <string>Axis Z</string>
           </property>
@@ -158,58 +152,14 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
-         <widget class="QRadioButton" name="radioButton_5">
-          <property name="text">
-           <string>Reverse Limit</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="MDLineEdit" name="axisXPosition">
-          <property name="label" stdset="0">
-           <string>Position</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="2">
-         <widget class="QRadioButton" name="radioButton_9">
-          <property name="text">
-           <string>Forward Limit</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="MDLineEdit" name="axisZPosition">
-          <property name="label" stdset="0">
-           <string>Position</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QRadioButton" name="radioButton">
-          <property name="text">
-           <string>Motor Off</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
-         <widget class="MDLineEdit" name="axisXMaxPosition">
+         <widget class="MDLineEdit" name="leAxisXMaxPosition">
           <property name="label" stdset="0">
            <string>Max Position</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="0" colspan="3">
+        <item row="11" column="0" colspan="3">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="spacing">
            <number>0</number>
@@ -253,14 +203,14 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonResetAxis">
+           <widget class="QPushButton" name="pbResetAxis">
             <property name="text">
              <string>Reset</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonStopAxis">
+           <widget class="QPushButton" name="pbStopAxis">
             <property name="text">
              <string>Stop</string>
             </property>
@@ -268,8 +218,15 @@
           </item>
          </layout>
         </item>
+        <item row="2" column="2">
+         <widget class="MDLineEdit" name="leAxisZMaxPosition">
+          <property name="label" stdset="0">
+           <string>Max Position</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
-         <widget class="QLabel" name="labelAxisX">
+         <widget class="QLabel" name="lAxisX">
           <property name="text">
            <string>Axis X</string>
           </property>
@@ -278,89 +235,68 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="MDLineEdit" name="axisYPosition">
-          <property name="label" stdset="0">
-           <string>Position</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QRadioButton" name="radioButton_4">
-          <property name="text">
-           <string>Motor Off</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
-         <widget class="QRadioButton" name="radioButton_8">
-          <property name="text">
-           <string>Reverse Limit</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
-         <widget class="MDLineEdit" name="axisYCurrentPosition">
-          <property name="label" stdset="0">
-           <string>Current Position</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="MDLineEdit" name="axisZMaxPosition">
-          <property name="label" stdset="0">
-           <string>Max Position</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="MDLineEdit" name="axisZCurrentPosition">
+         <widget class="MDLineEdit" name="leAxisYCurrentPosition">
           <property name="label" stdset="0">
            <string>Current Position</string>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="MDLineEdit" name="axisYMaxPosition">
+         <widget class="MDLineEdit" name="leAxisYMaxPosition">
           <property name="label" stdset="0">
            <string>Max Position</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="MDLineEdit" name="axisXCurrentPosition">
+        <item row="1" column="2">
+         <widget class="MDLineEdit" name="leAxisZCurrentPosition">
           <property name="label" stdset="0">
            <string>Current Position</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
-         <widget class="QRadioButton" name="radioButton_3">
-          <property name="text">
-           <string>Forward Limit</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
+        <item row="3" column="2">
+         <widget class="MDLineEdit" name="leAxisZPosition">
+          <property name="label" stdset="0">
+           <string>Position</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="2">
-         <widget class="QRadioButton" name="radioButton_7">
-          <property name="text">
-           <string>Motor Off</string>
-          </property>
-          <property name="isDigitalIO" stdset="0">
-           <bool>true</bool>
+        <item row="1" column="0">
+         <widget class="MDLineEdit" name="leAxisXCurrentPosition">
+          <property name="label" stdset="0">
+           <string>Current Position</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
+        <item row="10" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="10" column="2">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="9" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
            <number>0</number>
@@ -391,14 +327,14 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonMoveX">
+           <widget class="QPushButton" name="pbMoveX">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="buttonStopX">
+           <widget class="QPushButton" name="pbStopX">
             <property name="text">
              <string/>
             </property>
@@ -406,17 +342,7 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="labelAxisY">
-          <property name="text">
-           <string>Axis Y</string>
-          </property>
-          <property name="type" stdset="0">
-           <string>subheader</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0">
+        <item row="10" column="0">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -429,31 +355,135 @@
           </property>
          </spacer>
         </item>
-        <item row="8" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="1">
+         <widget class="QLabel" name="lAxisY">
+          <property name="text">
+           <string>Axis Y</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="type" stdset="0">
+           <string>subheader</string>
           </property>
-         </spacer>
+         </widget>
         </item>
-        <item row="8" column="2">
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="7" column="0">
+         <widget class="QCheckBox" name="cbAxisXForwardLimit">
+          <property name="text">
+           <string>Forward Limit</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
           </property>
-         </spacer>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QCheckBox" name="cbAxisXMotorOff">
+          <property name="text">
+           <string>Motor Off</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QCheckBox" name="cbAxisXReverseLimit">
+          <property name="text">
+           <string>Reverse Limit</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QCheckBox" name="cbAxisXMoving">
+          <property name="text">
+           <string>Moving</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QCheckBox" name="cbAxisYForwardLimit">
+          <property name="text">
+           <string>Forward Limit</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QCheckBox" name="cbAxisYMotorOff">
+          <property name="text">
+           <string>Motor Off</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QCheckBox" name="cbAxisYMoving">
+          <property name="text">
+           <string>Moving</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QCheckBox" name="cbAxisYReverseLimit">
+          <property name="text">
+           <string>Reverse Limit</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2">
+         <widget class="QCheckBox" name="cbAxisZForwardLimit">
+          <property name="text">
+           <string>Forward Limit</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QCheckBox" name="cbAxisZMotorOff">
+          <property name="text">
+           <string>Motor Off</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QCheckBox" name="cbAxisZMoving">
+          <property name="text">
+           <string>Moving</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
+         <widget class="QCheckBox" name="cbAxisZReverseLimit">
+          <property name="text">
+           <string>Reverse Limit</string>
+          </property>
+          <property name="isDigitalIO" stdset="0">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -475,13 +505,36 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>axisXCurrentPosition</tabstop>
-  <tabstop>axisXMaxPosition</tabstop>
-  <tabstop>axisYCurrentPosition</tabstop>
-  <tabstop>axisYMaxPosition</tabstop>
-  <tabstop>axisZCurrentPosition</tabstop>
-  <tabstop>axisZMaxPosition</tabstop>
   <tabstop>tabMotionFrame</tabstop>
+  <tabstop>leAxisXCurrentPosition</tabstop>
+  <tabstop>leAxisXMaxPosition</tabstop>
+  <tabstop>leAxisXPosition</tabstop>
+  <tabstop>leAxisYCurrentPosition</tabstop>
+  <tabstop>leAxisYMaxPosition</tabstop>
+  <tabstop>leAxisYPosition</tabstop>
+  <tabstop>leAxisZCurrentPosition</tabstop>
+  <tabstop>leAxisZMaxPosition</tabstop>
+  <tabstop>leAxisZPosition</tabstop>
+  <tabstop>pbMoveX</tabstop>
+  <tabstop>pbStopX</tabstop>
+  <tabstop>pbMoveY</tabstop>
+  <tabstop>pbStopY</tabstop>
+  <tabstop>pbMoveZ</tabstop>
+  <tabstop>pbStopZ</tabstop>
+  <tabstop>pbResetAxis</tabstop>
+  <tabstop>pbStopAxis</tabstop>
+  <tabstop>cbAxisXMotorOff</tabstop>
+  <tabstop>cbAxisXMoving</tabstop>
+  <tabstop>cbAxisXReverseLimit</tabstop>
+  <tabstop>cbAxisXForwardLimit</tabstop>
+  <tabstop>cbAxisYMotorOff</tabstop>
+  <tabstop>cbAxisYMoving</tabstop>
+  <tabstop>cbAxisYReverseLimit</tabstop>
+  <tabstop>cbAxisYForwardLimit</tabstop>
+  <tabstop>cbAxisZMotorOff</tabstop>
+  <tabstop>cbAxisZMoving</tabstop>
+  <tabstop>cbAxisZReverseLimit</tabstop>
+  <tabstop>cbAxisZForwardLimit</tabstop>
  </tabstops>
  <resources/>
  <connections/>

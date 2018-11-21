@@ -31,7 +31,7 @@
     font-size: 16px;
 }
 
-#labelTitle {
+#lTitle {
     padding: 0px 0px 0px 0px;
     padding-bottom: 14px;
     font-weight: 400;
@@ -51,15 +51,15 @@
     background-color: transparent;
 }
 
-
-QRadioButton[isDigitalIO = true] {
+QCheckBox[isDigitalIO = true] {
+    qproperty-focusPolicy: NoFocus;
 }
 
-QRadioButton::indicator::unchecked[isDigitalIO = true] {
+QCheckBox::indicator::unchecked[isDigitalIO = true] {
     image: url(:/mibdv/panorama);
 }
 
-QRadioButton::indicator::checked[isDigitalIO = true] {
+QCheckBox::indicator::checked[isDigitalIO = true] {
     image: url(:/mibdv/lens);
 }
 
@@ -75,7 +75,7 @@ QRadioButton::indicator::checked[isDigitalIO = true] {
     background-color: pink;
 }
 
-#tabMotion QPushButton {
+#tabMotion .QPushButton {
     padding: 16px 16px;
     margin: 10px 10px;
     border-width: 2px;
@@ -91,28 +91,28 @@ QRadioButton::indicator::checked[isDigitalIO = true] {
     background-color: transparent;
 }
 
-#tabMotion QLabel[type=subheader] {
+#tabMotion .QLabel[type=subheader] {
     font-size: 14px;
 }
 
-#tabMotion #buttonMoveX,
-#tabMotion #buttonMoveY,
-#tabMotion #buttonMoveZ {
+#tabMotion #pbMoveX,
+#tabMotion #pbMoveY,
+#tabMotion #pbMoveZ {
     background-image: url(:/mibdv/play);
     background-repeat: none;
     background-position: center center;
 }
 
-#tabMotion #buttonStopX,
-#tabMotion #buttonStopY,
-#tabMotion #buttonStopZ {
+#tabMotion #pbStopX,
+#tabMotion #pbStopY,
+#tabMotion #pbStopZ {
     background-image: url(:/mibdv/pause);
     background-repeat: none;
     background-position: center center;
 }
 
-#tabMotion #buttonStopAxis,
-#tabMotion #buttonResetAxis {
+#tabMotion #pbStopAxis,
+#tabMotion #pbResetAxis {
     padding: 0px 36px;
     margin: 6px 8px;
     border-width: 1px;

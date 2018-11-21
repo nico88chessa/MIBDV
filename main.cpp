@@ -5,10 +5,16 @@
 #include <gui/ui/MainWindow.hpp>
 #include <Logger.hpp>
 
+#include <MotionBean.hpp>
+#include <GalilCNStatusBean.hpp>
+
+#include <configure.h>
 
 void loadCustomFont() {
 
-    PROGRAM_NAMESPACE::traceEnter;
+    using namespace PROGRAM_NAMESPACE;
+
+    traceEnter;
 
     int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Black");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-BlackItalic");
@@ -23,9 +29,22 @@ void loadCustomFont() {
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Thin");
     id = QFontDatabase::addApplicationFont(":/fonts/Roboto-ThinItalic");
 
-    PROGRAM_NAMESPACE::traceDebug() << "Caricati" << id << " fonts Roboto";
+    traceDebug() << "Caricati" << id << " fonts Roboto";
 
-    PROGRAM_NAMESPACE::traceExit;
+    traceExit;
+}
+
+void registerMetatypes() {
+
+    using namespace PROGRAM_NAMESPACE;
+
+    traceEnter;
+
+    qRegisterMetaType<PROGRAM_NAMESPACE::GalilCNStatusBean>("GalilCNStatusBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MotionBean>("mibdv::MotionBean");
+
+    traceExit;
+
 }
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
@@ -39,6 +58,8 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     QCoreApplication::setApplicationVersion(PROGRAM_NAMESPACE::APPLICATION_VERSION);
 
     loadCustomFont();
+
+    registerMetatypes();
 
     MainWindow mainWindow;
     mainWindow.show();

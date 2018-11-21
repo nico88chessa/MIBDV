@@ -2,8 +2,10 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-GalilCNInspector::GalilCNInspector(QObject* parent) : QObject(parent),
+GalilCNInspector::GalilCNInspector(QObject* parent) :
+    QObject(parent),
     controller(new GalilCNController()),
+    refreshTimer(this),
     errorSignaler(new ErrorSignaler(this)) {
 
     Settings& s = Settings::instance();

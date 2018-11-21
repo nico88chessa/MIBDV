@@ -98,6 +98,8 @@ public:
 
     }
 
+    bool getAxisXForwardLimit() const { return axisXForwardLimit; }
+    void setAxisXForwardLimit(bool value) { axisXForwardLimit = value; }
     bool getAxisXReverseLimit() const { return axisXReverseLimit; }
     void setAxisXReverseLimit(bool value) { axisXReverseLimit = value; }
     bool getAxisXHomeInput() const { return axisXHomeInput; }
@@ -106,6 +108,10 @@ public:
     void setAxisXMotorOff(bool value) { axisXMotorOff = value; }
     real getAxisXPosition() const { return axisXPosition; }
     void setAxisXPosition(const real& value) { axisXPosition = value; }
+    bool getAxisXMoveInProgress() const { return axisXMoveInProgress; }
+    void setAxisXMoveInProgress(bool value) { axisXMoveInProgress = value; }
+
+
     bool getAxisYForwardLimit() const { return axisYForwardLimit; }
     void setAxisYForwardLimit(bool value) { axisYForwardLimit = value; }
     bool getAxisYReverseLimit() const { return axisYReverseLimit; }
@@ -118,6 +124,7 @@ public:
     void setAxisYMotorOff(bool value) { axisYMotorOff = value; }
     real getAxisYPosition() const { return axisYPosition; }
     void setAxisYPosition(const real& value) { axisYPosition = value; }
+
     bool getAxisZForwardLimit() const { return axisZForwardLimit; }
     void setAxisZForwardLimit(bool value) { axisZForwardLimit = value; }
     bool getAxisZReverseLimit() const { return axisZReverseLimit; }
@@ -130,11 +137,8 @@ public:
     void setAxisZMotorOff(bool value) { axisZMotorOff = value; }
     real getAxisZPosition() const { return axisZPosition; }
     void setAxisZPosition(const real& value) { axisZPosition = value; }
-    bool getAxisXForwardLimit() const { return axisXForwardLimit; }
-    void setAxisXForwardLimit(bool value) { axisXForwardLimit = value; }
 
 };
-
 
 }
 

@@ -1,13 +1,10 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
-#include <QFile>
 #include <QScopedPointer>
 
-#include <gui/resources/lang/lang.hpp>
-
 #include "UnmovableWindow.hpp"
-#include <Logger.hpp>
+
 #include <ErrorManager.hpp>
 #include <GalilCNInspector.hpp>
 
@@ -25,6 +22,8 @@ private:
 
     QScopedPointer<PROGRAM_NAMESPACE::ErrorManager> errorManager;
     QScopedPointer<PROGRAM_NAMESPACE::GalilCNInspector> galilCNInspector;
+
+    QScopedPointer<QThread> galilCNInspectorThread;
 
 public:
 
@@ -45,6 +44,10 @@ public:
 
 private slots:
     void setupStyleSheets() const;
+    void startDevices();
+
+signals:
+    void galilCNStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilCNStatusBean& status);
 
 };
 

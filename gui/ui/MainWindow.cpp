@@ -1,5 +1,11 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
+#include <QMetaObject>
+
+#include <QFile>
+#include <Logger.hpp>
+#include <gui/resources/lang/lang.hpp>
+
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -14,10 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
 
+    this->initDevices();
     this->initPanels();
     this->setupSignalsAndSlots();
 
-    Settings& s = Settings::instance();
+    Settings::instance();
 
 //    inspector.startProcess();
 
@@ -25,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     this->setupStyleSheets();
+
+    QTimer::singleShot(1000, this, &MainWindow::startDevices);
 
     traceExit;
 
@@ -44,7 +53,7 @@ void MainWindow::setupSignalsAndSlots() const {
 
     traceEnter;
 
-    connect(ui->buttonRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
+    connect(ui->pbRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
 
     traceExit;
 
@@ -89,6 +98,31 @@ void MainWindow::initContentPanel() {
 
     traceEnter;
 
+    using namespace PROGRAM_NAMESPACE;
+
+    int widgetsCount = ui->stackedWidget->count();
+    for (int i=0; i<widgetsCount; ++i) {
+
+        QWidget* current = ui->stackedWidget->widget(i);
+        if (MotionFrame::Ptr mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+            connect(galilCNInspector.data(), &GalilCNInspector::statusSignal,
+                    [mf](GalilCNStatusBean bean) {
+                MotionBean b(bean);
+                if (mf)
+                    QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(mibdv::MotionBean, b));
+                return;
+            });
+//            connect(galilCNInspector.data(), &GalilCNInspector::statusSignal,
+//                    [&](GalilCNStatusBean bean) {
+//                MotionBean b(bean);
+//                QMetaObject::invokeMethod(mf, "updateUI", Qt::ConnectionType::AutoConnection, Q_ARG(MotionBean, b));
+//            });
+
+            mf->init();
+        }
+
+    }
+
     traceExit;
 
 }
@@ -97,8 +131,26 @@ void MainWindow::initDevices() {
 
     traceEnter;
 
+    Settings& s = Settings::instance();
+
     errorManager.reset(new ErrorManager());
-    galilCNInspector.reset(new GalilCNInspector());
+
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
+
+        galilCNInspector.reset(new GalilCNInspector());
+        galilCNInspectorThread.reset(new QThread());
+
+        connect(galilCNInspectorThread.data(), &QThread::started, galilCNInspector.data(), &GalilCNInspector::startProcess);
+        connect(galilCNInspector.data(), &GalilCNInspector::processStopSignal, galilCNInspectorThread.data(), &QThread::quit);
+
+        connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, this, &MainWindow::galilCNStatusUpdateSignal);
+
+        connect(galilCNInspectorThread.data(), &QThread::finished, galilCNInspector.data(), &GalilCNInspector::deleteLater);
+        connect(galilCNInspectorThread.data(), &QThread::finished, galilCNInspectorThread.data(), &QThread::deleteLater);
+
+        galilCNInspector.data()->moveToThread(galilCNInspectorThread.data());
+
+    }
 
     errorManager->subscribeObject(*galilCNInspector);
 
@@ -149,6 +201,16 @@ void MainWindow::setupStyleSheets() const {
     QString content = mdGeomStr + geomStr + themeStr;
 
     app->setStyleSheet(content);
+
+    traceExit;
+
+}
+
+void MainWindow::startDevices() {
+
+    traceEnter;
+
+    galilCNInspectorThread.data()->start();
 
     traceExit;
 
