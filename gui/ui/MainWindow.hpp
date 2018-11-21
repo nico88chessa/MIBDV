@@ -13,8 +13,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public UnmovableWindow
-{
+class MainWindow : public UnmovableWindow {
     Q_OBJECT
 
 private:

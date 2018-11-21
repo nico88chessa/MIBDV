@@ -1,12 +1,17 @@
 #ifndef MOTIONBEAN_HPP
 #define MOTIONBEAN_HPP
 
+#include <type_traits>
+
 #include <Constants.hpp>
 #include <Settings.hpp>
-
 #include <GalilCNStatusBean.hpp>
 
 namespace PROGRAM_NAMESPACE {
+
+/**
+ * NOTE NIC: sarebbe interessante controllare che il motion bean sia
+ */
 
 class MotionBean {
 public:
@@ -73,7 +78,29 @@ public:
 
     }
 
-    MotionBean(const GalilCNStatusBean& galilCNStatusBean) {
+    template<typename T>
+    MotionBean(const T& bean) {
+
+        // NOTE Nic: qui ci andranno tutti i bean dei CN da implementare
+        traceEnter;
+
+        static_assert(std::is_same<T, PROGRAM_NAMESPACE::GalilCNStatusBean>::value, "Motion bean type not valid");
+        Settings& s = Settings::instance();
+
+        axisXStepPerMm = s.getAxisXStepPerMm();
+        axisYStepPerMm = s.getAxisYStepPerMm();
+        axisZStepPerMm = s.getAxisZStepPerMm();
+
+        if (std::is_same<T, PROGRAM_NAMESPACE::GalilCNStatusBean>::value)
+            initFromGalilCNStatusBean(bean);
+
+        traceExit;
+
+    }
+
+private:
+
+    void initFromGalilCNStatusBean(const GalilCNStatusBean& galilCNStatusBean) {
 
         axisXForwardLimit = galilCNStatusBean.getAxisAForwardLimit();
         axisXReverseLimit = galilCNStatusBean.getAxisAReverseLimit();
@@ -97,6 +124,8 @@ public:
         axisZPosition = galilCNStatusBean.getAxisCMotorPosition() * axisZStepPerMm;
 
     }
+
+public:
 
     bool getAxisXForwardLimit() const { return axisXForwardLimit; }
     void setAxisXForwardLimit(bool value) { axisXForwardLimit = value; }

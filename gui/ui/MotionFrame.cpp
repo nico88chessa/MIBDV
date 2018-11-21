@@ -26,8 +26,6 @@ void MotionFrame::setupSignalsAndSlots() {
 
     traceEnter;
 
-    connect(this, &MotionFrame::updateUIRequest, this, &MotionFrame::updateUI);
-
     traceExit;
 
 }
@@ -68,13 +66,13 @@ void MotionFrame::init() {
 
 }
 
-void MotionFrame::updateUI(MotionBean bean) {
+void MotionFrame::updateUI(const MotionBean& bean) {
 
     traceEnter;
 
-    ui->leAxisXCurrentPosition->setText(QString::number(bean.getAxisXPosition(), 'g', 3));
-    ui->leAxisYCurrentPosition->setText(QString::number(bean.getAxisYPosition(), 'g', 3));
-    ui->leAxisZCurrentPosition->setText(QString::number(bean.getAxisZPosition(), 'g', 3));
+    ui->leAxisXCurrentPosition->setText(QString::number(bean.getAxisXPosition(), 'f', 3));
+    ui->leAxisYCurrentPosition->setText(QString::number(bean.getAxisYPosition(), 'f', 3));
+    ui->leAxisZCurrentPosition->setText(QString::number(bean.getAxisZPosition(), 'f', 3));
 
     ui->cbAxisXForwardLimit->setChecked(bean.getAxisXForwardLimit());
     ui->cbAxisXMotorOff->setChecked(bean.getAxisXMotorOff());

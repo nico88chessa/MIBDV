@@ -36,10 +36,7 @@ public:
     void init();
 
 public slots:
-    void updateUI(PROGRAM_NAMESPACE::MotionBean bean);
-
-signals:
-    void updateUIRequest(const PROGRAM_NAMESPACE::MotionBean& bean);
+    void updateUI(const PROGRAM_NAMESPACE::MotionBean& bean);
 
 };
 

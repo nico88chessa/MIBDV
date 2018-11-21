@@ -105,19 +105,9 @@ void MainWindow::initContentPanel() {
 
         QWidget* current = ui->stackedWidget->widget(i);
         if (MotionFrame::Ptr mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
-            connect(galilCNInspector.data(), &GalilCNInspector::statusSignal,
-                    [mf](GalilCNStatusBean bean) {
-                MotionBean b(bean);
-                if (mf)
-                    QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(mibdv::MotionBean, b));
-                return;
+            connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, [mf](GalilCNStatusBean bean) {
+                QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(const mibdv::MotionBean&, MotionBean(bean)));
             });
-//            connect(galilCNInspector.data(), &GalilCNInspector::statusSignal,
-//                    [&](GalilCNStatusBean bean) {
-//                MotionBean b(bean);
-//                QMetaObject::invokeMethod(mf, "updateUI", Qt::ConnectionType::AutoConnection, Q_ARG(MotionBean, b));
-//            });
-
             mf->init();
         }
 
