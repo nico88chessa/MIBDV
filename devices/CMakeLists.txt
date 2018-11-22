@@ -8,6 +8,8 @@ SET(ITEMS
     GalilPLCController
     IOManager
     IOInspector
+    MotionManager
+    MotionManagerImpl
     )
 
 FOREACH(ITEM ${ITEMS})

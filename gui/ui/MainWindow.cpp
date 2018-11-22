@@ -6,6 +6,8 @@
 #include <Logger.hpp>
 #include <gui/resources/lang/lang.hpp>
 
+#include <MotionManagerImpl.hpp>
+
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -54,6 +56,11 @@ void MainWindow::setupSignalsAndSlots() const {
     traceEnter;
 
     connect(ui->pbRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
+    connect(ui->pb, &QPushButton::clicked, []() {
+        MotionManager::Ptr t = new MotionManagerImpl<DeviceKey::GALIL_CN>();
+        t->moveX(10);
+        delete t;
+    });
 
     traceExit;
 
