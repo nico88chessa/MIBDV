@@ -91,7 +91,7 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
     background-color: transparent;
 }
 
-#tabMotion .QLabel[type=subheader] {
+.QLabel[type=subheader] {
     font-size: 14px;
 }
 
@@ -129,3 +129,27 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
     color: white;
     background-color: green;
 }
+
+
+
+
+/******************/
+/* IOFrame
+/******************/
+
+.IOFrame QFrame {
+    background-color: transparent;
+}
+
+QTabWidget {
+    background-color: transparent;
+}
+
+#saDigitalIOContents,
+#saAnalogIOContents {
+    background-color: transparent;
+}
+
+/*.IOFrame #saDigitalIO QWidget {
+    min-height: 40px;
+}*/

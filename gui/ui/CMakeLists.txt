@@ -3,6 +3,8 @@ SET(ITEMS
     UnmovableWindow
     MotionFrame
     MotionFrameLogic
+    IOFrame
+    IOFrameLogic
     )
 
 FOREACH(ITEM ${ITEMS})

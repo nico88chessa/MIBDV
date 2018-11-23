@@ -22,16 +22,11 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
 
+    this->setupUiPanels();
     this->initDevices();
-    this->initPanels();
     this->setupSignalsAndSlots();
 
     Settings::instance();
-
-//    inspector.startProcess();
-
-//    errorManager.subscribeObject(inspector);
-
 
     this->setupStyleSheets();
 
@@ -56,56 +51,31 @@ void MainWindow::setupSignalsAndSlots() const {
     traceEnter;
 
     connect(ui->pbRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
-    connect(ui->pb, &QPushButton::clicked, []() {
+    /*connect(ui->pb, &QPushButton::clicked, []() {
         MotionManager::Ptr t = new MotionManagerImpl<DeviceKey::GALIL_CN>();
         t->moveX(10);
         delete t;
+    });*/
+
+    // left panel
+
+    auto listItem = ui->listItem;
+    connect(listItem, &MDListWidget::itemClicked, [&, listItem](QListWidgetItem* item) {
+        auto itemWidget = static_cast<MDCustomItem::Ptr>(listItem->itemWidget(item));
+        if (itemWidget == nullptr)
+            return;
+        QString text = itemWidget->text();
+        if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
+            ui->stackedWidget->setCurrentWidget(ui->pageMotion);
+        else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
+            ui->stackedWidget->setCurrentWidget(ui->pageIO);
+
     });
 
-    traceExit;
+//    auto alertItem = listItems->findChild<MDCustomItem::Ptr>(MAINWINDOW_MDCUSTOMITEM_ALERT, Qt::FindDirectChildrenOnly);
+//    if (alertItem)
 
-}
-
-void MainWindow::initPanels() {
-
-    traceEnter;
-
-    initLeftPanel();
-    initContentPanel();
-
-    traceExit;
-
-}
-
-void MainWindow::initLeftPanel() {
-
-    traceEnter;
-
-    MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/mibdv/alert");
-    MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/mibdv/io");
-    MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":mibdv/motion");
-
-    QListWidgetItem* alertItem = new QListWidgetItem();
-    QListWidgetItem* ioItem = new QListWidgetItem();
-    QListWidgetItem* motionItem = new QListWidgetItem();
-
-    ui->listItem->addItem(alertItem);
-    ui->listItem->addItem(ioItem);
-    ui->listItem->addItem(motionItem);
-    ui->listItem->setItemWidget(alertItem, alert);
-    ui->listItem->setItemWidget(ioItem, io);
-    ui->listItem->setItemWidget(motionItem, motion);
-
-
-    traceExit;
-
-}
-
-void MainWindow::initContentPanel() {
-
-    traceEnter;
-
-    using namespace PROGRAM_NAMESPACE;
+    // content panel
 
     int widgetsCount = ui->stackedWidget->count();
     for (int i=0; i<widgetsCount; ++i) {
@@ -119,6 +89,49 @@ void MainWindow::initContentPanel() {
         }
 
     }
+
+
+    traceExit;
+
+}
+
+void MainWindow::setupUiPanels() {
+
+    traceEnter;
+
+    setupUiLeftPanel();
+    setupUiContentPanel();
+
+    traceExit;
+
+}
+
+void MainWindow::setupUiLeftPanel() {
+
+    traceEnter;
+
+    MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/mibdv/alert");
+    MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/mibdv/io");
+    MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":mibdv/motion");
+
+    QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
+    QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);
+    QListWidgetItem* motionItem = new QListWidgetItem(ui->listItem);
+
+    ui->listItem->addItem(alertItem);
+    ui->listItem->addItem(ioItem);
+    ui->listItem->addItem(motionItem);
+    ui->listItem->setItemWidget(alertItem, alert);
+    ui->listItem->setItemWidget(ioItem, io);
+    ui->listItem->setItemWidget(motionItem, motion);
+
+    traceExit;
+
+}
+
+void MainWindow::setupUiContentPanel() {
+
+    traceEnter;
 
     traceExit;
 

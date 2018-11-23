@@ -28,9 +28,9 @@ public:
 
 private:
     void setupSignalsAndSlots() const;
-    void initPanels();
-    void initLeftPanel();
-    void initContentPanel();
+    void setupUiPanels();
+    void setupUiLeftPanel();
+    void setupUiContentPanel();
 
     void initDevices();
 
