@@ -14,9 +14,6 @@ public:
     using ConstPtr = const MotionManager*;
 
 
-protected:
-    QScopedPointer<PROGRAM_NAMESPACE::IAbstractDevice> cn;
-
 public:
     explicit MotionManager(QObject* parent = nullptr);
     ~MotionManager();
@@ -28,7 +25,7 @@ protected:
 
     void waitAxisXStop();
 
-    virtual int moveXImpl(int posMm) = 0;
+    virtual bool moveXImpl(int posMm) = 0;
 
 signals:
     void axisXStop(int errorCode);

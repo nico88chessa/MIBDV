@@ -3,55 +3,63 @@
 
 #include <CommonTraits.hpp>
 #include <MotionManager.hpp>
-#include <GalilCNController.hpp>
+#include <AbstractCN.hpp>
 #include <Settings.hpp>
+#include <Logger.hpp>
 
-template <PROGRAM_NAMESPACE::DeviceKey D>
+template <typename T>
 class MotionManagerImpl : public MotionManager {
 public:
     using Ptr = MotionManagerImpl*;
     using ConstPtr = const MotionManagerImpl*;
 
 private:
-    using C = typename PROGRAM_NAMESPACE::deviceKeyTraits<D>::type;
-    using S = typename PROGRAM_NAMESPACE::isCN<C>::statusType;
-    using E = typename PROGRAM_NAMESPACE::isCN<C>::errorType;
+    using S = typename PROGRAM_NAMESPACE::isCN<T>::statusType;
+    using E = typename PROGRAM_NAMESPACE::isCN<T>::errorType;
 
     constexpr typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr cnImpl() {
         return static_cast<typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr>(cn.data());
     }
 
+    QSharedPointer<PROGRAM_NAMESPACE::AbstractCN<S,E> > cn;
+
 public:
-    explicit MotionManagerImpl(QObject* parent = nullptr) : MotionManager(parent) {
+
+    explicit MotionManagerImpl(QObject* parent = nullptr, const QSharedPointer<T>& dev = nullptr) :
+        MotionManager(parent),
+        cn(dev) {
 
         using namespace PROGRAM_NAMESPACE;
-
-        using deviceType = typename deviceKeyTraits<D>::type;
-        static_assert(isCN<deviceType>::value, "Il device deve essere un CN");
-
-        this->initCN();
+        static_assert(isCN<T>::value, "Il device deve essere un CN");
+        if (!cn.isNull())
+            this->initCN();
 
     }
 
 protected:
 
-    int moveXImpl(int posMm) {
-        cnImpl()->setDigitalOutput(0, true);
-        return 0;
+    virtual bool moveXImpl(int posMm) {
+
+        using namespace PROGRAM_NAMESPACE;
+
+        traceEnter;
+
+        if (cn.isNull())
+            return false;
+
+        cn->setDigitalOutput(0, true);
+
+        traceExit;
+
+        return true;
 
     }
 
     virtual void initCN() {
         using namespace PROGRAM_NAMESPACE;
 
-        switch (D) {
-            case DeviceKey::GALIL_CN:
-                GalilCNController::Ptr galilCN = new GalilCNController();
-                galilCN->setupController(8,8,0);
-                galilCN->connect(Settings::instance().getGalilCNIpAddress());
-                cn.reset(galilCN);
-                break;
-        }
+        cn->setupController(8,8,0);
+        cn->connect(Settings::instance().getGalilCNIpAddress());
 
     }
 };
