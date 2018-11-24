@@ -19,9 +19,9 @@ int MDComboBox::getLabelTextWidth() const { return labelTextWidth; }
 
 void MDComboBox::setLabelTextWidth(int value) { labelTextWidth = value; }
 
-QColor MDComboBox::getLabelHoverColor() const { return labelHoverColor; }
+QColor MDComboBox::getLabelFocusColor() const { return labelFocusColor; }
 
-void MDComboBox::setLabelHoverColor(const QColor& value) { labelHoverColor = value; }
+void MDComboBox::setLabelFocusColor(const QColor& value) { labelFocusColor = value; }
 
 MDComboBox::MDComboBox(QWidget* parent) : QComboBox(parent) {
     this->setView(new QListView());
@@ -33,12 +33,13 @@ void MDComboBox::paintEvent(QPaintEvent* event) {
 
     QStylePainter p(this);
     QPalette pal(this->palette());
-    QRect rect = this->rect();
+//    QRect rect = this->rect();
 
     QPen pen;
     QColor labelColor;
-    if (this->underMouse())
-        labelColor = labelHoverColor;
+//    if (this->underMouse())
+    if (this->hasFocus())
+        labelColor = labelFocusColor;
     else
         labelColor = pal.text().color();
 
@@ -56,5 +57,12 @@ void MDComboBox::paintEvent(QPaintEvent* event) {
     labelRect.setHeight(fontMetrics.height());
 
     p.drawItemText(labelRect, Qt::AlignLeft, pal, true, labelText);
+
+}
+
+void MDComboBox::mousePressEvent(QMouseEvent* event)
+{
+    QComboBox::mousePressEvent(event);
+    this->setFocus();
 
 }
