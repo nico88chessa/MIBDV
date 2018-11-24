@@ -133,6 +133,24 @@ void MainWindow::setupUiContentPanel() {
 
     traceEnter;
 
+    using namespace PROGRAM_NAMESPACE;
+
+    int widgetsCount = ui->stackedWidget->count();
+    for (int i=0; i<widgetsCount; ++i) {
+
+        QWidget* current = ui->stackedWidget->widget(i);
+        if (MotionFrame::Ptr mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+
+            if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN) {
+                connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, [mf](GalilCNStatusBean bean) {
+                    QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(const mibdv::MotionBean&, MotionBean(bean)));
+                });
+                mf->init();
+            }
+        }
+
+    }
+
     traceExit;
 
 }
@@ -160,9 +178,9 @@ void MainWindow::initDevices() {
 
         galilCNInspector.data()->moveToThread(galilCNInspectorThread.data());
 
+        errorManager->subscribeObject(*galilCNInspector);
     }
 
-    errorManager->subscribeObject(*galilCNInspector);
 
     traceExit;
 
@@ -220,7 +238,8 @@ void MainWindow::startDevices() {
 
     traceEnter;
 
-    galilCNInspectorThread.data()->start();
+    if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN)
+        galilCNInspectorThread.data()->start();
 
     traceExit;
 
