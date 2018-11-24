@@ -16,9 +16,20 @@
     border-bottom-style: solid;
 }
 
-.MDLineEdit::focus {
+.MDLineEdit:focus {
     padding: 36px 0px 7px;
     border-bottom-width: 2px;
+}
+
+.MDLineEdit:read-only {
+    padding: 36px 0px 8px;
+    border-bottom-width: 1px;
+}
+
+.MDLineEdit:disabled {
+    padding: 36px 0px 7px;
+    border-bottom-width: 1px;
+    border-bottom-style: dotted;
 }
 
 
@@ -29,6 +40,7 @@
 /******************/
 
 .MDComboBox {
+    qproperty-focusPolicy: StrongFocus;
     font-size: 16px;
     min-width: 88px;
     min-height: 18px;
@@ -43,7 +55,16 @@
     border-bottom-style: solid;
 }
 
-.MDComboBox::on {
+.MDComboBox:focus {
+    padding: 8px 0px 7px 0px;
+    border-bottom-width: 2px;
+}
+
+.MDComboBox:disabled {
+    border-bottom-style: dotted;
+}
+
+.MDComboBox:on {
     border-bottom-width: 2px;
     border-bottom-style: solid;
     padding: 8px 0px 7px 0px;
@@ -59,6 +80,7 @@
 }
 
 .MDComboBox QAbstractItemView {
+    qproperty-focusPolicy: NoFocus;
     font-size: 16px;
     border: none;
     background-clip: margin;
@@ -68,20 +90,19 @@
     outline: 0;
 }
 
-.MDComboBox::on QAbstractItemView {
+.MDComboBox:on QAbstractItemView {
     border: none;
     border-width: 1px;
     border-style: solid;
-
 }
 
 .MDComboBox QAbstractItemView::item {
     border: none;
     min-height: 32px;
-    padding: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 16px;
 }
 
-.MDComboBox QAbstractItemView::item::hover {
+.MDComboBox QAbstractItemView::item:hover {
 }
 
 .MDComboBox::down-arrow {

@@ -1,3 +1,13 @@
+/*************************
+ color scheme
+ primary:           #2e7d32 - rgb(46,125,50)
+ primary-dark:      #005005 - rgb(0,80,5)
+ primary-light:     #60ad5e - rgb(96,173,94)
+ secondary:         #757575 - rgb(117,117,117)
+ secondary-dark:    #494949 - rgb(73,73,73)
+ secondary-light:   #a4a4a4 - rgb(164,164,164)
+ *************************/
+
 QMainWindow {
     background-color: white;
 }
@@ -15,14 +25,24 @@ QWidget {
 /******************/
 
 .MDLineEdit {
-    /*color: red;*/
-    qproperty-labelFocusColor: green;
+    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
     background-color: transparent;
-    border-bottom-color: green;
+    border-bottom-color: rgba(0, 0, 0, 42%);
+    color: rgba(0, 0, 0, 54%);
 }
 
-.MDLineEdit::focus {
-    color: green;
+.MDLineEdit:hover {
+    border-bottom-color: rgba(0, 0, 0, 87%);
+}
+
+.MDLineEdit:focus:!read-only {
+    color: rgba(0, 0, 0, 87%);
+    border-bottom-color: rgba(46, 125, 50, 100%);
+}
+
+.MDLineEdit:disabled {
+    color: rgba(0, 0, 0, 38%);
+    border-bottom-color: rgba(0, 0, 0, 42%);
 }
 
 
@@ -33,13 +53,29 @@ QWidget {
 /******************/
 
 .MDComboBox {
-    border-bottom-color: green;
+    border-bottom-color: rgba(0, 0, 0, 42%);
     background-color: transparent;
-    qproperty-labelHoverColor: green;
+    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    color: rgba(0, 0, 0, 54%);
 }
 
-.MDComboBox::on {
-    color: green;
+.MDComboBox:hover {
+    border-bottom-color: rgba(0, 0, 0, 87%);
+}
+
+.MDComboBox:focus {
+    color: rgba(0, 0, 0, 87%);
+    border-bottom-color: rgba(46, 125, 50, 100%);
+}
+
+.MDComboBox:disabled {
+    color: rgba(0, 0, 0, 38%);
+    border-bottom-color: rgba(0, 0, 0, 42%);
+}
+
+.MDComboBox:on {
+    color: rgba(0, 0, 0, 87%);
+    border-bottom-color: rgba(46, 125, 50, 100%);
 }
 
 .MDComboBox::drop-down {

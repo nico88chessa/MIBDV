@@ -43,7 +43,7 @@ void MDLineEdit::paintEvent(QPaintEvent* event) {
     QPalette pal = palette();
     QPen pen;
     QColor labelColor;
-    if (this->hasFocus())
+    if (this->hasFocus() && !this->isReadOnly())
         labelColor = this->labelFocusColor;
     else
         labelColor = pal.text().color();

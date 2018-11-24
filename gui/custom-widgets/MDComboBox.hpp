@@ -10,7 +10,7 @@ class MDComboBox : public QComboBox {
     Q_PROPERTY(int labelLeft READ getLabelLeft WRITE setLabelLeft)
     Q_PROPERTY(int labelTop READ getLabelTop WRITE setLabelTop)
     Q_PROPERTY(int labelTextWidth READ getLabelTextWidth WRITE setLabelTextWidth)
-    Q_PROPERTY(QColor labelHoverColor READ getLabelHoverColor WRITE setLabelHoverColor)
+    Q_PROPERTY(QColor labelFocusColor READ getLabelFocusColor WRITE setLabelFocusColor)
 
 public:
     using Ptr = MDComboBox*;
@@ -21,7 +21,7 @@ private:
     int labelLeft;
     int labelTop;
     int labelTextWidth;
-    QColor labelHoverColor;
+    QColor labelFocusColor;
 
 public:
     explicit MDComboBox(QWidget *parent = nullptr);
@@ -38,11 +38,13 @@ public:
     int getLabelTextWidth() const;
     void setLabelTextWidth(int value);
 
-    QColor getLabelHoverColor() const;
-    void setLabelHoverColor(const QColor& value);
+    QColor getLabelFocusColor() const;
+    void setLabelFocusColor(const QColor& value);
 
 protected:
     void paintEvent(QPaintEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+
 };
 
 #endif // MDCOMBOBOX_HPP
