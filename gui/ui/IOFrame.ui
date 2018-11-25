@@ -32,7 +32,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabIOFrame">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabDigitalIO">
       <attribute name="title">
@@ -75,6 +75,9 @@
            </rect>
           </property>
           <layout class="QGridLayout" name="glDigitalIOContents">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMinimumSize</enum>
+           </property>
            <property name="leftMargin">
             <number>40</number>
            </property>
@@ -113,8 +116,8 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <spacer name="vsDigitalInput">
+           <item row="1" column="1">
+            <spacer name="vsDigitalOutput">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -126,8 +129,8 @@
              </property>
             </spacer>
            </item>
-           <item row="1" column="1">
-            <spacer name="vsDigitalOutput">
+           <item row="1" column="0">
+            <spacer name="vsDigitalInput">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -186,6 +189,9 @@
            </rect>
           </property>
           <layout class="QGridLayout" name="glAnalogIOContents">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMinimumSize</enum>
+           </property>
            <property name="leftMargin">
             <number>40</number>
            </property>

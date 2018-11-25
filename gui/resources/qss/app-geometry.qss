@@ -137,6 +137,10 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
 /* IOFrame
 /******************/
 
+.IOFrame {
+    qproperty-rowMinHeight: 48;
+}
+
 .IOFrame QFrame {
     background-color: transparent;
 }

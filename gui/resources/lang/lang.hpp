@@ -1,6 +1,8 @@
 #ifndef LANG_HPP
 #define LANG_HPP
 
+#include <QtCore>
+
 static const char MAINWINDOW_MDCUSTOMITEM_ALERT[] = QT_TRANSLATE_NOOP("mibdv", "Alerts");
 static const char MAINWINDOW_MDCUSTOMITEM_IO[] = QT_TRANSLATE_NOOP("mibdv", "IO");
 static const char MAINWINDOW_MDCUSTOMITEM_MOTION[] = QT_TRANSLATE_NOOP("mibdv", "Motion");

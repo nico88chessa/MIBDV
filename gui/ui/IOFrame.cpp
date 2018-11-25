@@ -32,6 +32,9 @@ IOFrameLogic::~IOFrameLogic() {
  *            I O   F R A M E
  *******************************************/
 
+int IOFrame::getRowMinHeight() const { return rowMinHeight; }
+void IOFrame::setRowMinHeight(int value) { rowMinHeight = value; }
+
 IOFrame::IOFrame(QWidget *parent) :
     QFrame(parent), ui(new Ui::IOFrame), dPtr(new IOFrameLogic(parent)) {
 
@@ -69,7 +72,7 @@ void IOFrame::setupUi() {
 
     // ingressi digitali
     auto spacerDI = ui->vsDigitalInput;
-    int startRow = 1;
+    int startRow = 0;
     glDigitalIO->removeItem(spacerDI);
 
     for (const DigitalInput& digitalInput : s.getDigitalInputs()) {
@@ -85,7 +88,7 @@ void IOFrame::setupUi() {
 
     // uscite digitali
     auto spacerDo = ui->vsDigitalOutput;
-    startRow = 1;
+    startRow = 0;
     glDigitalIO->removeItem(spacerDo);
 
     for (const DigitalOutput& digitalOutput : s.getDigitalOutputs()) {
@@ -108,15 +111,16 @@ void IOFrame::setupUi() {
     const int colAnalogInput = 0;
 
     auto spacerAi = ui->vsAnalogInput;
-    startRow = 1;
+    startRow = 0;
     glAnalogIO->removeItem(spacerAi);
 
     for (const AnalogInput& analogInput : s.getAnalogInputs()) {
+
         MDLineEdit* switchLine = new MDLineEdit(tabAnalogIO);
         switchLine->setLabel(analogInput.getName());
         glAnalogIO->addWidget(switchLine, ++startRow, colAnalogInput);
-
     }
+
     glAnalogIO->addItem(spacerAi, ++startRow, colAnalogInput);
 
     traceExit;
@@ -128,5 +132,20 @@ void IOFrame::setupSignalsAndSlots() {
     traceEnter;
 
     traceExit;
+
+}
+
+void IOFrame::paintEvent(QPaintEvent* event) {
+
+    QFrame::paintEvent(event);
+
+    QGridLayout* glDigitalIO = ui->glDigitalIOContents;
+    for (int i=0; i<glDigitalIO->rowCount(); ++i)
+        glDigitalIO->setRowMinimumHeight(i, rowMinHeight);
+
+    QGridLayout* glAnalogIO = ui->glAnalogIOContents;
+    for (int i=0; i<glAnalogIO->rowCount(); ++i)
+        glAnalogIO->setRowMinimumHeight(i, rowMinHeight);
+
 
 }
