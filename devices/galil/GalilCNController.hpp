@@ -1,16 +1,11 @@
 #ifndef GALILCNCONTROLLER_HPP
 #define GALILCNCONTROLLER_HPP
 
-#include <gclib.h>
-#include <gclibo.h>
-
 #include <QString>
 #include <QScopedPointer>
 
 #include <configure.h>
-#include <Logger.hpp>
 #include <data/GalilCNStatusBean.hpp>
-#include <devices/galil/GalilControllerUtils.hpp>
 #include <devices/AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {
@@ -90,6 +85,7 @@ public:
     bool isConnected() const;
     virtual GalilCNStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
+    virtual QString decodeError(const int& errorCode);
 
 private:
     int disconnect();

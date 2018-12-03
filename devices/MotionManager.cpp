@@ -1,10 +1,12 @@
 #include "MotionManager.hpp"
 
+#include <QEventLoop>
+#include <QTimer>
+
 #include <AbstractCN.hpp>
 #include <Logger.hpp>
 #include <Settings.hpp>
 #include <galil/GalilCNController.hpp>
-#include <QEventLoop>
 
 using namespace PROGRAM_NAMESPACE;
 

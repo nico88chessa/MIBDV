@@ -10,12 +10,13 @@
 
 #include <Settings.hpp>
 #include <Logger.hpp>
-#include <CommonTraits.hpp>
+#include <Types.hpp>
 #include <AbstractCN.hpp>
 #include <AbstractPLC.hpp>
 #include <DigitalInput.hpp>
 #include <DigitalOutput.hpp>
 #include <AnalogInput.hpp>
+#include <Utils.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

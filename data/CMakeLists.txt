@@ -1,11 +1,11 @@
 SET(ITEMS
+    Types
     DigitalInput
     DigitalOutput
     AnalogInput
     Error
     GalilCNStatusBean
     GalilPLCStatusBean
-    CommonTraits
     MotionBean
     )
 

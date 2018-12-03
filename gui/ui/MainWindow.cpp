@@ -179,42 +179,34 @@ void MainWindow::initDevices() {
     if (errorManager.isNull())
         errorManager.reset(new ErrorManager());
 
-    // metto prima gli inspector perche' sono utilizzati da motion manager e iomanager per gestire i segnali
-    if (s.getMachineCNType() == DeviceKey::GALIL_CN)
-        this->initGalilCNInspector();
+    if (ioManager.isNull())
+        ioManager.reset(new IOManager());
 
-    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
-        this->initGalilPLCInspector();
-
-    this->initMotionManager();
-    this->initIOManager();
-
-    traceExit;
-
-}
-
-void MainWindow::initMotionManager() {
-
-    traceEnter;
-
-    Settings& s = Settings::instance();
-
+    // gestisco il CN Galil
     if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
 
-        traceDebug() << "Utilizzo il CN Galil come motion manager";
+        // per prima cosa, avvio l'inspector del CN galil
+        this->initGalilCNInspector();
+
+        // a questo punto imposto il galil come motion manager e lo aggiungo all'io manager
+
+        if (cn.isNull()) {
+            cn.reset(new GalilCNController());
+            GalilCNController::Ptr cnPtr = static_cast<GalilCNController::Ptr>(cn.data());
+
+            cnPtr->setupController(s.getGalilCNNumberDigitalInput(), s.getGalilCNNumberDigitalOutput(), s.getGalilCNNumberAnalogInput());
+            if (cnPtr->connect(s.getGalilCNIpAddress()))
+                traceErr() << "Impossibile connettersi al CN";
+
+        }
+
+        traceDebug() << "Inserisco il CN Galil ai dispositivi di IO";
+        ioManager->addDevice(DeviceKey::GALIL_CN, cn.staticCast<GalilCNController>());
+
         if (motionManager.isNull()) {
 
-            if (cn.isNull()) {
-                cn.reset(new GalilCNController());
-                GalilCNController::Ptr cnPtr = static_cast<GalilCNController::Ptr>(cn.data());
-
-                cnPtr->setupController(s.getGalilCNNumberDigitalInput(), s.getGalilCNNumberDigitalOutput(), s.getGalilCNNumberAnalogInput());
-                if (cnPtr->connect(s.getGalilCNIpAddress()))
-                    traceErr() << "Impossibile connettersi al CN";
-
-            }
-
             motionManager.reset(new MotionManagerImpl<GalilCNController>(cn.staticCast<GalilCNController>()));
+            traceDebug() << "Utilizzo il CN Galil come motion manager";
 
             // controllo che gli oggetti siano validi
             if (!(galilCNInspector.isNull() && motionManager.isNull())) {
@@ -228,40 +220,12 @@ void MainWindow::initMotionManager() {
 
     }
 
-    traceExit;
-
-}
-
-void MainWindow::initIOManager() {
-
-    traceEnter;
-
-    if (ioManager.isNull())
-        ioManager.reset(new IOManager());
-
-    Settings& s = Settings::instance();
-
-    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
-
-        traceDebug() << "Inserisco il CN Galil ai dispositivi di IO";
-
-        if (cn.isNull()) {
-
-            cn.reset(new GalilCNController());
-            GalilCNController::Ptr cnPtr = static_cast<GalilCNController::Ptr>(cn.data());
-            cnPtr->setupController(s.getGalilCNNumberDigitalInput(), s.getGalilCNNumberDigitalOutput(), s.getGalilCNNumberAnalogInput());
-            if (cnPtr->connect(s.getGalilCNIpAddress()))
-                traceErr() << "Impossibile connettersi al CN";
-
-        }
-
-        ioManager->addDevice(DeviceKey::GALIL_CN, cn.staticCast<GalilCNController>());
-
-    }
-
+    // gestisco il PLC Galil
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
 
-        traceDebug() << "Inserisco il PLC Galil ai dispositivi di IO";
+        // per prima cosa, avvio l'inspector del PLC galil
+        this->initGalilPLCInspector();
+
         if (plc.isNull()){
 
             plc.reset(new GalilPLCController());
@@ -272,6 +236,7 @@ void MainWindow::initIOManager() {
 
         }
 
+        traceDebug() << "Inserisco il PLC Galil ai dispositivi di IO";
         ioManager->addDevice(DeviceKey::GALIL_PLC, plc.staticCast<GalilPLCController>());
 
     }
@@ -323,23 +288,6 @@ void MainWindow::initGalilPLCInspector() {
     galilPLCInspector.data()->moveToThread(galilPLCInspectorThread);
 
     errorManager->subscribeObject(*galilPLCInspector);
-
-
-    traceExit;
-
-}
-
-void MainWindow::startGalilCNInspector() {
-
-    traceEnter;
-
-    traceExit;
-
-}
-
-void MainWindow::stopGalilCNInspector() {
-
-    traceEnter;
 
     traceExit;
 

@@ -1,15 +1,10 @@
 #ifndef GALILPLCCONTROLLER_HPP
 #define GALILPLCCONTROLLER_HPP
 
-#include <gclib.h>
-#include <gclibo.h>
-
 #include <QString>
 #include <QScopedPointer>
 
 #include <configure.h>
-#include <Logger.hpp>
-#include <devices/galil/GalilControllerUtils.hpp>
 #include <data/GalilPLCStatusBean.hpp>
 #include "AbstractPLC.hpp"
 
@@ -51,6 +46,7 @@ public:
     bool isConnected() const;
     virtual GalilPLCStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
+    virtual QString decodeError(const int& errorCode);
 
 private:
     int disconnect();

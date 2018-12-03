@@ -8,7 +8,7 @@
 #include <configure.h>
 #include <Constants.hpp>
 #include <Logger.hpp>
-#include <CommonTraits.hpp>
+#include <Types.hpp>
 #include <DigitalInput.hpp>
 #include <DigitalOutput.hpp>
 #include <AnalogInput.hpp>

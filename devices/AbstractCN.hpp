@@ -1,7 +1,10 @@
 #ifndef ABSTRACTCN_HPP
 #define ABSTRACTCN_HPP
 
+#include <QString>
+
 #include <configure.h>
+#include <Types.hpp>
 #include "AbstractDevice.hpp"
 
 namespace PROGRAM_NAMESPACE {
@@ -13,12 +16,6 @@ class AbstractCN : public AbstractDevice<S> {
 public:
     using Ptr = AbstractCN*;
     using ConstPtr = const AbstractCN*;
-
-public:
-    using posType = int;
-    using spdType = double;
-    using accType = double;
-    using anlType = double;
 
 public:
     virtual E getDigitalInput(int input, int& inputStatus) = 0;
@@ -45,6 +42,7 @@ public:
     virtual E moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec) = 0;
     virtual E setPosition(Axis a, posType pos) = 0;
     virtual bool isError(E errorCode) = 0;
+    virtual QString decodeError(const E& errorCode) = 0;
 
 };
 

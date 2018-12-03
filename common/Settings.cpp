@@ -2,6 +2,9 @@
 
 using namespace PROGRAM_NAMESPACE;
 
+#include <Logger.hpp>
+#include <Utils.hpp>
+
 constexpr char Settings::ARRAY_DIGITAL_INPUT[];
 constexpr char Settings::ARRAY_DIGITAL_OUTPUT[];
 constexpr char Settings::ARRAY_ANALOG_INPUT[];

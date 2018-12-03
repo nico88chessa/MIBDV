@@ -45,13 +45,8 @@ private:
     void setupUiContentPanel();
 
     void initDevices();
-    void initMotionManager();
-    void initIOManager();
     void initGalilCNInspector();
     void initGalilPLCInspector();
-
-    void startGalilCNInspector();
-    void stopGalilCNInspector();
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

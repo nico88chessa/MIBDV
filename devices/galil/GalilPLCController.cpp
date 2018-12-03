@@ -1,5 +1,10 @@
 #include "GalilPLCController.hpp"
 
+#include <gclib.h>
+#include <gclibo.h>
+#include <Logger.hpp>
+#include <devices/galil/GalilControllerUtils.hpp>
+
 using namespace PROGRAM_NAMESPACE;
 
 GalilPLCController::GalilPLCController() :
@@ -281,6 +286,12 @@ GalilPLCStatusBean GalilPLCController::getStatus() {
     GalilPLCStatusBean record;
     writeErrorIfExists(this->getRecord(record));
     return record;
+
+}
+
+QString GalilPLCController::decodeError(const int& errorCode) {
+
+    return GalilControllerUtils::getErrorDescription(errorCode);
 
 }
 

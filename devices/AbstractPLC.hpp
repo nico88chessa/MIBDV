@@ -1,7 +1,10 @@
 #ifndef ABTRACTPLC_HPP
 #define ABTRACTPLC_HPP
 
+#include <QString>
+
 #include <configure.h>
+#include <Types.hpp>
 #include "AbstractDevice.hpp"
 
 namespace PROGRAM_NAMESPACE {
@@ -13,14 +16,12 @@ public:
     using ConstPtr = AbstractPLC*;
 
 public:
-    using anlType = double;
-
-public:
     virtual E getDigitalInput(int input, int& inputStatus) = 0;
     virtual E getDigitalOutput(int output, int& outputStatus) = 0;
     virtual E getAnalogInput(int analogInput, anlType& analogInputStatus) = 0;
     virtual E setDigitalOutput(int output, bool value) = 0;
     virtual bool isError(E errorCode) = 0;
+    virtual QString decodeError(const E& errorCode) = 0;
 
 };
 

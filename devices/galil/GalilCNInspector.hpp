@@ -5,9 +5,7 @@
 #include <QString>
 #include <QScopedPointer>
 
-
 #include <Constants.hpp>
-#include <Logger.hpp>
 #include <configure.h>
 #include <MotionInspector.hpp>
 #include <galil/GalilCNController.hpp>

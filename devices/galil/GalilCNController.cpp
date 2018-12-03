@@ -1,5 +1,10 @@
 #include "GalilCNController.hpp"
 
+#include <gclib.h>
+#include <gclibo.h>
+#include <Logger.hpp>
+#include <devices/galil/GalilControllerUtils.hpp>
+
 using namespace PROGRAM_NAMESPACE;
 
 GalilCNController::GalilCNController() :
@@ -206,7 +211,7 @@ int GalilCNController::getAnalogInput(int analogInput, anlType& analogInputStatu
 
 }
 
-int GalilCNController::getPosition(Axis a, GalilCNController::posType& pos) {
+int GalilCNController::getPosition(Axis a, posType& pos) {
 
     traceEnter;
 
@@ -429,7 +434,7 @@ int GalilCNController::setDigitalOutput(int output, bool value) {
 
 }
 
-int GalilCNController::setSpeeds(Axis a, GalilCNController::spdType speed) {
+int GalilCNController::setSpeeds(Axis a, spdType speed) {
 
     traceEnter;
 
@@ -454,7 +459,7 @@ int GalilCNController::setSpeeds(Axis a, GalilCNController::spdType speed) {
 
 }
 
-int GalilCNController::setAccelerations(Axis a, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::setAccelerations(Axis a, accType acc, accType dec) {
 
     traceEnter;
 
@@ -492,7 +497,7 @@ int GalilCNController::setAccelerations(Axis a, GalilCNController::accType acc, 
 
 }
 
-int GalilCNController::setMoveParameters(Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::setMoveParameters(Axis a, spdType speed, accType acc, accType dec) {
 
     traceEnter;
 
@@ -539,7 +544,7 @@ int GalilCNController::stopAxis(Axis a) {
 
 }
 
-int GalilCNController::homingX(GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::homingX(spdType speed, accType acc, accType dec) {
 
     traceEnter;
 
@@ -571,7 +576,7 @@ int GalilCNController::homingX(GalilCNController::spdType speed, GalilCNControll
 
 }
 
-int GalilCNController::homingY(GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::homingY(spdType speed, accType acc, accType dec) {
 
     traceEnter;
 
@@ -603,7 +608,7 @@ int GalilCNController::homingY(GalilCNController::spdType speed, GalilCNControll
 
 }
 
-int GalilCNController::homingZ(GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::homingZ(spdType speed, accType acc, accType dec) {
 
     traceEnter;
 
@@ -635,7 +640,7 @@ int GalilCNController::homingZ(GalilCNController::spdType speed, GalilCNControll
 
 }
 
-int GalilCNController::homingW(MAYBE_UNUSED GalilCNController::spdType speed, MAYBE_UNUSED GalilCNController::accType acc, MAYBE_UNUSED GalilCNController::accType dec) {
+int GalilCNController::homingW(MAYBE_UNUSED spdType speed, MAYBE_UNUSED accType acc, MAYBE_UNUSED accType dec) {
 
     traceEnter;
 
@@ -651,7 +656,7 @@ int GalilCNController::homingW(MAYBE_UNUSED GalilCNController::spdType speed, MA
 
 }
 
-int GalilCNController::home(Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::home(Axis a, spdType speed, accType acc, accType dec) {
 
     traceEnter;
 
@@ -732,7 +737,7 @@ int GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accTyp
 
 }
 
-int GalilCNController::setPosition(Axis a, GalilCNController::posType pos) {
+int GalilCNController::setPosition(Axis a, posType pos) {
 
     traceEnter;
 
@@ -795,6 +800,12 @@ GalilCNStatusBean GalilCNController::getStatus() {
     GalilCNStatusBean record;
     writeErrorIfExists(this->getRecord(record));
     return record;
+
+}
+
+QString GalilCNController::decodeError(const int& errorCode) {
+
+    return GalilControllerUtils::getErrorDescription(errorCode);
 
 }
 

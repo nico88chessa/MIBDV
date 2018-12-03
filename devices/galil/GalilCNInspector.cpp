@@ -1,5 +1,7 @@
 #include "GalilCNInspector.hpp"
 
+#include <Logger.hpp>
+
 using namespace PROGRAM_NAMESPACE;
 
 GalilCNInspector::GalilCNInspector(QObject* parent) :

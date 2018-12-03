@@ -7,11 +7,9 @@
 
 #include <configure.h>
 #include <Constants.hpp>
-#include <Logger.hpp>
 #include <data/DigitalInput.hpp>
 #include <data/DigitalOutput.hpp>
 #include <data/AnalogInput.hpp>
-#include <Utils.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

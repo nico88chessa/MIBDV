@@ -1,7 +1,7 @@
 #ifndef MOTIONMANAGERIMPL_HPP
 #define MOTIONMANAGERIMPL_HPP
 
-#include <CommonTraits.hpp>
+#include <Types.hpp>
 #include <MotionManager.hpp>
 #include <AbstractCN.hpp>
 #include <Settings.hpp>
@@ -18,7 +18,7 @@ public:
 private:
     using S = typename PROGRAM_NAMESPACE::isCN<T>::statusType;
     using E = typename PROGRAM_NAMESPACE::isCN<T>::errorType;
-    using ACN = typename PROGRAM_NAMESPACE::AbstractCN<S,E>;
+//    using ACN = typename PROGRAM_NAMESPACE::AbstractCN<S,E>;
 
     constexpr typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr cnImpl() {
         return static_cast<typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr>(cn.data());
@@ -53,10 +53,10 @@ protected:
         Settings& s = Settings::instance();
 
         int resolution = s.getAxisXStepPerMm();
-        typename ACN::posType pos = posMm * resolution;
-        typename ACN::spdType speed = s.getAxisXOperativeSpeedMms() * resolution;
-        typename ACN::accType acc = s.getAxisXOperativeAccMms2() * resolution;
-        typename ACN::accType dec = s.getAxisXOperativeDecMms2() * resolution;
+        posType pos = posMm * resolution;
+        spdType speed = s.getAxisXOperativeSpeedMms() * resolution;
+        accType acc = s.getAxisXOperativeAccMms2() * resolution;
+        accType dec = s.getAxisXOperativeDecMms2() * resolution;
 
         E err = cn->moveToPosition(Axis::X, pos, speed, acc, dec);
 
