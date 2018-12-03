@@ -5,8 +5,11 @@
 
 #include "UnmovableWindow.hpp"
 
-#include <ErrorManager.hpp>
-#include <GalilCNInspector.hpp>
+#include <galil/GalilCNInspector.hpp>
+#include <galil/GalilPLCInspector.hpp>
+
+#include <IOManager.hpp>
+#include <MotionManager.hpp>
 
 
 namespace Ui {
@@ -20,19 +23,32 @@ private:
     Ui::MainWindow *ui;
 
     QScopedPointer<PROGRAM_NAMESPACE::ErrorManager> errorManager;
-    QScopedPointer<PROGRAM_NAMESPACE::GalilCNInspector> galilCNInspector;
 
-    QScopedPointer<QThread> galilCNInspectorThread;
+//    QScopedPointer<QThread> galilCNInspectorThread;
+    QScopedPointer<PROGRAM_NAMESPACE::GalilCNInspector> galilCNInspector;
+//    QScopedPointer<QThread> galilPLCInspectorThread;
+    QScopedPointer<PROGRAM_NAMESPACE::GalilPLCInspector> galilPLCInspector;
+
+    QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
+    QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
+
+    QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> cn; // utilizzato da motionManager
+    QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> plc; // utilizzato da motionManager e ioManager
 
 public:
 
 private:
+    void setupUi();
     void setupSignalsAndSlots() const;
     void setupUiPanels();
     void setupUiLeftPanel();
     void setupUiContentPanel();
 
     void initDevices();
+    void initMotionManager();
+    void initIOManager();
+    void initGalilCNInspector();
+    void initGalilPLCInspector();
 
     void startGalilCNInspector();
     void stopGalilCNInspector();
@@ -41,12 +57,16 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private:
+
 private slots:
     void setupStyleSheets() const;
     void startDevices();
+    void stopDevices();
 
 signals:
     void galilCNStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilCNStatusBean& status);
+    void galilPLCStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilPLCStatusBean& status);
 
 };
 

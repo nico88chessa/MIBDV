@@ -1,25 +1,24 @@
 #ifndef GALILCNINSPECTOR_HPP
 #define GALILCNINSPECTOR_HPP
 
-#include <QObject>
 #include <QTimer>
 #include <QString>
 #include <QScopedPointer>
 
+
 #include <Constants.hpp>
-#include <configure.h>
 #include <Logger.hpp>
-#include <GalilCNController.hpp>
+#include <configure.h>
+#include <MotionInspector.hpp>
+#include <galil/GalilCNController.hpp>
 #include <GalilCNStatusBean.hpp>
-#include <GalilPLCController.hpp>
-#include <GalilPLCStatusBean.hpp>
 #include <ErrorSignaler.hpp>
 #include <ErrorManager.hpp>
 #include <Settings.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNInspector : public QObject {
+class GalilCNInspector : public MotionInspector {
     Q_OBJECT
 
 public:
@@ -29,14 +28,22 @@ public:
 private:
     int reconnectionIntervalMs;
     QString ipAddress;
+    GalilCNStatusBean lastStatus;
 
     QScopedPointer<GalilCNController> controller;
     QTimer refreshTimer;
     DECL_ERROR_SIGNALER_FRIENDS(GalilCNInspector)
 
+    bool isFirst;
+    DigitalInput powerInput;
+    DigitalInput cycleInput;
+
 public:
     explicit GalilCNInspector(QObject* parent = nullptr);
     ~GalilCNInspector();
+
+private:
+    void analizeLastStatus(const GalilCNStatusBean& newStatus);
 
 private slots:
     void process();

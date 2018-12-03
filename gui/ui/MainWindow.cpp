@@ -7,28 +7,30 @@
 #include <gui/resources/lang/lang.hpp>
 
 #include <MotionManagerImpl.hpp>
+#include <galil/GalilCNController.hpp>
+#include <galil/GalilPLCController.hpp>
 
 
 using namespace PROGRAM_NAMESPACE;
 
 MainWindow::MainWindow(QWidget *parent) :
     UnmovableWindow(parent), ui(new Ui::MainWindow),
-    errorManager(nullptr), galilCNInspector(nullptr) {
+    errorManager(nullptr),
+    galilCNInspector(nullptr),
+    galilPLCInspector(nullptr),
+    ioManager(nullptr),
+    motionManager(nullptr),
+    cn(nullptr),
+    plc(nullptr) {
 
     traceEnter;
 
-    ui->setupUi(this);
-
-    this->setWindowFlags(Qt::FramelessWindowHint);
-    this->setFixedSize(this->width(), this->height());
-
-    this->setupUiPanels();
     this->initDevices();
-    this->setupSignalsAndSlots();
 
-    Settings::instance();
-
+    this->setupUi();
     this->setupStyleSheets();
+
+    this->setupSignalsAndSlots();
 
     QTimer::singleShot(1000, this, &MainWindow::startDevices);
 
@@ -40,7 +42,24 @@ MainWindow::~MainWindow() {
 
     traceEnter;
 
+    stopDevices();
+
     delete ui;
+
+    traceExit;
+
+}
+
+void MainWindow::setupUi() {
+
+    traceEnter;
+
+    ui->setupUi(this);
+
+    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setFixedSize(this->width(), this->height());
+
+    this->setupUiPanels();
 
     traceExit;
 
@@ -72,20 +91,20 @@ void MainWindow::setupSignalsAndSlots() const {
 
     });
 
-//    auto alertItem = listItems->findChild<MDCustomItem::Ptr>(MAINWINDOW_MDCUSTOMITEM_ALERT, Qt::FindDirectChildrenOnly);
-//    if (alertItem)
-
     // content panel
 
     int widgetsCount = ui->stackedWidget->count();
     for (int i=0; i<widgetsCount; ++i) {
 
         QWidget* current = ui->stackedWidget->widget(i);
-        if (MotionFrame::Ptr mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
-            connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, [mf](GalilCNStatusBean bean) {
-                QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(const mibdv::MotionBean&, MotionBean(bean)));
-            });
-            mf->init();
+        if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+
+            if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN) {
+                connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, [mf](GalilCNStatusBean bean) {
+                    // faccio una funziona lambda per convertire da GalilCNStatusBean a MotionBean
+                    QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(const mibdv::MotionBean&, MotionBean(bean)));
+                });
+            }
         }
 
     }
@@ -139,14 +158,10 @@ void MainWindow::setupUiContentPanel() {
     for (int i=0; i<widgetsCount; ++i) {
 
         QWidget* current = ui->stackedWidget->widget(i);
-        if (MotionFrame::Ptr mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+        if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
-            if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN) {
-                connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, [mf](GalilCNStatusBean bean) {
-                    QMetaObject::invokeMethod(mf, "updateUI", Qt::QueuedConnection, Q_ARG(const mibdv::MotionBean&, MotionBean(bean)));
-                });
-                mf->init();
-            }
+            mf->setupLogic(this->motionManager);
+
         }
 
     }
@@ -161,25 +176,153 @@ void MainWindow::initDevices() {
 
     Settings& s = Settings::instance();
 
-    errorManager.reset(new ErrorManager());
+    if (errorManager.isNull())
+        errorManager.reset(new ErrorManager());
+
+    // metto prima gli inspector perche' sono utilizzati da motion manager e iomanager per gestire i segnali
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN)
+        this->initGalilCNInspector();
+
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
+        this->initGalilPLCInspector();
+
+    this->initMotionManager();
+    this->initIOManager();
+
+    traceExit;
+
+}
+
+void MainWindow::initMotionManager() {
+
+    traceEnter;
+
+    Settings& s = Settings::instance();
 
     if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
 
-        galilCNInspector.reset(new GalilCNInspector());
-        galilCNInspectorThread.reset(new QThread());
+        traceDebug() << "Utilizzo il CN Galil come motion manager";
+        if (motionManager.isNull()) {
 
-        connect(galilCNInspectorThread.data(), &QThread::started, galilCNInspector.data(), &GalilCNInspector::startProcess);
-        connect(galilCNInspector.data(), &GalilCNInspector::processStopSignal, galilCNInspectorThread.data(), &QThread::quit);
+            if (cn.isNull()) {
+                cn.reset(new GalilCNController());
+                GalilCNController::Ptr cnPtr = static_cast<GalilCNController::Ptr>(cn.data());
 
-        connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, this, &MainWindow::galilCNStatusUpdateSignal);
+                cnPtr->setupController(s.getGalilCNNumberDigitalInput(), s.getGalilCNNumberDigitalOutput(), s.getGalilCNNumberAnalogInput());
+                if (cnPtr->connect(s.getGalilCNIpAddress()))
+                    traceErr() << "Impossibile connettersi al CN";
 
-        connect(galilCNInspectorThread.data(), &QThread::finished, galilCNInspector.data(), &GalilCNInspector::deleteLater);
-        connect(galilCNInspectorThread.data(), &QThread::finished, galilCNInspectorThread.data(), &QThread::deleteLater);
+            }
 
-        galilCNInspector.data()->moveToThread(galilCNInspectorThread.data());
+            motionManager.reset(new MotionManagerImpl<GalilCNController>(cn.staticCast<GalilCNController>()));
 
-        errorManager->subscribeObject(*galilCNInspector);
+            // controllo che gli oggetti siano validi
+            if (!(galilCNInspector.isNull() && motionManager.isNull())) {
+                // TODO NIC 03/12/2018 - completare gli altri segnali
+                connect(galilCNInspector.data(), &GalilCNInspector::powerOffSignal, motionManager.data(), &MotionManager::powerOffSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::cycleOffSignal, motionManager.data(), &MotionManager::cycleOffSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
+            }
+
+        }
+
     }
+
+    traceExit;
+
+}
+
+void MainWindow::initIOManager() {
+
+    traceEnter;
+
+    if (ioManager.isNull())
+        ioManager.reset(new IOManager());
+
+    Settings& s = Settings::instance();
+
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
+
+        traceDebug() << "Inserisco il CN Galil ai dispositivi di IO";
+
+        if (cn.isNull()) {
+
+            cn.reset(new GalilCNController());
+            GalilCNController::Ptr cnPtr = static_cast<GalilCNController::Ptr>(cn.data());
+            cnPtr->setupController(s.getGalilCNNumberDigitalInput(), s.getGalilCNNumberDigitalOutput(), s.getGalilCNNumberAnalogInput());
+            if (cnPtr->connect(s.getGalilCNIpAddress()))
+                traceErr() << "Impossibile connettersi al CN";
+
+        }
+
+        ioManager->addDevice(DeviceKey::GALIL_CN, cn.staticCast<GalilCNController>());
+
+    }
+
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
+
+        traceDebug() << "Inserisco il PLC Galil ai dispositivi di IO";
+        if (plc.isNull()){
+
+            plc.reset(new GalilPLCController());
+            GalilPLCController::Ptr plcPtr = static_cast<GalilPLCController::Ptr>(plc.data());
+            plcPtr->setupController(s.getGalilPLCNumberDigitalInput(), s.getGalilPLCNumberDigitalOutput(), s.getGalilPLCNumberAnalogInput());
+            if (!plcPtr->connect(s.getGalilPLCIpAddress()))
+                traceErr() << "Impossibile connettersi al PLC";
+
+        }
+
+        ioManager->addDevice(DeviceKey::GALIL_PLC, plc.staticCast<GalilPLCController>());
+
+    }
+
+    traceExit;
+
+}
+
+void MainWindow::initGalilCNInspector() {
+
+    traceEnter;
+
+    QThread* galilCNInspectorThread = new QThread();
+
+    galilCNInspector.reset(new GalilCNInspector());
+
+    connect(galilCNInspectorThread, &QThread::started, galilCNInspector.data(), &GalilCNInspector::startProcess);
+    connect(galilCNInspector.data(), &GalilCNInspector::processStopSignal, galilCNInspectorThread, &QThread::quit);
+
+    connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, this, &MainWindow::galilCNStatusUpdateSignal);
+
+    connect(galilCNInspectorThread, &QThread::finished, galilCNInspector.data(), &GalilCNInspector::deleteLater);
+    connect(galilCNInspectorThread, &QThread::finished, galilCNInspectorThread, &QThread::deleteLater);
+
+    galilCNInspector.data()->moveToThread(galilCNInspectorThread);
+
+    errorManager->subscribeObject(*galilCNInspector);
+
+    traceExit;
+
+}
+
+void MainWindow::initGalilPLCInspector() {
+
+    traceEnter;
+
+    QThread* galilPLCInspectorThread = new QThread();
+
+    galilPLCInspector.reset(new GalilPLCInspector());
+
+    connect(galilPLCInspectorThread, &QThread::started, galilPLCInspector.data(), &GalilPLCInspector::startProcess);
+    connect(galilPLCInspector.data(), &GalilPLCInspector::processStopSignal, galilPLCInspectorThread, &QThread::quit);
+
+    connect(galilPLCInspector.data(), &GalilPLCInspector::statusSignal, this, &MainWindow::galilPLCStatusUpdateSignal);
+
+    connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspector.data(), &GalilPLCInspector::deleteLater);
+    connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspectorThread, &QThread::deleteLater);
+
+    galilPLCInspector.data()->moveToThread(galilPLCInspectorThread);
+
+    errorManager->subscribeObject(*galilPLCInspector);
 
 
     traceExit;
@@ -238,8 +381,34 @@ void MainWindow::startDevices() {
 
     traceEnter;
 
-    if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN)
-        galilCNInspectorThread.data()->start();
+    Settings& s = Settings::instance();
+
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
+        QThread* galilCNThread = galilCNInspector->thread();
+        galilCNThread->start();
+    }
+
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
+        QThread* galilPLCThread = galilPLCInspector->thread();
+        galilPLCThread->start();
+    }
+
+    traceExit;
+
+}
+
+void MainWindow::stopDevices() {
+
+    traceEnter;
+
+    Settings& s = Settings::instance();
+
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN)
+        galilCNInspector->stopProcess();
+
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
+        galilPLCInspector->stopProcess();
+
 
     traceExit;
 

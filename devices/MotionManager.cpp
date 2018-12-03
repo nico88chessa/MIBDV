@@ -3,7 +3,7 @@
 #include <AbstractCN.hpp>
 #include <Logger.hpp>
 #include <Settings.hpp>
-#include <GalilCNController.hpp>
+#include <galil/GalilCNController.hpp>
 #include <QEventLoop>
 
 using namespace PROGRAM_NAMESPACE;
@@ -14,6 +14,7 @@ MotionManager::MotionManager(QObject* parent) : QObject(parent) {
 
 
     traceExit;
+
 }
 
 MotionManager::~MotionManager() {
@@ -28,17 +29,25 @@ bool MotionManager::moveX(int posMm) {
 
     traceEnter;
 
-    this->moveXImpl(posMm);
+    if (this->isMotorXOff()) {
+        return false;
+    }
+
+    if (!this->moveXImpl(posMm)) {
+        return false;
+    }
 
     QEventLoop loop;
     QTimer t;
-    t.setInterval(20000);
+    t.setInterval(10*1000);
     int res;
     connect(&t, &QTimer::timeout, [&]() {
         loop.exit(1);
         res = 10;
     });
-    connect(this, &MotionManager::axisXStop, &loop, &QEventLoop::exit);
+    connect(this, &MotionManager::powerOffSignal, &loop, &QEventLoop::quit);
+    connect(this, &MotionManager::cycleOffSignal, &loop, &QEventLoop::quit);
+    connect(this, &MotionManager::axisXMotorOffSignal, &loop, &QEventLoop::quit);
     t.start();
     loop.exec();
 

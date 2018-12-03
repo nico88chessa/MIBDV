@@ -8,15 +8,14 @@
 #include <QSharedPointer>
 #include <QWeakPointer>
 
-#include <AbstractDevice.hpp>
+#include <Settings.hpp>
+#include <Logger.hpp>
+#include <CommonTraits.hpp>
+#include <AbstractCN.hpp>
+#include <AbstractPLC.hpp>
 #include <DigitalInput.hpp>
 #include <DigitalOutput.hpp>
 #include <AnalogInput.hpp>
-#include <CommonTraits.hpp>
-#include <GalilCNController.hpp>
-#include <GalilPLCController.hpp>
-#include <Settings.hpp>
-#include <Logger.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

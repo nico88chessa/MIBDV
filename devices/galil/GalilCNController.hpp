@@ -10,7 +10,7 @@
 #include <configure.h>
 #include <Logger.hpp>
 #include <data/GalilCNStatusBean.hpp>
-#include <devices/GalilControllerUtils.hpp>
+#include <devices/galil/GalilControllerUtils.hpp>
 #include <devices/AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {

@@ -6,13 +6,14 @@
 
 #include <AbstractCN.hpp>
 
+namespace PROGRAM_NAMESPACE {
+
 class MotionManager : public QObject {
     Q_OBJECT
 
 public:
     using Ptr = MotionManager*;
     using ConstPtr = const MotionManager*;
-
 
 public:
     explicit MotionManager(QObject* parent = nullptr);
@@ -21,18 +22,27 @@ public:
     bool moveX(int posMm);
 
 protected:
-    virtual void initCN() = 0;
-
     void waitAxisXStop();
 
     virtual bool moveXImpl(int posMm) = 0;
+    virtual bool isMotorXOff() = 0;
+
 
 signals:
-    void axisXStop(int errorCode);
+    void powerOffSignal();
+    void powerOnSignal();
+    void cycleOffSignal();
+    void cycleOnSignal();
+    void axisXMotorOffSignal();
+    void axisYMotorOffSignal();
+    void axisZMotorOffSignal();
+    void axisXMotionStopSignal();
+    void axisYMotionStopSignal();
+    void axisZMotionStopSignal();
 
 };
 
-
+}
 
 
 #endif // MOTIONMANAGER_HPP

@@ -6,6 +6,8 @@
 
 namespace PROGRAM_NAMESPACE {
 
+enum class Axis { X, Y, Z, W };
+
 template <typename S, typename E>
 class AbstractCN : public AbstractDevice<S> {
 public:
@@ -17,9 +19,6 @@ public:
     using spdType = double;
     using accType = double;
     using anlType = double;
-
-public:
-    enum class Axis { X, Y, Z, W };
 
 public:
     virtual E getDigitalInput(int input, int& inputStatus) = 0;

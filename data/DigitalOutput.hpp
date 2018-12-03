@@ -22,16 +22,20 @@ private:
     IOType elementType;
 
 public:
-    DigitalOutput();
-    DigitalOutput(QString name, int channel, bool invertLogic,
-                  DeviceKey device, bool isAlarm, IOType elementType);
+    DigitalOutput() :
+        DigitalOutput("", -1, false, DeviceKey::NONE, false, IOType::NOT_VALID) { }
 
-    QString getName() const;
-    int getChannel() const;
-    bool getInvertLogic() const;
-    DeviceKey getDevice() const;
-    bool getIsAlarm() const;
-    IOType getElementType() const;
+    DigitalOutput(QString name, int channel, bool invertLogic,
+                  DeviceKey device, bool isAlarm, IOType elementType) :
+              name(name), channel(channel), invertLogic(invertLogic),
+              device(device), isAlarm(isAlarm), elementType(elementType) { }
+
+    inline QString getName() const { return name; }
+    inline int getChannel() const { return channel; }
+    inline bool getInvertLogic() const { return invertLogic; }
+    inline DeviceKey getDevice() const { return device; }
+    inline bool getIsAlarm() const { return isAlarm; }
+    inline IOType getElementType() const { return elementType; }
 
     friend inline bool operator==(const DigitalOutput& l, const DigitalOutput& r);
     friend inline bool operator<(const DigitalOutput& l, const DigitalOutput& r);

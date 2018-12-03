@@ -1,32 +1,35 @@
-#include "GalilCNInspector.hpp"
+#include "GalilPLCInspector.hpp"
+
+#include <Settings.hpp>
+#include <Logger.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 
-GalilCNInspector::GalilCNInspector(QObject* parent) :
+GalilPLCInspector::GalilPLCInspector(QObject* parent) :
     QObject(parent),
-    controller(new GalilCNController()),
+    controller(new GalilPLCController()),
     refreshTimer(this),
     errorSignaler(new ErrorSignaler(this)) {
 
     Settings& s = Settings::instance();
 
     ipAddress = s.getGalilCNIpAddress();
-    reconnectionIntervalMs = s.getGalilCNReconnectionIntervalMs();
-    int digitalInput = s.getGalilCNNumberDigitalInput();
-    int digitalOutput = s.getGalilCNNumberDigitalOutput();
-    int analogInput = s.getGalilCNNumberAnalogInput();
+    reconnectionIntervalMs = s.getGalilPLCReconnectionIntervalMs();
+    int digitalInput = s.getGalilPLCNumberDigitalInput();
+    int digitalOutput = s.getGalilPLCNumberDigitalOutput();
+    int analogInput = s.getGalilPLCNumberAnalogInput();
 
     controller->setupController(digitalInput, digitalOutput, analogInput);
 
     int refreshTimeMs = s.getGalilCNStatusRefreshIntervalMs();
     refreshTimer.setInterval(refreshTimeMs);
 
-    connect(&refreshTimer, &QTimer::timeout, this, &GalilCNInspector::process);
-    connect(this, &GalilCNInspector::disconnectedSignal, this, &GalilCNInspector::restartProcess);
+    connect(&refreshTimer, &QTimer::timeout, this, &GalilPLCInspector::process);
+    connect(this, &GalilPLCInspector::disconnectedSignal, this, &GalilPLCInspector::restartProcess);
 
 }
 
-GalilCNInspector::~GalilCNInspector() {
+GalilPLCInspector::~GalilPLCInspector() {
 
     traceEnter;
 
@@ -36,7 +39,7 @@ GalilCNInspector::~GalilCNInspector() {
     traceExit;
 }
 
-void GalilCNInspector::process() {
+void GalilPLCInspector::process() {
 
     traceEnter;
 
@@ -53,7 +56,7 @@ void GalilCNInspector::process() {
 
 }
 
-void GalilCNInspector::handleDisconnection() {
+void GalilPLCInspector::handleDisconnection() {
 
     traceEnter;
 
@@ -67,14 +70,14 @@ void GalilCNInspector::handleDisconnection() {
 
 }
 
-void GalilCNInspector::restartProcess() {
+void GalilPLCInspector::restartProcess() {
 
     traceEnter;
 
     if (refreshTimer.isActive())
         refreshTimer.stop();
 
-    QTimer::singleShot(reconnectionIntervalMs, this, &GalilCNInspector::startProcess);
+    QTimer::singleShot(reconnectionIntervalMs, this, &GalilPLCInspector::startProcess);
 
     traceExit;
 
@@ -82,14 +85,13 @@ void GalilCNInspector::restartProcess() {
 
 
 
-void GalilCNInspector::startProcess() {
+void GalilPLCInspector::startProcess() {
 
     traceEnter;
 
-    // TODO NIC 26/10/2018 - parametrizzare in file di configurazione
     if (!controller->connect(ipAddress)) {
         traceErr() << "GalilCNInspector: connessione al CN fallita";
-        QTimer::singleShot(reconnectionIntervalMs, this, &GalilCNInspector::startProcess);
+        QTimer::singleShot(reconnectionIntervalMs, this, &GalilPLCInspector::startProcess);
     } else
         emit connectedSignal();
 
@@ -100,7 +102,7 @@ void GalilCNInspector::startProcess() {
 
 }
 
-void GalilCNInspector::stopProcess() {
+void GalilPLCInspector::stopProcess() {
 
     traceEnter;
 

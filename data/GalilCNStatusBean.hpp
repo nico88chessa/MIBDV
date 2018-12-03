@@ -5,7 +5,7 @@
 
 #include <Constants.hpp>
 #include <configure.h>
-#include <devices/GalilControllerUtils.hpp>
+#include <devices/galil/GalilControllerUtils.hpp>
 
 #include <gclib_record.h>
 

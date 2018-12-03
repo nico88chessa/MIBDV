@@ -1,8 +1,11 @@
 #ifndef MOTIONFRAME_HPP
 #define MOTIONFRAME_HPP
 
-#include <MotionBean.hpp>
+#include <QSharedPointer>
 #include <QFrame>
+
+#include <MotionManager.hpp>
+#include <MotionBean.hpp>
 
 class MotionFrameLogic;
 
@@ -23,20 +26,20 @@ private:
     Ui::MotionFrame *ui;
     MotionFrameLogic* dPtr;
 
-private:
-    void setupSignalsAndSlots();
-
-private slots:
-    void initializeUI();
-
 public:
     explicit MotionFrame(QWidget *parent = nullptr);
     ~MotionFrame();
 
-    void init();
+    void setupLogic(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager);
+
+private:
+    void setupUi();
+    void setupSignalsAndSlots();
 
 public slots:
     void updateUI(const PROGRAM_NAMESPACE::MotionBean& bean);
+
+private slots:
 
 };
 

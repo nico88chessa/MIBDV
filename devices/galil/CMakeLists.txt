@@ -1,12 +1,9 @@
 SET(ITEMS
-    AbstractDevice
-    AbstractPLC
-    AbstractCN
-    IOManager
-    IOInspector
-    MotionInspector
-    MotionManager
-    MotionManagerImpl
+    GalilControllerUtils
+    GalilCNController
+    GalilCNInspector
+    GalilPLCController
+    GalilPLCInspector
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -41,7 +38,6 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    galil
 )
 
 FOREACH(item ${SUB_FOLDERS})

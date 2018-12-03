@@ -13,9 +13,9 @@
 #include <DigitalOutput.hpp>
 #include <AnalogInput.hpp>
 #include <AbstractDevice.hpp>
-#include <GalilCNController.hpp>
+#include <galil/GalilCNController.hpp>
 #include <GalilCNStatusBean.hpp>
-#include <GalilPLCController.hpp>
+#include <galil/GalilPLCController.hpp>
 #include <GalilPLCStatusBean.hpp>
 
 

@@ -1,5 +1,8 @@
 #include "IOManager.hpp"
 
+#include <galil/GalilCNController.hpp>
+#include <galil/GalilPLCController.hpp>
+
 using namespace PROGRAM_NAMESPACE;
 
 IOManager::IOManager(QObject *parent) : QObject(parent) {

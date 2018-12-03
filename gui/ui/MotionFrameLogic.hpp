@@ -2,6 +2,9 @@
 #define MOTIONFRAMELOGIC_HPP
 
 #include <QObject>
+#include <QSharedPointer>
+
+#include <MotionManager.hpp>
 
 class MotionFrame;
 
@@ -17,10 +20,16 @@ public:
 private:
     MotionFrame* qPtr;
 
+    QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
+
 public:
     MotionFrameLogic();
-
     ~MotionFrameLogic();
+
+    void setupLogic(const QSharedPointer<mibdv::MotionManager>& motionManager);
+
+private slots:
+    void moveAxisX();
 
 };
 

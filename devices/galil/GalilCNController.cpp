@@ -206,7 +206,7 @@ int GalilCNController::getAnalogInput(int analogInput, anlType& analogInputStatu
 
 }
 
-int GalilCNController::getPosition(GalilCNController::Axis a, GalilCNController::posType& pos) {
+int GalilCNController::getPosition(Axis a, GalilCNController::posType& pos) {
 
     traceEnter;
 
@@ -252,7 +252,7 @@ int GalilCNController::getPosition(GalilCNController::Axis a, GalilCNController:
 
 }
 
-int GalilCNController::isAxisInMotion(GalilCNController::Axis a, bool& inMotion) {
+int GalilCNController::isAxisInMotion(Axis a, bool& inMotion) {
 
     traceEnter;
 
@@ -271,7 +271,7 @@ int GalilCNController::isAxisInMotion(GalilCNController::Axis a, bool& inMotion)
 
 }
 
-int GalilCNController::isAxisPositionError(GalilCNController::Axis a, bool& isPositionError) {
+int GalilCNController::isAxisPositionError(Axis a, bool& isPositionError) {
 
     traceEnter;
 
@@ -290,7 +290,7 @@ int GalilCNController::isAxisPositionError(GalilCNController::Axis a, bool& isPo
 
 }
 
-int GalilCNController::isMotorOff(GalilCNController::Axis a, bool& isMotorOff) {
+int GalilCNController::isMotorOff(Axis a, bool& isMotorOff) {
 
     traceEnter;
 
@@ -309,7 +309,7 @@ int GalilCNController::isMotorOff(GalilCNController::Axis a, bool& isMotorOff) {
 
 }
 
-int GalilCNController::isForwardLimit(GalilCNController::Axis a, bool& isForwardLimit) {
+int GalilCNController::isForwardLimit(Axis a, bool& isForwardLimit) {
 
     traceEnter;
 
@@ -328,7 +328,7 @@ int GalilCNController::isForwardLimit(GalilCNController::Axis a, bool& isForward
 
 }
 
-int GalilCNController::isBackwardLimit(GalilCNController::Axis a, bool& isForwardLimit) {
+int GalilCNController::isBackwardLimit(Axis a, bool& isForwardLimit) {
 
     traceEnter;
 
@@ -347,7 +347,7 @@ int GalilCNController::isBackwardLimit(GalilCNController::Axis a, bool& isForwar
 
 }
 
-int GalilCNController::isHomeAxis(GalilCNController::Axis a, bool& isHome) {
+int GalilCNController::isHomeAxis(Axis a, bool& isHome) {
 
     traceEnter;
 
@@ -429,7 +429,7 @@ int GalilCNController::setDigitalOutput(int output, bool value) {
 
 }
 
-int GalilCNController::setSpeeds(GalilCNController::Axis a, GalilCNController::spdType speed) {
+int GalilCNController::setSpeeds(Axis a, GalilCNController::spdType speed) {
 
     traceEnter;
 
@@ -454,7 +454,7 @@ int GalilCNController::setSpeeds(GalilCNController::Axis a, GalilCNController::s
 
 }
 
-int GalilCNController::setAccelerations(GalilCNController::Axis a, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::setAccelerations(Axis a, GalilCNController::accType acc, GalilCNController::accType dec) {
 
     traceEnter;
 
@@ -492,7 +492,7 @@ int GalilCNController::setAccelerations(GalilCNController::Axis a, GalilCNContro
 
 }
 
-int GalilCNController::setMoveParameters(GalilCNController::Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::setMoveParameters(Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
 
     traceEnter;
 
@@ -512,7 +512,7 @@ int GalilCNController::setMoveParameters(GalilCNController::Axis a, GalilCNContr
 
 }
 
-int GalilCNController::stopAxis(GalilCNController::Axis a) {
+int GalilCNController::stopAxis(Axis a) {
 
     traceEnter;
 
@@ -651,7 +651,7 @@ int GalilCNController::homingW(MAYBE_UNUSED GalilCNController::spdType speed, MA
 
 }
 
-int GalilCNController::home(GalilCNController::Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
+int GalilCNController::home(Axis a, GalilCNController::spdType speed, GalilCNController::accType acc, GalilCNController::accType dec) {
 
     traceEnter;
 
@@ -673,7 +673,7 @@ int GalilCNController::home(GalilCNController::Axis a, GalilCNController::spdTyp
 
 }
 
-int GalilCNController::startMoveAxis(GalilCNController::Axis a) {
+int GalilCNController::startMoveAxis(Axis a) {
 
     traceEnter;
 
@@ -708,14 +708,18 @@ int GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accTyp
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
 
-    if (!this->setMoveParameters(a, speed, acc, dec))
-        return false;
+    GReturn result;
+
+    result = this->setMoveParameters(a, speed, acc, dec);
+
+    if (result != G_NO_ERROR)
+        return result;
 
     QString axisLetter(GalilCNController::letterFromAxis(a));
     QString command = QString("PA%1 = %2").arg(axisLetter).arg(pos);
     traceDebug() << "Invio comando:" << command;
 #ifdef FLAG_CN_PRESENT
-    GReturn result = GCmd(handle(), command.toStdString().data());
+    result = GCmd(handle(), command.toStdString().data());
 #else
     GReturn result = G_NO_ERROR;
 #endif
@@ -728,7 +732,7 @@ int GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accTyp
 
 }
 
-int GalilCNController::setPosition(GalilCNController::Axis a, GalilCNController::posType pos) {
+int GalilCNController::setPosition(Axis a, GalilCNController::posType pos) {
 
     traceEnter;
 
@@ -855,7 +859,7 @@ int GalilCNController::getInputs(int bank, int& bankStatus) {
 
 }
 
-int GalilCNController::tellSwitches(GalilCNController::Axis a, int& value) {
+int GalilCNController::tellSwitches(Axis a, int& value) {
 
     traceEnter;
 

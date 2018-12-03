@@ -9,7 +9,7 @@
 
 #include <configure.h>
 #include <Logger.hpp>
-#include <devices/GalilControllerUtils.hpp>
+#include <devices/galil/GalilControllerUtils.hpp>
 #include <data/GalilPLCStatusBean.hpp>
 #include "AbstractPLC.hpp"
 

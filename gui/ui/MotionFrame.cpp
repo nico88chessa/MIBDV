@@ -17,6 +17,27 @@ MotionFrameLogic::MotionFrameLogic() {
 
 MotionFrameLogic::~MotionFrameLogic() { }
 
+void MotionFrameLogic::setupLogic(const QSharedPointer<MotionManager>& motionManager) {
+
+    traceEnter;
+    this->motionManager = motionManager;
+    traceExit;
+
+}
+
+void MotionFrameLogic::moveAxisX() {
+
+    traceEnter;
+
+    QString positionStr = qPtr->ui->leAxisXPosition->text();
+    double position = positionStr.toDouble();
+
+    motionManager->moveX(position);
+
+    traceExit;
+
+}
+
 
 /**********************************************
  *         M O T I O N  F R A M E
@@ -26,11 +47,17 @@ void MotionFrame::setupSignalsAndSlots() {
 
     traceEnter;
 
+    connect(ui->pbMoveX, &QPushButton::clicked, dPtr, &MotionFrameLogic::moveAxisX);
+
     traceExit;
 
 }
 
-void MotionFrame::initializeUI() {
+void MotionFrame::setupUi() {
+
+    traceEnter;
+
+    ui->setupUi(this);
 
     Settings& s = Settings::instance();
 
@@ -38,17 +65,19 @@ void MotionFrame::initializeUI() {
     ui->leAxisYMaxPosition->setText(QString::number(s.getAxisYMaxPosMm(), 'g', 3));
     ui->leAxisZMaxPosition->setText(QString::number(s.getAxisZMaxPosMm(), 'g', 3));
 
+    traceExit;
+
 }
 
 MotionFrame::MotionFrame(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::MotionFrame), dPtr(new MotionFrameLogic()) {
 
-    ui->setupUi(this);
     dPtr->qPtr = this;
 
-    this->initializeUI();
+    this->setupUi();
 
+    this->setupSignalsAndSlots();
 
 }
 
@@ -56,11 +85,11 @@ MotionFrame::~MotionFrame() {
     delete ui;
 }
 
-void MotionFrame::init() {
+void MotionFrame::setupLogic(const QSharedPointer<MotionManager>& motionManager) {
 
     traceEnter;
 
-
+    dPtr->setupLogic(motionManager);
 
     traceExit;
 
