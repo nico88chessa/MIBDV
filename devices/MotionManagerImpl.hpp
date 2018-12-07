@@ -1,11 +1,13 @@
 #ifndef MOTIONMANAGERIMPL_HPP
 #define MOTIONMANAGERIMPL_HPP
 
+#include <QtGlobal>
+
 #include <Types.hpp>
 #include <MotionManager.hpp>
-#include <AbstractCN.hpp>
 #include <Settings.hpp>
 #include <Logger.hpp>
+#include <AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -32,36 +34,42 @@ public:
         MotionManager(parent),
         cn(dev) {
 
-        using namespace PROGRAM_NAMESPACE;
         static_assert(isCN<T>::value, "Il device deve essere un CN");
 
     }
 
 protected:
 
-    virtual bool moveXImpl(int posMm) {
-
-        using namespace PROGRAM_NAMESPACE;
+    virtual bool moveXImpl(posType posMm) {
 
         traceEnter;
 
-        if (cn.isNull())
+        if (cn.isNull()) {
+            traceErr() << "CN non inizializzato";
             return false;
-
-        cn->setDigitalOutput(0, true);
+        }
 
         Settings& s = Settings::instance();
 
         int resolution = s.getAxisXStepPerMm();
-        posType pos = posMm * resolution;
-        spdType speed = s.getAxisXOperativeSpeedMms() * resolution;
-        accType acc = s.getAxisXOperativeAccMms2() * resolution;
-        accType dec = s.getAxisXOperativeDecMms2() * resolution;
+        posCNType pos = qRound(posMm * resolution);
+        spdCNType speed = s.getAxisXOperativeSpeedMms() * resolution;
+        accCNType acc = s.getAxisXOperativeAccMms2() * resolution;
+        accCNType dec = s.getAxisXOperativeDecMms2() * resolution;
 
         E err = cn->moveToPosition(Axis::X, pos, speed, acc, dec);
 
         if (cn->isError(err)) {
-            traceErr() << "Errore nello spostamento dell'asse X; err: " << err;
+            traceErr() << "Errore nell'invio dei comandi di spostamento dell'asse X. Err: " << err;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
+            return false;
+        }
+
+        err = cn->startMoveAxis(Axis::X);
+
+        if (cn->isError(err)) {
+            traceErr() << "Errore nello start movimentazione dell'asse X. Err: " << err;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
             return false;
         }
 
@@ -71,25 +79,26 @@ protected:
 
     }
 
-    bool isMotorXOff() {
+    bool isMotorXOff(bool& res) {
 
         traceEnter;
-        using namespace PROGRAM_NAMESPACE;
 
-        if (cn.isNull())
+        if (cn.isNull()) {
+            traceErr() << "CN non inizializzato";
             return false;
+        }
 
-        bool isMotorOff;
-        E err = cn->isMotorOff(Axis::X, isMotorOff);
+        E err = cn->isMotorOff(Axis::X, res);
 
         if (cn->isError(err)) {
             traceErr() << "Errore check motor off: " << err;
-            return  false;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
+            return false;
         }
 
         traceExit;
 
-        return isMotorOff;
+        return true;
 
     }
 

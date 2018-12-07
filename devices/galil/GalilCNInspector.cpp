@@ -96,7 +96,7 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
     // check motion asse y
     bool isMovingAxisY = newStatus.getAxisBMoveInProgress();
     if (!isMovingAxisY) {
-        if (isMovingAxisX != lastStatus.getAxisBMoveInProgress())
+        if (isMovingAxisY != lastStatus.getAxisBMoveInProgress())
             emit axisYMotionStopSignal();
     }
 
@@ -124,12 +124,19 @@ void GalilCNInspector::process() {
 
     if (controller->isConnected()) {
 
-        auto status = controller->getStatus();
+        try {
+            auto status = controller->getStatus();
 
-        analizeLastStatus(status);
+            analizeLastStatus(status);
 
-        lastStatus = status;
-        emit statusSignal(status);
+            lastStatus = status;
+            emit statusSignal(status);
+
+        } catch (NoStatusException& e) {
+            Q_UNUSED(e)
+            traceErr() << "Errore nel recupero dello stato da GalilCNInspector";
+        }
+
 
     } else
         handleDisconnection();
@@ -174,6 +181,7 @@ void GalilCNInspector::startProcess() {
     if (!controller->connect(ipAddress)) {
         traceErr() << "GalilCNInspector: connessione al CN fallita";
         QTimer::singleShot(reconnectionIntervalMs, this, &GalilCNInspector::startProcess);
+        return;
     } else
         emit connectedSignal();
 

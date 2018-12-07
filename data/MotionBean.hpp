@@ -107,21 +107,30 @@ private:
         axisXMoveInProgress = galilCNStatusBean.getAxisAMoveInProgress();
         axisXHomeInput = galilCNStatusBean.getAxisAHomeInput();
         axisXMotorOff = galilCNStatusBean.getAxisAMotorOff();
-        axisXPosition = galilCNStatusBean.getAxisAMotorPosition() * axisXStepPerMm;
+        if (!galilCNStatusBean.getAxisASMJumperInstalled())
+            axisXPosition = galilCNStatusBean.getAxisAMotorPosition() / static_cast<real>(axisXStepPerMm);
+        else
+            axisXPosition = galilCNStatusBean.getAxisAReferencePosition() / static_cast<real>(axisXStepPerMm);
 
         axisYForwardLimit = galilCNStatusBean.getAxisBForwardLimit();
         axisYReverseLimit = galilCNStatusBean.getAxisBReverseLimit();
         axisYMoveInProgress = galilCNStatusBean.getAxisBMoveInProgress();
         axisYHomeInput = galilCNStatusBean.getAxisBHomeInput();
         axisYMotorOff = galilCNStatusBean.getAxisBMotorOff();
-        axisYPosition = galilCNStatusBean.getAxisBMotorPosition() * axisYStepPerMm;
+        if (!galilCNStatusBean.getAxisBSMJumperInstalled())
+            axisYPosition = galilCNStatusBean.getAxisBMotorPosition() / static_cast<real>(axisYStepPerMm);
+        else
+            axisYPosition = galilCNStatusBean.getAxisBReferencePosition() / static_cast<real>(axisYStepPerMm);
 
         axisZForwardLimit = galilCNStatusBean.getAxisCForwardLimit();
         axisZReverseLimit = galilCNStatusBean.getAxisCReverseLimit();
         axisZMoveInProgress = galilCNStatusBean.getAxisCMoveInProgress();
         axisZHomeInput = galilCNStatusBean.getAxisCHomeInput();
         axisZMotorOff = galilCNStatusBean.getAxisCMotorOff();
-        axisZPosition = galilCNStatusBean.getAxisCMotorPosition() * axisZStepPerMm;
+        if (!galilCNStatusBean.getAxisCSMJumperInstalled())
+            axisZPosition = galilCNStatusBean.getAxisCMotorPosition() / static_cast<real>(axisZStepPerMm);
+        else
+            axisZPosition = galilCNStatusBean.getAxisCReferencePosition() / static_cast<real>(axisZStepPerMm);
 
     }
 

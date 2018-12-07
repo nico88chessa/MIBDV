@@ -85,7 +85,7 @@ bool GalilPLCController::connect(const QString& ip) {
     int timeout = 1000;
     QString command = ip + QString(" -t %1").arg(timeout);
 
-#ifdef FLAG_CN_PRESENT
+#ifdef FLAG_PLC_PRESENT
     GReturn result = GOpen(command.toStdString().data(), handler.data());
 #else
     GReturn result = G_NO_ERROR;
@@ -268,7 +268,7 @@ int GalilPLCController::getTCCode(int& tcCode) {
 
     QString command = QString("TC 0");
     traceDebug() << "Invio comando:" << command;
-#ifdef FLAG_CN_PRESENT
+#ifdef FLAG_PLC_PRESENT
     GReturn result = GCmdI(handle(), command.toStdString().data(), &tcCode);
 #else
     GReturn result = G_NO_ERROR;
@@ -284,7 +284,12 @@ int GalilPLCController::getTCCode(int& tcCode) {
 GalilPLCStatusBean GalilPLCController::getStatus() {
 
     GalilPLCStatusBean record;
-    writeErrorIfExists(this->getRecord(record));
+    GReturn result = this->getRecord(record);
+    writeErrorIfExists(result);
+
+    if (this->isError(result))
+        throw NoStatusException();
+
     return record;
 
 }
@@ -306,8 +311,8 @@ void GalilPLCController::writeError(int errorCode) {
         this->getTCCode(tcCode);
         traceErr() << "Galil PLC: dettagli errore:" << GalilControllerUtils::getTCDescription(tcCode);
 
-    } else if (errorCode == G_TIMEOUT)
-        /* NOTE NIC 07/11/2018 - mi accorgo se il CN e' connesso dopo l'invio di comando;
+    } else if (errorCode == G_TIMEOUT || errorCode == G_READ_ERROR || errorCode == G_WRITE_ERROR)
+        /* NOTE NIC 07/11/2018 - mi accorgo se il PLC e' connesso dopo l'invio di comando;
          * il dispositivo non e' connesso se il comando da errore di timeout (1100)
          */
         this->disconnect();
@@ -361,11 +366,11 @@ int GalilPLCController::disconnect() {
     traceEnter;
 
     if (!this->isConnected()) {
-        traceInfo() << "Galil CN: connessione non presente; nessuna sconnessione da effettuare";
+        traceInfo() << "Galil PLC: connessione non presente; nessuna sconnessione da effettuare";
         return G_NO_ERROR;
     }
 
-#ifdef FLAG_CN_PRESENT
+#ifdef FLAG_PLC_PRESENT
     GReturn result = GClose(handle());
     if (result == G_NO_ERROR)
         this->setConnected(false);
@@ -374,6 +379,27 @@ int GalilPLCController::disconnect() {
 #endif
 
     writeErrorIfExists(result);
+
+    traceExit;
+    return result;
+
+}
+
+int GalilPLCController::getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue) {
+
+    traceEnter;
+
+    if (!isConnected()) {
+        traceErr() << "Galil PLC: il controller non e' connesso";
+        return G_CUSTOM_PLC_NOT_CONNECTED;
+    }
+
+#ifdef FLAG_PLC_PRESENT
+    GReturn result = GUtility(handle(), G_UTIL_GCAPS_KEEPALIVE, timeMs, newValue);
+#else
+    timeMs = 600*1000; // valore default
+    GReturn result = G_NO_ERROR;
+#endif
 
     traceExit;
     return result;

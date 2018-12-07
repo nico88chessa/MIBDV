@@ -2,6 +2,7 @@
 #include "ui_MotionFrame.h"
 
 #include "MotionFrameLogic.hpp"
+#include "DialogAlert.hpp"
 
 #include <Logger.hpp>
 
@@ -30,9 +31,73 @@ void MotionFrameLogic::moveAxisX() {
     traceEnter;
 
     QString positionStr = qPtr->ui->leAxisXPosition->text();
-    double position = positionStr.toDouble();
+    posType position = positionStr.toFloat();
 
-    motionManager->moveX(position);
+    int res;
+    res = motionManager->moveX(position);
+
+    if (motionManager->isErr(res)) {
+
+        DialogAlert diag;
+        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.exec();
+        return;
+
+    } else {
+
+        QEventLoop loop;
+        QTimer t;
+        t.setInterval(10*1000);
+        int res = MOTION_MANAGER_NO_ERR;
+        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_POWER_OFF;
+            }
+        });
+        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_CYCLE_OFF;
+            }
+        });
+        QMetaObject::Connection c3 = connect(motionManager.data(), &MotionManager::axisXMotorOffSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_MOTOR_X_OFF;
+            }
+        });
+        QMetaObject::Connection c4 = connect(&t, &QTimer::timeout, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_TIMEOUT;
+            }
+        });
+        QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisXMotionStopSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+            }
+        });
+        t.start();
+        loop.exec();
+        t.stop();
+        QObject::disconnect(c1);
+        QObject::disconnect(c2);
+        QObject::disconnect(c3);
+        QObject::disconnect(c4);
+        QObject::disconnect(c5);
+
+        if (motionManager->isErr(res)) {
+
+            DialogAlert diag;
+            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.exec();
+        }
+
+    }
+
+
 
     traceExit;
 
@@ -117,6 +182,8 @@ void MotionFrame::updateUI(const MotionBean& bean) {
     ui->cbAxisZMotorOff->setChecked(bean.getAxisZMotorOff());
     ui->cbAxisZMoving->setChecked(bean.getAxisZMoveInProgress());
     ui->cbAxisZReverseLimit->setChecked(bean.getAxisZReverseLimit());
+
+//    ui->pbMoveX->setEnabled(!bean.getAxisXMoveInProgress());
 
     traceExit;
 

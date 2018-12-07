@@ -5,6 +5,7 @@ SET(ITEMS
     MotionFrameLogic
     IOFrame
     IOFrameLogic
+    DialogAlert
     )
 
 FOREACH(ITEM ${ITEMS})

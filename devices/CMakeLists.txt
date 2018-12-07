@@ -2,6 +2,7 @@ SET(ITEMS
     AbstractDevice
     AbstractPLC
     AbstractCN
+    DeviceConnectionWatcher
     IOManager
     IOInspector
     MotionInspector

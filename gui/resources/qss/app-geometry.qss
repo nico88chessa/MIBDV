@@ -111,8 +111,8 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
     background-position: center center;
 }
 
-#tabMotion #pbStopAxis,
-#tabMotion #pbResetAxis {
+#tabMotion #pbStopAxes,
+#tabMotion #pbResetAxes {
     padding: 0px 36px;
     margin: 6px 8px;
     border-width: 1px;

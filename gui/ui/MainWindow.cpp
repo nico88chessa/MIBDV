@@ -21,7 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ioManager(nullptr),
     motionManager(nullptr),
     cn(nullptr),
-    plc(nullptr) {
+    plc(nullptr),
+    cnConnectionWatcher(nullptr),
+    plcConnectionWatcher(nullptr) {
 
     traceEnter;
 
@@ -43,6 +45,10 @@ MainWindow::~MainWindow() {
     traceEnter;
 
     stopDevices();
+
+    // TODO NIC 06/12/2018 - verificare se funziona
+    galilCNInspector->thread()->wait();
+    galilPLCInspector->thread()->wait();
 
     delete ui;
 
@@ -188,35 +194,38 @@ void MainWindow::initDevices() {
         // per prima cosa, avvio l'inspector del CN galil
         this->initGalilCNInspector();
 
-        // a questo punto imposto il galil come motion manager e lo aggiungo all'io manager
-
+        // a questo punto creo il cn galil
         if (cn.isNull()) {
+
             cn.reset(new GalilCNController());
             GalilCNController::Ptr cnPtr = static_cast<GalilCNController::Ptr>(cn.data());
-
             cnPtr->setupController(s.getGalilCNNumberDigitalInput(), s.getGalilCNNumberDigitalOutput(), s.getGalilCNNumberAnalogInput());
-            if (cnPtr->connect(s.getGalilCNIpAddress()))
-                traceErr() << "Impossibile connettersi al CN";
 
         }
 
+        // lo aggiungo all'io manager
         traceDebug() << "Inserisco il CN Galil ai dispositivi di IO";
         ioManager->addDevice(DeviceKey::GALIL_CN, cn.staticCast<GalilCNController>());
 
+        // e lo aggancio al motion manager
         if (motionManager.isNull()) {
 
             motionManager.reset(new MotionManagerImpl<GalilCNController>(cn.staticCast<GalilCNController>()));
             traceDebug() << "Utilizzo il CN Galil come motion manager";
 
             // controllo che gli oggetti siano validi
-            if (!(galilCNInspector.isNull() && motionManager.isNull())) {
+            if (!(galilCNInspector.isNull() || motionManager.isNull())) {
                 // TODO NIC 03/12/2018 - completare gli altri segnali
                 connect(galilCNInspector.data(), &GalilCNInspector::powerOffSignal, motionManager.data(), &MotionManager::powerOffSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::cycleOffSignal, motionManager.data(), &MotionManager::cycleOffSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisXMotionStopSignal, motionManager.data(), &MotionManager::axisXMotionStopSignal);
             }
 
         }
+
+        // infine inizializzo il cn watcher per controllare la connessione
+        initCNConnectionWatcher();
 
     }
 
@@ -226,20 +235,31 @@ void MainWindow::initDevices() {
         // per prima cosa, avvio l'inspector del PLC galil
         this->initGalilPLCInspector();
 
-        if (plc.isNull()){
+        if (plc.isNull()) {
 
             plc.reset(new GalilPLCController());
             GalilPLCController::Ptr plcPtr = static_cast<GalilPLCController::Ptr>(plc.data());
             plcPtr->setupController(s.getGalilPLCNumberDigitalInput(), s.getGalilPLCNumberDigitalOutput(), s.getGalilPLCNumberAnalogInput());
-            if (!plcPtr->connect(s.getGalilPLCIpAddress()))
-                traceErr() << "Impossibile connettersi al PLC";
 
         }
 
+        // e lo aggiungo all'io manager
         traceDebug() << "Inserisco il PLC Galil ai dispositivi di IO";
         ioManager->addDevice(DeviceKey::GALIL_PLC, plc.staticCast<GalilPLCController>());
 
+        initPLCConnectionWatcher();
+
     }
+
+    // TODO NIC 06/12/2018 - da parametrizzare in file di configurazione timers
+//    cnConnectionWatcher->setupTimers(1000);
+//    connect(cnConnectionWatcher.data(), &DeviceConnectionWatcher::deviceDisconnected, this, &MainWindow::handleDisconnectionCN);
+//    cnConnectionWatcher->startWatcher();
+
+//    // TODO NIC 06/12/2018 - da parametrizzare in file di configurazione timers
+//    plcConnectionWatcher->setupTimers(1000);
+//    connect(plcConnectionWatcher.data(), &DeviceConnectionWatcher::deviceDisconnected, this, &MainWindow::handleDisconnectionPLC);
+//    plcConnectionWatcher->startWatcher();
 
     traceExit;
 
@@ -293,6 +313,176 @@ void MainWindow::initGalilPLCInspector() {
 
 }
 
+void MainWindow::initCNConnectionWatcher() {
+
+    traceEnter;
+
+    if (cn.isNull()) {
+        // TODO NIC 07/12/2018 - lanciare eccezione se non e' impostato alcun cn
+        return;
+    }
+
+    class GalilCNDeviceConnetionWatcher : public DeviceConnectionWatcher {
+    private:
+        QTimer timerKeepAlive;
+    public:
+        explicit GalilCNDeviceConnetionWatcher(QObject* parent = nullptr) :
+            DeviceConnectionWatcher(parent),
+            timerKeepAlive(this) {
+
+            int intervalMs = Settings::instance().getGalilCNCheckConnectionIntervalMs();
+            this->setupTimers(intervalMs);
+
+            connect(&timerKeepAlive, &QTimer::timeout, [this]() {
+                traceEnter;
+                unsigned int timeMs;
+                device.staticCast<GalilCNController>()->getKeepAliveTimeMs(&timeMs);
+                traceExit;
+            });
+
+        }
+
+        ~GalilCNDeviceConnetionWatcher() {
+            timerKeepAlive.stop();
+        }
+
+    protected:
+        virtual void reconnectDevice() {
+
+            traceEnter;
+            if (!device.isNull()) {
+
+                if (!device->isConnected()) {
+
+                    timerKeepAlive.stop();
+
+                    QString ipCN = Settings::instance().getGalilCNIpAddress();
+                    auto galilCN = device.staticCast<GalilCNController>().data();
+
+                    if (galilCN->connect(ipCN)) {
+                        unsigned int timeMs;
+                        int res = galilCN->getKeepAliveTimeMs(&timeMs);
+                        if (galilCN->isError(res)) {
+
+                            traceErr() << "Errore chiamata CN keep alive; codice errore:" << res;
+                            traceErr() << "Descrizione errore:" << galilCN->decodeError(res);
+
+                        } else {
+
+                            timerKeepAlive.setInterval(timeMs / 2);
+                            timerKeepAlive.start();
+                        }
+                    }
+                }
+            }
+
+            traceExit;
+            return;
+        }
+    };
+
+    QThread* cnWatcherThread = new QThread();
+
+    cnConnectionWatcher.reset(new GalilCNDeviceConnetionWatcher());
+    cnConnectionWatcher->setDevice<DeviceKey::GALIL_CN>(cn.staticCast<GalilCNController>());
+
+    connect(cnWatcherThread, &QThread::started, cnConnectionWatcher.data(), &GalilCNDeviceConnetionWatcher::startWatcher);
+    connect(cnConnectionWatcher.data(), &GalilCNDeviceConnetionWatcher::watcherStopped, cnWatcherThread, &QThread::quit);
+
+    connect(cnWatcherThread, &QThread::finished, cnConnectionWatcher.data(), &GalilCNDeviceConnetionWatcher::deleteLater);
+    connect(cnWatcherThread, &QThread::finished, cnWatcherThread, &QThread::deleteLater);
+
+    cnConnectionWatcher->moveToThread(cnWatcherThread);
+
+    traceExit;
+
+}
+
+void MainWindow::initPLCConnectionWatcher() {
+
+    traceEnter;
+
+    if (plc.isNull()) {
+        // TODO NIC 07/12/2018 - lanciare eccezione se non e' impostato alcun plc
+        return;
+    }
+
+    class GalilPLCDeviceConnetionWatcher : public DeviceConnectionWatcher {
+    private:
+        QTimer timerKeepAlive;
+    public:
+        explicit GalilPLCDeviceConnetionWatcher(QObject* parent = nullptr) :
+            DeviceConnectionWatcher(parent),
+            timerKeepAlive(this) {
+
+            int intervalMs = Settings::instance().getGalilPLCCheckConnectionIntervalMs();
+            this->setupTimers(intervalMs);
+
+            connect(&timerKeepAlive, &QTimer::timeout, [this]() {
+                traceEnter;
+                unsigned int timeMs;
+                device.staticCast<GalilCNController>()->getKeepAliveTimeMs(&timeMs);
+                traceExit;
+            });
+
+        }
+
+        ~GalilPLCDeviceConnetionWatcher() {
+            timerKeepAlive.stop();
+        }
+
+    protected:
+        virtual void reconnectDevice() {
+
+            traceEnter;
+            if (!device.isNull()) {
+
+                if (!device->isConnected()) {
+
+                    timerKeepAlive.stop();
+
+                    QString ipPLC = Settings::instance().getGalilPLCIpAddress();
+                    auto galilPLC = device.staticCast<GalilPLCController>().data();
+
+                    if (galilPLC->connect(ipPLC)) {
+                        unsigned int timeMs;
+                        int res = galilPLC->getKeepAliveTimeMs(&timeMs);
+                        if (galilPLC->isError(res)) {
+
+                            traceErr() << "Errore chiamata PLC keep alive; codice errore:" << res;
+                            traceErr() << "Descrizione errore:" << galilPLC->decodeError(res);
+
+                        } else {
+
+                            timerKeepAlive.setInterval(timeMs / 2);
+                            timerKeepAlive.start();
+                        }
+                    }
+                }
+            }
+
+            traceExit;
+            return;
+        }
+    };
+
+    QThread* cnWatcherThread = new QThread();
+
+    plcConnectionWatcher.reset(new GalilPLCDeviceConnetionWatcher());
+    plcConnectionWatcher->setDevice<DeviceKey::GALIL_PLC>(plc.staticCast<GalilPLCController>());
+
+    connect(cnWatcherThread, &QThread::started, plcConnectionWatcher.data(), &GalilPLCDeviceConnetionWatcher::startWatcher);
+    connect(plcConnectionWatcher.data(), &GalilPLCDeviceConnetionWatcher::watcherStopped, cnWatcherThread, &QThread::quit);
+
+    connect(cnWatcherThread, &QThread::finished, plcConnectionWatcher.data(), &GalilPLCDeviceConnetionWatcher::deleteLater);
+    connect(cnWatcherThread, &QThread::finished, cnWatcherThread, &QThread::deleteLater);
+
+    plcConnectionWatcher->moveToThread(cnWatcherThread);
+
+    traceExit;
+
+}
+
 void MainWindow::setupStyleSheets() const {
 
     using namespace PROGRAM_NAMESPACE;
@@ -332,13 +522,25 @@ void MainWindow::startDevices() {
     Settings& s = Settings::instance();
 
     if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
-        QThread* galilCNThread = galilCNInspector->thread();
-        galilCNThread->start();
+        if (!galilCNInspector.isNull()) {
+            QThread* galilCNThread = galilCNInspector->thread();
+            galilCNThread->start();
+        }
+
+        if (!cnConnectionWatcher.isNull())
+            cnConnectionWatcher->thread()->start();
+
     }
 
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
-        QThread* galilPLCThread = galilPLCInspector->thread();
-        galilPLCThread->start();
+        if (!galilPLCInspector.isNull()) {
+            QThread* galilPLCThread = galilPLCInspector->thread();
+            galilPLCThread->start();
+        }
+
+        if (!plcConnectionWatcher.isNull())
+            plcConnectionWatcher->thread()->start();
+
     }
 
     traceExit;
@@ -352,13 +554,21 @@ void MainWindow::stopDevices() {
     Settings& s = Settings::instance();
 
     if (s.getMachineCNType() == DeviceKey::GALIL_CN)
-        galilCNInspector->stopProcess();
+        if (!galilCNInspector.isNull())
+            galilCNInspector->stopProcess();
 
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
-        galilPLCInspector->stopProcess();
+        if (!galilPLCInspector.isNull())
+            galilPLCInspector->stopProcess();
 
+    if (!cnConnectionWatcher.isNull())
+        cnConnectionWatcher->stopWatcher();
+
+    if (!plcConnectionWatcher.isNull())
+        plcConnectionWatcher->stopWatcher();
 
     traceExit;
 
 }
+
 

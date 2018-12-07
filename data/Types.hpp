@@ -2,16 +2,21 @@
 #define TYPES_HPP
 
 // type traits
+#include <configure.h>
 
 namespace PROGRAM_NAMESPACE {
 
 using real = float;
 using realHR = double; // real high resolution
 using analogReal = double;
-using posType = int;
-using spdType = double;
-using accType = double;
+
+using posCNType = int;
+using spdCNType = double;
+using accCNType = double;
+
 using anlType = double;
+
+using posType = float;
 
 class GalilCNController;
 class GalilPLCController;

@@ -14,7 +14,6 @@ MotionManager::MotionManager(QObject* parent) : QObject(parent) {
 
     traceEnter;
 
-
     traceExit;
 
 }
@@ -27,34 +26,22 @@ MotionManager::~MotionManager() {
 
 }
 
-bool MotionManager::moveX(int posMm) {
+int MotionManager::moveX(posType posMm) {
 
     traceEnter;
 
-    if (this->isMotorXOff()) {
-        return false;
-    }
+    bool check;
+    if (!this->isMotorXOff(check))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
 
-    if (!this->moveXImpl(posMm)) {
-        return false;
-    }
+    if (check)
+        return MOTION_MANAGER_MOTOR_X_OFF;
 
-    QEventLoop loop;
-    QTimer t;
-    t.setInterval(10*1000);
-    int res;
-    connect(&t, &QTimer::timeout, [&]() {
-        loop.exit(1);
-        res = 10;
-    });
-    connect(this, &MotionManager::powerOffSignal, &loop, &QEventLoop::quit);
-    connect(this, &MotionManager::cycleOffSignal, &loop, &QEventLoop::quit);
-    connect(this, &MotionManager::axisXMotorOffSignal, &loop, &QEventLoop::quit);
-    t.start();
-    loop.exec();
+    if (!this->moveXImpl(posMm))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
 
     traceExit;
-    return true;
+    return MOTION_MANAGER_NO_ERR;
 
 }
 

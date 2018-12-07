@@ -1,9 +1,17 @@
 #ifndef ABSTRACTDEVICE_HPP
 #define ABSTRACTDEVICE_HPP
 
+#include <exception>
+
 #include <configure.h>
 
 namespace PROGRAM_NAMESPACE {
+
+class NoStatusException : public std::exception {
+    const char* what() const noexcept {
+        return "No status exception: status is not available from device";
+    }
+};
 
 class IAbstractDevice {
 public:

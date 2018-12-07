@@ -211,7 +211,7 @@ int GalilCNController::getAnalogInput(int analogInput, anlType& analogInputStatu
 
 }
 
-int GalilCNController::getPosition(Axis a, posType& pos) {
+int GalilCNController::getPosition(Axis a, posCNType& pos) {
 
     traceEnter;
 
@@ -333,7 +333,7 @@ int GalilCNController::isForwardLimit(Axis a, bool& isForwardLimit) {
 
 }
 
-int GalilCNController::isBackwardLimit(Axis a, bool& isForwardLimit) {
+int GalilCNController::isBackwardLimit(Axis a, bool& isBackwardLimit) {
 
     traceEnter;
 
@@ -344,7 +344,7 @@ int GalilCNController::isBackwardLimit(Axis a, bool& isForwardLimit) {
 
     int value = 0;
     GReturn result = tellSwitches(a, value);
-    isForwardLimit = value & (0x01 << static_cast<int>(SwitchBitMask::FORWARD_LIMIT_SWITCH_INACTIVE));
+    isBackwardLimit = value & (0x01 << static_cast<int>(SwitchBitMask::REVERSE_LIMIT_SWITCH_INACTIVE));
 
     traceExit;
 
@@ -434,7 +434,7 @@ int GalilCNController::setDigitalOutput(int output, bool value) {
 
 }
 
-int GalilCNController::setSpeeds(Axis a, spdType speed) {
+int GalilCNController::setSpeeds(Axis a, spdCNType speed) {
 
     traceEnter;
 
@@ -459,7 +459,7 @@ int GalilCNController::setSpeeds(Axis a, spdType speed) {
 
 }
 
-int GalilCNController::setAccelerations(Axis a, accType acc, accType dec) {
+int GalilCNController::setAccelerations(Axis a, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -497,7 +497,7 @@ int GalilCNController::setAccelerations(Axis a, accType acc, accType dec) {
 
 }
 
-int GalilCNController::setMoveParameters(Axis a, spdType speed, accType acc, accType dec) {
+int GalilCNController::setMoveParameters(Axis a, spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -544,7 +544,7 @@ int GalilCNController::stopAxis(Axis a) {
 
 }
 
-int GalilCNController::homingX(spdType speed, accType acc, accType dec) {
+int GalilCNController::homingX(spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -576,7 +576,7 @@ int GalilCNController::homingX(spdType speed, accType acc, accType dec) {
 
 }
 
-int GalilCNController::homingY(spdType speed, accType acc, accType dec) {
+int GalilCNController::homingY(spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -608,7 +608,7 @@ int GalilCNController::homingY(spdType speed, accType acc, accType dec) {
 
 }
 
-int GalilCNController::homingZ(spdType speed, accType acc, accType dec) {
+int GalilCNController::homingZ(spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -640,7 +640,7 @@ int GalilCNController::homingZ(spdType speed, accType acc, accType dec) {
 
 }
 
-int GalilCNController::homingW(MAYBE_UNUSED spdType speed, MAYBE_UNUSED accType acc, MAYBE_UNUSED accType dec) {
+int GalilCNController::homingW(MAYBE_UNUSED spdCNType speed, MAYBE_UNUSED accCNType acc, MAYBE_UNUSED accCNType dec) {
 
     traceEnter;
 
@@ -656,7 +656,7 @@ int GalilCNController::homingW(MAYBE_UNUSED spdType speed, MAYBE_UNUSED accType 
 
 }
 
-int GalilCNController::home(Axis a, spdType speed, accType acc, accType dec) {
+int GalilCNController::home(Axis a, spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -704,7 +704,7 @@ int GalilCNController::startMoveAxis(Axis a) {
 
 }
 
-int GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec) {
+int GalilCNController::moveToPosition(Axis a, posCNType pos, spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
@@ -737,7 +737,7 @@ int GalilCNController::moveToPosition(Axis a, posType pos, spdType speed, accTyp
 
 }
 
-int GalilCNController::setPosition(Axis a, posType pos) {
+int GalilCNController::setPosition(Axis a, posCNType pos) {
 
     traceEnter;
 
@@ -798,7 +798,12 @@ int GalilCNController::getTCCode(int& tcCode) {
 GalilCNStatusBean GalilCNController::getStatus() {
 
     GalilCNStatusBean record;
-    writeErrorIfExists(this->getRecord(record));
+    GReturn result = this->getRecord(record);
+    writeErrorIfExists(result);
+
+    if (this->isError(result))
+        throw NoStatusException();
+
     return record;
 
 }
@@ -806,6 +811,27 @@ GalilCNStatusBean GalilCNController::getStatus() {
 QString GalilCNController::decodeError(const int& errorCode) {
 
     return GalilControllerUtils::getErrorDescription(errorCode);
+
+}
+
+int GalilCNController::getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue) {
+
+    traceEnter;
+
+    if (!isConnected()) {
+        traceErr() << "Galil CN: il controller non e' connesso";
+        return G_CUSTOM_CN_NOT_CONNECTED;
+    }
+
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GUtility(handle(), G_UTIL_GCAPS_KEEPALIVE, timeMs, newValue);
+#else
+    timeMs = 600*1000; // valore default
+    GReturn result = G_NO_ERROR;
+#endif
+
+    traceExit;
+    return result;
 
 }
 
@@ -820,7 +846,7 @@ void GalilCNController::writeError(int errorCode) {
         this->getTCCode(tcCode);
         traceErr() << "Galil CN: dettagli errore:" << GalilControllerUtils::getTCDescription(tcCode);
 
-    } else if (errorCode == G_TIMEOUT)
+    } else if (errorCode == G_TIMEOUT || errorCode == G_READ_ERROR || errorCode == G_WRITE_ERROR)
         /* NOTE NIC 07/11/2018 - mi accorgo se il CN e' connesso dopo l'invio di comando;
          * il dispositivo non e' connesso se il comando da errore di timeout (1100)
          */
@@ -902,7 +928,7 @@ int GalilCNController::disconnect() {
     traceEnter;
 
     if (!this->isConnected()) {
-        traceInfo() << "Galil CN: connessione non presente; nessuna sconnessione da effettuare";
+        traceInfo() << "Galil CN: connessione non presente; nessuna disconnessione da effettuare";
         return G_NO_ERROR;
     }
 

@@ -329,6 +329,7 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_CN_CONNECTION_TIMEOUT_MS, galilCNConnectionTimeoutMs);
         settings.setValue(GALIL_CN_STATUS_REFRESH_INTERVAL_MS, galilCNStatusRefreshIntervalMs);
         settings.setValue(GALIL_CN_CHECK_CONNECTION_INTERVAL_MS, galilCNCheckConnectionIntervalMs);
+        settings.setValue(GALIL_CN_RECONNECTION_INTERVAL_MS, galilCNReconnectionIntervalMs);
         settings.setValue(GALIL_CN_IP_ADDRESS, galilCNIpAddress);
         settings.setValue(GALIL_CN_NUMBER_DIGITAL_INPUT, galilCNNumberDigitalInput);
         settings.setValue(GALIL_CN_NUMBER_DIGITAL_OUTPUT, galilCNNumberDigitalOutput);
@@ -343,6 +344,7 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_PLC_CONNECTION_TIMEOUT_MS, galilPLCConnectionTimeoutMs);
         settings.setValue(GALIL_PLC_STATUS_REFRESH_INTERVAL_MS, galilPLCStatusRefreshIntervalMs);
         settings.setValue(GALIL_PLC_CHECK_CONNECTION_INTERVAL_MS, galilPLCCheckConnectionIntervalMs);
+        settings.setValue(GALIL_PLC_RECONNECTION_INTERVAL_MS, galilPLCReconnectionIntervalMs);
         settings.setValue(GALIL_PLC_IP_ADDRESS, galilPLCIpAddress);
         settings.setValue(GALIL_PLC_NUMBER_DIGITAL_INPUT, galilPLCNumberDigitalInput);
         settings.setValue(GALIL_PLC_NUMBER_DIGITAL_OUTPUT, galilPLCNumberDigitalOutput);

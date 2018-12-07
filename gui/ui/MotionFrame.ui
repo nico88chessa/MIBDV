@@ -154,6 +154,9 @@
         </item>
         <item row="2" column="0">
          <widget class="MDLineEdit" name="leAxisXMaxPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="label" stdset="0">
            <string>Max Position</string>
           </property>
@@ -203,14 +206,14 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pbResetAxis">
+           <widget class="QPushButton" name="pbResetAxes">
             <property name="text">
-             <string>Reset</string>
+             <string>Reset Axes</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pbStopAxis">
+           <widget class="QPushButton" name="pbStopAxes">
             <property name="text">
              <string>Stop</string>
             </property>
@@ -220,6 +223,9 @@
         </item>
         <item row="2" column="2">
          <widget class="MDLineEdit" name="leAxisZMaxPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="label" stdset="0">
            <string>Max Position</string>
           </property>
@@ -237,6 +243,9 @@
         </item>
         <item row="1" column="1">
          <widget class="MDLineEdit" name="leAxisYCurrentPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="label" stdset="0">
            <string>Current Position</string>
           </property>
@@ -244,6 +253,9 @@
         </item>
         <item row="2" column="1">
          <widget class="MDLineEdit" name="leAxisYMaxPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="label" stdset="0">
            <string>Max Position</string>
           </property>
@@ -251,6 +263,9 @@
         </item>
         <item row="1" column="2">
          <widget class="MDLineEdit" name="leAxisZCurrentPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="label" stdset="0">
            <string>Current Position</string>
           </property>
@@ -265,6 +280,9 @@
         </item>
         <item row="1" column="0">
          <widget class="MDLineEdit" name="leAxisXCurrentPosition">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="label" stdset="0">
            <string>Current Position</string>
           </property>
@@ -367,8 +385,14 @@
         </item>
         <item row="7" column="0">
          <widget class="QCheckBox" name="cbAxisXForwardLimit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Forward Limit</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -377,8 +401,14 @@
         </item>
         <item row="4" column="0">
          <widget class="QCheckBox" name="cbAxisXMotorOff">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Motor Off</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -387,8 +417,14 @@
         </item>
         <item row="6" column="0">
          <widget class="QCheckBox" name="cbAxisXReverseLimit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Reverse Limit</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -397,8 +433,14 @@
         </item>
         <item row="5" column="0">
          <widget class="QCheckBox" name="cbAxisXMoving">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Moving</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -407,8 +449,14 @@
         </item>
         <item row="7" column="1">
          <widget class="QCheckBox" name="cbAxisYForwardLimit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Forward Limit</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -417,8 +465,14 @@
         </item>
         <item row="4" column="1">
          <widget class="QCheckBox" name="cbAxisYMotorOff">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Motor Off</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -427,8 +481,14 @@
         </item>
         <item row="5" column="1">
          <widget class="QCheckBox" name="cbAxisYMoving">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Moving</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -437,8 +497,14 @@
         </item>
         <item row="6" column="1">
          <widget class="QCheckBox" name="cbAxisYReverseLimit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Reverse Limit</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -447,8 +513,14 @@
         </item>
         <item row="7" column="2">
          <widget class="QCheckBox" name="cbAxisZForwardLimit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Forward Limit</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -457,8 +529,14 @@
         </item>
         <item row="4" column="2">
          <widget class="QCheckBox" name="cbAxisZMotorOff">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Motor Off</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -467,8 +545,14 @@
         </item>
         <item row="5" column="2">
          <widget class="QCheckBox" name="cbAxisZMoving">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Moving</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -477,8 +561,14 @@
         </item>
         <item row="6" column="2">
          <widget class="QCheckBox" name="cbAxisZReverseLimit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Reverse Limit</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
           </property>
           <property name="isDigitalIO" stdset="0">
            <bool>true</bool>
@@ -521,8 +611,8 @@
   <tabstop>pbStopY</tabstop>
   <tabstop>pbMoveZ</tabstop>
   <tabstop>pbStopZ</tabstop>
-  <tabstop>pbResetAxis</tabstop>
-  <tabstop>pbStopAxis</tabstop>
+  <tabstop>pbResetAxes</tabstop>
+  <tabstop>pbStopAxes</tabstop>
   <tabstop>cbAxisXMotorOff</tabstop>
   <tabstop>cbAxisXMoving</tabstop>
   <tabstop>cbAxisXReverseLimit</tabstop>

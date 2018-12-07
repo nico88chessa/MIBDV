@@ -10,6 +10,16 @@
 
 namespace PROGRAM_NAMESPACE {
 
+/**
+ * @brief The GalilCNController class
+ * Classe utilizzata per controllare il controller Galil
+ * Nota importante:
+ * utilizzando il server GCaps, il server chiude la connessione con il client automaticamente
+ * dopo un periodo di default di 10 min;
+ * per evitare questo, e' necessario effettuare almeno una chiamata al server
+ * (vedere documentazione gcaps parametro G_UTIL_GCAPS_KEEPALIVE)
+ */
+
 class GalilCNController : public AbstractCN<GalilCNStatusBean, int> {
 public:
     using Ptr = GalilCNController *;
@@ -60,32 +70,33 @@ public:
     virtual int getDigitalInput(int input, int& inputStatus);
     virtual int getDigitalOutput(int output, int& outputStatus);
     virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
-    virtual int getPosition(Axis a, posType& pos);
+    virtual int getPosition(Axis a, posCNType& pos);
     virtual int isAxisInMotion(Axis a, bool& inMotion);
     virtual int isAxisPositionError(Axis a, bool& isPositionError);
     virtual int isMotorOff(Axis a, bool& isMotorOff);
     virtual int isForwardLimit(Axis a, bool& isForwardLimit);
-    virtual int isBackwardLimit(Axis a, bool& isForwardLimit);
+    virtual int isBackwardLimit(Axis a, bool& isBackwardLimit);
     virtual int isHomeAxis(Axis a, bool& isHome);
     bool checkAbort(bool& isAbort);
     virtual int setDigitalOutput(int output, bool value);
-    virtual int setSpeeds(Axis a, spdType speed);
-    virtual int setAccelerations(Axis a, accType acc, accType dec);
-    virtual int setMoveParameters(Axis a, spdType speed, accType acc, accType dec);
+    virtual int setSpeeds(Axis a, spdCNType speed);
+    virtual int setAccelerations(Axis a, accCNType acc, accCNType dec);
+    virtual int setMoveParameters(Axis a, spdCNType speed, accCNType acc, accCNType dec);
     virtual int stopAxis(Axis a);
-    virtual int homingX(spdType speed, accType acc, accType dec);
-    virtual int homingY(spdType speed, accType acc, accType dec);
-    virtual int homingZ(spdType speed, accType acc, accType dec);
-    virtual int homingW(spdType speed, accType acc, accType dec);
-    virtual int home(Axis a, spdType speed, accType acc, accType dec);
+    virtual int homingX(spdCNType speed, accCNType acc, accCNType dec);
+    virtual int homingY(spdCNType speed, accCNType acc, accCNType dec);
+    virtual int homingZ(spdCNType speed, accCNType acc, accCNType dec);
+    virtual int homingW(spdCNType speed, accCNType acc, accCNType dec);
+    virtual int home(Axis a, spdCNType speed, accCNType acc, accCNType dec);
     virtual int startMoveAxis(Axis a);
-    virtual int moveToPosition(Axis a, posType pos, spdType speed, accType acc, accType dec);
-    virtual int setPosition(Axis a, posType pos);
+    virtual int moveToPosition(Axis a, posCNType pos, spdCNType speed, accCNType acc, accCNType dec);
+    virtual int setPosition(Axis a, posCNType pos);
     int getTCCode(int& tcCode);
     bool isConnected() const;
     virtual GalilCNStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
     virtual QString decodeError(const int& errorCode);
+    int getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue = nullptr); // 10 min valore default
 
 private:
     int disconnect();

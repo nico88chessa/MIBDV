@@ -10,6 +10,7 @@
 
 #include <IOManager.hpp>
 #include <MotionManager.hpp>
+#include <DeviceConnectionWatcher.hpp>
 
 
 namespace Ui {
@@ -34,6 +35,8 @@ private:
 
     QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> cn; // utilizzato da motionManager
     QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> plc; // utilizzato da motionManager e ioManager
+    QScopedPointer<PROGRAM_NAMESPACE::DeviceConnectionWatcher> cnConnectionWatcher;
+    QScopedPointer<PROGRAM_NAMESPACE::DeviceConnectionWatcher> plcConnectionWatcher;
 
 public:
 
@@ -47,6 +50,8 @@ private:
     void initDevices();
     void initGalilCNInspector();
     void initGalilPLCInspector();
+    void initCNConnectionWatcher();
+    void initPLCConnectionWatcher();
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

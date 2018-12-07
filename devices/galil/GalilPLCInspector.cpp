@@ -13,7 +13,7 @@ GalilPLCInspector::GalilPLCInspector(QObject* parent) :
 
     Settings& s = Settings::instance();
 
-    ipAddress = s.getGalilCNIpAddress();
+    ipAddress = s.getGalilPLCIpAddress();
     reconnectionIntervalMs = s.getGalilPLCReconnectionIntervalMs();
     int digitalInput = s.getGalilPLCNumberDigitalInput();
     int digitalOutput = s.getGalilPLCNumberDigitalOutput();
@@ -21,7 +21,7 @@ GalilPLCInspector::GalilPLCInspector(QObject* parent) :
 
     controller->setupController(digitalInput, digitalOutput, analogInput);
 
-    int refreshTimeMs = s.getGalilCNStatusRefreshIntervalMs();
+    int refreshTimeMs = s.getGalilPLCStatusRefreshIntervalMs();
     refreshTimer.setInterval(refreshTimeMs);
 
     connect(&refreshTimer, &QTimer::timeout, this, &GalilPLCInspector::process);
@@ -45,12 +45,17 @@ void GalilPLCInspector::process() {
 
     if (controller->isConnected()) {
 
-        auto status = controller->getStatus();
-        emit statusSignal(status);
+        try {
+            auto status = controller->getStatus();
+            emit statusSignal(status);
+
+        } catch (NoStatusException& e) {
+            Q_UNUSED(e)
+            traceErr() << "Errore nel recupero dello stato da GalilPLCInspector";
+        }
 
     } else
         handleDisconnection();
-
 
     traceExit;
 
@@ -90,8 +95,9 @@ void GalilPLCInspector::startProcess() {
     traceEnter;
 
     if (!controller->connect(ipAddress)) {
-        traceErr() << "GalilCNInspector: connessione al CN fallita";
+        traceErr() << "GalilPLCInspector: connessione al PLC fallita";
         QTimer::singleShot(reconnectionIntervalMs, this, &GalilPLCInspector::startProcess);
+        return;
     } else
         emit connectedSignal();
 
