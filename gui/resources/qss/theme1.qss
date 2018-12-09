@@ -49,6 +49,62 @@ QWidget {
 
 
 /******************/
+/* MDSpinBox
+/******************/
+
+.MDSpinBox {
+    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    background-color: transparent;
+    border-bottom-color: rgba(0, 0, 0, 42%);
+    color: rgba(0, 0, 0, 54%);
+}
+
+.MDSpinBox:hover {
+    border-bottom-color: rgba(0, 0, 0, 87%);
+}
+
+.MDSpinBox:focus:!read-only {
+    color: rgba(0, 0, 0, 87%);
+    border-bottom-color: rgba(46, 125, 50, 100%);
+}
+
+.MDSpinBox:disabled {
+    color: rgba(0, 0, 0, 38%);
+    border-bottom-color: rgba(0, 0, 0, 42%);
+}
+
+
+
+
+/******************/
+/* MDDoubleSpinBox
+/******************/
+
+.MDDoubleSpinBox {
+    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    background-color: transparent;
+    border-bottom-color: rgba(0, 0, 0, 42%);
+    color: rgba(0, 0, 0, 54%);
+}
+
+.MDDoubleSpinBox:hover {
+    border-bottom-color: rgba(0, 0, 0, 87%);
+}
+
+.MDDoubleSpinBox:focus:!read-only {
+    color: rgba(0, 0, 0, 87%);
+    border-bottom-color: rgba(46, 125, 50, 100%);
+}
+
+.MDDoubleSpinBox:disabled {
+    color: rgba(0, 0, 0, 38%);
+    border-bottom-color: rgba(0, 0, 0, 42%);
+}
+
+
+
+
+/******************/
 /* MDComboBox
 /******************/
 
@@ -104,11 +160,11 @@ QWidget {
 }
 
 .MDComboBox::down-arrow {
-    image: url(:/mibdv/arrow-drop-down);
+    image: url(:/icons/black-theme/arrow_drop_down);
 }
 
 .MDComboBox::down-arrow:on {
-    image: url(:/mibdv/arrow-drop-up);
+    image: url(:/icons/black-theme/arrow_drop_up);
     /*top: 1px;
     left: 1px;*/
 }
@@ -173,7 +229,7 @@ QSlider::add-page:vertical {
 }
 
 .QComboBox::down-arrow {
-    image: url(:/mibdv/arrow-drop-down);
+    image: url(:/icons/black-theme/arrow_drop_down);
 }
 
 
@@ -207,11 +263,11 @@ QRadioButton {
 }
 
 QRadioButton::indicator::unchecked {
-    image: url(:/mibdv/radiobutton-unchecked);
+    image: url(:/icons/black-theme/radio_button-unchecked);
 }
 
 QRadioButton::indicator::checked {
-    image: url(:/mibdv/radiobutton-checked);
+    image: url(:/icons/black-theme/radio_button-checked);
 }
 
 
@@ -226,11 +282,11 @@ QCheckBox {
 }
 
 QCheckBox::indicator::unchecked {
-    image: url(:/mibdv/checkbox-off);
+    image: url(:/icons/black-theme/check_box_outline_blank);
 }
 
 QCheckBox::indicator::checked {
-    image: url(:/mibdv/checkbox-on);
+    image: url(:/icons/black-theme/check_box);
 }
 
 
@@ -254,11 +310,11 @@ MDSwitchLine::indicator {
 }
 
 MDSwitchLine::indicator::unchecked {
-    image: url(:/mibdv/toggle-off);
+    image: url(:/icons/black-theme/toggle_off);
 }
 
 MDSwitchLine::indicator::checked {
-    image: url(:/mibdv/toggle-on);
+    image: url(:/icons/black-theme/toggle_on);
 }
 
 

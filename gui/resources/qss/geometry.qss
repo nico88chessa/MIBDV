@@ -36,6 +36,80 @@
 
 
 /******************/
+/* MDSpinBox
+/******************/
+
+.MDSpinBox {
+    font-size: 16px;
+    padding: 36px 0px 8px;
+    max-height: 54px;
+    min-height: 18px;
+    margin: 0px 12px 8px;
+    qproperty-labelX: 14;
+    qproperty-labelY: 28;
+    qproperty-labelTextWidth: 12;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+.MDSpinBox:focus {
+    padding: 36px 0px 7px;
+    border-bottom-width: 2px;
+}
+
+.MDSpinBox:read-only {
+    padding: 36px 0px 8px;
+    border-bottom-width: 1px;
+}
+
+.MDSpinBox:disabled {
+    padding: 36px 0px 7px;
+    border-bottom-width: 1px;
+    border-bottom-style: dotted;
+}
+
+
+
+
+/******************/
+/* MDDoubleSpinBox
+/******************/
+
+.MDDoubleSpinBox {
+    font-size: 16px;
+    padding: 36px 0px 8px;
+    max-height: 54px;
+    min-height: 18px;
+    margin: 0px 12px 8px;
+    qproperty-labelX: 14;
+    qproperty-labelY: 28;
+    qproperty-labelTextWidth: 12;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+.MDDoubleSpinBox:focus {
+    padding: 36px 0px 7px;
+    border-bottom-width: 2px;
+}
+
+.MDDoubleSpinBox:read-only {
+    padding: 36px 0px 8px;
+    border-bottom-width: 1px;
+}
+
+.MDDoubleSpinBox:disabled {
+    padding: 36px 0px 7px;
+    border-bottom-width: 1px;
+    border-bottom-style: dotted;
+}
+
+
+
+
+/******************/
 /* MDComboBox
 /******************/
 

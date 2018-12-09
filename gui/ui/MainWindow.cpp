@@ -135,9 +135,9 @@ void MainWindow::setupUiLeftPanel() {
 
     traceEnter;
 
-    MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/mibdv/alert");
-    MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/mibdv/io");
-    MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":mibdv/motion");
+    MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/icons/black-theme/add_alert");
+    MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/icons/black-theme/input");
+    MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":icons/black-theme/pan_tool");
 
     QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
     QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);
@@ -421,7 +421,7 @@ void MainWindow::initPLCConnectionWatcher() {
             connect(&timerKeepAlive, &QTimer::timeout, [this]() {
                 traceEnter;
                 unsigned int timeMs;
-                device.staticCast<GalilCNController>()->getKeepAliveTimeMs(&timeMs);
+                device.staticCast<GalilPLCController>()->getKeepAliveTimeMs(&timeMs);
                 traceExit;
             });
 

@@ -1,23 +1,23 @@
 <RCC>
-    <qresource prefix="/mibdv">
-        <file alias="settings">icons/baseline_settings_black_24dp.png</file>
-        <file alias="expand-less">icons/baseline_expand_less_black_24dp.png</file>
-        <file alias="expand-more">icons/baseline_expand_more_black_24dp.png</file>
-        <file alias="arrow-drop-down">icons/baseline_arrow_drop_down_black_24dp.png</file>
-        <file alias="radiobutton-checked">icons/baseline_radio_button_checked_black_24dp.png</file>
-        <file alias="radiobutton-unchecked">icons/baseline_radio_button_unchecked_black_24dp.png</file>
-        <file alias="checkbox-on">icons/baseline_check_box_black_24dp.png</file>
-        <file alias="checkbox-off">icons/baseline_check_box_outline_blank_black_24dp.png</file>
-        <file alias="toggle-off">icons/baseline_toggle_off_black_24dp.png</file>
-        <file alias="toggle-on">icons/baseline_toggle_on_black_24dp.png</file>
-        <file alias="arrow-drop-up">icons/baseline_arrow_drop_up_black_24dp.png</file>
-        <file alias="alert">icons/baseline_add_alert_black_24dp.png</file>
-        <file alias="pan">icons/baseline_pan_tool_black_24dp.png</file>
-        <file alias="io">icons/baseline_input_black_24dp.png</file>
-        <file alias="pause">icons/baseline_pause_circle_filled_black_24dp.png</file>
-        <file alias="play">icons/baseline_play_circle_filled_black_24dp.png</file>
-        <file alias="lens">icons/baseline_lens_black_24dp.png</file>
-        <file alias="panorama">icons/baseline_panorama_fish_eye_black_24dp.png</file>
+    <qresource prefix="/icons/black-theme">
+        <file alias="settings">icons/black-theme/baseline_settings_black_24dp.png</file>
+        <file alias="expand_less">icons/black-theme/baseline_expand_less_black_24dp.png</file>
+        <file alias="expand_more">icons/black-theme/baseline_expand_more_black_24dp.png</file>
+        <file alias="arrow_drop_down">icons/black-theme/baseline_arrow_drop_down_black_24dp.png</file>
+        <file alias="radio_button_checked">icons/black-theme/baseline_radio_button_checked_black_24dp.png</file>
+        <file alias="radio_button_unchecked">icons/black-theme/baseline_radio_button_unchecked_black_24dp.png</file>
+        <file alias="check_box">icons/black-theme/baseline_check_box_black_24dp.png</file>
+        <file alias="check_box_outline_blank">icons/black-theme/baseline_check_box_outline_blank_black_24dp.png</file>
+        <file alias="toggle_off">icons/black-theme/baseline_toggle_off_black_24dp.png</file>
+        <file alias="toggle_on">icons/black-theme/baseline_toggle_on_black_24dp.png</file>
+        <file alias="arrow_drop_up">icons/black-theme/baseline_arrow_drop_up_black_24dp.png</file>
+        <file alias="add_alert">icons/black-theme/baseline_add_alert_black_24dp.png</file>
+        <file alias="pan_tool">icons/black-theme/baseline_pan_tool_black_24dp.png</file>
+        <file alias="input">icons/black-theme/baseline_input_black_24dp.png</file>
+        <file alias="pause_circle_filled">icons/black-theme/baseline_pause_circle_filled_black_24dp.png</file>
+        <file alias="play_circle_filled">icons/black-theme/baseline_play_circle_filled_black_24dp.png</file>
+        <file alias="lens">icons/black-theme/baseline_lens_black_24dp.png</file>
+        <file alias="panorama_fish_eye">icons/black-theme/baseline_panorama_fish_eye_black_24dp.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>
@@ -32,5 +32,25 @@
         <file alias="Roboto-Regular">fonts/Roboto-Regular.ttf</file>
         <file alias="Roboto-Thin">fonts/Roboto-Thin.ttf</file>
         <file alias="Roboto-ThinItalic">fonts/Roboto-ThinItalic.ttf</file>
+    </qresource>
+    <qresource prefix="/icons/disabled">
+        <file alias="settings">icons/disabled/baseline_add_alert_black_24dp.png</file>
+        <file alias="arrow_drop_down">icons/disabled/baseline_arrow_drop_down_black_24dp.png</file>
+        <file alias="arrow_drop_up">icons/disabled/baseline_arrow_drop_up_black_24dp.png</file>
+        <file alias="check_box">icons/disabled/baseline_check_box_black_24dp.png</file>
+        <file alias="check_box_outline_blank">icons/disabled/baseline_check_box_outline_blank_black_24dp.png</file>
+        <file alias="expand_less">icons/disabled/baseline_expand_less_black_24dp.png</file>
+        <file alias="expand_more">icons/disabled/baseline_expand_more_black_24dp.png</file>
+        <file alias="input">icons/disabled/baseline_input_black_24dp.png</file>
+        <file alias="lens">icons/disabled/baseline_lens_black_24dp.png</file>
+        <file alias="pan_tool">icons/disabled/baseline_pan_tool_black_24dp.png</file>
+        <file alias="panorama_fish_eye">icons/disabled/baseline_panorama_fish_eye_black_24dp.png</file>
+        <file alias="pause_circle_filled">icons/disabled/baseline_pause_circle_filled_black_24dp.png</file>
+        <file alias="play_circle_filled">icons/disabled/baseline_play_circle_filled_black_24dp.png</file>
+        <file alias="radio_button_checked">icons/disabled/baseline_radio_button_checked_black_24dp.png</file>
+        <file alias="radio_button_unchecked">icons/disabled/baseline_radio_button_unchecked_black_24dp.png</file>
+        <file alias="settings">icons/disabled/baseline_settings_black_24dp.png</file>
+        <file alias="toggle_off">icons/disabled/baseline_toggle_off_black_24dp.png</file>
+        <file alias="toggle_on">icons/disabled/baseline_toggle_on_black_24dp.png</file>
     </qresource>
 </RCC>

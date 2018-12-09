@@ -1,8 +1,11 @@
 SET(ITEMS
+    CustomDoubleValidator
     MDLineEdit
     MDSwitchLine
     MDListWidget
     MDComboBox
+    MDSpinBox
+    MDDoubleSpinBox
     )
 
 FOREACH(ITEM ${ITEMS})

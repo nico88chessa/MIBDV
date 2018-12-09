@@ -56,11 +56,11 @@ QCheckBox[isDigitalIO = true] {
 }
 
 QCheckBox::indicator::unchecked[isDigitalIO = true] {
-    image: url(:/mibdv/panorama);
+    image: url(:/icons/black-theme/panorama_fish_eye);
 }
 
 QCheckBox::indicator::checked[isDigitalIO = true] {
-    image: url(:/mibdv/lens);
+    image: url(:/icons/black-theme/lens);
 }
 
 /******************/
@@ -98,7 +98,15 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
 #tabMotion #pbMoveX,
 #tabMotion #pbMoveY,
 #tabMotion #pbMoveZ {
-    background-image: url(:/mibdv/play);
+    background-image: url(:/icons/black-theme/play_circle_filled);
+    background-repeat: none;
+    background-position: center center;
+}
+
+#tabMotion #pbMoveX:!enabled,
+#tabMotion #pbMoveY:!enabled,
+#tabMotion #pbMoveZ:!enabled {
+    background-image: url(:/icons/disabled/play_circle_filled);
     background-repeat: none;
     background-position: center center;
 }
@@ -106,7 +114,15 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
 #tabMotion #pbStopX,
 #tabMotion #pbStopY,
 #tabMotion #pbStopZ {
-    background-image: url(:/mibdv/pause);
+    background-image: url(:/icons/black-theme/pause_circle_filled);
+    background-repeat: none;
+    background-position: center center;
+}
+
+#tabMotion #pbStopX:!enabled,
+#tabMotion #pbStopY:!enabled,
+#tabMotion #pbStopZ:!enabled {
+    background-image: url(:/icons/disabled/play_circle_filled);
     background-repeat: none;
     background-position: center center;
 }

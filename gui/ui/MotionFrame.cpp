@@ -30,7 +30,7 @@ void MotionFrameLogic::moveAxisX() {
 
     traceEnter;
 
-    QString positionStr = qPtr->ui->leAxisXPosition->text();
+    QString positionStr = qPtr->ui->dsbPositionX->text();
     posType position = positionStr.toFloat();
 
     int res;
@@ -126,9 +126,37 @@ void MotionFrame::setupUi() {
 
     Settings& s = Settings::instance();
 
-    ui->leAxisXMaxPosition->setText(QString::number(s.getAxisXMaxPosMm(), 'g', 3));
-    ui->leAxisYMaxPosition->setText(QString::number(s.getAxisYMaxPosMm(), 'g', 3));
-    ui->leAxisZMaxPosition->setText(QString::number(s.getAxisZMaxPosMm(), 'g', 3));
+    ui->dsbAxisXCurrentPosition->setDecimals(3);
+    ui->dsbAxisYCurrentPosition->setDecimals(3);
+    ui->dsbAxisZCurrentPosition->setDecimals(3);
+
+    ui->dsbAxisXMaxPosition->setValue(s.getAxisXMaxPosMm());
+    ui->dsbAxisXMaxPosition->setDecimals(3);
+    ui->dsbAxisYMaxPosition->setValue(s.getAxisYMaxPosMm());
+    ui->dsbAxisYMaxPosition->setDecimals(3);
+    ui->dsbAxisZMaxPosition->setValue(s.getAxisZMaxPosMm());
+    ui->dsbAxisZMaxPosition->setDecimals(3);
+
+    int minX = s.getAxisXMinPosMm();
+    int maxX = s.getAxisXMaxPosMm();
+    int minY = s.getAxisYMinPosMm();
+    int maxY = s.getAxisYMaxPosMm();
+    int minZ = s.getAxisZMinPosMm();
+    int maxZ = s.getAxisZMaxPosMm();
+
+    ui->dsbPositionX->setRange(minX, maxX);
+    ui->dsbPositionX->setDecimals(3);
+    ui->dsbPositionY->setRange(minY, maxY);
+    ui->dsbPositionY->setDecimals(3);
+    ui->dsbPositionZ->setRange(minZ, maxZ);
+    ui->dsbPositionZ->setDecimals(3);
+
+    ui->pbMoveX->setEnabled(false);
+    ui->pbMoveY->setEnabled(false);
+    ui->pbMoveZ->setEnabled(false);
+    ui->pbStopX->setEnabled(false);
+    ui->pbStopY->setEnabled(false);
+    ui->pbStopZ->setEnabled(false);
 
     traceExit;
 
@@ -164,9 +192,9 @@ void MotionFrame::updateUI(const MotionBean& bean) {
 
     traceEnter;
 
-    ui->leAxisXCurrentPosition->setText(QString::number(bean.getAxisXPosition(), 'f', 3));
-    ui->leAxisYCurrentPosition->setText(QString::number(bean.getAxisYPosition(), 'f', 3));
-    ui->leAxisZCurrentPosition->setText(QString::number(bean.getAxisZPosition(), 'f', 3));
+    ui->dsbAxisXCurrentPosition->setValue(static_cast<double>(bean.getAxisXPosition()));
+    ui->dsbAxisYCurrentPosition->setValue(static_cast<double>(bean.getAxisYPosition()));
+    ui->dsbAxisZCurrentPosition->setValue(static_cast<double>(bean.getAxisZPosition()));
 
     ui->cbAxisXForwardLimit->setChecked(bean.getAxisXForwardLimit());
     ui->cbAxisXMotorOff->setChecked(bean.getAxisXMotorOff());
@@ -183,7 +211,7 @@ void MotionFrame::updateUI(const MotionBean& bean) {
     ui->cbAxisZMoving->setChecked(bean.getAxisZMoveInProgress());
     ui->cbAxisZReverseLimit->setChecked(bean.getAxisZReverseLimit());
 
-//    ui->pbMoveX->setEnabled(!bean.getAxisXMoveInProgress());
+    ui->pbMoveX->setEnabled(!bean.getAxisXMoveInProgress());
 
     traceExit;
 

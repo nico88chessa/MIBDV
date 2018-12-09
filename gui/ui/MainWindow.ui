@@ -194,7 +194,7 @@
          </property>
          <property name="icon">
           <iconset resource="../resources/resources.qrc">
-           <normaloff>:/mibdv/settings</normaloff>:/mibdv/settings</iconset>
+           <normaloff>:/icons/black-theme/settings</normaloff>:/icons/black-theme/settings</iconset>
          </property>
          <property name="iconSize">
           <size>
