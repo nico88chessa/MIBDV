@@ -47,7 +47,7 @@ void MotionFrameLogic::moveAxisX() {
 
         QEventLoop loop;
         QTimer t;
-        t.setInterval(10*1000);
+        t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
         QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
             if (loop.isRunning()) {
@@ -68,9 +68,11 @@ void MotionFrameLogic::moveAxisX() {
             }
         });
         QMetaObject::Connection c4 = connect(&t, &QTimer::timeout, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_TIMEOUT;
+            if (!qPtr->bean.getAxisXMoveInProgress()) {
+                if (loop.isRunning()) {
+                    loop.quit();
+                    res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+                }
             }
         });
         QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisXMotionStopSignal, [&]() {
@@ -82,14 +84,13 @@ void MotionFrameLogic::moveAxisX() {
         t.start();
         loop.exec();
         t.stop();
-        QObject::disconnect(c1);
-        QObject::disconnect(c2);
-        QObject::disconnect(c3);
-        QObject::disconnect(c4);
         QObject::disconnect(c5);
+        QObject::disconnect(c4);
+        QObject::disconnect(c3);
+        QObject::disconnect(c2);
+        QObject::disconnect(c1);
 
         if (motionManager->isErr(res)) {
-
             DialogAlert diag;
             diag.setupLabels("Error", MotionManager::decodeError(res));
             diag.exec();
@@ -188,9 +189,11 @@ void MotionFrame::setupLogic(const QSharedPointer<MotionManager>& motionManager)
 
 }
 
-void MotionFrame::updateUI(const MotionBean& bean) {
+void MotionFrame::updateUI(const MotionBean& b) {
 
     traceEnter;
+
+    this->bean = b;
 
     ui->dsbAxisXCurrentPosition->setValue(static_cast<double>(bean.getAxisXPosition()));
     ui->dsbAxisYCurrentPosition->setValue(static_cast<double>(bean.getAxisYPosition()));

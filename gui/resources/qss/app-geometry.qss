@@ -122,7 +122,7 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
 #tabMotion #pbStopX:!enabled,
 #tabMotion #pbStopY:!enabled,
 #tabMotion #pbStopZ:!enabled {
-    background-image: url(:/icons/disabled/play_circle_filled);
+    background-image: url(:/icons/disabled/pause_circle_filled);
     background-repeat: none;
     background-position: center center;
 }

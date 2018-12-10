@@ -19,8 +19,8 @@ public:
 
 private:
     MotionFrame* qPtr;
-
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
+    const int TIMER_CHECK_MOTION_MS = 1*1000;
 
 public:
     MotionFrameLogic();

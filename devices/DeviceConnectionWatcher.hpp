@@ -44,8 +44,7 @@ public:
 protected:
     void setupTimers(int checkTimerMs);
 
-    virtual void reconnectDevice() { // do nothing
-    }
+    virtual void reconnectDevice() = 0;
 
 public slots:
     void startWatcher();

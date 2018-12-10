@@ -74,17 +74,27 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
 
     // check coppia asse x
     bool isMotorXOff = newStatus.getAxisAMotorOff();
-    if (isMotorXOff) {
+    if (isMotorXOff)
         if (isMotorXOff != lastStatus.getAxisAMotorOff())
             emit axisXMotorOffSignal();
-    }
 
     // check motion asse x
     bool isMovingAxisX = newStatus.getAxisAMoveInProgress();
-    if (!isMovingAxisX) {
+    if (!isMovingAxisX)
         if (isMovingAxisX != lastStatus.getAxisAMoveInProgress())
             emit axisXMotionStopSignal();
-    }
+
+    // check forward limit asse x
+    bool isForwardLimitAxisX = newStatus.getAxisAForwardLimit();
+    if (isForwardLimitAxisX)
+        if (isForwardLimitAxisX != lastStatus.getAxisAForwardLimit())
+            emit axisXForwardLimitSignal();
+
+    // check backward limit asse x
+    bool isBackwardLimitAxisX = newStatus.getAxisAReverseLimit();
+    if (isBackwardLimitAxisX)
+        if (isBackwardLimitAxisX != lastStatus.getAxisAReverseLimit())
+            emit axisXBackwardLimitSignal();
 
     // check coppia asse y
     bool isMotorYOff = newStatus.getAxisBMotorOff();

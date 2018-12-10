@@ -44,12 +44,21 @@ signals:
     void powerOnSignal();
     void cycleOffSignal();
     void cycleOnSignal();
+
     void axisXMotorOffSignal();
     void axisXMotionStopSignal();
+    void axisXForwardLimitSignal();
+    void axisXBackwardLimitSignal();
+
     void axisYMotorOffSignal();
     void axisYMotionStopSignal();
+    void axisYForwardLimitSignal();
+    void axisYBackwardLimitSignal();
+
     void axisZMotorOffSignal();
     void axisZMotionStopSignal();
+    void axisZForwardLimitSignal();
+    void axisZBackwardLimitSignal();
 
 public:
 

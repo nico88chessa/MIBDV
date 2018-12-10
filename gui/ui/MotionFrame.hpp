@@ -25,6 +25,7 @@ public:
 private:
     Ui::MotionFrame *ui;
     MotionFrameLogic* dPtr;
+    PROGRAM_NAMESPACE::MotionBean bean;
 
 public:
     explicit MotionFrame(QWidget *parent = nullptr);
@@ -37,7 +38,7 @@ private:
     void setupSignalsAndSlots();
 
 public slots:
-    void updateUI(const PROGRAM_NAMESPACE::MotionBean& bean);
+    void updateUI(const PROGRAM_NAMESPACE::MotionBean& b);
 
 private slots:
 
