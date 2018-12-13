@@ -54,5 +54,5 @@ protected:
 
 }
 
-#endif // GALILCNINSPECTOR_HPP
+#endif // GALILPLCINSPECTOR_HPP
 

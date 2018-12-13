@@ -9,15 +9,22 @@
 
 namespace PROGRAM_NAMESPACE {
 
-static constexpr int MOTION_MANAGER_NO_ERR = PROGRAM_ERR_START_CODE + 1;
-static constexpr int MOTION_MANAGER_ERR_CN_PROBLEM = PROGRAM_ERR_START_CODE + 2;
-static constexpr int MOTION_MANAGER_MOTOR_X_OFF = PROGRAM_ERR_START_CODE + 3;
-static constexpr int MOTION_MANAGER_MOTOR_Y_OFF = PROGRAM_ERR_START_CODE + 4;
-static constexpr int MOTION_MANAGER_MOTOR_Z_OFF = PROGRAM_ERR_START_CODE + 5;
-static constexpr int MOTION_MANAGER_TIMEOUT = PROGRAM_ERR_START_CODE + 6;
-static constexpr int MOTION_MANAGER_CYCLE_OFF = PROGRAM_ERR_START_CODE + 7;
-static constexpr int MOTION_MANAGER_POWER_OFF = PROGRAM_ERR_START_CODE + 8;
-static constexpr int MOTION_MANAGER_MOTION_X_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 9;
+using MotionErr = int;
+
+static constexpr MotionErr MOTION_MANAGER_NO_ERR = PROGRAM_ERR_START_CODE + 1;
+static constexpr MotionErr MOTION_MANAGER_ERR_CN_PROBLEM = PROGRAM_ERR_START_CODE + 2;
+static constexpr MotionErr MOTION_MANAGER_MOTOR_X_OFF = PROGRAM_ERR_START_CODE + 3;
+static constexpr MotionErr MOTION_MANAGER_MOTOR_Y_OFF = PROGRAM_ERR_START_CODE + 4;
+static constexpr MotionErr MOTION_MANAGER_MOTOR_Z_OFF = PROGRAM_ERR_START_CODE + 5;
+static constexpr MotionErr MOTION_MANAGER_TIMEOUT = PROGRAM_ERR_START_CODE + 6;
+static constexpr MotionErr MOTION_MANAGER_CYCLE_OFF = PROGRAM_ERR_START_CODE + 7;
+static constexpr MotionErr MOTION_MANAGER_POWER_OFF = PROGRAM_ERR_START_CODE + 8;
+static constexpr MotionErr MOTION_MANAGER_MOTION_X_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 9;
+static constexpr MotionErr MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 10;
+static constexpr MotionErr MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 11;
+static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_X_ERR = PROGRAM_ERR_START_CODE + 12;
+static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Y_ERR = PROGRAM_ERR_START_CODE + 13;
+static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Z_ERR = PROGRAM_ERR_START_CODE + 14;
 
 
 class MotionManager : public QObject {
@@ -31,13 +38,31 @@ public:
     explicit MotionManager(QObject* parent = nullptr);
     ~MotionManager();
 
-    int moveX(posType posMm);
+    MotionErr moveX(posType posMm);
+    MotionErr moveXManual(posType posMm);
+    MotionErr stopX();
+
+    MotionErr moveY(posType posMm);
+    MotionErr moveYManual(posType posMm);
+    MotionErr stopY();
+
+    MotionErr moveZ(posType posMm);
+    MotionErr moveZManual(posType posMm);
+    MotionErr stopZ();
 
 protected:
-    void waitAxisXStop();
+    virtual bool moveXImpl(posType posMm, spdCNType speed, accCNType acc, accCNType dec) = 0;
+    virtual bool moveYImpl(posType posMm, spdCNType speed, accCNType acc, accCNType dec) = 0;
+    virtual bool moveZImpl(posType posMm, spdCNType speed, accCNType acc, accCNType dec) = 0;
 
-    virtual bool moveXImpl(posType posMm) = 0;
+    virtual bool stopXImpl() = 0;
+    virtual bool stopYImpl() = 0;
+    virtual bool stopZImpl() = 0;
+
+
     virtual bool isMotorXOff(bool& res) = 0;
+    virtual bool isMotorYOff(bool& res) = 0;
+    virtual bool isMotorZOff(bool& res) = 0;
 
 signals:
     void powerOffSignal();
@@ -62,7 +87,7 @@ signals:
 
 public:
 
-    static QString decodeError(int error) {
+    static QString decodeError(MotionErr error) {
 
         QString errDescr;
         switch (error) {
@@ -74,17 +99,23 @@ public:
             case MOTION_MANAGER_CYCLE_OFF: errDescr = tr("Movimentazione interrotta da cycle off"); break;
             case MOTION_MANAGER_POWER_OFF: errDescr = tr("Movimentazione interrotta da power off"); break;
             case MOTION_MANAGER_MOTION_X_STOP_CORRECTLY: errDescr = tr("Spostamento asse X completato correttamente"); break;
+            case MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY: errDescr = tr("Spostamento asse Y completato correttamente"); break;
+            case MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY: errDescr = tr("Spostamento asse Z completato correttamente"); break;
+            case MOTION_MANAGER_STOP_COMMAND_X_ERR: errDescr = tr("Errore nel comando di stop per l'asse X"); break;
+            case MOTION_MANAGER_STOP_COMMAND_Y_ERR: errDescr = tr("Errore nel comando di stop per l'asse Y"); break;
+            case MOTION_MANAGER_STOP_COMMAND_Z_ERR: errDescr = tr("Errore nel comando di stop per l'asse Z"); break;
             default: ;
         }
         return errDescr;
 
-
     }
 
-    inline bool isErr(int error) {
+    inline bool isErr(MotionErr error) {
 
         bool isErr = (error != MOTION_MANAGER_NO_ERR) &&
-                     (error != MOTION_MANAGER_MOTION_X_STOP_CORRECTLY);
+                     (error != MOTION_MANAGER_MOTION_X_STOP_CORRECTLY) &&
+                     (error != MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY) &&
+                     (error != MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY);
 
         return isErr;
 

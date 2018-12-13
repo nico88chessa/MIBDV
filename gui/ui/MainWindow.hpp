@@ -7,11 +7,11 @@
 
 #include <galil/GalilCNInspector.hpp>
 #include <galil/GalilPLCInspector.hpp>
+#include <IOInspector.hpp>
 
 #include <IOManager.hpp>
 #include <MotionManager.hpp>
 #include <DeviceConnectionWatcher.hpp>
-
 
 namespace Ui {
 class MainWindow;
@@ -25,10 +25,9 @@ private:
 
     QScopedPointer<PROGRAM_NAMESPACE::ErrorManager> errorManager;
 
-//    QScopedPointer<QThread> galilCNInspectorThread;
     QScopedPointer<PROGRAM_NAMESPACE::GalilCNInspector> galilCNInspector;
-//    QScopedPointer<QThread> galilPLCInspectorThread;
     QScopedPointer<PROGRAM_NAMESPACE::GalilPLCInspector> galilPLCInspector;
+    QScopedPointer<PROGRAM_NAMESPACE::IOInspector> ioInspector;
 
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
@@ -50,6 +49,7 @@ private:
     void initDevices();
     void initGalilCNInspector();
     void initGalilPLCInspector();
+    void initIOInspector();
     void initCNConnectionWatcher();
     void initPLCConnectionWatcher();
 
@@ -65,8 +65,11 @@ private slots:
     void stopDevices();
 
 signals:
-    void galilCNStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilCNStatusBean& status);
-    void galilPLCStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilPLCStatusBean& status);
+    void galilCNStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilCNStatusBean status);
+    void galilPLCStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilPLCStatusBean status);
+    void ioStatusUpdateSignal(const PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus& digitalInputs,
+                              const PROGRAM_NAMESPACE::IOInspector::DigitalOutputStatus& digitalOutputs,
+                              const PROGRAM_NAMESPACE::IOInspector::AnalogInputStatus& analogInputs);
 
 };
 

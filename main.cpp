@@ -10,6 +10,8 @@
 
 #include <configure.h>
 
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
+
 void loadCustomFont() {
 
     using namespace PROGRAM_NAMESPACE;
@@ -41,7 +43,12 @@ void registerMetatypes() {
     traceEnter;
 
     qRegisterMetaType<PROGRAM_NAMESPACE::GalilCNStatusBean>("GalilCNStatusBean");
-    qRegisterMetaType<PROGRAM_NAMESPACE::MotionBean>("mibdv::MotionBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::GalilPLCStatusBean>("GalilPLCStatusBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MotionBean>("MotionBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DeviceKey>("DeviceKey");
+    qRegisterMetaType<PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus>("DigitalInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::IOInspector::DigitalOutputStatus>("DigitalOutputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::IOInspector::AnalogInputStatus>("AnalogInputStatus");
 
     traceExit;
 
@@ -57,9 +64,9 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     QCoreApplication::setApplicationName(PROGRAM_NAMESPACE::APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(PROGRAM_NAMESPACE::APPLICATION_VERSION);
 
-    loadCustomFont();
-
     registerMetatypes();
+
+    loadCustomFont();
 
     MainWindow mainWindow;
     mainWindow.show();

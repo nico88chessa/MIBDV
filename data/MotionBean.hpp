@@ -180,4 +180,6 @@ public:
 
 }
 
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::MotionBean)
+
 #endif // MOTIONBEAN_HPP

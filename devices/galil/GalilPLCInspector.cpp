@@ -89,7 +89,6 @@ void GalilPLCInspector::restartProcess() {
 }
 
 
-
 void GalilPLCInspector::startProcess() {
 
     traceEnter;

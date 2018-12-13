@@ -383,12 +383,14 @@ public:
     short getAxisCTorque() const { return axisCTorque; }
     unsigned short getAxisCAnalogIn() const { return axisCAnalogIn; }
     bool getDigitalInput(int i) const {
-        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
-        return digitalInputs[i];
+        if (i<1 || i>GALIL_CN_DIGITAL_INPUTS)
+            throw DigitalInputOutOfBoundException();
+        return digitalInputs[i-1];
     }
     bool getDigitalOutput(int i) const {
-        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
-        return digitalOutputs[i];
+        if (i<1 || i>GALIL_CN_DIGITAL_INPUTS)
+            throw DigitalOutputOutOfBoundException();
+        return digitalOutputs[i-1];
     }
 
 };

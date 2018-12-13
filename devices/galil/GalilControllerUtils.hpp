@@ -1,6 +1,8 @@
 #ifndef GALILCONTROLLERUTILS_HPP
 #define GALILCONTROLLERUTILS_HPP
 
+#include <exception>
+
 #include <gclibo.h>
 #include <gclib_errors.h>
 
@@ -11,6 +13,30 @@
 #include <QString>
 
 namespace PROGRAM_NAMESPACE {
+
+class DigitalInputOutOfBoundException : public std::exception {
+    virtual const char* what() const noexcept {
+        return "Digital input out of bound exception";
+    }
+};
+
+class DigitalOutputOutOfBoundException : public std::exception {
+    virtual const char* what() const noexcept {
+        return "Digital output out of bound exception";
+    }
+};
+
+class AnalogInputOutOfBoundException : public std::exception {
+    virtual const char* what() const noexcept {
+        return "Digital output out of bound exception";
+    }
+};
+
+class AnalogOutputOutOfBoundException : public std::exception {
+    virtual const char* what() const noexcept {
+        return "Digital output out of bound exception";
+    }
+};
 
 static constexpr int GALIL_CN_DIGITAL_INPUTS = 8;
 static constexpr int GALIL_CN_DIGITAL_OUTPUTS = 8;

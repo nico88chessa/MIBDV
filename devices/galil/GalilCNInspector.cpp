@@ -110,6 +110,18 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
             emit axisYMotionStopSignal();
     }
 
+    // check forward limit asse y
+    bool isForwardLimitAxisY = newStatus.getAxisBForwardLimit();
+    if (isForwardLimitAxisY)
+        if (isForwardLimitAxisY != lastStatus.getAxisBForwardLimit())
+            emit axisYForwardLimitSignal();
+
+    // check backward limit asse y
+    bool isBackwardLimitAxisY = newStatus.getAxisBReverseLimit();
+    if (isBackwardLimitAxisY)
+        if (isBackwardLimitAxisY != lastStatus.getAxisBReverseLimit())
+            emit axisYBackwardLimitSignal();
+
     // check coppia asse z
     bool isMotorZOff = newStatus.getAxisCMotorOff();
     if (isMotorZOff) {
@@ -123,6 +135,18 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
         if (isMovingAxisZ != lastStatus.getAxisCMoveInProgress())
             emit axisZMotionStopSignal();
     }
+
+    // check forward limit asse z
+    bool isForwardLimitAxisZ = newStatus.getAxisCForwardLimit();
+    if (isForwardLimitAxisZ)
+        if (isForwardLimitAxisZ != lastStatus.getAxisCForwardLimit())
+            emit axisZForwardLimitSignal();
+
+    // check backward limit asse z
+    bool isBackwardLimitAxisZ = newStatus.getAxisCReverseLimit();
+    if (isBackwardLimitAxisZ)
+        if (isBackwardLimitAxisZ != lastStatus.getAxisCReverseLimit())
+            emit axisZBackwardLimitSignal();
 
     traceExit;
 
@@ -146,7 +170,6 @@ void GalilCNInspector::process() {
             Q_UNUSED(e)
             traceErr() << "Errore nel recupero dello stato da GalilCNInspector";
         }
-
 
     } else
         handleDisconnection();
@@ -181,8 +204,6 @@ void GalilCNInspector::restartProcess() {
     traceExit;
 
 }
-
-
 
 void GalilCNInspector::startProcess() {
 

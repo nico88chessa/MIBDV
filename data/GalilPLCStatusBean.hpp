@@ -123,20 +123,24 @@ public:
     bool getProgramRunning() const { return programRunning; }
     bool getWaitingInputFromINCommand() const { return waitingInputFromINCommand; }
     bool getDigitalInput(int i) const {
-        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
-        return digitalInputs[i];
+        if (i<1 || i>GALIL_PLC_DIGITAL_INPUTS)
+            throw DigitalInputOutOfBoundException();
+        return digitalInputs[i-1];
     }
     bool getDigitalOutput(int i) const {
-        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
-        return digitalOutputs[i];
+        if (i<1 || i>GALIL_PLC_DIGITAL_OUTPUTS)
+            throw DigitalOutputOutOfBoundException();
+        return digitalOutputs[i-1];
     }
     analogReal getAnalogInput(int i) const {
-        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
-        return analogInputs[i];
+        if (i<1 || i>GALIL_PLC_ANALOG_INPUTS)
+            throw AnalogInputOutOfBoundException();
+        return analogInputs[i-1];
     }
     analogReal getAnalogOutput(int i) const {
-        // TODO NIC 31/10/2018 - gestire eccezione di indice fuori range (usare eccezione)
-        return analogOutputs[i];
+        if (i<1 || i>GALIL_PLC_ANALOG_OUTPUTS)
+            throw AnalogOutputOutOfBoundException();
+        return analogOutputs[i-1];
     }
 
 };

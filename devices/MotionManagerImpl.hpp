@@ -20,7 +20,6 @@ public:
 private:
     using S = typename PROGRAM_NAMESPACE::isCN<T>::statusType;
     using E = typename PROGRAM_NAMESPACE::isCN<T>::errorType;
-//    using ACN = typename PROGRAM_NAMESPACE::AbstractCN<S,E>;
 
     constexpr typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr cnImpl() {
         return static_cast<typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr>(cn.data());
@@ -38,9 +37,9 @@ public:
 
     }
 
-protected:
+private:
 
-    virtual bool moveXImpl(posType posMm) {
+    bool moveImpl(Axis a, posType pos, spdCNType speed, accCNType acc, accCNType dec) {
 
         traceEnter;
 
@@ -49,15 +48,7 @@ protected:
             return false;
         }
 
-        Settings& s = Settings::instance();
-
-        int resolution = s.getAxisXStepPerMm();
-        posCNType pos = qRound(posMm * resolution);
-        spdCNType speed = s.getAxisXOperativeSpeedMms() * resolution;
-        accCNType acc = s.getAxisXOperativeAccMms2() * resolution;
-        accCNType dec = s.getAxisXOperativeDecMms2() * resolution;
-
-        E err = cn->moveToPosition(Axis::X, pos, speed, acc, dec);
+        E err = cn->moveToPosition(a, pos, speed, acc, dec);
 
         if (cn->isError(err)) {
             traceErr() << "Errore nell'invio dei comandi di spostamento dell'asse X. Err: " << err;
@@ -65,7 +56,7 @@ protected:
             return false;
         }
 
-        err = cn->startMoveAxis(Axis::X);
+        err = cn->startMoveAxis(a);
 
         if (cn->isError(err)) {
             traceErr() << "Errore nello start movimentazione dell'asse X. Err: " << err;
@@ -79,7 +70,7 @@ protected:
 
     }
 
-    bool isMotorXOff(bool& res) {
+    bool isMotorOff(Axis a, bool& res) {
 
         traceEnter;
 
@@ -88,10 +79,10 @@ protected:
             return false;
         }
 
-        E err = cn->isMotorOff(Axis::X, res);
+        E err = cn->isMotorOff(a, res);
 
         if (cn->isError(err)) {
-            traceErr() << "Errore check motor off: " << err;
+            traceErr() << "Errore controllo motor off: " << err;
             traceErr() << "Descrizione errore: " << cn->decodeError(err);
             return false;
         }
@@ -102,6 +93,105 @@ protected:
 
     }
 
+    bool stopMotor(Axis a) {
+
+        traceEnter;
+
+        if (cn.isNull()) {
+            traceErr() << "CN non inizializzato";
+            return false;
+        }
+
+        E err = cn->stopAxis(a);
+
+        if (cn->isError(err)) {
+            traceErr() << "Errore comando stop motore: " << err;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
+            return false;
+        }
+
+        traceExit;
+
+        return true;
+
+    }
+
+protected:
+
+    virtual bool moveXImpl(posType pos, spdCNType speed, accCNType acc, accCNType dec) override {
+
+        traceEnter;
+        bool isOk = moveImpl(Axis::X, pos, speed, acc, dec);
+        traceExit;
+        return isOk;
+
+    }
+
+    virtual bool moveYImpl(posType pos, spdCNType speed, accCNType acc, accCNType dec) override {
+
+        traceEnter;
+        bool isOk = moveImpl(Axis::Y, pos, speed, acc, dec);
+        traceExit;
+        return isOk;
+
+    }
+
+    virtual bool moveZImpl(posType pos, spdCNType speed, accCNType acc, accCNType dec) override {
+
+        traceEnter;
+        bool isOk = moveImpl(Axis::Z, pos, speed, acc, dec);
+        traceExit;
+        return isOk;
+
+    }
+
+    virtual bool isMotorXOff(bool& res) {
+
+        traceEnter;
+        bool isOk = isMotorOff(Axis::X, res);
+        traceExit;
+        return isOk;
+
+    }
+
+    virtual bool isMotorYOff(bool& res) {
+
+        traceEnter;
+        bool isOk = isMotorOff(Axis::Y, res);
+        traceExit;
+        return isOk;
+
+    }
+
+    virtual bool isMotorZOff(bool& res) {
+
+        traceEnter;
+        bool isOk = isMotorOff(Axis::Z, res);
+        traceExit;
+        return isOk;
+
+    }
+
+    virtual bool stopXImpl() override {
+        traceEnter;
+        bool isOk = this->stopMotor(Axis::X);
+        traceExit;
+        return isOk;
+    }
+
+    virtual bool stopYImpl() override {
+        traceEnter;
+        bool isOk = this->stopMotor(Axis::Y);
+        traceExit;
+        return isOk;
+    }
+
+    virtual bool stopZImpl() override {
+        traceEnter;
+        bool isOk = this->stopMotor(Axis::Z);
+        traceExit;
+        return isOk;
+    }
 };
 
 }

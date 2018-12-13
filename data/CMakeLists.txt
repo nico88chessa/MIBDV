@@ -3,6 +3,9 @@ SET(ITEMS
     DigitalInput
     DigitalOutput
     AnalogInput
+    DigitalInputValue
+    DigitalOutputValue
+    AnalogInputValue
     Error
     GalilCNStatusBean
     GalilPLCStatusBean

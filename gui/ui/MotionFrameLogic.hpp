@@ -5,6 +5,7 @@
 #include <QSharedPointer>
 
 #include <MotionManager.hpp>
+#include <IOManager.hpp>
 
 class MotionFrame;
 
@@ -20,16 +21,30 @@ public:
 private:
     MotionFrame* qPtr;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
-    const int TIMER_CHECK_MOTION_MS = 1*1000;
+    QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
+    const int TIMER_CHECK_MOTION_MS = 500;
 
 public:
     MotionFrameLogic();
     ~MotionFrameLogic();
 
-    void setupLogic(const QSharedPointer<mibdv::MotionManager>& motionManager);
+    void setupMotionManager(const QSharedPointer<mibdv::MotionManager>& motionManager);
+    void setupIOManager(const QSharedPointer<mibdv::IOManager>& ioManager);
+
+private:
+    bool checkCycle();
 
 private slots:
-    void moveAxisX();
+    void moveX();
+    void moveY();
+    void moveZ();
+
+    void stopX();
+    void stopY();
+    void stopZ();
+
+    void resetAxes();
+    void stopAxes();
 
 };
 

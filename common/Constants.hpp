@@ -6,9 +6,12 @@
 
 namespace PROGRAM_NAMESPACE {
 
-//inline bool operator<(const IOType left, const IOType right) {
-//    return static_cast<int>(left) < static_cast<int>(right);
-//}
+constexpr double EPSILON = 2.0;
+
+constexpr int DIGITAL_INPUT_CHANNEL_NONE = -1;
+constexpr int DIGITAL_OUTPUT_CHANNEL_NONE = -1;
+constexpr int ANALOG_INPUT_CHANNEL_NONE = -1;
+constexpr int ANALOG_OUTPUT_CHANNEL_NONE = -1;
 
 constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16;
 
