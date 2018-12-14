@@ -28,6 +28,9 @@ constexpr char AXIS_X_MANUAL_DEC_MMS2[] = "AxisX/ManualDecMms2";
 constexpr char AXIS_X_OPERATIVE_SPEED_MMS[] = "AxisX/OperativeSpeedMms";
 constexpr char AXIS_X_OPERATIVE_ACC_MMS2[] = "AxisX/OperativeAccMms2";
 constexpr char AXIS_X_OPERATIVE_DEC_MMS2[] = "AxisX/OperativeDecMms2";
+constexpr char AXIS_X_HOMING_SPEED_MMS[] = "AxisX/HomingSpeedMms";
+constexpr char AXIS_X_HOMING_ACC_MMS2[] = "AxisX/HomingAccMms2";
+constexpr char AXIS_X_HOMING_DEC_MMS2[] = "AxisX/HomingDecMms2";
 
 constexpr int AXIS_X_STEP_PER_MM_DFLT = 16385;
 constexpr int AXIS_X_MIN_POS_MM_DFLT = 0;
@@ -39,6 +42,9 @@ constexpr real AXIS_X_MANUAL_DEC_MMS2_DFLT = 10;
 constexpr real AXIS_X_OPERATIVE_SPEED_MMS_DFLT = 10;
 constexpr real AXIS_X_OPERATIVE_ACC_MMS2_DFLT = 10;
 constexpr real AXIS_X_OPERATIVE_DEC_MMS2_DFLT = 10;
+constexpr real AXIS_X_HOMING_SPEED_MMS_DFLT = AXIS_X_MANUAL_SPEED_MMS_DFLT;
+constexpr real AXIS_X_HOMING_ACC_MMS2_DFLT = AXIS_X_MANUAL_ACC_MMS2_DFLT;
+constexpr real AXIS_X_HOMING_DEC_MMS2_DFLT = AXIS_X_MANUAL_DEC_MMS2_DFLT;
 
 constexpr char AXIS_Y_STEP_PER_MM[] = "AxisY/StepPerMm";
 constexpr char AXIS_Y_MIN_POS_MM[] = "AxisY/MinPosMm";
@@ -50,6 +56,9 @@ constexpr char AXIS_Y_MANUAL_DEC_MMS2[] = "AxisY/ManualDecMms2";
 constexpr char AXIS_Y_OPERATIVE_SPEED_MMS[] = "AxisY/OperativeSpeedMms";
 constexpr char AXIS_Y_OPERATIVE_ACC_MMS2[] = "AxisY/OperativeAccMms2";
 constexpr char AXIS_Y_OPERATIVE_DEC_MMS2[] = "AxisY/OperativeDecMms2";
+constexpr char AXIS_Y_HOMING_SPEED_MMS[] = "AxisY/HomingSpeedMms";
+constexpr char AXIS_Y_HOMING_ACC_MMS2[] = "AxisY/HomingAccMms2";
+constexpr char AXIS_Y_HOMING_DEC_MMS2[] = "AxisY/HomingDecMms2";
 
 constexpr int AXIS_Y_STEP_PER_MM_DFLT = 1000;
 constexpr int AXIS_Y_MIN_POS_MM_DFLT = 0;
@@ -61,6 +70,9 @@ constexpr real AXIS_Y_MANUAL_DEC_MMS2_DFLT = 10;
 constexpr real AXIS_Y_OPERATIVE_SPEED_MMS_DFLT = 10;
 constexpr real AXIS_Y_OPERATIVE_ACC_MMS2_DFLT = 10;
 constexpr real AXIS_Y_OPERATIVE_DEC_MMS2_DFLT = 10;
+constexpr real AXIS_Y_HOMING_SPEED_MMS_DFLT = AXIS_Y_MANUAL_SPEED_MMS_DFLT;
+constexpr real AXIS_Y_HOMING_ACC_MMS2_DFLT = AXIS_Y_MANUAL_ACC_MMS2_DFLT;
+constexpr real AXIS_Y_HOMING_DEC_MMS2_DFLT = AXIS_Y_MANUAL_DEC_MMS2_DFLT;
 
 constexpr char AXIS_Z_STEP_PER_MM[] = "AxisZ/StepPerMm";
 constexpr char AXIS_Z_MIN_POS_MM[] = "AxisZ/MinPosMm";
@@ -72,6 +84,9 @@ constexpr char AXIS_Z_MANUAL_DEC_MMS2[] = "AxisZ/ManualDecMms2";
 constexpr char AXIS_Z_OPERATIVE_SPEED_MMS[] = "AxisZ/OperativeSpeedMms";
 constexpr char AXIS_Z_OPERATIVE_ACC_MMS2[] = "AxisZ/OperativeAccMms2";
 constexpr char AXIS_Z_OPERATIVE_DEC_MMS2[] = "AxisZ/OperativeDecMms2";
+constexpr char AXIS_Z_HOMING_SPEED_MMS[] = "AxisZ/HomingSpeedMms";
+constexpr char AXIS_Z_HOMING_ACC_MMS2[] = "AxisZ/HomingAccMms2";
+constexpr char AXIS_Z_HOMING_DEC_MMS2[] = "AxisZ/HomingDecMms2";
 
 constexpr int AXIS_Z_STEP_PER_MM_DFLT = 200;
 constexpr int AXIS_Z_MIN_POS_MM_DFLT = 0;
@@ -83,6 +98,9 @@ constexpr real AXIS_Z_MANUAL_DEC_MMS2_DFLT = 10;
 constexpr real AXIS_Z_OPERATIVE_SPEED_MMS_DFLT = 10;
 constexpr real AXIS_Z_OPERATIVE_ACC_MMS2_DFLT = 10;
 constexpr real AXIS_Z_OPERATIVE_DEC_MMS2_DFLT = 10;
+constexpr real AXIS_Z_HOMING_SPEED_MMS_DFLT = AXIS_Z_MANUAL_SPEED_MMS_DFLT;
+constexpr real AXIS_Z_HOMING_ACC_MMS2_DFLT = AXIS_Z_MANUAL_ACC_MMS2_DFLT;
+constexpr real AXIS_Z_HOMING_DEC_MMS2_DFLT = AXIS_Z_MANUAL_DEC_MMS2_DFLT;
 
 constexpr char DIGITAL_INPUT_TYPE[] = "Type";
 constexpr char DIGITAL_INPUT_NAME[] = "Name";

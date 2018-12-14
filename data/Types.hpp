@@ -10,9 +10,9 @@ using real = float;
 using realHR = double; // real high resolution
 using analogReal = double;
 
-using posCNType = int;
-using spdCNType = double;
-using accCNType = double;
+using posCNType = int; // sono impulsi, quindi uso un numero intero
+using spdCNType = int; // sono impulsi, quindi uso un numero intero
+using accCNType = int; // sono impulsi, quindi uso un numero intero
 
 using anlType = double;
 

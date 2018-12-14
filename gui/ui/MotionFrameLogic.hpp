@@ -43,7 +43,7 @@ private slots:
     void stopY();
     void stopZ();
 
-    void resetAxes();
+    void homeAxes();
     void stopAxes();
 
 };

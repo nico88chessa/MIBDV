@@ -41,9 +41,9 @@ MotionErr MotionManager::moveX(posType posMm) {
 
     int resolution = s.getAxisXStepPerMm();
     posCNType pos = qRound(posMm * resolution);
-    spdCNType speed = s.getAxisXOperativeSpeedMms() * resolution;
-    accCNType acc = s.getAxisXOperativeAccMms2() * resolution;
-    accCNType dec = s.getAxisXOperativeDecMms2() * resolution;
+    spdCNType speed = qRound(s.getAxisXOperativeSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisXOperativeAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisXOperativeDecMms2() * resolution);
 
     if (!this->moveXImpl(pos, speed, acc, dec))
         return MOTION_MANAGER_ERR_CN_PROBLEM;
@@ -68,9 +68,9 @@ MotionErr MotionManager::moveXManual(posType posMm) {
 
     int resolution = s.getAxisXStepPerMm();
     posCNType pos = qRound(posMm * resolution);
-    spdCNType speed = s.getAxisXManualSpeedMms() * resolution;
-    accCNType acc = s.getAxisXManualAccMms2() * resolution;
-    accCNType dec = s.getAxisXManualDecMms2() * resolution;
+    spdCNType speed = qRound(s.getAxisXManualSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisXManualAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisXManualDecMms2() * resolution);
 
     if (!this->moveXImpl(pos, speed, acc, dec))
         return MOTION_MANAGER_ERR_CN_PROBLEM;
@@ -92,6 +92,33 @@ MotionErr MotionManager::stopX() {
 
 }
 
+MotionErr MotionManager::homeX() {
+
+    traceEnter;
+
+    bool check;
+    if (!this->isMotorXOff(check))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
+
+    if (check)
+        return MOTION_MANAGER_MOTOR_X_OFF;
+
+    Settings& s = Settings::instance();
+
+    int resolution = s.getAxisXStepPerMm();
+    spdCNType speed = qRound(s.getAxisXHomingSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisXHomingAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisXHomingDecMms2() * resolution);
+
+    traceExit;
+
+    if (!this->homeXImpl(speed, acc, dec))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
+    else
+        return MOTION_MANAGER_NO_ERR;
+
+}
+
 MotionErr MotionManager::moveY(posType posMm) {
 
     traceEnter;
@@ -107,9 +134,9 @@ MotionErr MotionManager::moveY(posType posMm) {
 
     int resolution = s.getAxisYStepPerMm();
     posCNType pos = qRound(posMm * resolution);
-    spdCNType speed = s.getAxisYOperativeSpeedMms() * resolution;
-    accCNType acc = s.getAxisYOperativeAccMms2() * resolution;
-    accCNType dec = s.getAxisYOperativeDecMms2() * resolution;
+    spdCNType speed = qRound(s.getAxisYOperativeSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisYOperativeAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisYOperativeDecMms2() * resolution);
 
     if (!this->moveYImpl(pos, speed, acc, dec))
         return MOTION_MANAGER_ERR_CN_PROBLEM;
@@ -134,9 +161,9 @@ MotionErr MotionManager::moveYManual(posType posMm) {
 
     int resolution = s.getAxisYStepPerMm();
     posCNType pos = qRound(posMm * resolution);
-    spdCNType speed = s.getAxisYManualSpeedMms() * resolution;
-    accCNType acc = s.getAxisYManualAccMms2() * resolution;
-    accCNType dec = s.getAxisYManualDecMms2() * resolution;
+    spdCNType speed = qRound(s.getAxisYManualSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisYManualAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisYManualDecMms2() * resolution);
 
     if (!this->moveYImpl(pos, speed, acc, dec))
         return MOTION_MANAGER_ERR_CN_PROBLEM;
@@ -158,6 +185,33 @@ MotionErr MotionManager::stopY() {
 
 }
 
+MotionErr MotionManager::homeY() {
+
+    traceEnter;
+
+    bool check;
+    if (!this->isMotorYOff(check))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
+
+    if (check)
+        return MOTION_MANAGER_MOTOR_Y_OFF;
+
+    Settings& s = Settings::instance();
+
+    int resolution = s.getAxisYStepPerMm();
+    spdCNType speed = qRound(s.getAxisYHomingSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisYHomingAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisYHomingDecMms2() * resolution);
+
+    traceExit;
+
+    if (!this->homeYImpl(speed, acc, dec))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
+    else
+        return MOTION_MANAGER_NO_ERR;
+
+}
+
 MotionErr MotionManager::moveZ(posType posMm) {
 
     traceEnter;
@@ -173,9 +227,9 @@ MotionErr MotionManager::moveZ(posType posMm) {
 
     int resolution = s.getAxisZStepPerMm();
     posCNType pos = qRound(posMm * resolution);
-    spdCNType speed = s.getAxisZOperativeSpeedMms() * resolution;
-    accCNType acc = s.getAxisZOperativeAccMms2() * resolution;
-    accCNType dec = s.getAxisZOperativeDecMms2() * resolution;
+    spdCNType speed = qRound(s.getAxisZOperativeSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisZOperativeAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisZOperativeDecMms2() * resolution);
 
     if (!this->moveZImpl(pos, speed, acc, dec))
         return MOTION_MANAGER_ERR_CN_PROBLEM;
@@ -200,9 +254,9 @@ MotionErr MotionManager::moveZManual(posType posMm) {
 
     int resolution = s.getAxisZStepPerMm();
     posCNType pos = qRound(posMm * resolution);
-    spdCNType speed = s.getAxisZManualSpeedMms() * resolution;
-    accCNType acc = s.getAxisZManualAccMms2() * resolution;
-    accCNType dec = s.getAxisZManualDecMms2() * resolution;
+    spdCNType speed = qRound(s.getAxisZManualSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisZManualAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisZManualDecMms2() * resolution);
 
     if (!this->moveZImpl(pos, speed, acc, dec))
         return MOTION_MANAGER_ERR_CN_PROBLEM;
@@ -222,6 +276,33 @@ MotionErr MotionManager::stopZ() {
 
     if (!res)
         return MOTION_MANAGER_STOP_COMMAND_Z_ERR;
+    else
+        return MOTION_MANAGER_NO_ERR;
+
+}
+
+MotionErr MotionManager::homeZ() {
+
+    traceEnter;
+
+    bool check;
+    if (!this->isMotorZOff(check))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
+
+    if (check)
+        return MOTION_MANAGER_MOTOR_Z_OFF;
+
+    Settings& s = Settings::instance();
+
+    int resolution = s.getAxisZStepPerMm();
+    spdCNType speed = qRound(s.getAxisZHomingSpeedMms() * resolution);
+    accCNType acc = qRound(s.getAxisZHomingAccMms2() * resolution);
+    accCNType dec = qRound(s.getAxisZHomingDecMms2() * resolution);
+
+    traceExit;
+
+    if (!this->homeZImpl(speed, acc, dec))
+        return MOTION_MANAGER_ERR_CN_PROBLEM;
     else
         return MOTION_MANAGER_NO_ERR;
 

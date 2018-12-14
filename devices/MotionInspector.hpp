@@ -24,16 +24,22 @@ signals:
     void axisXMotionStopSignal();
     void axisXForwardLimitSignal();
     void axisXBackwardLimitSignal();
+    void axisXHomeInProgressStartSignal();
+    void axisXHomeInProgressStopSignal();
 
     void axisYMotorOffSignal();
     void axisYMotionStopSignal();
     void axisYForwardLimitSignal();
     void axisYBackwardLimitSignal();
+    void axisYHomeInProgressStartSignal();
+    void axisYHomeInProgressStopSignal();
 
     void axisZMotorOffSignal();
     void axisZMotionStopSignal();
     void axisZForwardLimitSignal();
     void axisZBackwardLimitSignal();
+    void axisZHomeInProgressStartSignal();
+    void axisZHomeInProgressStopSignal();
 
 };
 

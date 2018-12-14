@@ -53,6 +53,10 @@ public:
     real getAxisXOperativeSpeedMms() const { return axisXOperativeSpeedMms; }
     real getAxisXOperativeAccMms2() const { return axisXOperativeAccMms2; }
     real getAxisXOperativeDecMms2() const { return axisXOperativeDecMms2; }
+    real getAxisXHomingSpeedMms() const { return axisXHomingSpeedMms; }
+    real getAxisXHomingAccMms2() const { return axisXHomingAccMms2; }
+    real getAxisXHomingDecMms2() const { return axisXHomingDecMms2; }
+
     int getAxisYStepPerMm() const { return axisYStepPerMm; }
     int getAxisYMinPosMm() const { return axisYMinPosMm; }
     int getAxisYMaxPosMm() const { return axisYMaxPosMm; }
@@ -63,6 +67,10 @@ public:
     real getAxisYOperativeSpeedMms() const { return axisYOperativeSpeedMms; }
     real getAxisYOperativeAccMms2() const { return axisYOperativeAccMms2; }
     real getAxisYOperativeDecMms2() const { return axisYOperativeDecMms2; }
+    real getAxisYHomingSpeedMms() const { return axisYHomingSpeedMms; }
+    real getAxisYHomingAccMms2() const { return axisYHomingAccMms2; }
+    real getAxisYHomingDecMms2() const { return axisYHomingDecMms2; }
+
     int getAxisZStepPerMm() const { return axisZStepPerMm; }
     int getAxisZMinPosMm() const { return axisZMinPosMm; }
     int getAxisZMaxPosMm() const { return axisZMaxPosMm; }
@@ -73,6 +81,9 @@ public:
     real getAxisZOperativeSpeedMms() const { return axisZOperativeSpeedMms; }
     real getAxisZOperativeAccMms2() const { return axisZOperativeAccMms2; }
     real getAxisZOperativeDecMms2() const { return axisZOperativeDecMms2; }
+    real getAxisZHomingSpeedMms() const { return axisZHomingSpeedMms; }
+    real getAxisZHomingAccMms2() const { return axisZHomingAccMms2; }
+    real getAxisZHomingDecMms2() const { return axisZHomingDecMms2; }
 
     const QMap<IOType, DigitalInput>& getDigitalInputs() const { return digitalInputs; }
     const QMap<IOType, DigitalOutput>& getDigitalOutputs() const { return digitalOutputs; }
@@ -116,6 +127,9 @@ private:
     real axisXOperativeSpeedMms;
     real axisXOperativeAccMms2;
     real axisXOperativeDecMms2;
+    real axisXHomingSpeedMms;
+    real axisXHomingAccMms2;
+    real axisXHomingDecMms2;
 
     // ASSE Y
     int axisYStepPerMm;
@@ -128,6 +142,9 @@ private:
     real axisYOperativeSpeedMms;
     real axisYOperativeAccMms2;
     real axisYOperativeDecMms2;
+    real axisYHomingSpeedMms;
+    real axisYHomingAccMms2;
+    real axisYHomingDecMms2;
 
     // ASSE Z
     int axisZStepPerMm;
@@ -140,6 +157,9 @@ private:
     real axisZOperativeSpeedMms;
     real axisZOperativeAccMms2;
     real axisZOperativeDecMms2;
+    real axisZHomingSpeedMms;
+    real axisZHomingAccMms2;
+    real axisZHomingDecMms2;
 
     // IO
     QMap<IOType, DigitalInput> digitalInputs;

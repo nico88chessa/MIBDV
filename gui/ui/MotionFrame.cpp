@@ -348,14 +348,108 @@ void MotionFrameLogic::stopZ() {
 
 }
 
-// TODO NIC 13/12/2018
-void MotionFrameLogic::resetAxes() {
+void MotionFrameLogic::homeAxes() {
 
     traceEnter;
 
     if (!this->checkCycle())
         return;
 
+    int res;
+    res = motionManager->homeZ();
+
+    if (motionManager->isErr(res)) {
+
+        DialogAlert diag;
+        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.exec();
+        return;
+
+    } else {
+
+        qPtr->isHomingAxes = true;
+        QEventLoop loop;
+        res = MOTION_MANAGER_NO_ERR;
+        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_POWER_OFF;
+            }
+        });
+        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_CYCLE_OFF;
+            }
+        });
+        QMetaObject::Connection c3 = connect(motionManager.data(), &MotionManager::axisZMotorOffSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_MOTOR_Z_OFF;
+            }
+        });
+        QMetaObject::Connection c4 = connect(motionManager.data(), &MotionManager::axisZMotionStopSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+            }
+        });
+        QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal, [&]() {
+            if (loop.isRunning()) {
+                loop.quit();
+                res = MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY;
+            }
+        });
+        loop.exec();
+        QObject::disconnect(c5);
+        QObject::disconnect(c4);
+        QObject::disconnect(c3);
+        QObject::disconnect(c2);
+        QObject::disconnect(c1);
+
+        if (motionManager->isErr(res)) {
+            DialogAlert diag;
+            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.exec();
+            qPtr->isHomingAxes = false;
+            return;
+        }
+
+        if (res != MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY) {
+            DialogAlert diag;
+            diag.setupLabels("Error", tr("Homing Z non completato"));
+            diag.exec();
+            qPtr->isHomingAxes = false;
+            return;
+        }
+
+    }
+
+    res = motionManager->homeX();
+
+    if (motionManager->isErr(res)) {
+
+        DialogAlert diag;
+        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.exec();
+        qPtr->isHomingAxes = false;
+        return;
+
+    }
+
+    res = motionManager->homeY();
+
+    if (motionManager->isErr(res)) {
+
+        DialogAlert diag;
+        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.exec();
+        qPtr->isHomingAxes = false;
+        return;
+
+    }
+
+    qPtr->isHomingAxes = false;
     traceExit;
 
 }
@@ -414,7 +508,7 @@ void MotionFrame::setupSignalsAndSlots() {
     connect(ui->pbStopY, &QPushButton::clicked, dPtr, &MotionFrameLogic::stopY);
     connect(ui->pbStopZ, &QPushButton::clicked, dPtr, &MotionFrameLogic::stopZ);
 
-    connect(ui->pbResetAxes, &QPushButton::clicked, dPtr, &MotionFrameLogic::resetAxes);
+    connect(ui->pbResetAxes, &QPushButton::clicked, dPtr, &MotionFrameLogic::homeAxes);
     connect(ui->pbStopAxes, &QPushButton::clicked, dPtr, &MotionFrameLogic::stopAxes);
 
     traceExit;
@@ -467,7 +561,8 @@ void MotionFrame::setupUi() {
 
 MotionFrame::MotionFrame(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::MotionFrame), dPtr(new MotionFrameLogic()) {
+    ui(new Ui::MotionFrame), dPtr(new MotionFrameLogic()),
+    isHomingAxes(false) {
 
     dPtr->qPtr = this;
 
@@ -529,9 +624,14 @@ void MotionFrame::updateUI() {
     ui->cbAxisZMoving->setChecked(motionBean.getAxisZMoveInProgress());
     ui->cbAxisZReverseLimit->setChecked(motionBean.getAxisZReverseLimit());
 
-    ui->pbMoveX->setEnabled(!motionBean.getAxisXMoveInProgress());
-    ui->pbMoveY->setEnabled(!motionBean.getAxisYMoveInProgress());
-    ui->pbMoveZ->setEnabled(!motionBean.getAxisZMoveInProgress());
+    ui->pbMoveX->setEnabled(!motionBean.getAxisXMoveInProgress() && !isHomingAxes);
+    ui->pbMoveY->setEnabled(!motionBean.getAxisYMoveInProgress() && !isHomingAxes);
+    ui->pbMoveZ->setEnabled(!motionBean.getAxisZMoveInProgress() && !isHomingAxes);
+
+    ui->pbResetAxes->setEnabled(
+                !motionBean.getAxisXMoveInProgress() &&
+                !motionBean.getAxisYMoveInProgress() &&
+                !motionBean.getAxisZMoveInProgress());
 
     traceExit;
 

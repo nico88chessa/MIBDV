@@ -116,6 +116,37 @@ private:
 
     }
 
+    bool homeImpl(Axis a, spdCNType speed, accCNType acc, accCNType dec) {
+
+        traceEnter;
+
+        if (cn.isNull()) {
+            traceErr() << "CN non inizializzato";
+            return false;
+        }
+
+        E err = cn->home(a, speed, acc, dec);
+
+        if (cn->isError(err)) {
+            traceErr() << "Errore comando stop motore: " << err;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
+            return false;
+        }
+
+        err = cn->startMoveAxis(a);
+
+        if (cn->isError(err)) {
+            traceErr() << "Errore nello start movimentazione dell'asse X. Err: " << err;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
+            return false;
+        }
+
+        traceExit;
+
+        return true;
+
+    }
+
 protected:
 
     virtual bool moveXImpl(posType pos, spdCNType speed, accCNType acc, accCNType dec) override {
@@ -173,25 +204,59 @@ protected:
     }
 
     virtual bool stopXImpl() override {
+
         traceEnter;
-        bool isOk = this->stopMotor(Axis::X);
+        bool isOk = stopMotor(Axis::X);
         traceExit;
         return isOk;
+
     }
 
     virtual bool stopYImpl() override {
+
         traceEnter;
-        bool isOk = this->stopMotor(Axis::Y);
+        bool isOk = stopMotor(Axis::Y);
         traceExit;
         return isOk;
+
     }
 
     virtual bool stopZImpl() override {
+
         traceEnter;
-        bool isOk = this->stopMotor(Axis::Z);
+        bool isOk = stopMotor(Axis::Z);
         traceExit;
         return isOk;
+
     }
+
+    bool homeXImpl(spdCNType speed, accCNType acc, accCNType dec) override {
+
+        traceEnter;
+        bool isOk = homeImpl(Axis::X, speed, acc, dec);
+        traceExit;
+        return isOk;
+
+    }
+
+    bool homeYImpl(spdCNType speed, accCNType acc, accCNType dec) override {
+
+        traceEnter;
+        bool isOk = homeImpl(Axis::Y, speed, acc, dec);
+        traceExit;
+        return isOk;
+
+    }
+
+    bool homeZImpl(spdCNType speed, accCNType acc, accCNType dec) override {
+
+        traceEnter;
+        bool isOk = homeImpl(Axis::Z, speed, acc, dec);
+        traceExit;
+        return isOk;
+
+    }
+
 };
 
 }

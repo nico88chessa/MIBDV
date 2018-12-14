@@ -42,6 +42,8 @@ private:
     PROGRAM_NAMESPACE::MotionBean motionBean;
     PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus digitalInputStatus;
 
+    bool isHomingAxes;
+
 public:
     explicit MotionFrame(QWidget *parent = nullptr);
     ~MotionFrame();

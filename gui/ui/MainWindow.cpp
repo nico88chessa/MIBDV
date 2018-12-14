@@ -233,16 +233,22 @@ void MainWindow::initDevices() {
                 connect(galilCNInspector.data(), &GalilCNInspector::axisXMotionStopSignal, motionManager.data(), &MotionManager::axisXMotionStopSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
 
                 connect(galilCNInspector.data(), &GalilCNInspector::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisYMotionStopSignal, motionManager.data(), &MotionManager::axisYMotionStopSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
 
                 connect(galilCNInspector.data(), &GalilCNInspector::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisZMotionStopSignal, motionManager.data(), &MotionManager::axisZMotionStopSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
                 connect(galilCNInspector.data(), &GalilCNInspector::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
+                connect(galilCNInspector.data(), &GalilCNInspector::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
             }
 
         }

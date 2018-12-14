@@ -96,6 +96,16 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
         if (isBackwardLimitAxisX != lastStatus.getAxisAReverseLimit())
             emit axisXBackwardLimitSignal();
 
+    // check homing in progress asse x
+    bool isHomingXInProgress = newStatus.getAxisAHmInProgress();
+    bool lastStatusHomeXInProgress = lastStatus.getAxisAHmInProgress();
+    if (isHomingXInProgress != lastStatusHomeXInProgress) {
+        if (isHomingXInProgress)
+            emit axisXHomeInProgressStartSignal();
+        else
+            emit axisXHomeInProgressStopSignal();
+    }
+
     // check coppia asse y
     bool isMotorYOff = newStatus.getAxisBMotorOff();
     if (isMotorYOff) {
@@ -122,6 +132,16 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
         if (isBackwardLimitAxisY != lastStatus.getAxisBReverseLimit())
             emit axisYBackwardLimitSignal();
 
+    // check homing in progress asse y
+    bool isHomingYInProgress = newStatus.getAxisBHmInProgress();
+    bool lastStatusHomeYInProgress = lastStatus.getAxisBHmInProgress();
+    if (isHomingYInProgress != lastStatusHomeYInProgress) {
+        if (isHomingYInProgress)
+            emit axisYHomeInProgressStartSignal();
+        else
+            emit axisYHomeInProgressStopSignal();
+    }
+
     // check coppia asse z
     bool isMotorZOff = newStatus.getAxisCMotorOff();
     if (isMotorZOff) {
@@ -147,6 +167,16 @@ void GalilCNInspector::analizeLastStatus(const GalilCNStatusBean& newStatus) {
     if (isBackwardLimitAxisZ)
         if (isBackwardLimitAxisZ != lastStatus.getAxisCReverseLimit())
             emit axisZBackwardLimitSignal();
+
+    // check homing in progress asse z
+    bool isHomingZInProgress = newStatus.getAxisCHmInProgress();
+    bool lastStatusHomeZInProgress = lastStatus.getAxisCHmInProgress();
+    if (isHomingZInProgress != lastStatusHomeZInProgress) {
+        if (isHomingZInProgress)
+            emit axisZHomeInProgressStartSignal();
+        else
+            emit axisZHomeInProgressStopSignal();
+    }
 
     traceExit;
 

@@ -25,6 +25,9 @@ static constexpr MotionErr MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY = PROGRAM_ERR_
 static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_X_ERR = PROGRAM_ERR_START_CODE + 12;
 static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Y_ERR = PROGRAM_ERR_START_CODE + 13;
 static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Z_ERR = PROGRAM_ERR_START_CODE + 14;
+static constexpr MotionErr MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 15;
+static constexpr MotionErr MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 16;
+static constexpr MotionErr MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 17;
 
 
 class MotionManager : public QObject {
@@ -41,14 +44,17 @@ public:
     MotionErr moveX(posType posMm);
     MotionErr moveXManual(posType posMm);
     MotionErr stopX();
+    MotionErr homeX();
 
     MotionErr moveY(posType posMm);
     MotionErr moveYManual(posType posMm);
     MotionErr stopY();
+    MotionErr homeY();
 
     MotionErr moveZ(posType posMm);
     MotionErr moveZManual(posType posMm);
     MotionErr stopZ();
+    MotionErr homeZ();
 
 protected:
     virtual bool moveXImpl(posType posMm, spdCNType speed, accCNType acc, accCNType dec) = 0;
@@ -59,10 +65,13 @@ protected:
     virtual bool stopYImpl() = 0;
     virtual bool stopZImpl() = 0;
 
-
     virtual bool isMotorXOff(bool& res) = 0;
     virtual bool isMotorYOff(bool& res) = 0;
     virtual bool isMotorZOff(bool& res) = 0;
+
+    virtual bool homeXImpl(spdCNType speed, accCNType acc, accCNType dec) = 0;
+    virtual bool homeYImpl(spdCNType speed, accCNType acc, accCNType dec) = 0;
+    virtual bool homeZImpl(spdCNType speed, accCNType acc, accCNType dec) = 0;
 
 signals:
     void powerOffSignal();
@@ -74,16 +83,22 @@ signals:
     void axisXMotionStopSignal();
     void axisXForwardLimitSignal();
     void axisXBackwardLimitSignal();
+    void axisXHomeInProgressStartSignal();
+    void axisXHomeInProgressStopSignal();
 
     void axisYMotorOffSignal();
     void axisYMotionStopSignal();
     void axisYForwardLimitSignal();
     void axisYBackwardLimitSignal();
+    void axisYHomeInProgressStartSignal();
+    void axisYHomeInProgressStopSignal();
 
     void axisZMotorOffSignal();
     void axisZMotionStopSignal();
     void axisZForwardLimitSignal();
     void axisZBackwardLimitSignal();
+    void axisZHomeInProgressStartSignal();
+    void axisZHomeInProgressStopSignal();
 
 public:
 
@@ -104,6 +119,9 @@ public:
             case MOTION_MANAGER_STOP_COMMAND_X_ERR: errDescr = tr("Errore nel comando di stop per l'asse X"); break;
             case MOTION_MANAGER_STOP_COMMAND_Y_ERR: errDescr = tr("Errore nel comando di stop per l'asse Y"); break;
             case MOTION_MANAGER_STOP_COMMAND_Z_ERR: errDescr = tr("Errore nel comando di stop per l'asse Z"); break;
+            case MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY: errDescr = tr("Homing asse X completato correttamente"); break;;
+            case MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY: errDescr = tr("Homing asse Y completato correttamente"); break;;
+            case MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY: errDescr = tr("Homing asse Z completato correttamente"); break;;
             default: ;
         }
         return errDescr;
@@ -115,7 +133,10 @@ public:
         bool isErr = (error != MOTION_MANAGER_NO_ERR) &&
                      (error != MOTION_MANAGER_MOTION_X_STOP_CORRECTLY) &&
                      (error != MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY) &&
-                     (error != MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY);
+                     (error != MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY) &&
+                     (error != MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY) &&
+                     (error != MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY) &&
+                     (error != MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY);
 
         return isErr;
 

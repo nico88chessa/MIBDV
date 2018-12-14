@@ -41,6 +41,9 @@ void Settings::loadValuesFromFile() {
     axisXOperativeSpeedMms = settings.value(AXIS_X_OPERATIVE_SPEED_MMS, AXIS_X_OPERATIVE_SPEED_MMS_DFLT).value<real>();
     axisXOperativeAccMms2 = settings.value(AXIS_X_OPERATIVE_ACC_MMS2, AXIS_X_OPERATIVE_ACC_MMS2_DFLT).value<real>();
     axisXOperativeDecMms2 = settings.value(AXIS_X_OPERATIVE_DEC_MMS2, AXIS_X_OPERATIVE_DEC_MMS2_DFLT).value<real>();
+    axisXHomingSpeedMms = settings.value(AXIS_X_HOMING_SPEED_MMS, AXIS_X_HOMING_SPEED_MMS_DFLT).value<real>();
+    axisXHomingAccMms2 = settings.value(AXIS_X_HOMING_ACC_MMS2, AXIS_X_HOMING_ACC_MMS2_DFLT).value<real>();
+    axisXHomingDecMms2 = settings.value(AXIS_X_HOMING_DEC_MMS2, AXIS_X_HOMING_DEC_MMS2_DFLT).value<real>();
 
     axisYStepPerMm = settings.value(AXIS_Y_STEP_PER_MM, AXIS_Y_STEP_PER_MM_DFLT).value<int>();
     axisYMinPosMm = settings.value(AXIS_Y_MIN_POS_MM, AXIS_Y_MIN_POS_MM_DFLT).value<int>();
@@ -52,6 +55,9 @@ void Settings::loadValuesFromFile() {
     axisYOperativeSpeedMms = settings.value(AXIS_Y_OPERATIVE_SPEED_MMS, AXIS_Y_OPERATIVE_SPEED_MMS_DFLT).value<real>();
     axisYOperativeAccMms2 = settings.value(AXIS_Y_OPERATIVE_ACC_MMS2, AXIS_Y_OPERATIVE_ACC_MMS2_DFLT).value<real>();
     axisYOperativeDecMms2 = settings.value(AXIS_Y_OPERATIVE_DEC_MMS2, AXIS_Y_OPERATIVE_DEC_MMS2_DFLT).value<real>();
+    axisYHomingSpeedMms = settings.value(AXIS_Y_HOMING_SPEED_MMS, AXIS_Y_HOMING_SPEED_MMS_DFLT).value<real>();
+    axisYHomingAccMms2 = settings.value(AXIS_Y_HOMING_ACC_MMS2, AXIS_Y_HOMING_ACC_MMS2_DFLT).value<real>();
+    axisYHomingDecMms2 = settings.value(AXIS_Y_HOMING_DEC_MMS2, AXIS_Y_HOMING_DEC_MMS2_DFLT).value<real>();
 
     axisZStepPerMm = settings.value(AXIS_Z_STEP_PER_MM, AXIS_Z_STEP_PER_MM_DFLT).value<int>();
     axisZMinPosMm = settings.value(AXIS_Z_MIN_POS_MM, AXIS_Z_MIN_POS_MM_DFLT).value<int>();
@@ -63,6 +69,9 @@ void Settings::loadValuesFromFile() {
     axisZOperativeSpeedMms = settings.value(AXIS_Z_OPERATIVE_SPEED_MMS, AXIS_Z_OPERATIVE_SPEED_MMS_DFLT).value<real>();
     axisZOperativeAccMms2 = settings.value(AXIS_Z_OPERATIVE_ACC_MMS2, AXIS_Z_OPERATIVE_ACC_MMS2_DFLT).value<real>();
     axisZOperativeDecMms2 = settings.value(AXIS_Z_OPERATIVE_DEC_MMS2, AXIS_Z_OPERATIVE_DEC_MMS2_DFLT).value<real>();
+    axisZHomingSpeedMms = settings.value(AXIS_Z_HOMING_SPEED_MMS, AXIS_Z_HOMING_SPEED_MMS_DFLT).value<real>();
+    axisZHomingAccMms2 = settings.value(AXIS_Z_HOMING_ACC_MMS2, AXIS_Z_HOMING_ACC_MMS2_DFLT).value<real>();
+    axisZHomingDecMms2 = settings.value(AXIS_Z_HOMING_DEC_MMS2, AXIS_Z_HOMING_DEC_MMS2_DFLT).value<real>();
 
     // lettura input digitali
     int size = settings.beginReadArray(Settings::ARRAY_DIGITAL_INPUT);
@@ -249,6 +258,9 @@ void Settings::writeValuesToFile() {
     settings.setValue(AXIS_X_OPERATIVE_SPEED_MMS, static_cast<double>(axisXOperativeSpeedMms));
     settings.setValue(AXIS_X_OPERATIVE_ACC_MMS2, static_cast<double>(axisXOperativeAccMms2));
     settings.setValue(AXIS_X_OPERATIVE_DEC_MMS2, static_cast<double>(axisXOperativeDecMms2));
+    settings.setValue(AXIS_X_HOMING_SPEED_MMS, static_cast<double>(axisXHomingSpeedMms));
+    settings.setValue(AXIS_X_HOMING_ACC_MMS2, static_cast<double>(axisXHomingAccMms2));
+    settings.setValue(AXIS_X_HOMING_DEC_MMS2, static_cast<double>(axisXHomingDecMms2));
 
     settings.setValue(AXIS_Y_STEP_PER_MM, static_cast<double>(axisYStepPerMm));
     settings.setValue(AXIS_Y_MIN_POS_MM, static_cast<double>(axisYMinPosMm));
@@ -260,6 +272,9 @@ void Settings::writeValuesToFile() {
     settings.setValue(AXIS_Y_OPERATIVE_SPEED_MMS, static_cast<double>(axisYOperativeSpeedMms));
     settings.setValue(AXIS_Y_OPERATIVE_ACC_MMS2, static_cast<double>(axisYOperativeAccMms2));
     settings.setValue(AXIS_Y_OPERATIVE_DEC_MMS2, static_cast<double>(axisYOperativeDecMms2));
+    settings.setValue(AXIS_Y_HOMING_SPEED_MMS, static_cast<double>(axisYHomingSpeedMms));
+    settings.setValue(AXIS_Y_HOMING_ACC_MMS2, static_cast<double>(axisYHomingAccMms2));
+    settings.setValue(AXIS_Y_HOMING_DEC_MMS2, static_cast<double>(axisYHomingDecMms2));
 
     settings.setValue(AXIS_Z_STEP_PER_MM, static_cast<double>(axisZStepPerMm));
     settings.setValue(AXIS_Z_MIN_POS_MM, static_cast<double>(axisZMinPosMm));
@@ -271,6 +286,9 @@ void Settings::writeValuesToFile() {
     settings.setValue(AXIS_Z_OPERATIVE_SPEED_MMS, static_cast<double>(axisZOperativeSpeedMms));
     settings.setValue(AXIS_Z_OPERATIVE_ACC_MMS2, static_cast<double>(axisZOperativeAccMms2));
     settings.setValue(AXIS_Z_OPERATIVE_DEC_MMS2, static_cast<double>(axisZOperativeDecMms2));
+    settings.setValue(AXIS_Z_HOMING_SPEED_MMS, static_cast<double>(axisZHomingSpeedMms));
+    settings.setValue(AXIS_Z_HOMING_ACC_MMS2, static_cast<double>(axisZHomingAccMms2));
+    settings.setValue(AXIS_Z_HOMING_DEC_MMS2, static_cast<double>(axisZHomingDecMms2));
 
     // lettura input digitali
     settings.beginWriteArray(Settings::ARRAY_DIGITAL_INPUT);
