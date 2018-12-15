@@ -4,7 +4,6 @@
 #include <type_traits>
 
 #include <QObject>
-#include <QMap>
 #include <QSharedPointer>
 #include <QWeakPointer>
 
@@ -24,9 +23,9 @@ class IOManager : public QObject {
     Q_OBJECT
 
 private:
-    QMap<IOType, DigitalInput> digitalInputs;
-    QMap<IOType, DigitalOutput> digitalOutputs;
-    QMap<IOType, AnalogInput> analogInputs;
+    DigitalInputSet digitalInputs;
+    DigitalOutputSet digitalOutputs;
+    AnalogInputSet analogInputs;
 
     QMap<DeviceKey, QWeakPointer<IAbstractDevice> > devices;
 

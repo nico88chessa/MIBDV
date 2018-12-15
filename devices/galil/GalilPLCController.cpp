@@ -397,7 +397,7 @@ int GalilPLCController::getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* n
 #ifdef FLAG_PLC_PRESENT
     GReturn result = GUtility(handle(), G_UTIL_GCAPS_KEEPALIVE, timeMs, newValue);
 #else
-    timeMs = 600*1000; // valore default
+    *timeMs = 600*1000; // valore default
     GReturn result = G_NO_ERROR;
 #endif
 

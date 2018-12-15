@@ -6,9 +6,9 @@ using namespace PROGRAM_NAMESPACE;
 IOInspector::IOInspector(QObject *parent) : QObject(parent), refreshTimer(this), needSignaler(false) {
 
     const Settings& settings = Settings::instance();
-    QMap<IOType, DigitalInput> dInMap = settings.getDigitalInputs();
-    QMap<IOType, DigitalOutput> dOutMap = settings.getDigitalOutputs();
-    QMap<IOType, AnalogInput> aInMap = settings.getAnalogInputs();
+    DigitalInputSet dInMap = settings.getDigitalInputs();
+    DigitalOutputSet dOutMap = settings.getDigitalOutputs();
+    AnalogInputSet aInMap = settings.getAnalogInputs();
 
     for (auto dIn: dInMap.values()) {
         if (dIn.getChannel() == DIGITAL_INPUT_CHANNEL_NONE)

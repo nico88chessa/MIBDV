@@ -110,7 +110,7 @@ void MainWindow::setupSignalsAndSlots() const {
                 Q_UNUSED(b);
                 Q_UNUSED(c);
                 QMetaObject::invokeMethod(mf, "updateDigitalInputStatus", Qt::QueuedConnection,
-                                          Q_ARG(const mibdv::IOInspector::DigitalInputStatus&, a));
+                                          Q_ARG(const mibdv::DigitalInputStatus&, a));
 
             });
 //            if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN) {

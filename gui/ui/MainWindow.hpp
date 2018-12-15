@@ -67,9 +67,9 @@ private slots:
 signals:
     void galilCNStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilCNStatusBean status);
     void galilPLCStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilPLCStatusBean status);
-    void ioStatusUpdateSignal(const PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus& digitalInputs,
-                              const PROGRAM_NAMESPACE::IOInspector::DigitalOutputStatus& digitalOutputs,
-                              const PROGRAM_NAMESPACE::IOInspector::AnalogInputStatus& analogInputs);
+    void ioStatusUpdateSignal(const PROGRAM_NAMESPACE::DigitalInputStatus& digitalInputs,
+                              const PROGRAM_NAMESPACE::DigitalOutputStatus& digitalOutputs,
+                              const PROGRAM_NAMESPACE::AnalogInputStatus& analogInputs);
 
 };
 

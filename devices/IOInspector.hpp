@@ -24,11 +24,6 @@ namespace PROGRAM_NAMESPACE {
 class IOInspector : public QObject {
     Q_OBJECT
 
-public:
-    using DigitalInputStatus = QMap<IOType, DigitalInputValue>;
-    using DigitalOutputStatus = QMap<IOType, DigitalOutputValue>;
-    using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
-
 private:
     DigitalInputStatus digitalInputStatus;
     DigitalOutputStatus digitalOutputStatus;
@@ -72,9 +67,6 @@ public slots:
     void updateIOStatus(DeviceKey k, const QVariant& status);
 
 signals:
-//    void digitalInputsStateSignal(const QMap<DigitalInput, bool>& digitalInputs);
-//    void digitalOutputsStateSignal(const QMap<DigitalOutput, bool>& digitalOutputs);
-//    void analogInputsStateSignal(const QMap<AnalogInput, analogReal>& analogInputs);
     void statusSignal(
             const DigitalInputStatus& digitalInputs,
             const DigitalOutputStatus& digitalOutputs,
@@ -86,8 +78,8 @@ signals:
 
 }
 
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus)
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::IOInspector::DigitalOutputStatus)
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::IOInspector::AnalogInputStatus)
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalInputStatus)
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalOutputStatus)
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::AnalogInputStatus)
 
 #endif // IOINSPECTOR_HPP

@@ -523,6 +523,13 @@ void MotionFrame::setupUi() {
 
     Settings& s = Settings::instance();
 
+    ui->dsbAxisXMaxPosition->setRange(MOTION_FRAME_DSB_MIN_VALUE, MOTION_FRAME_DSB_MAX_VALUE);
+    ui->dsbAxisYMaxPosition->setRange(MOTION_FRAME_DSB_MIN_VALUE, MOTION_FRAME_DSB_MAX_VALUE);
+    ui->dsbAxisZMaxPosition->setRange(MOTION_FRAME_DSB_MIN_VALUE, MOTION_FRAME_DSB_MAX_VALUE);
+    ui->dsbAxisXCurrentPosition->setRange(MOTION_FRAME_DSB_MIN_VALUE, MOTION_FRAME_DSB_MAX_VALUE);
+    ui->dsbAxisYCurrentPosition->setRange(MOTION_FRAME_DSB_MIN_VALUE, MOTION_FRAME_DSB_MAX_VALUE);
+    ui->dsbAxisZCurrentPosition->setRange(MOTION_FRAME_DSB_MIN_VALUE, MOTION_FRAME_DSB_MAX_VALUE);
+
     ui->dsbAxisXCurrentPosition->setDecimals(3);
     ui->dsbAxisYCurrentPosition->setDecimals(3);
     ui->dsbAxisZCurrentPosition->setDecimals(3);
@@ -593,7 +600,7 @@ void MotionFrame::updateMotionBean(const MotionBean& b) {
 
 }
 
-void MotionFrame::updateDigitalInputStatus(const IOInspector::DigitalInputStatus& i) {
+void MotionFrame::updateDigitalInputStatus(const DigitalInputStatus& i) {
 
     traceEnter;
     this->digitalInputStatus = i;

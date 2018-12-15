@@ -3,6 +3,7 @@
 
 // type traits
 #include <configure.h>
+#include <QMap>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -20,6 +21,22 @@ using posType = float;
 
 class GalilCNController;
 class GalilPLCController;
+class DigitalInput;
+class DigitalOutput;
+class AnalogInput;
+class DigitalInputValue;
+class DigitalOutputValue;
+class AnalogInputValue;
+
+enum class IOType;
+
+using DigitalInputSet = QMap<IOType, DigitalInput>;
+using DigitalOutputSet = QMap<IOType, DigitalOutput>;
+using AnalogInputSet = QMap<IOType, AnalogInput>;
+
+using DigitalInputStatus = QMap<IOType, DigitalInputValue>;
+using DigitalOutputStatus = QMap<IOType, DigitalOutputValue>;
+using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
 
 enum class DeviceKey : int {
     NONE = -1,

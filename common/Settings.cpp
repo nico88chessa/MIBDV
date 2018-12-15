@@ -77,11 +77,13 @@ void Settings::loadValuesFromFile() {
     int size = settings.beginReadArray(Settings::ARRAY_DIGITAL_INPUT);
     for (int i=0; i<size; ++i) {
         settings.setArrayIndex(i);
+        auto device = Utils::getDeviceKeyFromString(settings.value(DIGITAL_INPUT_DEVICE).value<QString>());
+        auto channel = settings.value(DIGITAL_INPUT_CHANNEL).value<int>();
+        if (channel == DIGITAL_INPUT_CHANNEL_NONE || device == DeviceKey::NONE)
+            continue;
         auto name = settings.value(DIGITAL_INPUT_NAME).value<QString>();
         auto type = Utils::getIOTypeFromString(settings.value(DIGITAL_INPUT_TYPE).value<QString>());
-        auto channel = settings.value(DIGITAL_INPUT_CHANNEL).value<int>();
         auto invertLogic = settings.value(DIGITAL_INPUT_INVERT_LOGIC).value<bool>();
-        auto device = Utils::getDeviceKeyFromString(settings.value(DIGITAL_INPUT_DEVICE).value<QString>());
         auto isAlarm = settings.value(DIGITAL_INPUT_IS_ALARM).value<bool>();
         DigitalInput input(name, channel, invertLogic, device, isAlarm, type);
         this->digitalInputs.insertMulti(static_cast<IOType>(type), input);
@@ -455,6 +457,7 @@ bool Settings::validateSettings() const {
     /* NOTE NIC 30/10/2018 - per ora il controllo delle analogiche
      * viene fatto solamente sul PLC
      */
+    // TODO NIC 15/12/2018: controllare che gli ingressi POWER e CYCLE siano presenti
 
     // key = ingresso
     // value = chiave ridondante

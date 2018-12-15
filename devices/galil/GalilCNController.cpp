@@ -585,7 +585,7 @@ int GalilCNController::homingY(spdCNType speed, accCNType acc, accCNType dec) {
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
 
-    Axis a = Axis::X;
+    Axis a = Axis::Y;
     GReturn result;
     result = this->setMoveParameters(a, speed, acc, dec);
 
@@ -726,7 +726,7 @@ int GalilCNController::moveToPosition(Axis a, posCNType pos, spdCNType speed, ac
 #ifdef FLAG_CN_PRESENT
     result = GCmd(handle(), command.toStdString().data());
 #else
-    GReturn result = G_NO_ERROR;
+    result = G_NO_ERROR;
 #endif
 
     writeErrorIfExists(result);
@@ -826,7 +826,7 @@ int GalilCNController::getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* ne
 #ifdef FLAG_CN_PRESENT
     GReturn result = GUtility(handle(), G_UTIL_GCAPS_KEEPALIVE, timeMs, newValue);
 #else
-    timeMs = 600*1000; // valore default
+    *timeMs = 600*1000; // valore default
     GReturn result = G_NO_ERROR;
 #endif
 

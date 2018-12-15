@@ -8,7 +8,7 @@
 #include <MotionBean.hpp>
 #include <GalilCNStatusBean.hpp>
 
-#include <configure.h>
+#include <Types.hpp>
 
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
@@ -46,9 +46,9 @@ void registerMetatypes() {
     qRegisterMetaType<PROGRAM_NAMESPACE::GalilPLCStatusBean>("GalilPLCStatusBean");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionBean>("MotionBean");
     qRegisterMetaType<PROGRAM_NAMESPACE::DeviceKey>("DeviceKey");
-    qRegisterMetaType<PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus>("DigitalInputStatus");
-    qRegisterMetaType<PROGRAM_NAMESPACE::IOInspector::DigitalOutputStatus>("DigitalOutputStatus");
-    qRegisterMetaType<PROGRAM_NAMESPACE::IOInspector::AnalogInputStatus>("AnalogInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputStatus>("DigitalInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("DigitalOutputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("AnalogInputStatus");
 
     traceExit;
 

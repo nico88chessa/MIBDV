@@ -3,9 +3,8 @@
 
 #include <QSettings>
 #include <QString>
-#include <QMap>
 
-#include <configure.h>
+#include <Types.hpp>
 #include <Constants.hpp>
 #include <data/DigitalInput.hpp>
 #include <data/DigitalOutput.hpp>
@@ -85,9 +84,9 @@ public:
     real getAxisZHomingAccMms2() const { return axisZHomingAccMms2; }
     real getAxisZHomingDecMms2() const { return axisZHomingDecMms2; }
 
-    const QMap<IOType, DigitalInput>& getDigitalInputs() const { return digitalInputs; }
-    const QMap<IOType, DigitalOutput>& getDigitalOutputs() const { return digitalOutputs; }
-    const QMap<IOType, AnalogInput>& getAnalogInputs() const { return analogInputs; }
+    const DigitalInputSet& getDigitalInputs() const { return digitalInputs; }
+    const DigitalOutputSet& getDigitalOutputs() const { return digitalOutputs; }
+    const AnalogInputSet& getAnalogInputs() const { return analogInputs; }
 
     int getGalilCNConnectionTimeoutMs() const { return galilCNConnectionTimeoutMs; }
     int getGalilCNStatusRefreshIntervalMs() const { return galilCNStatusRefreshIntervalMs; }
@@ -162,9 +161,9 @@ private:
     real axisZHomingDecMms2;
 
     // IO
-    QMap<IOType, DigitalInput> digitalInputs;
-    QMap<IOType, DigitalOutput> digitalOutputs;
-    QMap<IOType, AnalogInput> analogInputs;
+    DigitalInputSet digitalInputs;
+    DigitalOutputSet digitalOutputs;
+    AnalogInputSet analogInputs;
 
     // MACHINE
     DeviceKey machineCNType;

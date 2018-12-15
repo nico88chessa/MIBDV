@@ -25,6 +25,8 @@ public:
 
 private:
     static constexpr int MOTION_FRAME_CYCLE_ERR = PROGRAM_NAMESPACE::PROGRAM_ERR_START_CODE + 1;
+    static constexpr int MOTION_FRAME_DSB_MIN_VALUE = -100000;
+    static constexpr int MOTION_FRAME_DSB_MAX_VALUE = 100000;
 
     static QString decodeError(int error) {
 
@@ -40,7 +42,7 @@ private:
     Ui::MotionFrame *ui;
     MotionFrameLogic* dPtr;
     PROGRAM_NAMESPACE::MotionBean motionBean;
-    PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus digitalInputStatus;
+    PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
 
     bool isHomingAxes;
 
@@ -56,7 +58,7 @@ private:
 
 public slots:
     void updateMotionBean(const PROGRAM_NAMESPACE::MotionBean& b);
-    void updateDigitalInputStatus(const PROGRAM_NAMESPACE::IOInspector::DigitalInputStatus& i);
+    void updateDigitalInputStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& i);
     void updateUI();
 
 private slots:
