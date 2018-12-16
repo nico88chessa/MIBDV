@@ -2,6 +2,7 @@ SET(ITEMS
     GalilControllerUtils
     GalilCNController
     GalilCNInspector
+    GalilCNInspectorNew
     GalilPLCController
     GalilPLCInspector
     )
