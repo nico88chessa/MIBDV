@@ -9,7 +9,7 @@ using namespace PROGRAM_NAMESPACE;
 
 GalilPLCController::GalilPLCController() :
     handler(new GCon), isInitialized(false), connected(false),
-    numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0) {
+    numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0), handleCode("") {
 
     traceEnter;
 
@@ -101,6 +101,39 @@ bool GalilPLCController::connect(const QString& ip) {
     if (result == G_NO_ERROR) {
         this->setConnected(true);
         traceInfo() << "Galil PLC: connessione avvenuta";
+
+        command = QString("WH");
+        char out[1024] = {};
+        char* outPtr = nullptr;
+
+        traceInfo() << "Galil PLC: prendo l'handleCode della connessione attuale";
+        traceDebug() << "Invio comando:" << command;
+    #ifdef FLAG_PLC_PRESENT
+        result = GCmdT(handle(), command.toStdString().data(), out, sizeof(out), &outPtr);
+    #else
+        result = G_NO_ERROR;
+    #endif
+        writeErrorIfExists(result);
+
+        if (result == G_NO_ERROR) {
+
+            QString currentHandleCode(outPtr);
+            if (!handleCode.isEmpty()) {
+
+                if (handleCode.compare(currentHandleCode) != 0) {
+                    traceInfo() << "Galil PLC: forzo chiusura di una precedente connessione con handle:" << handleCode;
+
+                    command = handleCode + "=>-3";
+                    traceDebug() << "Invio comando:" << command;
+                    result = GCmd(handle(), command.toStdString().data());
+                    writeErrorIfExists(result);
+
+                }
+
+            }
+            handleCode = currentHandleCode;
+        }
+
     }
 
     traceExit;

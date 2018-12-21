@@ -36,7 +36,8 @@ void AbstractConnectedDeviceInspector::process() {
 void AbstractConnectedDeviceInspector::manageDisconnectedDevice() {
 
     traceEnter;
-    this->stopProcess();
+    if (refreshTimer.isActive())
+        refreshTimer.stop();
     this->handleDisconnection();
     emit disconnectedSignal();
     traceExit;

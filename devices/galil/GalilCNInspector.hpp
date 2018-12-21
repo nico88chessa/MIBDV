@@ -1,70 +1,37 @@
 #ifndef GALILCNINSPECTOR_HPP
 #define GALILCNINSPECTOR_HPP
 
-#include <QTimer>
-#include <QString>
-#include <QScopedPointer>
-
-#include <Constants.hpp>
-#include <configure.h>
-#include <MotionInspector.hpp>
-#include <galil/GalilCNController.hpp>
-#include <GalilCNStatusBean.hpp>
-#include <ErrorSignaler.hpp>
-#include <ErrorManager.hpp>
-#include <Settings.hpp>
+#include "MotionInspectorImpl.hpp"
+#include "GalilCNController.hpp"
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNInspector : public MotionInspector {
-    Q_OBJECT
-
+class GalilCNInspector : public MotionInspectorImpl<GalilCNController> {
 public:
     using Ptr = GalilCNInspector*;
-    using ConstPtr = GalilCNInspector*;
+    using ConstPtr = const GalilCNInspector*;
 
 private:
-    int reconnectionIntervalMs;
-    QString ipAddress;
     GalilCNStatusBean lastStatus;
-
-    QScopedPointer<GalilCNController> controller;
-    QTimer refreshTimer;
-    DECL_ERROR_SIGNALER_FRIENDS(GalilCNInspector)
-
+    QString ipAddress;
     bool isFirst;
-    DigitalInput powerInput;
-    DigitalInput cycleInput;
+
+    inline GalilCNController::Ptr getGalilCNDevicePtr() {
+        return static_cast<GalilCNController::Ptr>(device.data());
+    }
 
 public:
     explicit GalilCNInspector(QObject* parent = nullptr);
-    ~GalilCNInspector();
 
-private:
-    void analizeLastStatus(const GalilCNStatusBean& newStatus);
-
-private slots:
-    void process();
-    void handleDisconnection();
-
-public slots:
-    void restartProcess();
-    void startProcess();
-    void stopProcess();
-
-signals:
-    void connectedSignal();
-    void disconnectedSignal();
-    void statusSignal(GalilCNStatusBean);
-
-    void processStartSignal();
-    void processStopSignal();
+    ~GalilCNInspector() { }
 
 protected:
+    bool connectDevice();
+
+    void analizeLastStatus(const S& status);
 
 };
 
 }
 
 #endif // GALILCNINSPECTOR_HPP
-

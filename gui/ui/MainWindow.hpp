@@ -5,13 +5,13 @@
 
 #include "UnmovableWindow.hpp"
 
-#include <galil/GalilCNInspector.hpp>
 #include <galil/GalilPLCInspector.hpp>
 #include <IOInspector.hpp>
 
 #include <IOManager.hpp>
 #include <MotionManager.hpp>
-#include <DeviceConnectionWatcher.hpp>
+#include <AbstractDeviceConnectionWatcher.hpp>
+#include <AbstractMotionInspector.hpp>
 
 namespace Ui {
 class MainWindow;
@@ -25,17 +25,17 @@ private:
 
     QScopedPointer<PROGRAM_NAMESPACE::ErrorManager> errorManager;
 
-    QScopedPointer<PROGRAM_NAMESPACE::GalilCNInspector> galilCNInspector;
-    QScopedPointer<PROGRAM_NAMESPACE::GalilPLCInspector> galilPLCInspector;
+    QScopedPointer<PROGRAM_NAMESPACE::AbstractMotionInspector> motionInspector;
     QScopedPointer<PROGRAM_NAMESPACE::IOInspector> ioInspector;
+    QScopedPointer<PROGRAM_NAMESPACE::GalilPLCInspector> galilPLCInspector;
 
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
 
     QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> cn; // utilizzato da motionManager
     QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> plc; // utilizzato da motionManager e ioManager
-    QScopedPointer<PROGRAM_NAMESPACE::DeviceConnectionWatcher> cnConnectionWatcher;
-    QScopedPointer<PROGRAM_NAMESPACE::DeviceConnectionWatcher> plcConnectionWatcher;
+    QScopedPointer<PROGRAM_NAMESPACE::AbstractDeviceConnectionWatcher> cnConnectionWatcher;
+    QScopedPointer<PROGRAM_NAMESPACE::AbstractDeviceConnectionWatcher> plcConnectionWatcher;
 
 public:
 
@@ -47,7 +47,7 @@ private:
     void setupUiContentPanel();
 
     void initDevices();
-    void initGalilCNInspector();
+    void initMotionInspector();
     void initGalilPLCInspector();
     void initIOInspector();
     void initCNConnectionWatcher();
@@ -65,11 +65,11 @@ private slots:
     void stopDevices();
 
 signals:
-    void galilCNStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilCNStatusBean status);
     void galilPLCStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilPLCStatusBean status);
     void ioStatusUpdateSignal(const PROGRAM_NAMESPACE::DigitalInputStatus& digitalInputs,
                               const PROGRAM_NAMESPACE::DigitalOutputStatus& digitalOutputs,
                               const PROGRAM_NAMESPACE::AnalogInputStatus& analogInputs);
+    void motionStatusUpdateSignal(const QVariant& status);
 
 };
 

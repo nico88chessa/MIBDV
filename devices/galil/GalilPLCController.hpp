@@ -26,6 +26,7 @@ private:
     int numDigitalInput;
     int numDigitalOutput;
     int numAnalogInput;
+    QString handleCode;
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 

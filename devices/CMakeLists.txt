@@ -6,7 +6,7 @@ SET(ITEMS
     MotionInspectorImpl
     AbstractPLC
     AbstractCN
-    DeviceConnectionWatcher
+    AbstractDeviceConnectionWatcher
     IOManager
     IOInspector
     MotionInspector

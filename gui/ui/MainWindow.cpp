@@ -8,7 +8,10 @@
 
 #include <MotionManagerImpl.hpp>
 #include <galil/GalilCNController.hpp>
+#include <galil/GalilCNInspector.hpp>
 #include <galil/GalilPLCController.hpp>
+#include <galil/GalilCNConnectionWatcher.hpp>
+#include <galil/GalilPLCConnectionWatcher.hpp>
 
 
 using namespace PROGRAM_NAMESPACE;
@@ -16,7 +19,7 @@ using namespace PROGRAM_NAMESPACE;
 MainWindow::MainWindow(QWidget *parent) :
     UnmovableWindow(parent), ui(new Ui::MainWindow),
     errorManager(nullptr),
-    galilCNInspector(nullptr),
+    motionInspector(nullptr),
     galilPLCInspector(nullptr),
     ioManager(nullptr),
     motionManager(nullptr),
@@ -47,7 +50,7 @@ MainWindow::~MainWindow() {
     stopDevices();
 
     // TODO NIC 06/12/2018 - verificare se funziona
-    galilCNInspector->thread()->wait();
+    motionInspector->thread()->wait();
     galilPLCInspector->thread()->wait();
 
     delete ui;
@@ -105,7 +108,13 @@ void MainWindow::setupSignalsAndSlots() const {
         QWidget* current = ui->stackedWidget->widget(i);
         if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
-            connect(this, &MainWindow::galilCNStatusUpdateSignal, mf, &MotionFrame::updateMotionBean);
+            connect(this, &MainWindow::motionStatusUpdateSignal, [mf](const QVariant& bean) {
+                auto motionBean = MotionBean(bean.value<GalilCNStatusBean>());
+                QMetaObject::invokeMethod(mf, "updateMotionBean", Qt::QueuedConnection,
+                                          Q_ARG(const mibdv::MotionBean&, motionBean));
+
+            });
+
             connect(this, &MainWindow::ioStatusUpdateSignal, [mf](auto a, auto b, auto c) {
                 Q_UNUSED(b);
                 Q_UNUSED(c);
@@ -113,12 +122,7 @@ void MainWindow::setupSignalsAndSlots() const {
                                           Q_ARG(const mibdv::DigitalInputStatus&, a));
 
             });
-//            if (Settings::instance().getMachineCNType() == DeviceKey::GALIL_CN) {
-//                connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, [mf](GalilCNStatusBean bean) {
-//                    // faccio una funziona lambda per convertire da GalilCNStatusBean a MotionBean
-//                    QMetaObject::invokeMethod(mf, "updateMotionBean", Qt::QueuedConnection, Q_ARG(const mibdv::MotionBean&, MotionBean(bean)));
-//                });
-//            }
+
         }
 
     }
@@ -198,11 +202,14 @@ void MainWindow::initDevices() {
 
     this->initIOInspector();
 
-    // gestisco il CN Galil
-    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
+    // avvio il motion inspector (galil cn inspector)
+    this->initMotionInspector();
 
-        // per prima cosa, avvio l'inspector del CN galil
-        this->initGalilCNInspector();
+    // avvio il plc inspector (galil plc inspector)
+    this->initGalilPLCInspector();
+
+    // inizializzo il motion manager
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
 
         // a questo punto creo il cn galil
         if (cn.isNull()) {
@@ -223,46 +230,42 @@ void MainWindow::initDevices() {
             motionManager.reset(new MotionManagerImpl<GalilCNController>(cn.staticCast<GalilCNController>()));
             traceDebug() << "Utilizzo il CN Galil come motion manager";
 
-            // controllo che gli oggetti siano validi
-            if (!(galilCNInspector.isNull() || motionManager.isNull())) {
-                // TODO NIC 03/12/2018 - completare gli altri segnali
-                connect(galilCNInspector.data(), &GalilCNInspector::powerOffSignal, motionManager.data(), &MotionManager::powerOffSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::cycleOffSignal, motionManager.data(), &MotionManager::cycleOffSignal);
+            // TODO NIC 03/12/2018 - completare gli altri segnali
+            // connect(motionInspector.data(), &AbstractMotionInspector::powerOffSignal, motionManager.data(), &MotionManager::powerOffSignal);
+            // connect(motionInspector.data(), &AbstractMotionInspector::cycleOffSignal, motionManager.data(), &MotionManager::cycleOffSignal);
 
-                connect(galilCNInspector.data(), &GalilCNInspector::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisXMotionStopSignal, motionManager.data(), &MotionManager::axisXMotionStopSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXMotionStopSignal, motionManager.data(), &MotionManager::axisXMotionStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
 
-                connect(galilCNInspector.data(), &GalilCNInspector::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisYMotionStopSignal, motionManager.data(), &MotionManager::axisYMotionStopSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYMotionStopSignal, motionManager.data(), &MotionManager::axisYMotionStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
 
-                connect(galilCNInspector.data(), &GalilCNInspector::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisZMotionStopSignal, motionManager.data(), &MotionManager::axisZMotionStopSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
-                connect(galilCNInspector.data(), &GalilCNInspector::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
-            }
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZMotionStopSignal, motionManager.data(), &MotionManager::axisZMotionStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
 
         }
 
-        // infine inizializzo il cn watcher per controllare la connessione
-        initCNConnectionWatcher();
-
     }
+
+    // inizializzo il cn watcher per controllare la connessione
+    initCNConnectionWatcher();
 
     // gestisco il PLC Galil
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
 
         // per prima cosa, avvio l'inspector del PLC galil
-        this->initGalilPLCInspector();
 
         if (plc.isNull()) {
 
@@ -294,25 +297,27 @@ void MainWindow::initDevices() {
 
 }
 
-void MainWindow::initGalilCNInspector() {
+void MainWindow::initMotionInspector() {
 
     traceEnter;
 
-    QThread* galilCNInspectorThread = new QThread();
+    Settings& s = Settings::instance();
+    QThread* motionInspectorThread = new QThread();
 
-    galilCNInspector.reset(new GalilCNInspector());
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN)
+        motionInspector.reset(new GalilCNInspector());
 
-    connect(galilCNInspectorThread, &QThread::started, galilCNInspector.data(), &GalilCNInspector::startProcess);
-    connect(galilCNInspector.data(), &GalilCNInspector::processStopSignal, galilCNInspectorThread, &QThread::quit);
+    connect(motionInspectorThread, &QThread::started, motionInspector.data(), &AbstractMotionInspector::startProcess);
+    connect(motionInspector.data(), &AbstractMotionInspector::processStoppedSignal, motionInspectorThread, &QThread::quit);
 
-    connect(galilCNInspector.data(), &GalilCNInspector::statusSignal, this, &MainWindow::galilCNStatusUpdateSignal);
+    connect(motionInspector.data(), &AbstractMotionInspector::statusSignal, this, &MainWindow::motionStatusUpdateSignal);
 
-    connect(galilCNInspectorThread, &QThread::finished, galilCNInspector.data(), &GalilCNInspector::deleteLater);
-    connect(galilCNInspectorThread, &QThread::finished, galilCNInspectorThread, &QThread::deleteLater);
+    connect(motionInspectorThread, &QThread::finished, motionInspector.data(), &AbstractMotionInspector::deleteLater);
+    connect(motionInspectorThread, &QThread::finished, motionInspectorThread, &QThread::deleteLater);
 
-    galilCNInspector.data()->moveToThread(galilCNInspectorThread);
+    motionInspector.data()->moveToThread(motionInspectorThread);
 
-    errorManager->subscribeObject(*galilCNInspector);
+//    errorManager->subscribeObject(*motionInspector);
 
     traceExit;
 
@@ -322,21 +327,26 @@ void MainWindow::initGalilPLCInspector() {
 
     traceEnter;
 
-    QThread* galilPLCInspectorThread = new QThread();
+    Settings& s = Settings::instance();
 
-    galilPLCInspector.reset(new GalilPLCInspector());
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
 
-    connect(galilPLCInspectorThread, &QThread::started, galilPLCInspector.data(), &GalilPLCInspector::startProcess);
-    connect(galilPLCInspector.data(), &GalilPLCInspector::processStopSignal, galilPLCInspectorThread, &QThread::quit);
+        galilPLCInspector.reset(new GalilPLCInspector());
 
-    connect(galilPLCInspector.data(), &GalilPLCInspector::statusSignal, this, &MainWindow::galilPLCStatusUpdateSignal);
+        QThread* galilPLCInspectorThread = new QThread();
 
-    connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspector.data(), &GalilPLCInspector::deleteLater);
-    connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspectorThread, &QThread::deleteLater);
+        connect(galilPLCInspectorThread, &QThread::started, galilPLCInspector.data(), &GalilPLCInspector::startProcess);
+        connect(galilPLCInspector.data(), &GalilPLCInspector::processStopSignal, galilPLCInspectorThread, &QThread::quit);
 
-    galilPLCInspector.data()->moveToThread(galilPLCInspectorThread);
+        connect(galilPLCInspector.data(), &GalilPLCInspector::statusSignal, this, &MainWindow::galilPLCStatusUpdateSignal);
 
-    errorManager->subscribeObject(*galilPLCInspector);
+        connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspector.data(), &GalilPLCInspector::deleteLater);
+        connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspectorThread, &QThread::deleteLater);
+
+        galilPLCInspector.data()->moveToThread(galilPLCInspectorThread);
+
+        errorManager->subscribeObject(*galilPLCInspector);
+    }
 
     traceExit;
 
@@ -353,12 +363,12 @@ void MainWindow::initIOInspector() {
     connect(ioInspectorThread, &QThread::started, ioInspector.data(), &IOInspector::startProcess);
     connect(ioInspector.data(), &IOInspector::processStopSignal, ioInspectorThread, &QThread::quit);
 
-    connect(this, &MainWindow::galilCNStatusUpdateSignal, [&](const GalilCNStatusBean& status){
+    connect(this, &MainWindow::motionStatusUpdateSignal, [&](const QVariant& status) {
         QMetaObject::invokeMethod(ioInspector.data(), "updateIOStatus", Qt::QueuedConnection,
                                   Q_ARG(DeviceKey, DeviceKey::GALIL_CN),
-                                  Q_ARG(const QVariant&, QVariant::fromValue<GalilCNStatusBean>(status)));
+                                  Q_ARG(const QVariant&, status));
     });
-    connect(this, &MainWindow::galilPLCStatusUpdateSignal, [&](const GalilPLCStatusBean& status){
+    connect(this, &MainWindow::galilPLCStatusUpdateSignal, [&](const GalilPLCStatusBean& status) {
         QMetaObject::invokeMethod(ioInspector.data(), "updateIOStatus", Qt::QueuedConnection,
                                   Q_ARG(DeviceKey, DeviceKey::GALIL_PLC),
                                   Q_ARG(const QVariant&, QVariant::fromValue<GalilPLCStatusBean>(status)));
@@ -383,77 +393,29 @@ void MainWindow::initCNConnectionWatcher() {
         return;
     }
 
-    class GalilCNDeviceConnetionWatcher : public DeviceConnectionWatcher {
-    private:
-        QTimer timerKeepAlive;
-    public:
-        explicit GalilCNDeviceConnetionWatcher(QObject* parent = nullptr) :
-            DeviceConnectionWatcher(parent),
-            timerKeepAlive(this) {
+    Settings& s = Settings::instance();
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
+        cnConnectionWatcher.reset(new GalilCNConnectionWatcher());
+        cnConnectionWatcher->setDevice<DeviceKey::GALIL_CN>(cn.staticCast<GalilCNController>());
+    }
 
-            int intervalMs = Settings::instance().getGalilCNCheckConnectionIntervalMs();
-            this->setupTimers(intervalMs);
+    if (cnConnectionWatcher.isNull())
+        return;
 
-            connect(&timerKeepAlive, &QTimer::timeout, [this]() {
-                traceEnter;
-                unsigned int timeMs;
-                device.staticCast<GalilCNController>()->getKeepAliveTimeMs(&timeMs);
-                traceExit;
-            });
+    // NOTE NIC 21/12/2018: non creo un thread a parte perche' il device e' associato al thread main;
+    // usare il device in un altro thread potrebbe creare problemi
 
-        }
+    /*****************************************************************
+    QThread* watcherThread = new QThread();
 
-        ~GalilCNDeviceConnetionWatcher() {
-            timerKeepAlive.stop();
-        }
+    connect(watcherThread, &QThread::started, cnConnectionWatcher.data(), &AbstractDeviceConnectionWatcher::startWatcher);
+    connect(cnConnectionWatcher.data(), &AbstractDeviceConnectionWatcher::watcherStopped, watcherThread, &QThread::quit);
 
-    protected:
-        virtual void reconnectDevice() {
+    connect(watcherThread, &QThread::finished, cnConnectionWatcher.data(), &AbstractDeviceConnectionWatcher::deleteLater);
+    connect(watcherThread, &QThread::finished, watcherThread, &QThread::deleteLater);
 
-            traceEnter;
-            if (!device.isNull()) {
-
-                if (!device->isConnected()) {
-
-                    timerKeepAlive.stop();
-
-                    QString ipCN = Settings::instance().getGalilCNIpAddress();
-                    auto galilCN = device.staticCast<GalilCNController>().data();
-
-                    if (galilCN->connect(ipCN)) {
-                        unsigned int timeMs;
-                        int res = galilCN->getKeepAliveTimeMs(&timeMs);
-                        if (galilCN->isError(res)) {
-
-                            traceErr() << "Errore chiamata CN keep alive; codice errore:" << res;
-                            traceErr() << "Descrizione errore:" << galilCN->decodeError(res);
-
-                        } else {
-
-                            timerKeepAlive.setInterval(timeMs / 2);
-                            timerKeepAlive.start();
-                        }
-                    }
-                }
-            }
-
-            traceExit;
-            return;
-        }
-    };
-
-    QThread* cnWatcherThread = new QThread();
-
-    cnConnectionWatcher.reset(new GalilCNDeviceConnetionWatcher());
-    cnConnectionWatcher->setDevice<DeviceKey::GALIL_CN>(cn.staticCast<GalilCNController>());
-
-    connect(cnWatcherThread, &QThread::started, cnConnectionWatcher.data(), &GalilCNDeviceConnetionWatcher::startWatcher);
-    connect(cnConnectionWatcher.data(), &GalilCNDeviceConnetionWatcher::watcherStopped, cnWatcherThread, &QThread::quit);
-
-    connect(cnWatcherThread, &QThread::finished, cnConnectionWatcher.data(), &GalilCNDeviceConnetionWatcher::deleteLater);
-    connect(cnWatcherThread, &QThread::finished, cnWatcherThread, &QThread::deleteLater);
-
-    cnConnectionWatcher->moveToThread(cnWatcherThread);
+    cnConnectionWatcher->moveToThread(watcherThread);
+    *****************************************************************/
 
     traceExit;
 
@@ -468,77 +430,29 @@ void MainWindow::initPLCConnectionWatcher() {
         return;
     }
 
-    class GalilPLCDeviceConnetionWatcher : public DeviceConnectionWatcher {
-    private:
-        QTimer timerKeepAlive;
-    public:
-        explicit GalilPLCDeviceConnetionWatcher(QObject* parent = nullptr) :
-            DeviceConnectionWatcher(parent),
-            timerKeepAlive(this) {
+    Settings& s = Settings::instance();
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
+        plcConnectionWatcher.reset(new GalilPLCConnectionWatcher());
+        plcConnectionWatcher->setDevice<DeviceKey::GALIL_PLC>(plc.staticCast<GalilPLCController>());
+    }
 
-            int intervalMs = Settings::instance().getGalilPLCCheckConnectionIntervalMs();
-            this->setupTimers(intervalMs);
+    if (plcConnectionWatcher.isNull())
+        return;
 
-            connect(&timerKeepAlive, &QTimer::timeout, [this]() {
-                traceEnter;
-                unsigned int timeMs;
-                device.staticCast<GalilPLCController>()->getKeepAliveTimeMs(&timeMs);
-                traceExit;
-            });
+    // NOTE NIC 21/12/2018: non creo un thread a parte perche' il device e' associato al thread main;
+    // usare il device in un altro thread potrebbe creare problemi
 
-        }
+    /*****************************************************************
+    QThread* watcherThread = new QThread();
 
-        ~GalilPLCDeviceConnetionWatcher() {
-            timerKeepAlive.stop();
-        }
+    connect(watcherThread, &QThread::started, plcConnectionWatcher.data(), &AbstractDeviceConnectionWatcher::startWatcher);
+    connect(plcConnectionWatcher.data(), &AbstractDeviceConnectionWatcher::watcherStopped, watcherThread, &QThread::quit);
 
-    protected:
-        virtual void reconnectDevice() {
+    connect(watcherThread, &QThread::finished, plcConnectionWatcher.data(), &AbstractDeviceConnectionWatcher::deleteLater);
+    connect(watcherThread, &QThread::finished, watcherThread, &QThread::deleteLater);
 
-            traceEnter;
-            if (!device.isNull()) {
-
-                if (!device->isConnected()) {
-
-                    timerKeepAlive.stop();
-
-                    QString ipPLC = Settings::instance().getGalilPLCIpAddress();
-                    auto galilPLC = device.staticCast<GalilPLCController>().data();
-
-                    if (galilPLC->connect(ipPLC)) {
-                        unsigned int timeMs;
-                        int res = galilPLC->getKeepAliveTimeMs(&timeMs);
-                        if (galilPLC->isError(res)) {
-
-                            traceErr() << "Errore chiamata PLC keep alive; codice errore:" << res;
-                            traceErr() << "Descrizione errore:" << galilPLC->decodeError(res);
-
-                        } else {
-
-                            timerKeepAlive.setInterval(timeMs / 2);
-                            timerKeepAlive.start();
-                        }
-                    }
-                }
-            }
-
-            traceExit;
-            return;
-        }
-    };
-
-    QThread* cnWatcherThread = new QThread();
-
-    plcConnectionWatcher.reset(new GalilPLCDeviceConnetionWatcher());
-    plcConnectionWatcher->setDevice<DeviceKey::GALIL_PLC>(plc.staticCast<GalilPLCController>());
-
-    connect(cnWatcherThread, &QThread::started, plcConnectionWatcher.data(), &GalilPLCDeviceConnetionWatcher::startWatcher);
-    connect(plcConnectionWatcher.data(), &GalilPLCDeviceConnetionWatcher::watcherStopped, cnWatcherThread, &QThread::quit);
-
-    connect(cnWatcherThread, &QThread::finished, plcConnectionWatcher.data(), &GalilPLCDeviceConnetionWatcher::deleteLater);
-    connect(cnWatcherThread, &QThread::finished, cnWatcherThread, &QThread::deleteLater);
-
-    plcConnectionWatcher->moveToThread(cnWatcherThread);
+    plcConnectionWatcher->moveToThread(watcherThread);
+    *****************************************************************/
 
     traceExit;
 
@@ -580,31 +494,20 @@ void MainWindow::startDevices() {
 
     traceEnter;
 
-    Settings& s = Settings::instance();
+    if (!motionInspector.isNull())
+        motionInspector->thread()->start();
 
-    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
-        if (!galilCNInspector.isNull()) {
-            QThread* galilCNThread = galilCNInspector->thread();
-            galilCNThread->start();
-        }
+    if (!cnConnectionWatcher.isNull())
+        cnConnectionWatcher->startWatcher();
 
-        if (!cnConnectionWatcher.isNull())
-            cnConnectionWatcher->thread()->start();
+    if (!galilPLCInspector.isNull())
+        galilPLCInspector->thread()->start();
 
-    }
+    if (!plcConnectionWatcher.isNull())
+        plcConnectionWatcher->startWatcher();
 
-    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
-        if (!galilPLCInspector.isNull()) {
-            QThread* galilPLCThread = galilPLCInspector->thread();
-            galilPLCThread->start();
-        }
-
-        if (!plcConnectionWatcher.isNull())
-            plcConnectionWatcher->thread()->start();
-
-    }
-
-    ioInspector->thread()->start();
+    if (!ioInspector.isNull())
+        ioInspector->thread()->start();
 
     traceExit;
 
@@ -614,23 +517,20 @@ void MainWindow::stopDevices() {
 
     traceEnter;
 
-    Settings& s = Settings::instance();
-
-    if (s.getMachineCNType() == DeviceKey::GALIL_CN)
-        if (!galilCNInspector.isNull())
-            galilCNInspector->stopProcess();
-
-    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
-        if (!galilPLCInspector.isNull())
-            galilPLCInspector->stopProcess();
+    if (!motionInspector.isNull())
+        motionInspector->stopProcess();
 
     if (!cnConnectionWatcher.isNull())
         cnConnectionWatcher->stopWatcher();
 
+    if (!galilPLCInspector.isNull())
+        galilPLCInspector->stopProcess();
+
     if (!plcConnectionWatcher.isNull())
         plcConnectionWatcher->stopWatcher();
 
-    ioInspector->stopProcess();
+    if (!ioInspector.isNull())
+        ioInspector->stopProcess();
 
     traceExit;
 

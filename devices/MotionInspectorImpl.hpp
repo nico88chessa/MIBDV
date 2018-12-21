@@ -44,11 +44,11 @@ protected:
     virtual void analizeLastStatus(const S& status) = 0;
 
     bool getStatus(QVariant& status) {
+
         traceEnter;
-        S s;
         bool res;
         try {
-            s = getDevicePtr()->getStatus();
+            S s = getDevicePtr()->getStatus();
             analizeLastStatus(s);
             status = QVariant::fromValue(s);
             res = true;
@@ -59,6 +59,7 @@ protected:
         }
         traceExit;
         return res;
+
     }
 
     bool isDeviceConnected() {

@@ -1,19 +1,19 @@
-#include "DeviceConnectionWatcher.hpp"
+#include "AbstractDeviceConnectionWatcher.hpp"
 
 #include <Logger.hpp>
 #include <common/Utils.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 
-DeviceConnectionWatcher::DeviceConnectionWatcher(QObject* parent) :
+AbstractDeviceConnectionWatcher::AbstractDeviceConnectionWatcher(QObject* parent) :
     QObject(parent), device(nullptr),
     connectionCheckTimer(this), isConnected(false) {
 
-    connect(&connectionCheckTimer, &QTimer::timeout, this, &DeviceConnectionWatcher::checkConnection);
+    connect(&connectionCheckTimer, &QTimer::timeout, this, &AbstractDeviceConnectionWatcher::checkConnection);
 
 }
 
-DeviceConnectionWatcher::~DeviceConnectionWatcher() {
+AbstractDeviceConnectionWatcher::~AbstractDeviceConnectionWatcher() {
 
     traceEnter;
     connectionCheckTimer.stop();
@@ -21,7 +21,7 @@ DeviceConnectionWatcher::~DeviceConnectionWatcher() {
 
 }
 
-void DeviceConnectionWatcher::setupTimers(int checkIntervalMs) {
+void AbstractDeviceConnectionWatcher::setupTimers(int checkIntervalMs) {
 
     traceEnter;
     connectionCheckTimer.setInterval(checkIntervalMs);
@@ -29,7 +29,7 @@ void DeviceConnectionWatcher::setupTimers(int checkIntervalMs) {
 
 }
 
-void DeviceConnectionWatcher::startWatcher() {
+void AbstractDeviceConnectionWatcher::startWatcher() {
 
     traceEnter;
     connectionCheckTimer.start();
@@ -38,7 +38,7 @@ void DeviceConnectionWatcher::startWatcher() {
 
 }
 
-void DeviceConnectionWatcher::stopWatcher() {
+void AbstractDeviceConnectionWatcher::stopWatcher() {
 
     traceEnter;
     connectionCheckTimer.stop();
@@ -47,7 +47,7 @@ void DeviceConnectionWatcher::stopWatcher() {
 
 }
 
-void DeviceConnectionWatcher::checkConnection() {
+void AbstractDeviceConnectionWatcher::checkConnection() {
 
     traceEnter;
 

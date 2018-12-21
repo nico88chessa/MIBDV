@@ -1,5 +1,5 @@
-#ifndef DEVICECONNECTIONWATCHER_HPP
-#define DEVICECONNECTIONWATCHER_HPP
+#ifndef ABSTRACTDEVICECONNECTIONWATCHER_HPP
+#define ABSTRACTDEVICECONNECTIONWATCHER_HPP
 
 #include <QObject>
 #include <QSharedPointer>
@@ -12,12 +12,12 @@
 
 namespace PROGRAM_NAMESPACE {
 
-class DeviceConnectionWatcher : public QObject {
+class AbstractDeviceConnectionWatcher : public QObject {
     Q_OBJECT
 
 public:
-    using Ptr = DeviceConnectionWatcher*;
-    using ConstPtr = const DeviceConnectionWatcher*;
+    using Ptr = AbstractDeviceConnectionWatcher*;
+    using ConstPtr = const AbstractDeviceConnectionWatcher*;
 
 protected:
     QSharedPointer<IAbstractDevice> device;
@@ -27,9 +27,8 @@ protected:
     bool isConnected;
 
 public:
-    explicit DeviceConnectionWatcher(QObject* parent = nullptr);
-    ~DeviceConnectionWatcher();
-
+    explicit AbstractDeviceConnectionWatcher(QObject* parent = nullptr);
+    ~AbstractDeviceConnectionWatcher();
 
     template <DeviceKey D>
     void setDevice(const QSharedPointer<typename deviceKeyTraits<D>::type>& dev) {
@@ -61,4 +60,4 @@ signals:
 
 }
 
-#endif // DEVICECONNECTIONWATCHER_HPP
+#endif // ABSTRACTDEVICECONNECTIONWATCHER_HPP
