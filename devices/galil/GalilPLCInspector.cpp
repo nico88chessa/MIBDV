@@ -10,6 +10,7 @@ GalilPLCInspector::GalilPLCInspector(QObject* parent) :
     Settings& s = Settings::instance();
     ipAddress = s.getGalilPLCIpAddress();
 
+    device.reset(new GalilPLCController());
     this->setRefreshValue(s.getGalilPLCStatusRefreshIntervalMs());
     this->setRestartTime(s.getGalilPLCReconnectionIntervalMs());
 
