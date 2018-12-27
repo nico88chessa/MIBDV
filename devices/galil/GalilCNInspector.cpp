@@ -162,3 +162,7 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     traceExit;
 
 }
+
+void GalilCNInspector::handleDisconnection() {
+    // do nothing
+}

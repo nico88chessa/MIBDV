@@ -46,18 +46,6 @@ signals:
     void axisZHomeInProgressStartSignal();
     void axisZHomeInProgressStopSignal();
 
-protected:
-    virtual void handleDisconnetionImpl() {
-        // do nothing
-    }
-
-
-protected slots:
-    void handleDisconnection() {
-        traceEnter;
-        handleDisconnetionImpl();
-        traceExit;
-    }
 };
 
 }

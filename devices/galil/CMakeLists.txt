@@ -2,9 +2,9 @@ SET(ITEMS
     GalilControllerUtils
     GalilCNController
     GalilCNInspector
+    GalilCNConnectionWatcher
     GalilPLCController
     GalilPLCInspector
-    GalilCNConnectionWatcher
     GalilPLCConnectionWatcher
     )
 

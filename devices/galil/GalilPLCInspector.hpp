@@ -1,58 +1,43 @@
 #ifndef GALILPLCINSPECTOR_HPP
 #define GALILPLCINSPECTOR_HPP
 
-#include <QObject>
-#include <QTimer>
-#include <QString>
-#include <QScopedPointer>
+#include "AbstractConnectedDeviceInspector.hpp"
 
-#include <configure.h>
-#include <galil/GalilPLCController.hpp>
-#include <ErrorManager.hpp>
+#include "GalilPLCController.hpp"
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilPLCInspector : public QObject {
+class GalilPLCInspector : public AbstractConnectedDeviceInspector {
     Q_OBJECT
 
 public:
     using Ptr = GalilPLCInspector*;
-    using ConstPtr = GalilPLCInspector*;
+    using ConstPtr = const GalilPLCInspector*;
 
 private:
-    int reconnectionIntervalMs;
+    GalilPLCStatusBean lastStatus;
     QString ipAddress;
+    QScopedPointer<GalilPLCController> device;
 
-    QScopedPointer<GalilPLCController> controller;
-    QTimer refreshTimer;
-    DECL_ERROR_SIGNALER_FRIENDS(GalilPLCInspector)
+    inline GalilPLCController::Ptr getGalilPLCDevicePtr() {
+        return static_cast<GalilPLCController::Ptr>(device.data());
+    }
 
 public:
     explicit GalilPLCInspector(QObject* parent = nullptr);
-    ~GalilPLCInspector();
-
-private slots:
-    void process();
-    void handleDisconnection();
-
-public slots:
-    void restartProcess();
-    void startProcess();
-    void stopProcess();
-
-signals:
-    void connectedSignal();
-    void disconnectedSignal();
-    void statusSignal(GalilPLCStatusBean);
-
-    void processStartSignal();
-    void processStopSignal();
 
 protected:
 
+    bool getStatus(QVariant& status);
+
+    bool isDeviceConnected();
+
+    bool connectDevice();
+
+protected slots:
+    void handleDisconnection();
 };
 
 }
 
 #endif // GALILPLCINSPECTOR_HPP
-

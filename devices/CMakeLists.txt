@@ -9,7 +9,6 @@ SET(ITEMS
     AbstractDeviceConnectionWatcher
     IOManager
     IOInspector
-    MotionInspector
     MotionManager
     MotionManagerImpl
     )

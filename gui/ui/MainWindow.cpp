@@ -7,10 +7,13 @@
 #include <gui/resources/lang/lang.hpp>
 
 #include <MotionManagerImpl.hpp>
+
 #include <galil/GalilCNController.hpp>
 #include <galil/GalilCNInspector.hpp>
-#include <galil/GalilPLCController.hpp>
 #include <galil/GalilCNConnectionWatcher.hpp>
+
+#include <galil/GalilPLCController.hpp>
+#include <galil/GalilPLCInspector.hpp>
 #include <galil/GalilPLCConnectionWatcher.hpp>
 
 
@@ -265,8 +268,6 @@ void MainWindow::initDevices() {
     // gestisco il PLC Galil
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
 
-        // per prima cosa, avvio l'inspector del PLC galil
-
         if (plc.isNull()) {
 
             plc.reset(new GalilPLCController());
@@ -283,16 +284,6 @@ void MainWindow::initDevices() {
 
     }
 
-    // TODO NIC 06/12/2018 - da parametrizzare in file di configurazione timers
-//    cnConnectionWatcher->setupTimers(1000);
-//    connect(cnConnectionWatcher.data(), &DeviceConnectionWatcher::deviceDisconnected, this, &MainWindow::handleDisconnectionCN);
-//    cnConnectionWatcher->startWatcher();
-
-//    // TODO NIC 06/12/2018 - da parametrizzare in file di configurazione timers
-//    plcConnectionWatcher->setupTimers(1000);
-//    connect(plcConnectionWatcher.data(), &DeviceConnectionWatcher::deviceDisconnected, this, &MainWindow::handleDisconnectionPLC);
-//    plcConnectionWatcher->startWatcher();
-
     traceExit;
 
 }
@@ -304,8 +295,12 @@ void MainWindow::initMotionInspector() {
     Settings& s = Settings::instance();
     QThread* motionInspectorThread = new QThread();
 
+    // qui ci va la lista dei cn.
     if (s.getMachineCNType() == DeviceKey::GALIL_CN)
         motionInspector.reset(new GalilCNInspector());
+
+    if (motionInspector.isNull())
+        return;
 
     connect(motionInspectorThread, &QThread::started, motionInspector.data(), &AbstractMotionInspector::startProcess);
     connect(motionInspector.data(), &AbstractMotionInspector::processStoppedSignal, motionInspectorThread, &QThread::quit);
@@ -335,17 +330,17 @@ void MainWindow::initGalilPLCInspector() {
 
         QThread* galilPLCInspectorThread = new QThread();
 
-        connect(galilPLCInspectorThread, &QThread::started, galilPLCInspector.data(), &GalilPLCInspector::startProcess);
-        connect(galilPLCInspector.data(), &GalilPLCInspector::processStopSignal, galilPLCInspectorThread, &QThread::quit);
+        connect(galilPLCInspectorThread, &QThread::started, galilPLCInspector.data(), &AbstractConnectedDeviceInspector::startProcess);
+        connect(galilPLCInspector.data(), &AbstractConnectedDeviceInspector::processStoppedSignal, galilPLCInspectorThread, &QThread::quit);
 
-        connect(galilPLCInspector.data(), &GalilPLCInspector::statusSignal, this, &MainWindow::galilPLCStatusUpdateSignal);
+        connect(galilPLCInspector.data(), &AbstractConnectedDeviceInspector::statusSignal, this, &MainWindow::galilPLCStatusUpdateSignal);
 
-        connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspector.data(), &GalilPLCInspector::deleteLater);
+        connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
         connect(galilPLCInspectorThread, &QThread::finished, galilPLCInspectorThread, &QThread::deleteLater);
 
         galilPLCInspector.data()->moveToThread(galilPLCInspectorThread);
 
-        errorManager->subscribeObject(*galilPLCInspector);
+//        errorManager->subscribeObject(*galilPLCInspector);
     }
 
     traceExit;
@@ -368,10 +363,10 @@ void MainWindow::initIOInspector() {
                                   Q_ARG(DeviceKey, DeviceKey::GALIL_CN),
                                   Q_ARG(const QVariant&, status));
     });
-    connect(this, &MainWindow::galilPLCStatusUpdateSignal, [&](const GalilPLCStatusBean& status) {
+    connect(this, &MainWindow::galilPLCStatusUpdateSignal, [&](const QVariant& status) {
         QMetaObject::invokeMethod(ioInspector.data(), "updateIOStatus", Qt::QueuedConnection,
                                   Q_ARG(DeviceKey, DeviceKey::GALIL_PLC),
-                                  Q_ARG(const QVariant&, QVariant::fromValue<GalilPLCStatusBean>(status)));
+                                  Q_ARG(const QVariant&, status));
     });
     connect(ioInspector.data(), &IOInspector::statusSignal, this, &MainWindow::ioStatusUpdateSignal);
 

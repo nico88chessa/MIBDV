@@ -37,7 +37,7 @@ public:
 
 protected:
 
-    void setDevice(CN* dev) {
+    void setDevice(CNPtr dev) {
         device.reset(dev);
     }
 

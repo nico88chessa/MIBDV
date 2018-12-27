@@ -30,6 +30,10 @@ protected:
 
     void analizeLastStatus(const S& status);
 
+protected slots:
+
+    void handleDisconnection();
+
 };
 
 }

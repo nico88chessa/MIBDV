@@ -1,15 +1,16 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+#include <QSharedPointer>
 #include <QScopedPointer>
 
 #include "UnmovableWindow.hpp"
 
-#include <galil/GalilPLCInspector.hpp>
 #include <IOInspector.hpp>
 
 #include <IOManager.hpp>
 #include <MotionManager.hpp>
+#include <ErrorManager.hpp>
 #include <AbstractDeviceConnectionWatcher.hpp>
 #include <AbstractMotionInspector.hpp>
 
@@ -27,7 +28,7 @@ private:
 
     QScopedPointer<PROGRAM_NAMESPACE::AbstractMotionInspector> motionInspector;
     QScopedPointer<PROGRAM_NAMESPACE::IOInspector> ioInspector;
-    QScopedPointer<PROGRAM_NAMESPACE::GalilPLCInspector> galilPLCInspector;
+    QScopedPointer<PROGRAM_NAMESPACE::AbstractConnectedDeviceInspector> galilPLCInspector;
 
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
@@ -65,11 +66,11 @@ private slots:
     void stopDevices();
 
 signals:
-    void galilPLCStatusUpdateSignal(const PROGRAM_NAMESPACE::GalilPLCStatusBean status);
+    void motionStatusUpdateSignal(const QVariant& status);
+    void galilPLCStatusUpdateSignal(const QVariant& status);
     void ioStatusUpdateSignal(const PROGRAM_NAMESPACE::DigitalInputStatus& digitalInputs,
                               const PROGRAM_NAMESPACE::DigitalOutputStatus& digitalOutputs,
                               const PROGRAM_NAMESPACE::AnalogInputStatus& analogInputs);
-    void motionStatusUpdateSignal(const QVariant& status);
 
 };
 
