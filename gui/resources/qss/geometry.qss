@@ -357,22 +357,22 @@ QCheckBox::indicator {
 /* MDSwitchLine
 /******************/
 
-MDSwitchLine {
+.MDSwitchLine {
     qproperty-focusPolicy: NoFocus;
     padding: 0px 16px;
     font-size: 13px;
-    qproperty-circleRadiuos: 10;
-    qproperty-circleLeftPadding: 16;
-    qproperty-circleRightPadding: 16;
-    qproperty-circleBorderWidth: 2;
+    qproperty-imageLeftPadding: 16;
+    qproperty-imageRightPadding: 20;
+    qproperty-imageWidth: 24;
+    qproperty-imageHeight: 24;
     qproperty-layoutDirection: RightToLeft;
 }
 
-MDSwitchLine:hover {
+.MDSwitchLine:hover {
 /*    background-color: blue;*/
 }
 
-MDSwitchLine::indicator {
+.MDSwitchLine::indicator {
 /*    border: 1px solid red;*/
     padding: 0px;
     width: 48px;

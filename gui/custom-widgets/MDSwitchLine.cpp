@@ -3,40 +3,44 @@
 #include <QStyleOption>
 #include <QStylePainter>
 
-QColor MDSwitchLine::getCircleColor() const { return circleColor; }
+int MDSwitchLine::getImageLeftPadding() const { return imageLeftPadding; }
 
-void MDSwitchLine::setCircleColor(const QColor& value) { circleColor = value; }
+void MDSwitchLine::setImageLeftPadding(int value) { imageLeftPadding = value; }
 
-int MDSwitchLine::getCircleLeftPadding() const { return circleLeftPadding; }
+int MDSwitchLine::getImageRightPadding() const { return imageRightPadding; }
 
-void MDSwitchLine::setCircleLeftPadding(int value) { circleLeftPadding = value; }
+void MDSwitchLine::setImageRightPadding(int value) { imageRightPadding = value; }
 
-int MDSwitchLine::getCircleRadiuos() const { return circleRadiuos; }
+QString MDSwitchLine::getImageOnEnable() const { return imageOnEnable; }
 
-void MDSwitchLine::setCircleRadiuos(int value) { circleRadiuos = value; }
+void MDSwitchLine::setImageOnEnable(const QString& value) { imageOnEnable = value; }
 
-QColor MDSwitchLine::getCircleBorderColor() const { return circleBorderColor; }
+QString MDSwitchLine::getImageOnDisable() const { return imageOnDisable; }
 
-void MDSwitchLine::setCircleBorderColor(const QColor& value) { circleBorderColor = value; }
+void MDSwitchLine::setImageOnDisable(const QString& value) { imageOnDisable = value; }
 
-int MDSwitchLine::getCircleBorderWidth() const { return circleBorderWidth; }
+QString MDSwitchLine::getImageOffEnable() const { return imageOffEnable; }
 
-void MDSwitchLine::setCircleBorderWidth(int value) { circleBorderWidth = value; }
+void MDSwitchLine::setImageOffEnable(const QString& value) { imageOffEnable = value; }
 
-int MDSwitchLine::getCircleRightPadding() const { return circleRightPadding; }
+QString MDSwitchLine::getImageOffDisable() const { return imageOffDisable; }
 
-void MDSwitchLine::setCircleRightPadding(int value) { circleRightPadding = value; }
+void MDSwitchLine::setImageOffDisable(const QString& value) { imageOffDisable = value; }
 
 bool MDSwitchLine::getIsOn() const { return isOn; }
+
+int MDSwitchLine::getImageWidth() const { return imageWidth; }
+
+void MDSwitchLine::setImageWidth(int value) { imageWidth = value; }
+
+int MDSwitchLine::getImageHeight() const { return imageHeight; }
+
+void MDSwitchLine::setImageHeight(int value) { imageHeight = value; }
 
 void MDSwitchLine::setIsOn(bool value) {
     isOn = value;
     update();
 }
-
-QColor MDSwitchLine::getCircleOnColor() const { return circleOnColor; }
-
-void MDSwitchLine::setCircleOnColor(const QColor& value) { circleOnColor = value; }
 
 MDSwitchLine::MDSwitchLine(QWidget* parent) :
     QCheckBox(parent), isOn(false) {
@@ -55,27 +59,40 @@ void MDSwitchLine::paintEvent(QPaintEvent* event) {
     opt.text.clear();
     p.drawControl(QStyle::CE_CheckBox, opt);
 
-    QPalette pal = this->palette();
-
     QRect rect = this->rect();
     int x = rect.x();
     int y = rect.y();
     int height = rect.height();
 
-    int yRect = y + (height - circleRadiuos*2)/2;
-    int xRect = x + circleLeftPadding;
+    QPixmap image;
+    if (this->isEnabled())
+        if (this->getIsOn())
+            image.load(this->imageOnEnable);
+        else
+            image.load(this->imageOffEnable);
+    else
+        if (this->getIsOn())
+            image.load(this->imageOnDisable);
+        else
+            image.load(this->imageOffDisable);
+
+    int yRect = y + (height - imageHeight)/2;
+    int xRect = x + imageLeftPadding;
+
+    image = image.scaled(imageWidth, imageHeight, Qt::AspectRatioMode::KeepAspectRatio, Qt::SmoothTransformation);
+    p.drawPixmap(xRect, yRect, image);
 
     // disegno il cerchio
-    QPainterPath path;
-    QRect rect2Draw(xRect, yRect, circleRadiuos*2, circleRadiuos*2);
-    path.addEllipse(rect2Draw);
-    QPen pen(circleBorderColor, circleBorderWidth);
-    p.setPen(pen);
-    if (this->isOn)
-        p.fillPath(path, circleOnColor);
-    else
-        p.fillPath(path, circleColor);
-    p.drawPath(path);
+//    QPainterPath path;
+//    QRect rect2Draw(xRect, yRect, circleRadiuos*2, circleRadiuos*2);
+//    path.addEllipse(rect2Draw);
+//    QPen pen(circleBorderColor, circleBorderWidth);
+//    p.setPen(pen);
+//    if (this->isOn)
+//        p.fillPath(path, circleOnColor);
+//    else
+//        p.fillPath(path, circleColor);
+//    p.drawPath(path);
 
     // scrivo il testo della checkbox
     QFontMetrics fm = this->fontMetrics();
@@ -83,13 +100,14 @@ void MDSwitchLine::paintEvent(QPaintEvent* event) {
     int textWidth = fm.width(this->text());
     int textHeight = rText.height();
     QPoint pTopLeft;
-    pTopLeft.setX(x + circleLeftPadding + circleRadiuos*2 + circleRightPadding);
+    pTopLeft.setX(x + imageLeftPadding + imageWidth + imageRightPadding);
     pTopLeft.setY(y + (height - rText.height())/2);
     rText.setTopLeft(pTopLeft);
     rText.setSize(QSize(textWidth, textHeight));
 
-    pen.setBrush(pal.text());
-    p.setPen(pen);
+    QPalette pal = this->palette();
+//    pen.setBrush(pal.text());
+//    p.setPen(pen);
     p.drawItemText(rText, Qt::AlignLeft, pal, true, this->text());
 
 }

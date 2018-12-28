@@ -17,6 +17,10 @@ QWidget {
     color: black;
 }
 
+QWidget:!enabled {
+/*    color: rgba(0, 0, 0, 38%);*/
+}
+
 
 
 
@@ -300,21 +304,41 @@ MDSwitchLine {
 /*    border: 1px solid red;*/
 /*    background-color: yellow;*/
 /*    border: 1px solid red;*/
-    qproperty-circleColor: transparent;
-    qproperty-circleOnColor: green;
-    qproperty-circleBorderColor: black;
+/*    qproperty-circleColor: transparent; */
+/*    qproperty-circleOnColor: green; */
+/*    qproperty-circleBorderColor: black; */
+    qproperty-imageLeftPadding: 0;
+    qproperty-imageRightPadding: 0;
+    qproperty-imageWidth: 48;
+    qproperty-imageHeight: 48;
+    qproperty-imageOnEnable: url(:/icons/black-theme/lens);
+    qproperty-imageOnDisable: url(:/icons/disabled/lens);
+    qproperty-imageOffEnable: url(:/icons/black-theme/panorama_fish_eye);
+    qproperty-imageOffDisable: url(:/icons/disabled/panorama_fish_eye);
 }
 
-MDSwitchLine::indicator {
+MDSwitchLine:!enabled {
+    color: rgba(0, 0, 0, 38%);
+}
+
+.MDSwitchLine::indicator {
     /*border: 1px solid blue;*/
 }
 
-MDSwitchLine::indicator::unchecked {
+.MDSwitchLine::indicator:unchecked {
     image: url(:/icons/black-theme/toggle_off);
 }
 
-MDSwitchLine::indicator::checked {
+.MDSwitchLine::indicator:checked {
     image: url(:/icons/black-theme/toggle_on);
+}
+
+.MDSwitchLine::indicator:!enabled:unchecked {
+    image: url(:/icons/disabled/toggle_off);
+}
+
+.MDSwitchLine::indicator:!enabled:checked {
+    image: url(:/icons/disabled/toggle_on);
 }
 
 
