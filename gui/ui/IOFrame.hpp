@@ -3,6 +3,8 @@
 
 #include <QFrame>
 
+#include <devices/IOManager.hpp>
+
 class IOFrameLogic;
 
 namespace Ui {
@@ -20,9 +22,19 @@ public:
     using ConstPtr = const IOFrame*;
 
 private:
+    static constexpr int IOFRAME_DSB_MIN_VALUE = -100000;
+    static constexpr int IOFRAME_DSB_MAX_VALUE = 100000;
+
     Ui::IOFrame *ui;
     IOFrameLogic* dPtr;
     int rowMinHeight;
+    PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
+    PROGRAM_NAMESPACE::DigitalOutputStatus digitalOutputStatus;
+    PROGRAM_NAMESPACE::AnalogInputStatus analogInputStatus;
+
+    PROGRAM_NAMESPACE::DigitalInputSet digitalInputs;
+    PROGRAM_NAMESPACE::DigitalOutputSet digitalOutputs;
+    PROGRAM_NAMESPACE::AnalogInputSet analogInputs;
 
 public:
     explicit IOFrame(QWidget *parent = nullptr);
@@ -31,12 +43,23 @@ public:
     int getRowMinHeight() const;
     void setRowMinHeight(int value);
 
+    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
+
 private:
     void setupUi();
     void setupSignalsAndSlots();
 
 protected:
     void paintEvent(QPaintEvent* event);
+
+private slots:
+    void updateUI();
+
+public slots:
+    void updateDigitalIOStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& iStatus,
+                               const PROGRAM_NAMESPACE::DigitalOutputStatus& oStatus,
+                               const PROGRAM_NAMESPACE::AnalogInputStatus& aiStatus);
+
 };
 
 #endif // IOFRAME_HPP

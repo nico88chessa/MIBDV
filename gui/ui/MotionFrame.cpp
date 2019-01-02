@@ -12,9 +12,7 @@ using namespace PROGRAM_NAMESPACE;
  *    M O T I O N  F R A M E  L O G I C
  *********************************************/
 
-MotionFrameLogic::MotionFrameLogic() {
-
-}
+MotionFrameLogic::MotionFrameLogic() { }
 
 MotionFrameLogic::~MotionFrameLogic() { }
 
@@ -572,9 +570,7 @@ MotionFrame::MotionFrame(QWidget *parent) :
     isHomingAxes(false) {
 
     dPtr->qPtr = this;
-
     this->setupUi();
-
     this->setupSignalsAndSlots();
 
 }

@@ -340,13 +340,14 @@ QRadioButton::indicator {
 /* QCheckBox
 /******************/
 
-QCheckBox {
+.QCheckBox {
     padding: 4px 16px;
     font-size: 13px;
+    spacing: 0px;
 }
 
-QCheckBox::indicator {
-    padding-right: 20px;
+.QCheckBox::indicator {
+    padding-right: 32px;
     width: 24px;
     height: 24px;
 }
@@ -362,7 +363,7 @@ QCheckBox::indicator {
     padding: 0px 16px;
     font-size: 13px;
     qproperty-imageLeftPadding: 16;
-    qproperty-imageRightPadding: 20;
+    qproperty-imageRightPadding: 32;
     qproperty-imageWidth: 24;
     qproperty-imageHeight: 24;
     qproperty-layoutDirection: RightToLeft;

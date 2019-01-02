@@ -31,9 +31,6 @@
    </property>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabIOFrame">
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
      <widget class="QWidget" name="tabDigitalIO">
       <attribute name="title">
        <string>Digital IO</string>
@@ -56,14 +53,14 @@
        </property>
        <item row="0" column="0">
         <widget class="QScrollArea" name="saDigitalIO">
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
          </property>
          <widget class="QWidget" name="saDigitalIOContents">
           <property name="geometry">
@@ -96,6 +93,19 @@
            <property name="verticalSpacing">
             <number>0</number>
            </property>
+           <item row="1" column="0" colspan="2">
+            <spacer name="vsDigitalIO">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>661</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="lDigitalInput">
              <property name="text">
@@ -115,32 +125,6 @@
               <string>subheader</string>
              </property>
             </widget>
-           </item>
-           <item row="1" column="1">
-            <spacer name="vsDigitalOutput">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>661</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="0">
-            <spacer name="vsDigitalInput">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>661</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>

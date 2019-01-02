@@ -28,6 +28,12 @@ private:
     static constexpr int MOTION_FRAME_DSB_MIN_VALUE = -100000;
     static constexpr int MOTION_FRAME_DSB_MAX_VALUE = 100000;
 
+    Ui::MotionFrame *ui;
+    MotionFrameLogic* dPtr;
+    PROGRAM_NAMESPACE::MotionBean motionBean;
+    PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
+    bool isHomingAxes;
+
     static QString decodeError(int error) {
 
         QString errDescr;
@@ -38,13 +44,6 @@ private:
         return errDescr;
 
     }
-
-    Ui::MotionFrame *ui;
-    MotionFrameLogic* dPtr;
-    PROGRAM_NAMESPACE::MotionBean motionBean;
-    PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
-
-    bool isHomingAxes;
 
 public:
     explicit MotionFrame(QWidget *parent = nullptr);
@@ -59,9 +58,9 @@ private:
 public slots:
     void updateMotionBean(const PROGRAM_NAMESPACE::MotionBean& b);
     void updateDigitalInputStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& i);
-    void updateUI();
 
 private slots:
+    void updateUI();
 
 };
 

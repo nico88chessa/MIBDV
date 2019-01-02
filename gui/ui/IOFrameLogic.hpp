@@ -2,6 +2,9 @@
 #define IOFRAMELOGIC_HPP
 
 #include <QObject>
+#include <QSharedPointer>
+
+#include <devices/IOManager.hpp>
 
 class IOFrame;
 
@@ -16,11 +19,17 @@ public:
 
 private:
     IOFrame* qPtr;
+    QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
 
 public:
     explicit IOFrameLogic(QObject* parent = nullptr);
     ~IOFrameLogic();
 
+    void setupIOManager(const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
+
+private slots:
+    void setDigitalOutput(PROGRAM_NAMESPACE::IOType type);
+    void unsetDigitalOutput(PROGRAM_NAMESPACE::IOType type);
 
 
 };

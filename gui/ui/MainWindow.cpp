@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setupSignalsAndSlots();
 
-    QTimer::singleShot(1000, this, &MainWindow::startDevices);
+//    QTimer::singleShot(1000, this, &MainWindow::startDevices);
 
     traceExit;
 
@@ -109,7 +109,7 @@ void MainWindow::setupSignalsAndSlots() const {
     for (int i=0; i<widgetsCount; ++i) {
 
         QWidget* current = ui->stackedWidget->widget(i);
-        if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+        if (auto&& mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
             connect(this, &MainWindow::motionStatusUpdateSignal, [mf](const QVariant& bean) {
                 auto motionBean = MotionBean(bean.value<GalilCNStatusBean>());
@@ -125,6 +125,15 @@ void MainWindow::setupSignalsAndSlots() const {
                                           Q_ARG(const mibdv::DigitalInputStatus&, a));
 
             });
+
+        } else if (auto&& iof = current->findChild<IOFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+                connect(this, &MainWindow::ioStatusUpdateSignal, [iof](auto a, auto b, auto c) {
+                    QMetaObject::invokeMethod(iof, "updateDigitalIOStatus", Qt::QueuedConnection,
+                                              Q_ARG(const mibdv::DigitalInputStatus&, a),
+                                              Q_ARG(const mibdv::DigitalOutputStatus&, b),
+                                              Q_ARG(const mibdv::AnalogInputStatus&, c));
+                });
+
 
         }
 
@@ -182,6 +191,10 @@ void MainWindow::setupUiContentPanel() {
         if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
             mf->setupDevices(this->motionManager);
+
+        } else if (auto iof = current->findChild<IOFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+
+            iof->setupDevices(this->ioManager);
 
         }
 
