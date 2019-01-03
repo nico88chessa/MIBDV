@@ -382,13 +382,15 @@ public:
     int getAxisCVelocity() const { return axisCVelocity; }
     short getAxisCTorque() const { return axisCTorque; }
     unsigned short getAxisCAnalogIn() const { return axisCAnalogIn; }
+
+    // NOTE NIC 03/01/2019: gli I/O del galil CN a differenza del PLC partono da 1 e non da 0
     bool getDigitalInput(int i) const {
-        if (i<1 || i>GALIL_CN_DIGITAL_INPUTS)
+        if (i<1 || i>=GALIL_CN_DIGITAL_INPUTS)
             throw DigitalInputOutOfBoundException();
         return digitalInputs[i-1];
     }
     bool getDigitalOutput(int i) const {
-        if (i<1 || i>GALIL_CN_DIGITAL_INPUTS)
+        if (i<1 || i>=GALIL_CN_DIGITAL_INPUTS)
             throw DigitalOutputOutOfBoundException();
         return digitalOutputs[i-1];
     }

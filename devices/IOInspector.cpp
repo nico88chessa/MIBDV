@@ -51,7 +51,7 @@ void IOInspector::updateStatus(const GalilCNStatusBean& status) {
     }
 
     for (auto dOutKey: digitalOutputStatus.keys()) {
-        auto& dOut = digitalInputStatus[dOutKey];
+        auto& dOut = digitalOutputStatus[dOutKey];
         if (dOut.getDevice() == DeviceKey::GALIL_CN) {
             bool value = status.getDigitalOutput(dOut.getChannel());
             if (dOut.getInvertLogic())
@@ -81,7 +81,7 @@ void IOInspector::updateStatus(const GalilPLCStatusBean& status) {
     }
 
     for (auto dOutKey: digitalOutputStatus.keys()) {
-        auto& dOut = digitalInputStatus[dOutKey];
+        auto& dOut = digitalOutputStatus[dOutKey];
         if (dOut.getDevice() == DeviceKey::GALIL_PLC) {
             bool value = status.getDigitalOutput(dOut.getChannel());
             if (dOut.getInvertLogic())
@@ -94,6 +94,7 @@ void IOInspector::updateStatus(const GalilPLCStatusBean& status) {
         auto& aIn = analogInputStatus[aInKey];
         if (aIn.getDevice() == DeviceKey::GALIL_PLC) {
             analogReal value = status.getAnalogInput(aIn.getChannel());
+            value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
             aIn.setValue(value);
         }
     }

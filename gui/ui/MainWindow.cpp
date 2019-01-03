@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setupSignalsAndSlots();
 
-//    QTimer::singleShot(1000, this, &MainWindow::startDevices);
+    QTimer::singleShot(1000, this, &MainWindow::startDevices);
 
     traceExit;
 

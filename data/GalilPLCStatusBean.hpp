@@ -35,6 +35,7 @@ private:
     static constexpr unsigned int BIT_MASK_14 = 0x01 << 14;
     static constexpr unsigned int BIT_MASK_15 = 0x01 << 15;
 
+
 private:
     bool programRunning;
     bool waitingInputFromINCommand;
@@ -123,24 +124,24 @@ public:
     bool getProgramRunning() const { return programRunning; }
     bool getWaitingInputFromINCommand() const { return waitingInputFromINCommand; }
     bool getDigitalInput(int i) const {
-        if (i<1 || i>GALIL_PLC_DIGITAL_INPUTS)
+        if (i<0 || i>=GALIL_PLC_DIGITAL_INPUTS)
             throw DigitalInputOutOfBoundException();
-        return digitalInputs[i-1];
+        return digitalInputs[i];
     }
     bool getDigitalOutput(int i) const {
-        if (i<1 || i>GALIL_PLC_DIGITAL_OUTPUTS)
+        if (i<0 || i>=GALIL_PLC_DIGITAL_OUTPUTS)
             throw DigitalOutputOutOfBoundException();
-        return digitalOutputs[i-1];
+        return digitalOutputs[i];
     }
     analogReal getAnalogInput(int i) const {
-        if (i<1 || i>GALIL_PLC_ANALOG_INPUTS)
+        if (i<0 || i>=GALIL_PLC_ANALOG_INPUTS)
             throw AnalogInputOutOfBoundException();
-        return analogInputs[i-1];
+        return analogInputs[i];
     }
     analogReal getAnalogOutput(int i) const {
-        if (i<1 || i>GALIL_PLC_ANALOG_OUTPUTS)
+        if (i<0 || i>=GALIL_PLC_ANALOG_OUTPUTS)
             throw AnalogOutputOutOfBoundException();
-        return analogOutputs[i-1];
+        return analogOutputs[i];
     }
 
 };

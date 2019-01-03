@@ -45,6 +45,7 @@ static constexpr int GALIL_PLC_DIGITAL_INPUTS = 16;
 static constexpr int GALIL_PLC_DIGITAL_OUTPUTS = 16;
 static constexpr int GALIL_PLC_ANALOG_INPUTS = 8;
 static constexpr int GALIL_PLC_ANALOG_OUTPUTS = 8;
+static constexpr unsigned int GALIL_PLC_ANALOG_COUNT_MAX_VALUE = 32572;
 
 static constexpr int G_CUSTOM_CN_NON_INIZIALIZZATO = PROGRAM_ERR_START_CODE + 1;
 static constexpr int G_CUSTOM_CN_DIGITAL_INPUT_OUT_OF_RANGE = PROGRAM_ERR_START_CODE + 2;
