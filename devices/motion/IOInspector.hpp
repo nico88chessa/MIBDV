@@ -12,10 +12,10 @@
 #include <DigitalInputValue.hpp>
 #include <DigitalOutputValue.hpp>
 #include <AnalogInputValue.hpp>
-#include <AbstractDevice.hpp>
-#include <galil/GalilCNController.hpp>
+#include <devices/AbstractDevice.hpp>
+#include <devices/motion/galil/GalilCNController.hpp>
 #include <GalilCNStatusBean.hpp>
-#include <galil/GalilPLCController.hpp>
+#include <devices/motion/galil/GalilPLCController.hpp>
 #include <GalilPLCStatusBean.hpp>
 
 

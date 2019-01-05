@@ -10,8 +10,8 @@
 #include <Settings.hpp>
 #include <Logger.hpp>
 #include <Types.hpp>
-#include <AbstractCN.hpp>
-#include <AbstractPLC.hpp>
+#include <devices/motion/AbstractCN.hpp>
+#include <devices/motion/AbstractPLC.hpp>
 #include <DigitalInput.hpp>
 #include <DigitalOutput.hpp>
 #include <AnalogInput.hpp>

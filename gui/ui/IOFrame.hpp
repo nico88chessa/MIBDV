@@ -3,7 +3,7 @@
 
 #include <QFrame>
 
-#include <devices/IOManager.hpp>
+#include <devices/motion/IOManager.hpp>
 
 class IOFrameLogic;
 

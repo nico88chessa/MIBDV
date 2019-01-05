@@ -4,10 +4,10 @@
 #include <QtGlobal>
 
 #include <Types.hpp>
-#include <MotionManager.hpp>
+#include <devices/motion/MotionManager.hpp>
 #include <Settings.hpp>
 #include <Logger.hpp>
-#include <AbstractCN.hpp>
+#include <devices/motion/AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

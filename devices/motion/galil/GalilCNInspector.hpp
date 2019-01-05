@@ -1,8 +1,8 @@
 #ifndef GALILCNINSPECTOR_HPP
 #define GALILCNINSPECTOR_HPP
 
-#include "MotionInspectorImpl.hpp"
-#include "GalilCNController.hpp"
+#include <devices/motion/MotionInspectorImpl.hpp>
+#include <devices/motion/galil/GalilCNController.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

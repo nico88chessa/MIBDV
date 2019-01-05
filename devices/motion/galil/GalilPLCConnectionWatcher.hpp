@@ -1,7 +1,7 @@
 #ifndef GALILPLCCONNECTIONWATCHER_HPP
 #define GALILPLCCONNECTIONWATCHER_HPP
 
-#include "AbstractDeviceConnectionWatcher.hpp"
+#include <devices/AbstractDeviceConnectionWatcher.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

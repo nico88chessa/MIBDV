@@ -1,7 +1,7 @@
 #include "IOManager.hpp"
 
-#include <galil/GalilCNController.hpp>
-#include <galil/GalilPLCController.hpp>
+#include <devices/motion/galil/GalilPLCController.hpp>
+#include <devices/motion/galil/GalilCNController.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 

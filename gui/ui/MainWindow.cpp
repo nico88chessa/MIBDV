@@ -6,15 +6,15 @@
 #include <Logger.hpp>
 #include <gui/resources/lang/lang.hpp>
 
-#include <MotionManagerImpl.hpp>
+#include <devices/motion/MotionManagerImpl.hpp>
 
-#include <galil/GalilCNController.hpp>
-#include <galil/GalilCNInspector.hpp>
-#include <galil/GalilCNConnectionWatcher.hpp>
+#include <devices/motion/galil/GalilCNController.hpp>
+#include <devices/motion/galil/GalilCNInspector.hpp>
+#include <devices/motion/galil/GalilCNConnectionWatcher.hpp>
 
-#include <galil/GalilPLCController.hpp>
-#include <galil/GalilPLCInspector.hpp>
-#include <galil/GalilPLCConnectionWatcher.hpp>
+#include <devices/motion/galil/GalilPLCController.hpp>
+#include <devices/motion/galil/GalilPLCInspector.hpp>
+#include <devices/motion/galil/GalilPLCConnectionWatcher.hpp>
 
 
 using namespace PROGRAM_NAMESPACE;

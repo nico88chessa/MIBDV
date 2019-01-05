@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QSharedPointer>
 
-#include <MotionManager.hpp>
-#include <IOManager.hpp>
+#include <devices/motion/MotionManager.hpp>
+#include <devices/motion/IOManager.hpp>
 
 class MotionFrame;
 

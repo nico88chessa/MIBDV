@@ -6,7 +6,7 @@
 
 #include <configure.h>
 #include <data/GalilPLCStatusBean.hpp>
-#include "AbstractPLC.hpp"
+#include <devices/motion/AbstractPLC.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

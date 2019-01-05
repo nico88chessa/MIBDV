@@ -3,10 +3,10 @@
 #include <QEventLoop>
 #include <QTimer>
 
-#include <AbstractCN.hpp>
+#include <devices/motion/AbstractCN.hpp>
 #include <Logger.hpp>
 #include <Settings.hpp>
-#include <galil/GalilCNController.hpp>
+#include <devices/motion/galil/GalilCNController.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 

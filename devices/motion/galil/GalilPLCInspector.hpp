@@ -1,7 +1,7 @@
 #ifndef GALILPLCINSPECTOR_HPP
 #define GALILPLCINSPECTOR_HPP
 
-#include "AbstractConnectedDeviceInspector.hpp"
+#include <devices/AbstractConnectedDeviceInspector.hpp>
 
 #include "GalilPLCController.hpp"
 

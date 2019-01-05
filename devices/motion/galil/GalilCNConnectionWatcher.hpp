@@ -1,7 +1,7 @@
 #ifndef GALILCNCONNECTIONWATCHER_HPP
 #define GALILCNCONNECTIONWATCHER_HPP
 
-#include "AbstractDeviceConnectionWatcher.hpp"
+#include <devices/AbstractDeviceConnectionWatcher.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

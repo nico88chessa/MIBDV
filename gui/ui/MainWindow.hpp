@@ -6,13 +6,13 @@
 
 #include "UnmovableWindow.hpp"
 
-#include <IOInspector.hpp>
+#include <devices/motion/IOInspector.hpp>
 
-#include <IOManager.hpp>
-#include <MotionManager.hpp>
+#include <devices/motion/IOManager.hpp>
+#include <devices/motion/MotionManager.hpp>
 #include <ErrorManager.hpp>
-#include <AbstractDeviceConnectionWatcher.hpp>
-#include <AbstractMotionInspector.hpp>
+#include <devices/AbstractDeviceConnectionWatcher.hpp>
+#include <devices/motion/AbstractMotionInspector.hpp>
 
 namespace Ui {
 class MainWindow;

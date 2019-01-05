@@ -5,7 +5,7 @@
 
 #include <configure.h>
 #include <Types.hpp>
-#include "AbstractDevice.hpp"
+#include <devices/AbstractDevice.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

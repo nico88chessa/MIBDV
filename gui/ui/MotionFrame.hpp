@@ -4,9 +4,9 @@
 #include <QSharedPointer>
 #include <QFrame>
 
-#include <MotionManager.hpp>
+#include <devices/motion/MotionManager.hpp>
 #include <MotionBean.hpp>
-#include <IOInspector.hpp>
+#include <devices/motion/IOInspector.hpp>
 
 class MotionFrameLogic;
 

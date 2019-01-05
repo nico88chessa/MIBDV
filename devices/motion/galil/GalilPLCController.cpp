@@ -3,7 +3,7 @@
 #include <gclib.h>
 #include <gclibo.h>
 #include <Logger.hpp>
-#include <devices/galil/GalilControllerUtils.hpp>
+#include <devices/motion/galil/GalilControllerUtils.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 

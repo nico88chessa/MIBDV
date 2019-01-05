@@ -6,7 +6,7 @@
 
 #include <configure.h>
 #include <data/GalilCNStatusBean.hpp>
-#include <devices/AbstractCN.hpp>
+#include <devices/motion/AbstractCN.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

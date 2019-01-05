@@ -1,8 +1,16 @@
 SET(ITEMS
-    AbstractConnectedDeviceInspector
     AbstractDevice
-    AbstractDeviceConnectionWatcher
     AbstractDeviceInspector
+    AbstractConnectedDeviceInspector
+    AbstractMotionInspector
+    MotionInspectorImpl
+    AbstractPLC
+    AbstractCN
+    AbstractDeviceConnectionWatcher
+    IOManager
+    IOInspector
+    MotionManager
+    MotionManagerImpl
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -37,8 +45,7 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    motion
-    laser
+    galil
 )
 
 FOREACH(item ${SUB_FOLDERS})
@@ -46,6 +53,3 @@ FOREACH(item ${SUB_FOLDERS})
     INCLUDE_DIRECTORIES(${item})
     ADD_SUBDIRECTORY(${item})
 ENDFOREACH(item)
-
-
-
