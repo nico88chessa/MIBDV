@@ -73,7 +73,7 @@ protected:
 
 public:
 
-    SocketSyncExecutor(QObject* parent = 0) :
+    SocketSyncExecutor(QObject* parent = nullptr) :
         AbstractSyncExecutor(parent),
         ip(CONNECTION_DEFAULT_IP), port(CONNECTION_DEFAULT_PORT),
         socket(this), standbyTimer(this) {
@@ -87,7 +87,7 @@ public:
 
     }
 
-    SocketSyncExecutor(const QString& ipAddress, quint16 portNumber, QObject* parent = 0) :
+    SocketSyncExecutor(const QString& ipAddress, quint16 portNumber, QObject* parent = nullptr) :
         AbstractSyncExecutor(parent),
         ip(ipAddress), port(portNumber) { }
 

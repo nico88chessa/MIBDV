@@ -38,7 +38,7 @@ protected:
 
 public:
 
-    AbstractAsyncExecutor(AbstractSender::Ptr _s, AbstractReceiver::Ptr _r, QObject* parent=0) :
+    AbstractAsyncExecutor(AbstractSender::Ptr _s, AbstractReceiver::Ptr _r, QObject* parent = nullptr) :
         QObject(parent), sender(_s), receiver(_r) {
 
         connect(_r, SIGNAL(dataArrives()), this, SLOT(receive()));

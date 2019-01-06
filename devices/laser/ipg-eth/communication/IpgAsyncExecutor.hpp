@@ -24,7 +24,7 @@ protected:
 
     MarshallerInterface::Ptr marshallerFactory(int i) {
 
-        MarshallerInterface::Ptr marshaller = NULL;
+        MarshallerInterface::Ptr marshaller = nullptr;
 
         switch (i) {
         case COMMAND_GET_NETWORK_SETTINGS: marshaller = new GetNetworkSettingsMarshaller(); break;
@@ -56,7 +56,7 @@ protected:
 
     OutputBean::Ptr outputBeanFactory(int i) {
 
-        OutputBean::Ptr bean = NULL;
+        OutputBean::Ptr bean = nullptr;
 
         switch (i) {
         case COMMAND_GET_NETWORK_SETTINGS: bean = new GetNetworkSettingsOutput(); break;
@@ -88,7 +88,7 @@ protected:
 
 public:
 
-    IpgAsyncExecutor(AbstractSender::Ptr _s, AbstractReceiver::Ptr _r, QObject* parent=0) :
+    IpgAsyncExecutor(AbstractSender::Ptr _s, AbstractReceiver::Ptr _r, QObject* parent = nullptr) :
         AbstractAsyncExecutor(_s, _r, parent) { }
 
 public slots:
@@ -148,13 +148,13 @@ public slots:
             }
 
             MarshallerInterface::Ptr marshaller = this->marshallerFactory(answer);
-            if (marshaller == NULL) {
+            if (marshaller == nullptr) {
                 qWarning() << "  - Ipg async executor: errore nel factoring marshaller.";
                 return IPG_ASYNC_EXECUTOR_MARSHALLER_FACTORY_ERROR;
             }
 
             OutputBean::Ptr outputBean = this->outputBeanFactory(answer);
-            if (outputBean == NULL) {
+            if (outputBean == nullptr) {
                 qWarning() << "  - Ipg async executor: errore nel factoring bean.";
                 return IPG_ASYNC_EXECUTOR_BEAN_FACTORY_ERROR;
             }
@@ -168,121 +168,121 @@ public slots:
             switch (answer) {
             case COMMAND_GET_NETWORK_SETTINGS: {
                 GetNetworkSettingsOutput::Ptr gns = dynamic_cast<GetNetworkSettingsOutput::Ptr>(outputBean);
-                if (gns != NULL)
+                if (gns != nullptr)
                     emit getNetworkSettingsSignal(*gns);
                 break;
             }
             case COMMAND_SET_IPSETTINGS: {
                 SetIpSettingsOutput::Ptr si = dynamic_cast<SetIpSettingsOutput::Ptr>(outputBean);
-                if (si != NULL)
+                if (si != nullptr)
                     emit setIpSettingsSignal(*si);
                 break;
             }
             case COMMAND_SET_COMMAND_TIMEOUT: {
                 SetCommandTimeoutOutput::Ptr sct = dynamic_cast<SetCommandTimeoutOutput::Ptr>(outputBean);
-                if (sct != NULL)
+                if (sct != nullptr)
                     emit setCommandTimeoutSignal(*sct);
                 break;
             }
             case COMMAND_GET_CRITICAL_ERROR_COUNTER: {
                 GetCriticalErrorCounterOutput::Ptr gcec = dynamic_cast<GetCriticalErrorCounterOutput::Ptr>(outputBean);
-                if (gcec != NULL)
+                if (gcec != nullptr)
                     emit getCriticalErrorCounterSignal(*gcec);
                 break;
             }
             case COMMAND_GET_LASER_MODEL_INFO: {
                 GetLaserModelInfoOutput::Ptr glmi = dynamic_cast<GetLaserModelInfoOutput::Ptr>(outputBean);
-                if (glmi != NULL)
+                if (glmi != nullptr)
                     emit getLaserModelInfoSignal(*glmi);
                 break;
             }
             case COMMAND_GET_LASER_SOFTWARE_INFO: {
                 GetLaserSoftwareInfoOutput::Ptr glsi = dynamic_cast<GetLaserSoftwareInfoOutput::Ptr>(outputBean);
-                if (glsi != NULL)
+                if (glsi != nullptr)
                     emit getLaserSoftwareInfoSignal(*glsi);
                 break;
             }
             case COMMAND_GET_MODE_PARAMETER: {
                 GetModeParameterOutput::Ptr gmp = dynamic_cast<GetModeParameterOutput::Ptr>(outputBean);
-                if (gmp != NULL)
+                if (gmp != nullptr)
                     emit getModeParameterSignal(*gmp);
                 break;
             }
             case COMMAND_GET_ALARM_COUNTER: {
                 GetAlarmCounterOutput::Ptr gac = dynamic_cast<GetAlarmCounterOutput::Ptr>(outputBean);
-                if (gac != NULL)
+                if (gac != nullptr)
                     emit getAlarmCounterSignal(*gac);
                 break;
             }
             case COMMAND_SET_LASER_INTERFACE: {
                 SetLaserInterfaceOutput::Ptr sli = dynamic_cast<SetLaserInterfaceOutput::Ptr>(outputBean);
-                if (sli != NULL)
+                if (sli != nullptr)
                     emit setLaserInterfaceSignal(*sli);
                 break;
             }
             case COMMAND_GET_LASER_INTERFACE: {
                 GetLaserInterfaceOutput::Ptr gli = dynamic_cast<GetLaserInterfaceOutput::Ptr>(outputBean);
-                if (gli != NULL)
+                if (gli != nullptr)
                     emit getLaserInterfaceSignal(*gli);
                 break;
             }
             case COMMAND_RESET: {
                 ResetOutput::Ptr r = dynamic_cast<ResetOutput::Ptr>(outputBean);
-                if (r != NULL)
+                if (r != nullptr)
                     emit resetSignal(*r);
                 break;
             }
             case COMMAND_RESET_CRITICAL_ERROR: {
                 ResetCriticalErrorOutput::Ptr rce = dynamic_cast<ResetCriticalErrorOutput::Ptr>(outputBean);
-                if (rce != NULL)
+                if (rce != nullptr)
                     emit resetCriticalErrorSignal(*rce);
                 break;
             }
             case COMMAND_SET_MODE_INDEX: {
                 SetModeIndexOutput::Ptr smi = dynamic_cast<SetModeIndexOutput::Ptr>(outputBean);
-                if (smi != NULL)
+                if (smi != nullptr)
                     emit setModeIndexSignal(*smi);
                 break;
             }
             case COMMAND_SET_PS_MODE: {
                 SetPSModeOutput::Ptr spm = dynamic_cast<SetPSModeOutput::Ptr>(outputBean);
-                if (spm != NULL)
+                if (spm != nullptr)
                     emit setPSModeSignal(*spm);
                 break;
             }
             case COMMAND_SET_GL: {
                 SetGLModeOutput::Ptr sg = dynamic_cast<SetGLModeOutput::Ptr>(outputBean);
-                if (sg != NULL)
+                if (sg != nullptr)
                     emit setGLModeSignal(*sg);
                 break;
             }
             case COMMAND_SET_FREQUENCY: {
                 SetFrequencyOutput::Ptr sf = dynamic_cast<SetFrequencyOutput::Ptr>(outputBean);
-                if (sf != NULL)
+                if (sf != nullptr)
                     emit setFrequencySignal(*sf);
                 break;
             }
             case COMMAND_SET_POWER: {
                 SetPowerOutput::Ptr sp = dynamic_cast<SetPowerOutput::Ptr>(outputBean);
-                if (sp != NULL)
+                if (sp != nullptr)
                     emit setPowerSignal(*sp);
                 break;
             }
             case COMMAND_SET_EE: {
                 SetEEOutput::Ptr see = dynamic_cast<SetEEOutput::Ptr>(outputBean);
-                if (see != NULL)
+                if (see != nullptr)
                     emit setEESignal(*see);
                 break;
             }
             case COMMAND_SET_EM: {
                 SetEMOutput::Ptr sem = dynamic_cast<SetEMOutput::Ptr>(outputBean);
-                if (sem != NULL)
+                if (sem != nullptr)
                     emit setEMSignal(*sem);
                 break;
             }
             case COMMAND_GET_LASER_STATUS: {
                 GetLaserStatusOutput::Ptr g = dynamic_cast<GetLaserStatusOutput::Ptr>(outputBean);
-                if (g != NULL)
+                if (g != nullptr)
                     emit getLaserStatusSignal(*g);
                 break;
             }

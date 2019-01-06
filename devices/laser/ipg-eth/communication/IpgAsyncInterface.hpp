@@ -22,7 +22,7 @@ private:
 
 public:
 
-    SenderImpl(QTcpSocket* _s, QObject* parent=0) :
+    SenderImpl(QTcpSocket* _s, QObject* parent = nullptr) :
         AbstractSender(parent),
         socket(_s) {
     }
@@ -57,7 +57,7 @@ private:
 
 public:
 
-    ReceiverImpl(QTcpSocket* _s, QObject* parent=0) : AbstractReceiver(parent), socket(_s) {
+    ReceiverImpl(QTcpSocket* _s, QObject* parent = nullptr) : AbstractReceiver(parent), socket(_s) {
 
         connect(socket, SIGNAL(readyRead()), this, SIGNAL(dataArrives()));
 
@@ -144,7 +144,7 @@ public slots:
 
 public:
 
-    IpgAsyncInterface(QObject* parent=0) : QObject(parent) {
+    IpgAsyncInterface(QObject* parent = nullptr) : QObject(parent) {
 
         socket = new QTcpSocket(parent);
         sender = new SenderImpl(socket, parent);

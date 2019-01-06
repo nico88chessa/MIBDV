@@ -28,7 +28,7 @@ public:
 
 public:
 
-    AbstractReceiver(QObject* parent=0) : QObject(parent) { }
+    AbstractReceiver(QObject* parent = nullptr) : QObject(parent) { }
 
     virtual bool hasData() = 0;
 

@@ -38,7 +38,7 @@ private slots:
 
 public:
 
-    IpgSyncInterface(QObject* parent=0) : QObject(parent), isConnected(false) {
+    IpgSyncInterface(QObject* parent = nullptr) : QObject(parent), isConnected(false) {
 
         this->syncExecutor = new SocketSyncExecutor();
 

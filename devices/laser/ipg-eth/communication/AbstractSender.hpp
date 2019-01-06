@@ -21,7 +21,7 @@ public:
 
 public:
 
-    AbstractSender(QObject* parent=0) : QObject(parent) { }
+    AbstractSender(QObject* parent = nullptr) : QObject(parent) { }
 
 public slots:
 
