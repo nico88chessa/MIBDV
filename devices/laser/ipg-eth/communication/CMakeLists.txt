@@ -1,6 +1,13 @@
 SET(ITEMS
-    AbstractLaser
-    )
+    AbstractAsyncExecutor
+    AbstractReceiver
+    AbstractSender
+    AbstractSyncExecutor
+    IpgAsyncExecutor
+    IpgAsyncInterface
+    IpgSyncInterface
+    SocketSyncExecutor
+)
 
 FOREACH(ITEM ${ITEMS})
     IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ui")
@@ -34,7 +41,6 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    ipg-eth
 )
 
 FOREACH(item ${SUB_FOLDERS})

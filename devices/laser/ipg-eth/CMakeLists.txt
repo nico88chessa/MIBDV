@@ -1,5 +1,5 @@
 SET(ITEMS
-    AbstractLaser
+    Beans
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -34,7 +34,10 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    ipg-eth
+    beans
+    marshalling
+    communication
+    utility
 )
 
 FOREACH(item ${SUB_FOLDERS})
