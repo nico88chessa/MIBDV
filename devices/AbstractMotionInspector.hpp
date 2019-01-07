@@ -20,11 +20,6 @@ public:
     ~AbstractMotionInspector() { }
 
 signals:
-    void powerOffSignal();
-    void powerOnSignal();
-    void cycleOffSignal();
-    void cycleOnSignal();
-
     void axisXMotorOffSignal();
     void axisXMotionStopSignal();
     void axisXForwardLimitSignal();

@@ -134,11 +134,9 @@ void MainWindow::setupSignalsAndSlots() const {
                                               Q_ARG(const mibdv::AnalogInputStatus&, c));
                 });
 
-
         }
 
     }
-
 
     traceExit;
 
@@ -190,7 +188,7 @@ void MainWindow::setupUiContentPanel() {
         QWidget* current = ui->stackedWidget->widget(i);
         if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
-            mf->setupDevices(this->motionManager);
+            mf->setupDevices(this->motionManager, this->ioManager);
 
         } else if (auto iof = current->findChild<IOFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
@@ -213,10 +211,17 @@ void MainWindow::initDevices() {
     if (errorManager.isNull())
         errorManager.reset(new ErrorManager());
 
-    if (ioManager.isNull())
+    this->initIOInspector();
+
+    if (ioManager.isNull()) {
         ioManager.reset(new IOManager());
 
-    this->initIOInspector();
+        connect(ioInspector.data(), &IOInspector::powerOnSignal, ioManager.data(), &IOManager::powerOnSignal);
+        connect(ioInspector.data(), &IOInspector::powerOffSignal, ioManager.data(), &IOManager::powerOffSignal);
+        connect(ioInspector.data(), &IOInspector::cycleOnSignal, ioManager.data(), &IOManager::cycleOnSignal);
+        connect(ioInspector.data(), &IOInspector::cycleOffSignal, ioManager.data(), &IOManager::cycleOffSignal);
+
+    }
 
     // avvio il motion inspector (galil cn inspector)
     this->initMotionInspector();

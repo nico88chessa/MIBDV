@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 #include <QFrame>
 
+#include <IOManager.hpp>
 #include <MotionManager.hpp>
 #include <MotionBean.hpp>
 #include <IOInspector.hpp>
@@ -49,7 +50,8 @@ public:
     explicit MotionFrame(QWidget *parent = nullptr);
     ~MotionFrame();
 
-    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager);
+    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
+            const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
 
 private:
     void setupUi();

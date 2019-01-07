@@ -54,6 +54,8 @@ void MotionFrameLogic::moveX() {
 
     traceEnter;
 
+    traceInfo() << "Inizio move asse X";
+
     if (!this->checkCycle())
         return;
 
@@ -64,8 +66,12 @@ void MotionFrameLogic::moveX() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -76,13 +82,13 @@ void MotionFrameLogic::moveX() {
         t.setSingleShot(true);
         t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+        QMetaObject::Connection c1 = connect(ioManager.data(), &IOManager::powerOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_POWER_OFF;
             }
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
+        QMetaObject::Connection c2 = connect(ioManager.data(), &IOManager::cycleOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_CYCLE_OFF;
@@ -118,8 +124,13 @@ void MotionFrameLogic::moveX() {
         QObject::disconnect(c1);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore move asse X - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
         }
 
@@ -133,6 +144,8 @@ void MotionFrameLogic::moveY() {
 
     traceEnter;
 
+    traceInfo() << "Inizio move asse Y";
+
     if (!this->checkCycle())
         return;
 
@@ -143,8 +156,12 @@ void MotionFrameLogic::moveY() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -155,13 +172,13 @@ void MotionFrameLogic::moveY() {
         t.setSingleShot(true);
         t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+        QMetaObject::Connection c1 = connect(ioManager.data(), &IOManager::powerOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_POWER_OFF;
             }
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
+        QMetaObject::Connection c2 = connect(ioManager.data(), &IOManager::cycleOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_CYCLE_OFF;
@@ -198,8 +215,13 @@ void MotionFrameLogic::moveY() {
         QObject::disconnect(c1);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore move asse Y - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
         }
 
@@ -213,6 +235,8 @@ void MotionFrameLogic::moveZ() {
 
     traceEnter;
 
+    traceInfo() << "Inizio move asse Z";
+
     if (!this->checkCycle())
         return;
 
@@ -223,8 +247,12 @@ void MotionFrameLogic::moveZ() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -235,13 +263,13 @@ void MotionFrameLogic::moveZ() {
         t.setSingleShot(true);
         t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+        QMetaObject::Connection c1 = connect(ioManager.data(), &IOManager::powerOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_POWER_OFF;
             }
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
+        QMetaObject::Connection c2 = connect(ioManager.data(), &IOManager::cycleOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_CYCLE_OFF;
@@ -278,8 +306,13 @@ void MotionFrameLogic::moveZ() {
         QObject::disconnect(c1);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore move asse Z - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
         }
 
@@ -297,8 +330,12 @@ void MotionFrameLogic::stopX() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -316,8 +353,12 @@ void MotionFrameLogic::stopY() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -335,8 +376,12 @@ void MotionFrameLogic::stopZ() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -350,6 +395,8 @@ void MotionFrameLogic::homeAxes() {
 
     traceEnter;
 
+    traceInfo() << "Inizio procedura homing assi";
+
     if (!this->checkCycle())
         return;
 
@@ -358,8 +405,12 @@ void MotionFrameLogic::homeAxes() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando home asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -368,13 +419,13 @@ void MotionFrameLogic::homeAxes() {
         qPtr->isHomingAxes = true;
         QEventLoop loop;
         res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+        QMetaObject::Connection c1 = connect(ioManager.data(), &IOManager::powerOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_POWER_OFF;
             }
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
+        QMetaObject::Connection c2 = connect(ioManager.data(), &IOManager::cycleOffSignal, [&]() {
             if (loop.isRunning()) {
                 loop.quit();
                 res = MOTION_MANAGER_CYCLE_OFF;
@@ -406,14 +457,24 @@ void MotionFrameLogic::homeAxes() {
         QObject::disconnect(c1);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore home asse Z - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
             qPtr->isHomingAxes = false;
             return;
         }
 
         if (res != MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore home asse Z - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
             diag.setupLabels("Error", tr("Homing Z non completato"));
             diag.exec();
@@ -427,8 +488,12 @@ void MotionFrameLogic::homeAxes() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando home asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         qPtr->isHomingAxes = false;
         return;
@@ -439,8 +504,12 @@ void MotionFrameLogic::homeAxes() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando home asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         qPtr->isHomingAxes = false;
         return;
@@ -456,11 +525,17 @@ void MotionFrameLogic::stopAxes() {
 
     traceEnter;
 
+    traceInfo() << "Inizio procedura stop assi";
+
     int res = motionManager->stopY();
     if (motionManager->isErr(res)) {
 
+        QString descr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descr);
         diag.exec();
         return;
 
@@ -469,8 +544,12 @@ void MotionFrameLogic::stopAxes() {
     res = motionManager->stopX();
     if (motionManager->isErr(res)) {
 
+        QString descr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descr);
         diag.exec();
         return;
 
@@ -479,8 +558,12 @@ void MotionFrameLogic::stopAxes() {
     res = motionManager->stopZ();
     if (motionManager->isErr(res)) {
 
+        QString descr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descr);
         diag.exec();
         return;
 
@@ -579,10 +662,12 @@ MotionFrame::~MotionFrame() {
     delete ui;
 }
 
-void MotionFrame::setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager) {
+void MotionFrame::setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
+                               const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager) {
 
     traceEnter;
     dPtr->setupMotionManager(motionManager);
+    dPtr->setupIOManager(ioManager);
     traceExit;
 
 }

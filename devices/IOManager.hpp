@@ -95,6 +95,10 @@ public slots:
 
 
 signals:
+    void powerOffSignal();
+    void powerOnSignal();
+    void cycleOffSignal();
+    void cycleOnSignal();
 
 };
 
