@@ -26,7 +26,7 @@ public:
 
 private:
     static constexpr int MOTION_FRAME_CYCLE_ERR = PROGRAM_NAMESPACE::PROGRAM_ERR_START_CODE + 1;
-    static constexpr int MOTION_FRAME_DSB_MIN_VALUE = -100000;
+    static constexpr int MOTION_FRAME_DSB_MIN_VALUE = 0;
     static constexpr int MOTION_FRAME_DSB_MAX_VALUE = 100000;
 
     Ui::MotionFrame *ui;

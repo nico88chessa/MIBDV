@@ -6,6 +6,7 @@
 #include <QScopedPointer>
 
 #include <Constants.hpp>
+#include <AbstractMotionUtils.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -22,12 +23,15 @@ static constexpr MotionErr MOTION_MANAGER_POWER_OFF = PROGRAM_ERR_START_CODE + 8
 static constexpr MotionErr MOTION_MANAGER_MOTION_X_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 9;
 static constexpr MotionErr MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 10;
 static constexpr MotionErr MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY = PROGRAM_ERR_START_CODE + 11;
-static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_X_ERR = PROGRAM_ERR_START_CODE + 12;
-static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Y_ERR = PROGRAM_ERR_START_CODE + 13;
-static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Z_ERR = PROGRAM_ERR_START_CODE + 14;
-static constexpr MotionErr MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 15;
-static constexpr MotionErr MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 16;
-static constexpr MotionErr MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 17;
+static constexpr MotionErr MOTION_MANAGER_MOTION_X_STOP_ERROR = PROGRAM_ERR_START_CODE + 12;
+static constexpr MotionErr MOTION_MANAGER_MOTION_Y_STOP_ERROR = PROGRAM_ERR_START_CODE + 13;
+static constexpr MotionErr MOTION_MANAGER_MOTION_Z_STOP_ERROR = PROGRAM_ERR_START_CODE + 14;
+static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_X_ERR = PROGRAM_ERR_START_CODE + 15;
+static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Y_ERR = PROGRAM_ERR_START_CODE + 16;
+static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Z_ERR = PROGRAM_ERR_START_CODE + 17;
+static constexpr MotionErr MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 18;
+static constexpr MotionErr MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 19;
+static constexpr MotionErr MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 20;
 
 
 class MotionManager : public QObject {
@@ -80,6 +84,7 @@ signals:
     void cycleOnSignal();
 
     void axisXMotorOffSignal();
+    void axisXMotionStopSignal(MotionStopCode stopCode, QString detail = "");
     void axisXMotionStopSignal();
     void axisXForwardLimitSignal();
     void axisXBackwardLimitSignal();
@@ -87,6 +92,7 @@ signals:
     void axisXHomeInProgressStopSignal();
 
     void axisYMotorOffSignal();
+    void axisYMotionStopSignal(MotionStopCode stopCode, QString detail = "");
     void axisYMotionStopSignal();
     void axisYForwardLimitSignal();
     void axisYBackwardLimitSignal();
@@ -94,6 +100,7 @@ signals:
     void axisYHomeInProgressStopSignal();
 
     void axisZMotorOffSignal();
+    void axisZMotionStopSignal(MotionStopCode stopCode, QString detail = "");
     void axisZMotionStopSignal();
     void axisZForwardLimitSignal();
     void axisZBackwardLimitSignal();
@@ -116,6 +123,9 @@ public:
             case MOTION_MANAGER_MOTION_X_STOP_CORRECTLY: errDescr = tr("Spostamento asse X completato correttamente"); break;
             case MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY: errDescr = tr("Spostamento asse Y completato correttamente"); break;
             case MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY: errDescr = tr("Spostamento asse Z completato correttamente"); break;
+            case MOTION_MANAGER_MOTION_X_STOP_ERROR: errDescr = tr("Movimento asse X interrotto"); break;
+            case MOTION_MANAGER_MOTION_Y_STOP_ERROR: errDescr = tr("Movimento asse Y interrotto"); break;
+            case MOTION_MANAGER_MOTION_Z_STOP_ERROR: errDescr = tr("Movimento asse Z interrotto"); break;
             case MOTION_MANAGER_STOP_COMMAND_X_ERR: errDescr = tr("Errore nel comando di stop per l'asse X"); break;
             case MOTION_MANAGER_STOP_COMMAND_Y_ERR: errDescr = tr("Errore nel comando di stop per l'asse Y"); break;
             case MOTION_MANAGER_STOP_COMMAND_Z_ERR: errDescr = tr("Errore nel comando di stop per l'asse Z"); break;

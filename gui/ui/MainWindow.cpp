@@ -256,21 +256,30 @@ void MainWindow::initDevices() {
             // connect(motionInspector.data(), &AbstractMotionInspector::cycleOffSignal, motionManager.data(), &MotionManager::cycleOffSignal);
 
             connect(motionInspector.data(), &AbstractMotionInspector::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
-            connect(motionInspector.data(), &AbstractMotionInspector::axisXMotionStopSignal, motionManager.data(), &MotionManager::axisXMotionStopSignal);
+            connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)()>(&AbstractMotionInspector::axisXMotionStopSignal),
+                    motionManager.data(), static_cast<void (MotionManager::*)()>(&MotionManager::axisXMotionStopSignal));
+            connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)(MotionStopCode, QString)>(&AbstractMotionInspector::axisXMotionStopSignal),
+                    motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode, QString)>(&MotionManager::axisXMotionStopSignal));
             connect(motionInspector.data(), &AbstractMotionInspector::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
 
             connect(motionInspector.data(), &AbstractMotionInspector::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
-            connect(motionInspector.data(), &AbstractMotionInspector::axisYMotionStopSignal, motionManager.data(), &MotionManager::axisYMotionStopSignal);
+            connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)()>(&AbstractMotionInspector::axisYMotionStopSignal),
+                    motionManager.data(), static_cast<void (MotionManager::*)()>(&MotionManager::axisYMotionStopSignal));
+            connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)(MotionStopCode, QString)>(&AbstractMotionInspector::axisYMotionStopSignal),
+                    motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode, QString)>(&MotionManager::axisYMotionStopSignal));
             connect(motionInspector.data(), &AbstractMotionInspector::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
 
             connect(motionInspector.data(), &AbstractMotionInspector::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
-            connect(motionInspector.data(), &AbstractMotionInspector::axisZMotionStopSignal, motionManager.data(), &MotionManager::axisZMotionStopSignal);
+            connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)()>(&AbstractMotionInspector::axisZMotionStopSignal),
+                    motionManager.data(), static_cast<void (MotionManager::*)()>(&MotionManager::axisZMotionStopSignal));
+            connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)(MotionStopCode, QString)>(&AbstractMotionInspector::axisZMotionStopSignal),
+                    motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode, QString)>(&MotionManager::axisZMotionStopSignal));
             connect(motionInspector.data(), &AbstractMotionInspector::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);

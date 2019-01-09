@@ -3,6 +3,7 @@
 
 #include "AbstractConnectedDeviceInspector.hpp"
 #include "AbstractCN.hpp"
+#include "AbstractMotionUtils.hpp"
 
 namespace PROGRAM_NAMESPACE {
 
@@ -21,6 +22,7 @@ public:
 
 signals:
     void axisXMotorOffSignal();
+    void axisXMotionStopSignal(MotionStopCode stopCode, QString detail = "");
     void axisXMotionStopSignal();
     void axisXForwardLimitSignal();
     void axisXBackwardLimitSignal();
@@ -28,6 +30,7 @@ signals:
     void axisXHomeInProgressStopSignal();
 
     void axisYMotorOffSignal();
+    void axisYMotionStopSignal(MotionStopCode stopCode, QString detail = "");
     void axisYMotionStopSignal();
     void axisYForwardLimitSignal();
     void axisYBackwardLimitSignal();
@@ -35,6 +38,7 @@ signals:
     void axisYHomeInProgressStopSignal();
 
     void axisZMotorOffSignal();
+    void axisZMotionStopSignal(MotionStopCode stopCode, QString detail = "");
     void axisZMotionStopSignal();
     void axisZForwardLimitSignal();
     void axisZBackwardLimitSignal();

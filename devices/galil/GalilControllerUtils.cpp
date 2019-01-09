@@ -185,4 +185,40 @@ QString GalilControllerUtils::getCustomErrorDescription(int errorCode) {
 
 }
 
+QString GalilControllerUtils::getStopCodeDescription(int stopCode) {
 
+    QString descr = "";
+
+    switch (stopCode) {
+        case GALIL_CN_STOP_CODE_MOTORS_RUNNING_INDEPENDENT_MODE: descr = "Motors are running, independent mode"; break;
+        case GALIL_CN_STOP_CODE_MOTORS_DECELERATING_STOP_COMMANDED_INDEPENDENT_POSITION: descr = "Motors decelerating or stopped at commanded independent position"; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_FWD_LIMIT_SWITCH_OR_SOFT_LIMIT_FL: descr = "Decelerating or stopped by FWD limit switch or soft limit FL"; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_REV_LIMIT_SWITCH_OR_SOFT_LIMIT_BL: descr = "Decelerating or stopped by REV limit switch or soft limit BL"; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOP_COMMAND: descr = "Decelerating or stopped by Stop Command (ST)"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ABORT_INPUT: descr = "Stopped by Abort input"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ABORT_COMMAND: descr = "Stopped by Abort command (AB)"; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_OFF_ON_ERROR: descr = "Decelerating or stopped by Off on Error (OE1)"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_AFTER_FINDING_EDGE: descr = "Stopped after finding edge (FE)"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX: descr = "Stopped after homing (HM) or Find Index (FI)"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_SELECTIVE_ABORT_INPUT: descr = "Stopped by selective abort input"; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_ENCODER_FAILURE: descr = "Decelerating or stopped by encoder failure (OA1) (For controllers supporting OA/OV/OT)"; break;
+        case GALIL_CN_STOP_CODE_AMPLIFIER_FAULT: descr = "Amplifier Fault (For controllers with internal drives)"; break;
+        case GALIL_CN_STOP_CODE_STEPPER_POSITION_MAINTENANCE_ERROR: descr = "Stepper position maintenance error"; break;
+        case GALIL_CN_STOP_CODE_RUNNING_IN_PVT_MODE: descr = "Running in PVT mode"; break;
+        case GALIL_CN_STOP_CODE_PVT_MODE_COMPLETED_NORMALLY: descr = "PVT mode completed normally"; break;
+        case GALIL_CN_STOP_CODE_PVT_MODE_EXITED_BECAUSE_BUFFER_IS_EMPTY: descr = "PVT mode exited because buffer is empty"; break;
+        case GALIL_CN_STOP_CODE_CONTOUR_RUNNING: descr = "Contour Running"; break;
+        case GALIL_CN_STOP_CODE_CONTOUR_STOPPED: descr = "Contour Stopped"; break;
+        case GALIL_CN_STOP_CODE_ECAM_RUNNING: descr = "ECAM Running"; break;
+        case GALIL_CN_STOP_CODE_ECAM_STOPPED: descr = "ECAM Stopped"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ETHERCAT_COMMUNICATION_FAILURE: descr = "Stopped due to EtherCAT communication failure"; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ETHERCAT_DRIVE_FAULT: descr = "Stopped due to EtherCAT drive fault"; break;
+        case GALIL_CN_STOP_CODE_MC_TIMEOUT: descr = "MC timeout"; break;
+        case GALIL_CN_STOP_CODE_VECTOR_SEQUENCE_RUNNING: descr = "Vector Sequence running"; break;
+        case GALIL_CN_STOP_CODE_VECTOR_SEQUENCE_STOPPED: descr = "Vector Sequence stopped"; break;
+        default: descr = ""; break;
+    }
+
+    return descr;
+
+}
