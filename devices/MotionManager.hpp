@@ -6,7 +6,6 @@
 #include <QScopedPointer>
 
 #include <Constants.hpp>
-#include <AbstractMotionUtils.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -84,24 +83,21 @@ signals:
     void cycleOnSignal();
 
     void axisXMotorOffSignal();
-    void axisXMotionStopSignal(MotionStopCode stopCode, QString detail = "");
-    void axisXMotionStopSignal();
+    void axisXMotionStopSignal(MotionStopCode stopCode);
     void axisXForwardLimitSignal();
     void axisXBackwardLimitSignal();
     void axisXHomeInProgressStartSignal();
     void axisXHomeInProgressStopSignal();
 
     void axisYMotorOffSignal();
-    void axisYMotionStopSignal(MotionStopCode stopCode, QString detail = "");
-    void axisYMotionStopSignal();
+    void axisYMotionStopSignal(MotionStopCode stopCode);
     void axisYForwardLimitSignal();
     void axisYBackwardLimitSignal();
     void axisYHomeInProgressStartSignal();
     void axisYHomeInProgressStopSignal();
 
     void axisZMotorOffSignal();
-    void axisZMotionStopSignal(MotionStopCode stopCode, QString detail = "");
-    void axisZMotionStopSignal();
+    void axisZMotionStopSignal(MotionStopCode stopCode);
     void axisZForwardLimitSignal();
     void axisZBackwardLimitSignal();
     void axisZHomeInProgressStartSignal();

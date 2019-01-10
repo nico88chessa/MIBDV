@@ -94,6 +94,7 @@ public:
     static QString getTCDescription(int rcCode);
     static QString getCustomErrorDescription(int errorCode);
     static QString getStopCodeDescription(int stopCode);
+    static MotionStopCode evaluateStopCode(int stopCode);
 
 };
 

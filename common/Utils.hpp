@@ -159,6 +159,21 @@ public:
 
     }
 
+    static inline QString getMotionStopCodeDescription(const MotionStopCode& value) {
+
+        QString descr = "";
+
+        switch(value) {
+            case MotionStopCode::MOTION_NAN: descr = tr("Motion unknown stop code"); break;
+            case MotionStopCode::MOTION_IS_RUNNING: descr = tr("Motion is running"); break;
+            case MotionStopCode::MOTION_STOP_CORRECTLY: descr = tr("Motion stop correctly"); break;
+            case MotionStopCode::MOTION_STOP_COMMAND: descr = tr("Motion stop command"); break;
+            case MotionStopCode::MOTION_STOP_ON_ERROR: descr = tr("Motion stop on error"); break;
+        }
+        return descr;
+
+    }
+
 };
 
 }

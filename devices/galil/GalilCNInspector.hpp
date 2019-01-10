@@ -30,9 +30,6 @@ protected:
 
     void analizeLastStatus(const S& status);
 
-private:
-    MotionStopCode evaluateStopCode(int stopCode);
-
 protected slots:
 
     void handleDisconnection();

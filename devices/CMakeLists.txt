@@ -3,7 +3,6 @@ SET(ITEMS
     AbstractDeviceInspector
     AbstractConnectedDeviceInspector
     AbstractMotionInspector
-    AbstractMotionUtils
     MotionInspectorImpl
     AbstractPLC
     AbstractCN

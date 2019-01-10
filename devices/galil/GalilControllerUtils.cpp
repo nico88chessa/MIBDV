@@ -222,3 +222,39 @@ QString GalilControllerUtils::getStopCodeDescription(int stopCode) {
     return descr;
 
 }
+
+MotionStopCode GalilControllerUtils::evaluateStopCode(int stopCode) {
+
+    MotionStopCode motionStopCode = MotionStopCode::MOTION_NAN;
+
+    switch (stopCode) {
+        case GALIL_CN_STOP_CODE_MOTORS_RUNNING_INDEPENDENT_MODE: motionStopCode = MotionStopCode::MOTION_IS_RUNNING; break;
+        case GALIL_CN_STOP_CODE_MOTORS_DECELERATING_STOP_COMMANDED_INDEPENDENT_POSITION: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_FWD_LIMIT_SWITCH_OR_SOFT_LIMIT_FL: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_REV_LIMIT_SWITCH_OR_SOFT_LIMIT_BL: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOP_COMMAND: motionStopCode = MotionStopCode::MOTION_STOP_COMMAND; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ABORT_INPUT: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ABORT_COMMAND: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_OFF_ON_ERROR: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_STOPPED_AFTER_FINDING_EDGE: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+        case GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+        case GALIL_CN_STOP_CODE_STOPPED_SELECTIVE_ABORT_INPUT: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_DECELERATING_STOPPED_ENCODER_FAILURE: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_AMPLIFIER_FAULT: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_STEPPER_POSITION_MAINTENANCE_ERROR: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_RUNNING_IN_PVT_MODE: motionStopCode = MotionStopCode::MOTION_IS_RUNNING; break;
+        case GALIL_CN_STOP_CODE_PVT_MODE_COMPLETED_NORMALLY: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+        case GALIL_CN_STOP_CODE_PVT_MODE_EXITED_BECAUSE_BUFFER_IS_EMPTY: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_CONTOUR_RUNNING: motionStopCode = MotionStopCode::MOTION_IS_RUNNING; break;
+        case GALIL_CN_STOP_CODE_CONTOUR_STOPPED: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+        case GALIL_CN_STOP_CODE_ECAM_RUNNING: motionStopCode = MotionStopCode::MOTION_IS_RUNNING; break;
+        case GALIL_CN_STOP_CODE_ECAM_STOPPED: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ETHERCAT_COMMUNICATION_FAILURE: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_STOPPED_ETHERCAT_DRIVE_FAULT: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_MC_TIMEOUT: motionStopCode = MotionStopCode::MOTION_STOP_ON_ERROR; break;
+        case GALIL_CN_STOP_CODE_VECTOR_SEQUENCE_RUNNING: motionStopCode = MotionStopCode::MOTION_IS_RUNNING; break;
+        case GALIL_CN_STOP_CODE_VECTOR_SEQUENCE_STOPPED: motionStopCode = MotionStopCode::MOTION_STOP_CORRECTLY; break;
+    }
+    return motionStopCode;
+
+}

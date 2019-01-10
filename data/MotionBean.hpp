@@ -30,6 +30,7 @@ private:
     bool axisXHomeInput;
     bool axisXMotorOff;
     real axisXPosition;
+    MotionStopCode axisXStopCode;
 
     bool axisYForwardLimit;
     bool axisYReverseLimit;
@@ -37,6 +38,7 @@ private:
     bool axisYMoveInProgress;
     bool axisYMotorOff;
     real axisYPosition;
+    MotionStopCode axisYStopCode;
 
     bool axisZForwardLimit;
     bool axisZReverseLimit;
@@ -44,6 +46,7 @@ private:
     bool axisZMoveInProgress;
     bool axisZMotorOff;
     real axisZPosition;
+    MotionStopCode axisZStopCode;
 
 public:
 
@@ -111,6 +114,7 @@ private:
             axisXPosition = galilCNStatusBean.getAxisAMotorPosition() / static_cast<real>(axisXStepPerMm);
         else
             axisXPosition = galilCNStatusBean.getAxisAReferencePosition() / static_cast<real>(axisXStepPerMm);
+        axisXStopCode = GalilControllerUtils::evaluateStopCode(galilCNStatusBean.getAxisAStopCode());
 
         axisYForwardLimit = galilCNStatusBean.getAxisBForwardLimit();
         axisYReverseLimit = galilCNStatusBean.getAxisBReverseLimit();
@@ -121,6 +125,7 @@ private:
             axisYPosition = galilCNStatusBean.getAxisBMotorPosition() / static_cast<real>(axisYStepPerMm);
         else
             axisYPosition = galilCNStatusBean.getAxisBReferencePosition() / static_cast<real>(axisYStepPerMm);
+        axisYStopCode = GalilControllerUtils::evaluateStopCode(galilCNStatusBean.getAxisBStopCode());
 
         axisZForwardLimit = galilCNStatusBean.getAxisCForwardLimit();
         axisZReverseLimit = galilCNStatusBean.getAxisCReverseLimit();
@@ -131,6 +136,7 @@ private:
             axisZPosition = galilCNStatusBean.getAxisCMotorPosition() / static_cast<real>(axisZStepPerMm);
         else
             axisZPosition = galilCNStatusBean.getAxisCReferencePosition() / static_cast<real>(axisZStepPerMm);
+        axisZStopCode = GalilControllerUtils::evaluateStopCode(galilCNStatusBean.getAxisCStopCode());
 
     }
 
@@ -148,7 +154,8 @@ public:
     void setAxisXPosition(const real& value) { axisXPosition = value; }
     bool getAxisXMoveInProgress() const { return axisXMoveInProgress; }
     void setAxisXMoveInProgress(bool value) { axisXMoveInProgress = value; }
-
+    MotionStopCode getAxisYStopCode() const { return axisYStopCode; }
+    void setAxisYStopCode(const MotionStopCode& value) { axisYStopCode = value; }
 
     bool getAxisYForwardLimit() const { return axisYForwardLimit; }
     void setAxisYForwardLimit(bool value) { axisYForwardLimit = value; }
@@ -162,6 +169,8 @@ public:
     void setAxisYMotorOff(bool value) { axisYMotorOff = value; }
     real getAxisYPosition() const { return axisYPosition; }
     void setAxisYPosition(const real& value) { axisYPosition = value; }
+    MotionStopCode getAxisZStopCode() const { return axisZStopCode; }
+    void setAxisZStopCode(const MotionStopCode& value) { axisZStopCode = value; }
 
     bool getAxisZForwardLimit() const { return axisZForwardLimit; }
     void setAxisZForwardLimit(bool value) { axisZForwardLimit = value; }
@@ -175,8 +184,11 @@ public:
     void setAxisZMotorOff(bool value) { axisZMotorOff = value; }
     real getAxisZPosition() const { return axisZPosition; }
     void setAxisZPosition(const real& value) { axisZPosition = value; }
+    MotionStopCode getAxisXStopCode() const { return axisXStopCode; }
+    void setAxisXStopCode(const MotionStopCode& value) { axisXStopCode = value; }
 
 };
+
 
 }
 
