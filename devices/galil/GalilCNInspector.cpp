@@ -76,18 +76,23 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
 
                 if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX) {
 
+                    Logger::instance().debug() << "Galil axis X FI ok";
                     emit axisXHomingComplete();
                     isFECheck = 0;
 
                 } else if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_FINDING_EDGE) {
 
+                    Logger::instance().debug() << "Galil axis X FE ok";
+
                     if (isFECheck < CUSTOM_HOME_AXIS_X_FE_COUNT) {
 
+                        Logger::instance().debug() << "count: " << isFECheck;
                         lastStatus.setAxisAMoveInProgress(true); // obbligo a ricontrollare se l'asse e' davvero fermo al giro dopo
                         ++isFECheck;
 
                     } else {
 
+                        Logger::instance().debug() << "Galil axis X still in FE";
                         isFECheck = 0;
                         MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
                         if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
@@ -160,7 +165,7 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     // check motion asse y
     bool isMovingAxisY = newStatus.getAxisBMoveInProgress();
     if (!isMovingAxisY) {
-        if (isMovingAxisY != lastStatus.getAxisBMoveInProgress()) {
+        if (isMovingAxisY != oldStatus.getAxisBMoveInProgress()) {
 
             int galilStopCode = newStatus.getAxisBStopCode();
 
@@ -190,7 +195,7 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
 
     // check homing in progress asse y
     bool isHomingYInProgress = newStatus.getAxisBHmInProgress();
-    bool lastStatusHomeYInProgress = lastStatus.getAxisBHmInProgress();
+    bool lastStatusHomeYInProgress = oldStatus.getAxisBHmInProgress();
     if (isHomingYInProgress != lastStatusHomeYInProgress) {
         if (isHomingYInProgress)
             emit axisYHomeInProgressStartSignal();
