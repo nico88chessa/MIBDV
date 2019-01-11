@@ -97,7 +97,7 @@ public:
     int getGalilCNNumberAnalogInput() const { return galilCNNumberAnalogInput; }
     int getGalilCNNumberAnalogOutput() const { return galilCNNumberAnalogOutput; }
     QString getGalilCNIpAddress() const { return galilCNIpAddress; }
-    bool getGalilCNOptionCustomHomeAxisZ() const { return galilCNOptionCustomHomeAxisZ; }
+    bool getGalilCNOptionCustomHomeAxisX() const { return galilCNOptionCustomHomeAxisX; }
 
     int getGalilPLCConnectionTimeoutMs() const { return galilPLCConnectionTimeoutMs; }
     int getGalilPLCStatusRefreshIntervalMs() const { return galilPLCStatusRefreshIntervalMs; }
@@ -180,7 +180,7 @@ private:
     int galilCNNumberAnalogInput;
     int galilCNNumberAnalogOutput;
     QString galilCNIpAddress;
-    bool galilCNOptionCustomHomeAxisZ;
+    bool galilCNOptionCustomHomeAxisX;
 
     // GALIL PLC PARAMETERS
     int galilPLCConnectionTimeoutMs;

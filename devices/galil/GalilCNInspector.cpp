@@ -8,7 +8,7 @@
 using namespace PROGRAM_NAMESPACE;
 
 GalilCNInspector::GalilCNInspector(QObject* parent) :
-    MotionInspectorImpl(parent), isFirst(true) {
+    MotionInspectorImpl(parent), isFirst(true), isFECheck(0), isCustomHomeAxisX(false) {
 
     Settings& s = Settings::instance();
     ipAddress = s.getGalilCNIpAddress();
@@ -16,6 +16,7 @@ GalilCNInspector::GalilCNInspector(QObject* parent) :
 
     this->setRefreshValue(s.getGalilCNStatusRefreshIntervalMs());
     this->setRestartTime(s.getGalilCNReconnectionIntervalMs());
+    this->isCustomHomeAxisX = s.getGalilCNOptionCustomHomeAxisX();
 
 }
 
@@ -31,6 +32,9 @@ bool GalilCNInspector::connectDevice() {
 void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus) {
 
     traceEnter;
+
+    GalilCNStatusBean oldStatus = lastStatus;
+    lastStatus = newStatus;
 
     if (isFirst) {
         isFirst = false;
@@ -58,37 +62,87 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     // check coppia asse x
     bool isMotorXOff = newStatus.getAxisAMotorOff();
     if (isMotorXOff)
-        if (isMotorXOff != lastStatus.getAxisAMotorOff())
+        if (isMotorXOff != oldStatus.getAxisAMotorOff())
             emit axisXMotorOffSignal();
 
     // check motion asse x
     bool isMovingAxisX = newStatus.getAxisAMoveInProgress();
-    if (!isMovingAxisX)
-        if (isMovingAxisX != lastStatus.getAxisAMoveInProgress()) {
+    if (!isMovingAxisX) {
+        if (isMovingAxisX != oldStatus.getAxisAMoveInProgress()) {
+
             int galilStopCode = newStatus.getAxisAStopCode();
-            MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
-            if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
-                Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
-                Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+
+            if (isCustomHomeAxisX) {
+
+                if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX) {
+
+                    emit axisXHomingComplete();
+                    isFECheck = 0;
+
+                } else if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_FINDING_EDGE) {
+
+                    if (isFECheck < CUSTOM_HOME_AXIS_X_FE_COUNT) {
+
+                        lastStatus.setAxisAMoveInProgress(true); // obbligo a ricontrollare se l'asse e' davvero fermo al giro dopo
+                        ++isFECheck;
+
+                    } else {
+
+                        isFECheck = 0;
+                        MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
+                        if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
+                            Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
+                            Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                        }
+
+                        emit axisXMotionStopSignal(stopCode);
+                    }
+
+                } else {
+
+                    isFECheck = 0;
+
+                    MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
+                    if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
+                        Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
+                        Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                    }
+
+                    emit axisXMotionStopSignal(stopCode);
+                }
+
+            } else {
+
+                if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
+                    emit axisYHomingComplete();
+
+                MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
+                if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
+                    Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
+                    Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                }
+                emit axisXMotionStopSignal(stopCode);
+
             }
-            emit axisXMotionStopSignal(stopCode);
+
         }
+    }
 
     // check forward limit asse x
     bool isForwardLimitAxisX = newStatus.getAxisAForwardLimit();
     if (isForwardLimitAxisX)
-        if (isForwardLimitAxisX != lastStatus.getAxisAForwardLimit())
+        if (isForwardLimitAxisX != oldStatus.getAxisAForwardLimit())
             emit axisXForwardLimitSignal();
 
     // check backward limit asse x
     bool isBackwardLimitAxisX = newStatus.getAxisAReverseLimit();
     if (isBackwardLimitAxisX)
-        if (isBackwardLimitAxisX != lastStatus.getAxisAReverseLimit())
+        if (isBackwardLimitAxisX != oldStatus.getAxisAReverseLimit())
             emit axisXBackwardLimitSignal();
 
     // check homing in progress asse x
     bool isHomingXInProgress = newStatus.getAxisAHmInProgress();
-    bool lastStatusHomeXInProgress = lastStatus.getAxisAHmInProgress();
+    bool lastStatusHomeXInProgress = oldStatus.getAxisAHmInProgress();
     if (isHomingXInProgress != lastStatusHomeXInProgress) {
         if (isHomingXInProgress)
             emit axisXHomeInProgressStartSignal();
@@ -99,7 +153,7 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     // check coppia asse y
     bool isMotorYOff = newStatus.getAxisBMotorOff();
     if (isMotorYOff) {
-        if (isMotorYOff != lastStatus.getAxisBMotorOff())
+        if (isMotorYOff != oldStatus.getAxisBMotorOff())
             emit axisYMotorOffSignal();
     }
 
@@ -107,11 +161,16 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     bool isMovingAxisY = newStatus.getAxisBMoveInProgress();
     if (!isMovingAxisY) {
         if (isMovingAxisY != lastStatus.getAxisBMoveInProgress()) {
+
             int galilStopCode = newStatus.getAxisBStopCode();
+
+            if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
+                emit axisYHomingComplete();
+
             MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
             if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
                 Logger::instance().error() << "Galil axis Y stop code error:" << galilStopCode;
-                Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                Logger::instance().error() << "Galil axis Y stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
             }
             emit axisYMotionStopSignal(stopCode);
         }
@@ -120,13 +179,13 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     // check forward limit asse y
     bool isForwardLimitAxisY = newStatus.getAxisBForwardLimit();
     if (isForwardLimitAxisY)
-        if (isForwardLimitAxisY != lastStatus.getAxisBForwardLimit())
+        if (isForwardLimitAxisY != oldStatus.getAxisBForwardLimit())
             emit axisYForwardLimitSignal();
 
     // check backward limit asse y
     bool isBackwardLimitAxisY = newStatus.getAxisBReverseLimit();
     if (isBackwardLimitAxisY)
-        if (isBackwardLimitAxisY != lastStatus.getAxisBReverseLimit())
+        if (isBackwardLimitAxisY != oldStatus.getAxisBReverseLimit())
             emit axisYBackwardLimitSignal();
 
     // check homing in progress asse y
@@ -142,19 +201,24 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     // check coppia asse z
     bool isMotorZOff = newStatus.getAxisCMotorOff();
     if (isMotorZOff) {
-        if (isMotorZOff != lastStatus.getAxisCMotorOff())
+        if (isMotorZOff != oldStatus.getAxisCMotorOff())
             emit axisZMotorOffSignal();
     }
 
     // check motion asse z
     bool isMovingAxisZ = newStatus.getAxisCMoveInProgress();
     if (!isMovingAxisZ) {
-        if (isMovingAxisZ != lastStatus.getAxisCMoveInProgress()) {
+        if (isMovingAxisZ != oldStatus.getAxisCMoveInProgress()) {
+
             int galilStopCode = newStatus.getAxisCStopCode();
+
+            if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
+                emit axisZHomingComplete();
+
             MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
             if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
                 Logger::instance().error() << "Galil axis Z stop code error:" << galilStopCode;
-                Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                Logger::instance().error() << "Galil axis Z stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
             }
             emit axisZMotionStopSignal(stopCode);
         }
@@ -163,18 +227,18 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     // check forward limit asse z
     bool isForwardLimitAxisZ = newStatus.getAxisCForwardLimit();
     if (isForwardLimitAxisZ)
-        if (isForwardLimitAxisZ != lastStatus.getAxisCForwardLimit())
+        if (isForwardLimitAxisZ != oldStatus.getAxisCForwardLimit())
             emit axisZForwardLimitSignal();
 
     // check backward limit asse z
     bool isBackwardLimitAxisZ = newStatus.getAxisCReverseLimit();
     if (isBackwardLimitAxisZ)
-        if (isBackwardLimitAxisZ != lastStatus.getAxisCReverseLimit())
+        if (isBackwardLimitAxisZ != oldStatus.getAxisCReverseLimit())
             emit axisZBackwardLimitSignal();
 
     // check homing in progress asse z
     bool isHomingZInProgress = newStatus.getAxisCHmInProgress();
-    bool lastStatusHomeZInProgress = lastStatus.getAxisCHmInProgress();
+    bool lastStatusHomeZInProgress = oldStatus.getAxisCHmInProgress();
     if (isHomingZInProgress != lastStatusHomeZInProgress) {
         if (isHomingZInProgress)
             emit axisZHomeInProgressStartSignal();
@@ -182,7 +246,7 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
             emit axisZHomeInProgressStopSignal();
     }
 
-    lastStatus = newStatus;
+
     traceExit;
 
 }

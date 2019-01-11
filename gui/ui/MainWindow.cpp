@@ -241,7 +241,7 @@ void MainWindow::initDevices() {
                         s.getGalilCNNumberDigitalInput(),
                         s.getGalilCNNumberDigitalOutput(),
                         s.getGalilCNNumberAnalogInput(),
-                        s.getGalilCNOptionCustomHomeAxisZ());
+                        s.getGalilCNOptionCustomHomeAxisX());
 
         }
 
@@ -266,6 +266,7 @@ void MainWindow::initDevices() {
             connect(motionInspector.data(), &AbstractMotionInspector::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisXHomingComplete, motionManager.data(), &MotionManager::axisXHomingComplete);
 
             connect(motionInspector.data(), &AbstractMotionInspector::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
             connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)(MotionStopCode)>(&AbstractMotionInspector::axisYMotionStopSignal),
@@ -274,6 +275,7 @@ void MainWindow::initDevices() {
             connect(motionInspector.data(), &AbstractMotionInspector::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisYHomingComplete, motionManager.data(), &MotionManager::axisYHomingComplete);
 
             connect(motionInspector.data(), &AbstractMotionInspector::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
             connect(motionInspector.data(), static_cast<void (AbstractMotionInspector::*)(MotionStopCode)>(&AbstractMotionInspector::axisZMotionStopSignal),
@@ -282,6 +284,7 @@ void MainWindow::initDevices() {
             connect(motionInspector.data(), &AbstractMotionInspector::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
             connect(motionInspector.data(), &AbstractMotionInspector::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
+            connect(motionInspector.data(), &AbstractMotionInspector::axisZHomingComplete, motionManager.data(), &MotionManager::axisZHomingComplete);
 
         }
 

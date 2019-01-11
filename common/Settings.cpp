@@ -196,7 +196,7 @@ void Settings::loadValuesFromFile() {
         galilCNNumberAnalogInput = settings.value(GALIL_CN_NUMBER_ANALOG_INPUT, GALIL_CN_NUMBER_ANALOG_INPUT_DFLT).value<int>();
         galilCNNumberAnalogOutput = settings.value(GALIL_CN_NUMBER_ANALOG_OUTPUT, GALIL_CN_NUMBER_ANALOG_OUTPUT_DFLT).value<int>();
         galilCNIpAddress = settings.value(GALIL_CN_IP_ADDRESS, GALIL_CN_IP_ADDRESS_DFLT).value<QString>();
-        galilCNOptionCustomHomeAxisZ = settings.value(GALIL_CN_OPTION_CUSTOM_HOME_AXIS_Z, GALIL_CN_OPTION_CUSTOM_HOME_AXIS_Z_DFLT).value<bool>();
+        galilCNOptionCustomHomeAxisX = settings.value(GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X, GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X_DFLT).value<bool>();
     }
 
     // se il plc e' di tipo galil, carico i parametri del galil)
@@ -365,7 +365,7 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_CN_NUMBER_DIGITAL_OUTPUT, galilCNNumberDigitalOutput);
         settings.setValue(GALIL_CN_NUMBER_ANALOG_INPUT, galilCNNumberAnalogInput);
         settings.setValue(GALIL_CN_NUMBER_ANALOG_OUTPUT, galilCNNumberAnalogOutput);
-        settings.setValue(GALIL_CN_OPTION_CUSTOM_HOME_AXIS_Z, galilCNOptionCustomHomeAxisZ);
+        settings.setValue(GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X, galilCNOptionCustomHomeAxisX);
     } else
         settings.remove(GALIL_CN_PREFIX);
 

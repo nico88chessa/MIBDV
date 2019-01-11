@@ -88,6 +88,7 @@ signals:
     void axisXBackwardLimitSignal();
     void axisXHomeInProgressStartSignal();
     void axisXHomeInProgressStopSignal();
+    void axisXHomingComplete();
 
     void axisYMotorOffSignal();
     void axisYMotionStopSignal(MotionStopCode stopCode);
@@ -95,6 +96,7 @@ signals:
     void axisYBackwardLimitSignal();
     void axisYHomeInProgressStartSignal();
     void axisYHomeInProgressStopSignal();
+    void axisYHomingComplete();
 
     void axisZMotorOffSignal();
     void axisZMotionStopSignal(MotionStopCode stopCode);
@@ -102,6 +104,7 @@ signals:
     void axisZBackwardLimitSignal();
     void axisZHomeInProgressStartSignal();
     void axisZHomeInProgressStopSignal();
+    void axisZHomingComplete();
 
 public:
 
