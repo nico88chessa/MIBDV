@@ -19,9 +19,9 @@ public:
     using ConstPtr = const Settings*;
 
 private:
-    static constexpr char ARRAY_DIGITAL_INPUT[] = "DigitalInput";
-    static constexpr char ARRAY_DIGITAL_OUTPUT[] = "DigitalOutput";
-    static constexpr char ARRAY_ANALOG_INPUT[] = "AnalogInput";
+    static const char* ARRAY_DIGITAL_INPUT;
+    static const char* ARRAY_DIGITAL_OUTPUT;
+    static const char* ARRAY_ANALOG_INPUT;
 
 private:
     Settings();

@@ -39,7 +39,7 @@ private:
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 
-    static constexpr char letterFromAxis(Axis v) {
+    static char letterFromAxis(Axis v) {
         switch (v) {
         case Axis::X: return 'A';
         case Axis::Y: return 'B';

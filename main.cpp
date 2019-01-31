@@ -10,6 +10,8 @@
 
 #include <Types.hpp>
 
+#include <third-party/ipg-marking-library-wrapper/include/Scanner.h>
+
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
 void loadCustomFont() {
@@ -58,7 +60,13 @@ void registerMetatypes() {
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
+    using namespace ipg_marking_library_wrapper;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+
+//    std::string err;
+    std::vector<ScannerInfo> v = Scanner::scanners();
+
+    std::cout << v.size();
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);

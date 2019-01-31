@@ -5,9 +5,9 @@ using namespace PROGRAM_NAMESPACE;
 #include <Logger.hpp>
 #include <Utils.hpp>
 
-constexpr char Settings::ARRAY_DIGITAL_INPUT[];
-constexpr char Settings::ARRAY_DIGITAL_OUTPUT[];
-constexpr char Settings::ARRAY_ANALOG_INPUT[];
+const char* Settings::ARRAY_DIGITAL_INPUT = "DigitalInput";
+const char* Settings::ARRAY_DIGITAL_OUTPUT = "DigitalOutput";
+const char* Settings::ARRAY_ANALOG_INPUT = "AnalogInput";
 
 Settings::Settings() {
 
