@@ -5,6 +5,7 @@ SET(ITEMS
     ErrorSignaler
     ErrorManager
     Utils
+    ComputationUtils
     )
 
 FOREACH(ITEM ${ITEMS})
