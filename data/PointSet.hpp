@@ -12,19 +12,20 @@
 
 namespace PROGRAM_NAMESPACE {
 
+static const int DEFAULT_POINT_SET_SIZE = 100;
+
 class ComputationUtils;
 
 template <typename T>
 class PointSet {
+    friend class ComputationUtils;
+
 private:
     QVector<Point<T>> set;
     BoundingBox<T> boundingBox;
 
-    static const int DEFAULT_VECTOR_SIZE = 100;
-    friend class ComputationUtils;
-
 public:
-    PointSet(int size = DEFAULT_VECTOR_SIZE) :
+    PointSet(int size = DEFAULT_POINT_SET_SIZE) :
         set() {
 
         set.reserve(size);

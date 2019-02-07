@@ -8,56 +8,43 @@
 
 #include <Tile.hpp>
 
+static const int NUM_POINT_PER_STACK_DEFAULT = 100;
+
 namespace PROGRAM_NAMESPACE {
 
 template <typename T>
 class StackedTile {
 private:
-    QList<PointSet<T>> list;
-    int pointsPerStack;
+    QList<Tile<T>> list;
+    int pointsPerTile;
     int currentListIndex;
     BoundingBoxI bb;
 
-    static const int NUM_POINT_PER_STACK_DEFAULT = 100;
-
 public:
+    StackedTile() : list(), pointsPerTile(0), currentListIndex(0), bb() { }
 
     StackedTile(const PointI& min, const PointI& max, int pps = NUM_POINT_PER_STACK_DEFAULT) :
-        list(), bb(min, max), pointsPerStack(pps) {
+        list(), pointsPerTile(pps), currentListIndex(0), bb(min, max) {
     }
 
     StackedTile(PointI p, int width, int height, int pps = NUM_POINT_PER_STACK_DEFAULT) :
         StackedTile(p, p + PointI(width, height), pps) { }
+
+    StackedTile(const BoundingBoxI& b, int pps = NUM_POINT_PER_STACK_DEFAULT) :
+        StackedTile(b.getMin(), b.getMax(), pps) { }
 
     StackedTile(int minX, int minY, int maxX, int maxY, int pps = NUM_POINT_PER_STACK_DEFAULT) :
         StackedTile(PointI(minX, minY), PointI(maxX, maxY), pps) { }
 
     StackedTile(const Tile<T>& tile,
               int pps = NUM_POINT_PER_STACK_DEFAULT) :
-        pointsPerStack(pps),
+        pointsPerTile(pps),
         currentListIndex(0),
         bb(tile.getBoundingBox()) {
 
-        auto&& pointSet = tile.getCPointSet();
+        const auto& pointSet = tile.getPointSet();
 
         this->addPointSet(pointSet);
-
-//        int listSize = qCeil((float) pointSet.size() / pointsPerStack);
-//        for (int i=0; i<listSize; ++i)
-//            list.append(PointSet<T>(pointsPerStack));
-
-//        auto&& vector = pointSet.getVector();
-
-//        int count = 0;
-//        for (auto&& p: vector) {
-
-//            if (count == pointsPerStack)
-//                ++currentListIndex;
-
-//            list[currentListIndex].addPoint(p);
-//            ++count;
-
-//        }
 
     }
 
@@ -73,12 +60,6 @@ public:
         }
 
         add(p);
-//        if (list.at(currentListIndex).size() == pointsPerStack) {
-//            list.append(PointSet<T>(pointsPerStack));
-//            ++currentListIndex;
-//        }
-
-//        list[currentListIndex].addPoint(p);
         return true;
 
     }
@@ -100,17 +81,21 @@ public:
         return true;
     }
 
-    const QList<PointSet<T>>& getList() const { return list; }
-
-    QList<PointSet<T>>& getList() { return list; }
+    const QList<Tile<T>>& getTiles() const { return list; }
 
 protected:
 
     inline void add(const Point<T>& p) {
 
-        if (list.at(currentListIndex).size() == pointsPerStack) {
-            list.append(PointSet<T>(pointsPerStack));
+        if (list.isEmpty()) {
+
+            list.append(Tile<T>(bb, pointsPerTile));
+
+        } else if (list.at(currentListIndex).getPointSet().size() == pointsPerTile) {
+
+            list.append(Tile<T>(bb, pointsPerTile));
             ++currentListIndex;
+
         }
 
         list[currentListIndex].addPoint(p);

@@ -31,6 +31,8 @@ public:
         numTileX = qCeil((float) width / tileSize);
         numTileY = qCeil((float) height / tileSize);
 
+        // NOTE NIC 07/02/2019
+        // Questo serve per gestire i casi in cui i punti sono sul bordo della griglia
         if (width % tileSize == 0) {
             traceDebug() << "Tile multiplo esatto lungo l'asse X; aggiungo un tile in X";
             numTileX++;
@@ -71,7 +73,7 @@ public:
     Grid(int x, int y, int width, int height, int tileSize) :
         Grid(PointI(x, y), width, height, tileSize) { }
 
-    const Tile<T>& getCTile(int r, int c) const {
+    const Tile<T>& getTile(int r, int c) const {
         return vet.at(r).at(c);
     }
 
@@ -79,20 +81,20 @@ public:
         return vet[r][c];
     }
 
-    const Tile<T>& getCTile(const Point<T>& p) const {
-        return getCTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
+    const Tile<T>& getTile(const Point<T>& p) const {
+        return getTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
     }
 
     Tile<T>& getTile(const Point<T>& p) {
         return getTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
     }
 
-    const QVector<Tile<T>>& getCRow(int row) const {
-        return vet.at(r);
+    const QVector<Tile<T>>& getRow(int row) const {
+        return vet.at(row);
     }
 
     QVector<Tile<T>>& getRow(int row) {
-        return vet[r];
+        return vet[row];
     }
 
     void addPoint(const Point<T>& p) {

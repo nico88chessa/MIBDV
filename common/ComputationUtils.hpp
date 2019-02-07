@@ -11,6 +11,7 @@
 #include <random>
 
 #include <PointSet.hpp>
+#include <Tile.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -73,6 +74,21 @@ public:
         }
 
         return pointSetList;
+    }
+
+    template <typename T>
+    static QList<T> shuffleList(const QList<T>& other) {
+        QList<T> temp = other;
+        auto rng = std::default_random_engine{};
+        std::shuffle(temp.begin(), temp.end(), rng);
+        return temp;
+    }
+
+    template <typename T>
+    static Tile<T> shuffleTile(const Tile<T>& other) {
+        Tile<T> temp(other.getBoundingBox());
+        temp.addPointSet(ComputationUtils::shufflePointSet(other.getPointSet()));
+        return temp;
     }
 
 };

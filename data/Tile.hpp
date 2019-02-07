@@ -9,8 +9,12 @@
 
 namespace PROGRAM_NAMESPACE {
 
+class ComputationUtils;
+
 template <typename T>
 class Tile {
+    friend class ComputationUtils;
+
 private:
     PointSet<T> pointSet;
     BoundingBoxI bb;
@@ -19,18 +23,21 @@ private:
 public:
     Tile() : pointSet(), bb(), center() { }
 
-    Tile(const PointI& min, const PointI& max) :
-        pointSet(), bb(min, max) {
+    Tile(const PointI& min, const PointI& max, int estimatedPointSize = DEFAULT_POINT_SET_SIZE) :
+        pointSet(estimatedPointSize), bb(min, max) {
 
         center.setX((min.getX() + max.getX()) / 2);
         center.setY((min.getY() + max.getY()) / 2);
     }
 
-    Tile(PointI p, int width, int height) :
-        Tile(p, p + PointI(width, height)) { }
+    Tile(PointI p, int width, int height, int estimatedPointSize = DEFAULT_POINT_SET_SIZE) :
+        Tile(p, p + PointI(width, height), estimatedPointSize) { }
 
-    Tile(int minX, int minY, int maxX, int maxY) :
-        Tile(PointI(minX, minY), PointI(maxX, maxY)) { }
+    Tile(const BoundingBoxI& b, int estimatedPointSize = DEFAULT_POINT_SET_SIZE) :
+        Tile(b.getMin(), b.getMax(), estimatedPointSize) { }
+
+    Tile(int minX, int minY, int maxX, int maxY, int estimatedPointSize = DEFAULT_POINT_SET_SIZE) :
+        Tile(PointI(minX, minY), PointI(maxX, maxY), estimatedPointSize) { }
 
     bool addPoint(const Point<T>& p) {
 
@@ -46,6 +53,23 @@ public:
 
     }
 
+    bool addPointSet(const PointSet<T>& ps) {
+
+        if (ps.getMin() < bb.getMin() || ps.getMax() >= bb.getMax()) {
+            traceErr() << "Impossibile inserire il PointSet in questo Tile";
+            traceErr() << "StackTile: " << bb.getMin() << " x " << bb.getMax() ;
+            traceErr() << "PointSet: " << ps.getMin() << " x " << ps.getMax() ;
+            return false;
+        }
+
+        auto&& vector = ps.getVector();
+
+        for (auto&& p: vector)
+            pointSet.addPoint(p);
+
+        return true;
+    }
+
     const BoundingBoxI& getBoundingBox() const {
         return bb;
     }
@@ -54,11 +78,7 @@ public:
         pointSet.clear();
     }
 
-    PointSet<T>& getPointSet() {
-        return pointSet;
-    }
-
-    const PointSet<T>& getCPointSet() const {
+    const PointSet<T>& getPointSet() const {
         return pointSet;
     }
 
