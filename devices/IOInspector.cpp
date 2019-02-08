@@ -139,6 +139,16 @@ void IOInspector::analizeIO() {
             digitalInputLastValues[IOType::CYCLE].setValue(cycleValue);
         }
 
+        auto&& markInProgressValue = digitalInputStatus.value(IOType::MARK_IN_PROGRESS).getValue();
+        auto&& markInProgressOldValue = digitalInputLastValues.value(IOType::MARK_IN_PROGRESS).getValue();
+        if (markInProgressValue != markInProgressOldValue) {
+            if (markInProgressValue == true)
+                emit markInProgressOnSignal();
+            else
+                emit markInProgressOffSignal();
+            digitalInputLastValues[IOType::MARK_IN_PROGRESS].setValue(markInProgressValue);
+        }
+
     }
 
     traceExit;

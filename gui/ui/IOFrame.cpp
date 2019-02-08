@@ -108,6 +108,7 @@ IOFrame::IOFrame(QWidget *parent) :
 IOFrame::~IOFrame() {
 
     traceEnter;
+    delete dPtr;
     delete ui;
     traceExit;
 

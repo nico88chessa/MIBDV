@@ -6,6 +6,8 @@ SET(ITEMS
     IOFrame
     IOFrameLogic
     DialogAlert
+    TestFrame
+    TestFrameLogic
     )
 
 FOREACH(ITEM ${ITEMS})

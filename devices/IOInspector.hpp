@@ -78,6 +78,8 @@ signals:
     void powerOnSignal();
     void cycleOffSignal();
     void cycleOnSignal();
+    void markInProgressOnSignal();
+    void markInProgressOffSignal();
 
     void statusSignal(
             const DigitalInputStatus& digitalInputs,

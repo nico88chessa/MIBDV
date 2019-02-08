@@ -100,6 +100,8 @@ void MainWindow::setupSignalsAndSlots() const {
             ui->stackedWidget->setCurrentWidget(ui->pageMotion);
         else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageIO);
+        else if (QString(MAINWINDOW_MDCUSTOMITEM_TEST_FORI).compare(text) == 0)
+            ui->stackedWidget->setCurrentWidget(ui->pageTestFori);
 
     });
 
@@ -160,17 +162,22 @@ void MainWindow::setupUiLeftPanel() {
     MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/icons/black-theme/add_alert");
     MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/icons/black-theme/input");
     MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":icons/black-theme/pan_tool");
+    MDCustomItem::Ptr fori = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_TEST_FORI, ":icons/black-theme/pan_tool");
 
     QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
     QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);
     QListWidgetItem* motionItem = new QListWidgetItem(ui->listItem);
+    QListWidgetItem* foriItem = new QListWidgetItem(ui->listItem);
 
     ui->listItem->addItem(alertItem);
     ui->listItem->addItem(ioItem);
     ui->listItem->addItem(motionItem);
+    ui->listItem->addItem(foriItem);
+
     ui->listItem->setItemWidget(alertItem, alert);
     ui->listItem->setItemWidget(ioItem, io);
     ui->listItem->setItemWidget(motionItem, motion);
+    ui->listItem->setItemWidget(foriItem, fori);
 
     traceExit;
 
@@ -186,13 +193,17 @@ void MainWindow::setupUiContentPanel() {
     for (int i=0; i<widgetsCount; ++i) {
 
         QWidget* current = ui->stackedWidget->widget(i);
-        if (auto mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+        if (auto&& mf = current->findChild<MotionFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
             mf->setupDevices(this->motionManager, this->ioManager);
 
-        } else if (auto iof = current->findChild<IOFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+        } else if (auto&& iof = current->findChild<IOFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
             iof->setupDevices(this->ioManager);
+
+        } else if (auto&& tf = current->findChild<TestFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+
+            tf->setupDevices(this->motionManager, this->ioManager);
 
         }
 
@@ -220,6 +231,8 @@ void MainWindow::initDevices() {
         connect(ioInspector.data(), &IOInspector::powerOffSignal, ioManager.data(), &IOManager::powerOffSignal);
         connect(ioInspector.data(), &IOInspector::cycleOnSignal, ioManager.data(), &IOManager::cycleOnSignal);
         connect(ioInspector.data(), &IOInspector::cycleOffSignal, ioManager.data(), &IOManager::cycleOffSignal);
+        connect(ioInspector.data(), &IOInspector::markInProgressOnSignal, ioManager.data(), &IOManager::markInProgressOnSignal);
+        connect(ioInspector.data(), &IOInspector::markInProgressOffSignal, ioManager.data(), &IOManager::markInProgressOffSignal);
 
     }
 

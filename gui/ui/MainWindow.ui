@@ -69,7 +69,7 @@
           <number>0</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="pageMotion">
           <widget class="MotionFrame" name="frameMotion">
@@ -85,6 +85,24 @@
          </widget>
          <widget class="QWidget" name="pageIO">
           <widget class="IOFrame" name="frameIO">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>824</width>
+             <height>704</height>
+            </rect>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="pageTestFori">
+          <widget class="TestFrame" name="frameTestFori">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -233,6 +251,12 @@
    <class>IOFrame</class>
    <extends>QFrame</extends>
    <header>gui/ui/IOFrame.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TestFrame</class>
+   <extends>QFrame</extends>
+   <header>gui/ui/TestFrame.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

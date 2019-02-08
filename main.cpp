@@ -10,6 +10,11 @@
 
 #include <Types.hpp>
 
+#include <Grid.hpp>
+#include <PointSet.hpp>
+#include <StackedTile.hpp>
+#include <ComputationUtils.hpp>
+
 #include <third-party/ipg-marking-library-wrapper/include/Scanner.h>
 
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
@@ -57,6 +62,69 @@ void registerMetatypes() {
 
 }
 
+int mainTestFori(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
+
+    using namespace PROGRAM_NAMESPACE;
+    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+
+    QFile file("C:\\Users\\nicola\\Desktop\\a4-norotate.csv");
+//    QFile file("C:\\Users\\nicola\\Desktop\\test.csv");
+//    QFile file("C:\\Users\\nicola\\Desktop\\50x50.csv");
+//    QFile file("C:\\Users\\nicola\\Desktop\\5x5.csv");
+
+    if (!file.open(QIODevice::ReadOnly))
+        exit(-1);
+
+    QString firstLine(file.readLine());
+    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
+    file.readLine();
+    file.readLine();
+
+    mibdv::PointSetI set(pointsNumber);
+    bool okX;
+    bool okY;
+    int count = 0;
+    int fixedSize = 10;
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        QList<QByteArray> lineSplit = line.split(';');
+        if (lineSplit.size()>2) {
+            int x = lineSplit.at(0).toInt(&okX);
+            int y = lineSplit.at(1).toInt(&okY);
+            if (!(okX && okY))
+                exit(-1);
+            set.addPoint(x, y);
+
+        }
+//        if (++count > fixedSize)
+//            break;
+    }
+
+    PointI m = set.getMin();
+    PointI M = set.getMax();
+    int w = M.getX() - m.getX();
+    int h = M.getY() - m.getY();
+    GridI test(m, w, h, 10000);
+
+    for (auto&& p: set.getVector())
+        test.addPoint(p);
+
+    const QVector<TileI>& row = test.getRow(0);
+
+    QVector<StackedTileI> stacks;
+    for (auto&& item: row)
+        stacks.append(StackedTileI(ComputationUtils::shuffleTile(item), 500));
+
+    QList<TileI> rowTiles;
+    for (auto&& st: stacks)
+        rowTiles.append(st.getTiles());
+
+    auto sl = ComputationUtils::shuffleList(rowTiles);
+
+    traceExit;
+
+}
+
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
@@ -64,9 +132,9 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
 //    std::string err;
-    std::vector<ScannerInfo> v = Scanner::scanners();
+//    std::vector<ScannerInfo> v = Scanner::scanners();
 
-    std::cout << v.size();
+//    std::cout << v.size();
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);
