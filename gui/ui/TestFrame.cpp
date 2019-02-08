@@ -71,6 +71,7 @@ void TestFrameLogic::startProcess() {
     imlw::Scanner* scanner = new imlw::Scanner(scannerList[0].getName(), true, imlw::Units::MICRONS, err);
     imlw::OutputPointsProperties pointParameters(0.001);
 
+    scanner->guide(false);
     scanner->config(pointParameters, 0.0f);
 
     float powerpercent = 100.0;
@@ -125,6 +126,9 @@ void TestFrameLogic::startProcess() {
         }
     }
 
+
+    // creo la griglia (in tile)
+
     PointI m = set.getMin();
     PointI M = set.getMax();
     int w = M.getX() - m.getX();
@@ -134,6 +138,10 @@ void TestFrameLogic::startProcess() {
 
     for (auto&& p: set.getVector())
         grid.addPoint(p);
+
+    // griglia creata
+
+    scanner->laser(imlw::LaserAction::Enable);
 
     // ciclo su tutte le righe
     for (int r=0; r<grid.getRows(); ++r) {
@@ -258,6 +266,11 @@ void TestFrameLogic::startProcess() {
         }
 
     }
+
+    scanner->laser(imlw::LaserAction::Disable);
+    scanner->close();
+
+    delete scanner;
 
     // fine gestione file
 
