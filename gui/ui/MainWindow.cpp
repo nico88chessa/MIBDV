@@ -136,6 +136,23 @@ void MainWindow::setupSignalsAndSlots() const {
                                               Q_ARG(const mibdv::AnalogInputStatus&, c));
                 });
 
+        } else if (auto&& tf = current->findChild<TestFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+
+            connect(this, &MainWindow::motionStatusUpdateSignal, [tf](const QVariant& bean) {
+                auto motionBean = MotionBean(bean.value<GalilCNStatusBean>());
+                QMetaObject::invokeMethod(tf, "updateMotionBean", Qt::QueuedConnection,
+                                          Q_ARG(const mibdv::MotionBean&, motionBean));
+
+            });
+
+            connect(this, &MainWindow::ioStatusUpdateSignal, [tf](auto a, auto b, auto c) {
+                Q_UNUSED(b);
+                Q_UNUSED(c);
+                QMetaObject::invokeMethod(tf, "updateDigitalInputStatus", Qt::QueuedConnection,
+                                          Q_ARG(const mibdv::DigitalInputStatus&, a));
+
+            });
+
         }
 
     }

@@ -4,6 +4,7 @@
 #include <QtAlgorithms>
 #include <QList>
 #include <QtMath>
+#include <QVector>
 
 #include <configure.h>
 
@@ -12,6 +13,7 @@
 
 #include <PointSet.hpp>
 #include <Tile.hpp>
+#include <StackedTile.hpp>
 
 namespace PROGRAM_NAMESPACE {
 

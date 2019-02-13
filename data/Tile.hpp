@@ -85,6 +85,10 @@ public:
         return center;
     }
 
+    int size() const {
+        return this->pointSet.size();
+    }
+
 };
 
 using TileI = Tile<int>;

@@ -22,6 +22,9 @@ private:
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
 
+    bool isProcessStopped;
+
+
 public:
     TestFrameLogic();
     ~TestFrameLogic();
@@ -31,7 +34,7 @@ public:
 
 private slots:
     void startProcess();
-
+    void stopProcess();
 
 };
 

@@ -24,7 +24,10 @@ using namespace PROGRAM_NAMESPACE;
  *    T E S T   F R A M E  L O G I C
  *********************************************/
 
-TestFrameLogic::TestFrameLogic() { }
+TestFrameLogic::TestFrameLogic() :
+    isProcessStopped(false) {
+
+}
 
 TestFrameLogic::~TestFrameLogic() { }
 
@@ -50,10 +53,88 @@ void TestFrameLogic::startProcess() {
 
     namespace imlw = ipg_marking_library_wrapper;
 
+    this->isProcessStopped = false;
+
+    int tileSizeMm = qPtr->ui->sbTileSize->text().toInt();
+    double offsetXmm = qPtr->ui->dsbOffsetX->text().toDouble();
+    double offsetYmm = qPtr->ui->dsbOffsetY->text().toDouble();
+
     int numberOfPulses = qPtr->ui->sbPulses->text().toInt();
-    int frequency = qPtr->ui->sbFrequency->text().toInt();
-    int pointsPerTile = qPtr->ui->sbPointsPerTile->text().toInt();
-    int tileSize = qPtr->ui->sbTileSize->text().toInt();
+    int frequency = qPtr->ui->sbFrequency->text().toInt() * 1000;
+
+    //bool moveAxisYEachTile = qPtr->ui->cbMoveYEachTile->isChecked();
+    //bool moveAxisYEachLayerTile = qPtr->ui->cbMoveYEachStackedTile->isChecked();
+
+    int waitTimeMs = qPtr->ui->sbWaitTime->text().toInt();
+    int waitTimeAfterYMovementMs = qPtr->ui->sbWaitTimeYMovement->text().toInt();
+
+//    if (moveAxisYEachTile && moveAxisYEachLayerTile) {
+//        DialogAlert diag;
+//        diag.setupLabels("Error", "Controllare checkbox spostamenti Asse Y ");
+//        diag.exec();
+//        return;
+//    }
+
+    // widget random
+    bool isRandomAlgorithm = qPtr->ui->cbRandomChoice->isChecked();
+    bool isNeighborhoodAlgorithm = qPtr->ui->cbNHChoice->isChecked();
+
+    if (isRandomAlgorithm && isNeighborhoodAlgorithm) {
+        DialogAlert diag;
+        diag.setupLabels("Error", "Controllare checkbox algoritmo tiling");
+        diag.exec();
+        return;
+    }
+
+    int randomPointsPerTile = qPtr->ui->sbRPointsPerTile->text().toInt();
+    bool randomIsShuffleRowTiles = qPtr->ui->cbRShuffleRowTiles->isChecked();
+
+    // widget neighborhood
+    int neighborhoodMinDistanceUm = qPtr->ui->sbNHMinDistance->text().toInt();
+    bool neighborhoodIsShuffleStackedTiles = qPtr->ui->cbNHShuffleStackedTiles->isChecked();
+    bool neighborhoodIsShuffleRowTiles = qPtr->ui->cbNHShuffleRowTiles->isChecked();
+
+
+    // inizio gestione file
+
+    QString filePath = qPtr->ui->leFilePath->text();
+    QFile file(filePath);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        traceErr() << "Impossibile aprire il file: " << filePath;
+        DialogAlert diag;
+        diag.setupLabels("Error", "File non trovato");
+        diag.exec();
+        return;
+    }
+
+    QString firstLine(file.readLine());
+    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
+    file.readLine();
+    file.readLine();
+
+    mibdv::PointSetI set(pointsNumber);
+    bool okX;
+    bool okY;
+    int count = 0;
+    int fixedSize = 10;
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine().trimmed();
+        QList<QByteArray> lineSplit = line.split(';');
+        if (lineSplit.size()>1) {
+            int x = lineSplit.at(0).toInt(&okX);
+            int y = lineSplit.at(1).toInt(&okY);
+            if (!(okX && okY)) {
+                traceErr() << "Errore nella lettura del file";
+                DialogAlert diag;
+                diag.setupLabels("Error", "Errore nella lettura del file");
+                diag.exec();
+                return;
+            }
+            set.addPoint(x, y);
+
+        }
+    }
 
     // inizio configurazione testa scansione ipg
 
@@ -69,62 +150,20 @@ void TestFrameLogic::startProcess() {
 
     std::string err;
     imlw::Scanner* scanner = new imlw::Scanner(scannerList[0].getName(), true, imlw::Units::MICRONS, err);
-    imlw::OutputPointsProperties pointParameters(0.001);
+    imlw::OutputPointsProperties pointParameters(0.001f);
 
-    scanner->guide(false);
     scanner->config(pointParameters, 0.0f);
+    scanner->clearLaserEntry();
 
     float powerpercent = 100.0;
-    float width = (float) 1.0f / frequency;
+    float width =  0.5f / frequency;
     float dwell = width;
 
-    scanner->clearLaserEntry();
     scanner->addLaserEntry(dwell, width, powerpercent, numberOfPulses);
+    scanner->guide(false);
+    scanner->laser(imlw::LaserAction::Enable);
 
     // fine configurazione testa scansione ipg
-
-    // inizio gestione file
-
-    QString filePath = qPtr->ui->leFilePath->text();
-    QFile file(filePath);
-
-    if (!file.open(QIODevice::ReadOnly)) {
-        traceErr() << "Impossibile aprire il file: " << filePath;
-        DialogAlert diag;
-        diag.setupLabels("Error", "File non trovato");
-        diag.exec();
-        scanner->close();
-        return;
-    }
-
-    QString firstLine(file.readLine());
-    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
-    file.readLine();
-    file.readLine();
-
-    mibdv::PointSetI set(pointsNumber);
-    bool okX;
-    bool okY;
-    int count = 0;
-    int fixedSize = 10;
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        QList<QByteArray> lineSplit = line.split(';');
-        if (lineSplit.size()>2) {
-            int x = lineSplit.at(0).toInt(&okX);
-            int y = lineSplit.at(1).toInt(&okY);
-            if (!(okX && okY)) {
-                traceErr() << "Errore nella lettura del file";
-                DialogAlert diag;
-                diag.setupLabels("Error", "Errore nella lettura del file");
-                diag.exec();
-                scanner->close();
-                return;
-            }
-            set.addPoint(x, y);
-
-        }
-    }
 
 
     // creo la griglia (in tile)
@@ -134,14 +173,14 @@ void TestFrameLogic::startProcess() {
     int w = M.getX() - m.getX();
     int h = M.getY() - m.getY();
 
-    GridI grid(m, w, h, 10000);
+    GridI grid(m, w, h, tileSizeMm*1000);
 
     for (auto&& p: set.getVector())
         grid.addPoint(p);
 
-    // griglia creata
+    int countTile = 0;
 
-    scanner->laser(imlw::LaserAction::Enable);
+    // griglia creata
 
     // ciclo su tutte le righe
     for (int r=0; r<grid.getRows(); ++r) {
@@ -150,12 +189,19 @@ void TestFrameLogic::startProcess() {
         const QVector<TileI>& row = grid.getRow(r);
 
         int xUm = row.at(0).getBoundingBox().getMin().getX();
-        float xMM = (float) xUm / 1000;
+        int offsetXum = offsetXmm * 1000;
+        int tileSizeUm = tileSizeMm * 1000 * 0.5;
 
-        traceDebug() << "Spostamento asse lungo l'asse X: " << xUm << "um";
-        traceDebug() << "Spostamento asse lungo l'asse X: " << xMM << "mm";
+        int moveXum = xUm + offsetXum + tileSizeUm;
+        float moveXmm = (float) moveXum * 0.001;
 
-        int res = this->motionManager->moveX(xMM);
+        traceDebug() << "Spostamento asse lungo l'asse X per bounding box immagine: " << xUm << "um";
+        traceDebug() << "Offset asse lungo l'asse X: " << offsetXum << "um";
+        traceDebug() << "Offset per dimensione tile X (diviso per 2): " << tileSizeUm << "um";
+        traceDebug() << "Spostamento asse lungo l'asse X totale: " << moveXum << "um";
+        traceDebug() << "Spostamento asse lungo l'asse X totale: " << moveXmm << "mm";
+
+        int res = this->motionManager->moveX(moveXmm);
 
         if (motionManager->isErr(res)) {
 
@@ -172,9 +218,21 @@ void TestFrameLogic::startProcess() {
         } else {
 
             QEventLoop loop;
+            QTimer t;
+            t.setSingleShot(true);
+            t.setInterval(500);
+
             res = MOTION_MANAGER_NO_ERR;
 
-            QMetaObject::Connection c1 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
+            QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
+                if (!qPtr->motionBean.getAxisXMoveInProgress()) {
+                    if (loop.isRunning()) {
+                        res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+                        loop.quit();
+                    }
+                }
+            });
+            QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
                 if (loop.isRunning()) {
                     if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                         res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -184,86 +242,176 @@ void TestFrameLogic::startProcess() {
                 }
             });
 
+            t.start();
             loop.exec();
+            t.stop();
             QObject::disconnect(c1);
+            QObject::disconnect(c2);
 
         }
 
         // per ogni riga, dai tile creo gli stacked tile
         QVector<StackedTileI> stackedTiles;
-        for (auto&& item: row)
-            stackedTiles.append(StackedTileI(ComputationUtils::shuffleTile(item), pointsPerTile));
+
+        if (isRandomAlgorithm) {
+
+            for (auto&& item: row)
+                stackedTiles.append(StackedTileI(ComputationUtils::shuffleTile(item), randomPointsPerTile));
+
+        } else if (isNeighborhoodAlgorithm) {
+
+            for (auto&& item: row)
+                stackedTiles.append(StackedTileI(item, neighborhoodMinDistanceUm, neighborhoodMinDistanceUm));
+
+        } else {
+
+            for (auto&& item: row)
+                stackedTiles.append(StackedTileI(item, randomPointsPerTile));
+
+        }
 
         // una volta creati gli stacked tile, devo creare la lista di tutti i tile per mescolarli
         QList<TileI> rowTiles;
-        for (auto&& stack: stackedTiles)
-            rowTiles.append(stack.getTiles());
+        for (const StackedTileI& stack: stackedTiles) {
 
+            if (isNeighborhoodAlgorithm && neighborhoodIsShuffleStackedTiles)
+                rowTiles.append(ComputationUtils::shuffleList(stack.getTiles()));
+            else
+                rowTiles.append(stack.getTiles());
+        }
+
+        QList<TileI> sl;
         // disordino i tiles di ogni singola riga
-        QList<TileI> sl = ComputationUtils::shuffleList(rowTiles);
+        if (isRandomAlgorithm && randomIsShuffleRowTiles)
+            sl = ComputationUtils::shuffleList(rowTiles);
+        else if (isNeighborhoodAlgorithm && neighborhoodIsShuffleRowTiles)
+            sl = ComputationUtils::shuffleList(rowTiles);
+        else
+            sl = rowTiles;
+
+
+        float lastMoveYmm = 0;
 
         for (auto&& currentTile: sl) {
 
             // dalla lista, inizio a stampare ogni singolo tile
             int yUm = currentTile.getBoundingBox().getMin().getY();
-            float yMM = (float) yUm / 1000;
-            traceDebug() << "Spostamento asse lungo l'asse Y: " << yUm << "um";
-            traceDebug() << "Spostamento asse lungo l'asse Y: " << yMM << "mm";
+            int offsetYum = offsetYmm * 1000;
+            int tileSizeUm = tileSizeMm * 1000 * 0.5;
 
-            res = this->motionManager->moveY(yMM);
+            int moveYum = yUm + offsetYum + tileSizeUm;
+            float moveYmm = (float) moveYum * 0.001;
 
-            if (motionManager->isErr(res)) {
+            traceDebug() << "Spostamento asse lungo l'asse Y per bounding box immagine: " << yUm << "um";
+            traceDebug() << "Offset asse lungo l'asse Y: " << offsetYum << "um";
+            traceDebug() << "Offset per dimensione tile Y (diviso per 2): " << tileSizeUm << "um";
+            traceDebug() << "Spostamento asse lungo l'asse Y totale: " << moveYum << "um";
+            traceDebug() << "Spostamento asse lungo l'asse Y totale: " << moveYmm << "mm";
 
-                QString descrErr = MotionManager::decodeError(res);
-                traceErr() << "Errore comando move asse Y - codice:" << res;
-                traceErr() << "Descrizione:" << descrErr;
+            if (lastMoveYmm != moveYmm) {
 
-                DialogAlert diag;
-                diag.setupLabels("Error", descrErr);
-                diag.exec();
-                return;
+                res = this->motionManager->moveY(moveYmm);
+                lastMoveYmm = moveYmm;
 
-            } else {
+                if (motionManager->isErr(res)) {
 
-                QEventLoop loop;
-                res = MOTION_MANAGER_NO_ERR;
+                    QString descrErr = MotionManager::decodeError(res);
+                    traceErr() << "Errore comando move asse Y - codice:" << res;
+                    traceErr() << "Descrizione:" << descrErr;
 
-                QMetaObject::Connection c1 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
-                    if (loop.isRunning()) {
-                        if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
-                            res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
-                        else
-                            res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
-                        loop.quit();
-                    }
-                });
+                    DialogAlert diag;
+                    diag.setupLabels("Error", descrErr);
+                    diag.exec();
+                    return;
 
-                loop.exec();
-                QObject::disconnect(c1);
+                } else {
 
+                    QEventLoop loop;
+                    QTimer t;
+                    t.setSingleShot(true);
+                    t.setInterval(500);
+
+                    res = MOTION_MANAGER_NO_ERR;
+
+                    QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
+                        if (!qPtr->motionBean.getAxisYMoveInProgress()) {
+                            if (loop.isRunning()) {
+                                res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                                loop.quit();
+                            }
+                        }
+                    });
+                    QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
+                        if (loop.isRunning()) {
+                            if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                                res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                            else
+                                res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
+                            loop.quit();
+                        }
+                    });
+
+                    t.start();
+                    loop.exec();
+                    t.stop();
+                    QObject::disconnect(c1);
+                    QObject::disconnect(c2);
+
+                    this->thread()->msleep(waitTimeAfterYMovementMs);
+                }
             }
 
-            std::list<imlw::Point> listOfPoints;
-            imlw::PointList outputPoints(listOfPoints);
+            this->thread()->msleep(waitTimeMs);
 
-            PointSetI movePoints = ComputationUtils::movePointSet(currentTile.getPointSet(), currentTile.getCenter());
+            if (isProcessStopped)
+                break;
+
+            scanner->laser(imlw::LaserAction::Disable);
+            scanner->laser(imlw::LaserAction::Enable);
+            std::list<imlw::Point> listOfPoints;
+            PointI offset = currentTile.getCenter();
+            offset.setX(-offset.getX());
+            offset.setY(-offset.getY());
+            PointSetI movePoints = ComputationUtils::movePointSet(currentTile.getPointSet(), offset);
             const QVector<PointI>& vectorPoints = movePoints.getVector();
 
             for (auto&& p: vectorPoints)
                 listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
 
-            scanner->output(outputPoints, pointParameters);
+            imlw::PointList outputPoints(listOfPoints);
+            scanner->output(outputPoints);
             listOfPoints.clear();
 
+            scanner->laser(imlw::LaserAction::Enable);
+            scanner->laser(imlw::LaserAction::Disable);
+
             QEventLoop loopIO;
-            QMetaObject::Connection c1 = connect(ioManager.data(), &IOManager::markInProgressOffSignal, [&]() {
+            QTimer t;
+            t.setSingleShot(true);
+            t.setInterval(1000);
+
+            QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
+                if (loopIO.isRunning())
+                    if (qPtr->digitalInputStatus[IOType::MARK_IN_PROGRESS].getValue() == false)
+                        loopIO.quit();
+            });
+            QMetaObject::Connection c2 = connect(ioManager.data(), &IOManager::markInProgressOffSignal, [&]() {
                 if (loopIO.isRunning())
                     loopIO.quit();
             });
+
+            t.start();
             loopIO.exec();
+            t.stop();
+            listOfPoints.clear();
+            ++countTile;
             QObject::disconnect(c1);
+            QObject::disconnect(c2);
 
         }
+
+        if (isProcessStopped)
+            break;
 
     }
 
@@ -274,37 +422,23 @@ void TestFrameLogic::startProcess() {
 
     // fine gestione file
 
-
-
-
-
-
-//    std::list<Point> listOfPoints;
-//    float pitch = 250;
-
-//    int x = 20;
-//    int y = 20;
-//    for (int j = 0; j < y; j++) {
-//        for (int i = 0; i < x; i++) {
-//            listOfPoints.push_back(Point(pitch*i, pitch*j));
-//        }
-//    }
-
-//    {
-//        PointList outputpoint(listOfPoints);
-
-//        s->guide(false);
-//        s->wait(WaitEvent::StartBit);
-//        s->laser(LaserAction::Enable);
-//        s->output(outputpoint);
-//        s->laser(LaserAction::Disable);
-//    }
-
-//    int w = 10;
+    DialogAlert diag;
+    if (isProcessStopped)
+        diag.setupLabels("Info", "Processo fermato");
+    else
+        diag.setupLabels("Info", "Bucato tutto");
+    diag.exec();
 
     traceExit;
 
 }
+
+void TestFrameLogic::stopProcess() {
+    traceEnter;
+    this->isProcessStopped = true;
+    traceExit;
+}
+
 
 
 /**********************************************
@@ -368,9 +502,23 @@ void TestFrame::setupUi() {
     ui->setupUi(this);
 
     ui->sbFrequency->setRange(TEST_FRAME_MIN_FREQUENCY, TEST_FRAME_MAX_FREQUENCY);
-    ui->sbPointsPerTile->setRange(TEST_FRAME_POINTS_PER_TILE_MIN_VALUE, TEST_FRAME_POINTS_PER_TILE_MAX_VALUE);
-    ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN_VALUE, TEST_FRAME_PULSES_MAX_VALUE);
-    ui->sbTileSize->setRange(TEST_FRAME_TILE_SIZE_MIN_VALUE, TEST_FRAME_TILE_SIZE_MAX_VALUE);
+    ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
+
+    ui->sbTileSize->setRange(TEST_FRAME_TILE_SIZE_MIN, TEST_FRAME_TILE_SIZE_MAX);
+
+    ui->sbWaitTime->setRange(TEST_FRAME_WAIT_TIME_MS_MIN, TEST_FRAME_WAIT_TIME_MS_MAX);
+    ui->sbWaitTimeYMovement->setRange(TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MIN, TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MAX);
+
+    ui->dsbOffsetX->setRange(TEST_FRAME_OFFSET_X_MIN, TEST_FRAME_OFFSET_X_MAX);
+    ui->dsbOffsetX->setSingleStep(TEST_FRAME_DSB_STEP);
+    ui->dsbOffsetX->setDecimals(3);
+
+    ui->dsbOffsetY->setRange(TEST_FRAME_OFFSET_Y_MIN, TEST_FRAME_OFFSET_Y_MAX);
+    ui->dsbOffsetY->setSingleStep(TEST_FRAME_DSB_STEP);
+    ui->dsbOffsetY->setDecimals(3);
+
+    ui->sbRPointsPerTile->setRange(TEST_FRAME_POINTS_PER_TILE_MIN, TEST_FRAME_POINTS_PER_TILE_MAX);
+    ui->sbNHMinDistance->setRange(TEST_FRAME_POINTS_DISTANCE_UM_MIN, TEST_FRAME_POINTS_DISTANCE_UM_MAX);
 
     traceExit;
 
@@ -380,6 +528,8 @@ void TestFrame::setupSignalsAndSlots() {
 
     traceEnter;
     connect(ui->pbStartProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::startProcess);
+    connect(ui->pbStopProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::stopProcess);
+
     traceExit;
 
 }

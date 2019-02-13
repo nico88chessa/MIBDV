@@ -53,7 +53,7 @@ public:
 
 };
 
-// TODO NIC 04/02/2019 verificare il comportamento del confronto nel caso di numero float
+// TODO NIC 04/02/2019 - verificare il comportamento del confronto nel caso di numero float
 template<typename TT>
 bool operator<(const Point<TT>& l, const Point<TT>& r) {
     bool res;
