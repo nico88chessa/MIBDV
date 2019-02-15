@@ -46,7 +46,8 @@ private slots:
     void homeAxes();
     void stopAxes();
 
-    void airChange();
+    void airOn();
+    void airOff();
 
 };
 
