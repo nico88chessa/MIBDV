@@ -641,6 +641,17 @@ void MotionFrameLogic::stopAxes() {
 
 }
 
+void MotionFrameLogic::airChange() {
+
+    traceEnter;
+    if (this->qPtr->digitalInputStatus.value(IOType::COMPRESSED_AIR_1).getValue())
+        this->ioManager->unsetDigitalOutput(IOType::COMPRESSED_AIR_1);
+    else
+        this->ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1);
+    traceExit;
+
+}
+
 /**********************************************
  *         M O T I O N  F R A M E
  *********************************************/
@@ -659,6 +670,8 @@ void MotionFrame::setupSignalsAndSlots() {
 
     connect(ui->pbResetAxes, &QPushButton::clicked, dPtr, &MotionFrameLogic::homeAxes);
     connect(ui->pbStopAxes, &QPushButton::clicked, dPtr, &MotionFrameLogic::stopAxes);
+
+    connect(ui->pbAir, &QPushButton::clicked, dPtr, &MotionFrameLogic::airChange);
 
     traceExit;
 

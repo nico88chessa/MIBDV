@@ -55,18 +55,18 @@ void TestFrameLogic::startProcess() {
 
     this->isProcessStopped = false;
 
-    int tileSizeMm = qPtr->ui->sbTileSize->text().toInt();
-    double offsetXmm = qPtr->ui->dsbOffsetX->text().toDouble();
-    double offsetYmm = qPtr->ui->dsbOffsetY->text().toDouble();
+    int tileSizeMm = qPtr->ui->sbTileSize->value();
+    double offsetXmm = qPtr->ui->dsbOffsetX->value();
+    double offsetYmm = qPtr->ui->dsbOffsetY->value();
 
-    int numberOfPulses = qPtr->ui->sbPulses->text().toInt();
-    int frequency = qPtr->ui->sbFrequency->text().toInt() * 1000;
+    int numberOfPulses = qPtr->ui->sbPulses->value();
+    int frequency = qPtr->ui->sbFrequency->value() * 1000;
 
     //bool moveAxisYEachTile = qPtr->ui->cbMoveYEachTile->isChecked();
     //bool moveAxisYEachLayerTile = qPtr->ui->cbMoveYEachStackedTile->isChecked();
 
-    int waitTimeMs = qPtr->ui->sbWaitTime->text().toInt();
-    int waitTimeAfterYMovementMs = qPtr->ui->sbWaitTimeYMovement->text().toInt();
+    int waitTimeMs = qPtr->ui->sbWaitTime->value();
+    int waitTimeAfterYMovementMs = qPtr->ui->sbWaitTimeYMovement->value();
 
 //    if (moveAxisYEachTile && moveAxisYEachLayerTile) {
 //        DialogAlert diag;
@@ -86,11 +86,11 @@ void TestFrameLogic::startProcess() {
         return;
     }
 
-    int randomPointsPerTile = qPtr->ui->sbRPointsPerTile->text().toInt();
+    int randomPointsPerTile = qPtr->ui->sbRPointsPerTile->value();
     bool randomIsShuffleRowTiles = qPtr->ui->cbRShuffleRowTiles->isChecked();
 
     // widget neighborhood
-    int neighborhoodMinDistanceUm = qPtr->ui->sbNHMinDistance->text().toInt();
+    int neighborhoodMinDistanceUm = qPtr->ui->sbNHMinDistance->value();
     bool neighborhoodIsShuffleStackedTiles = qPtr->ui->cbNHShuffleStackedTiles->isChecked();
     bool neighborhoodIsShuffleRowTiles = qPtr->ui->cbNHShuffleRowTiles->isChecked();
 
@@ -138,6 +138,9 @@ void TestFrameLogic::startProcess() {
 
     // inizio configurazione testa scansione ipg
 
+    ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1);
+
+#ifdef FLAG_SCANNER_HEAD_PRESENT
     const std::vector<imlw::ScannerInfo>& scannerList = imlw::Scanner::scanners();
 
     if (scannerList.empty()) {
@@ -154,15 +157,18 @@ void TestFrameLogic::startProcess() {
 
     scanner->config(pointParameters, 0.0f);
     scanner->clearLaserEntry();
+#endif
+
 
     float powerpercent = 100.0;
     float width =  0.5f / frequency;
     float dwell = width;
 
+#ifdef FLAG_SCANNER_HEAD_PRESENT
     scanner->addLaserEntry(dwell, width, powerpercent, numberOfPulses);
     scanner->guide(false);
     scanner->laser(imlw::LaserAction::Enable);
-
+#endif
     // fine configurazione testa scansione ipg
 
 
@@ -212,7 +218,9 @@ void TestFrameLogic::startProcess() {
             DialogAlert diag;
             diag.setupLabels("Error", descrErr);
             diag.exec();
+#ifdef FLAG_SCANNER_HEAD_PRESENT
             scanner->close();
+#endif
             return;
 
         } else {
@@ -366,8 +374,10 @@ void TestFrameLogic::startProcess() {
             if (isProcessStopped)
                 break;
 
+#ifdef FLAG_SCANNER_HEAD_PRESENT
             scanner->laser(imlw::LaserAction::Disable);
             scanner->laser(imlw::LaserAction::Enable);
+#endif
             std::list<imlw::Point> listOfPoints;
             PointI offset = currentTile.getCenter();
             offset.setX(-offset.getX());
@@ -379,12 +389,13 @@ void TestFrameLogic::startProcess() {
                 listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
 
             imlw::PointList outputPoints(listOfPoints);
+#ifdef FLAG_SCANNER_HEAD_PRESENT
             scanner->output(outputPoints);
             listOfPoints.clear();
 
             scanner->laser(imlw::LaserAction::Enable);
             scanner->laser(imlw::LaserAction::Disable);
-
+#endif
             QEventLoop loopIO;
             QTimer t;
             t.setSingleShot(true);
@@ -415,10 +426,14 @@ void TestFrameLogic::startProcess() {
 
     }
 
+    ioManager->unsetDigitalOutput(IOType::COMPRESSED_AIR_1);
+
+#ifdef FLAG_SCANNER_HEAD_PRESENT
     scanner->laser(imlw::LaserAction::Disable);
     scanner->close();
 
     delete scanner;
+#endif
 
     // fine gestione file
 
