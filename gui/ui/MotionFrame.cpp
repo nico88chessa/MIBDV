@@ -727,6 +727,7 @@ MotionFrame::MotionFrame(QWidget *parent) :
 }
 
 MotionFrame::~MotionFrame() {
+    delete dPtr;
     delete ui;
 }
 

@@ -7,7 +7,6 @@
 
 #include <configure.h>
 
-#include <Point.hpp>
 #include <Tile.hpp>
 
 namespace PROGRAM_NAMESPACE {
@@ -101,6 +100,10 @@ public:
         auto&& tile = this->getTile(p);
         tile.addPoint(p);
     }
+
+    int getRows() const { return numTileX; }
+
+    int getCols() const { return numTileY; }
 
 };
 

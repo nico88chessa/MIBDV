@@ -3,7 +3,6 @@
 
 #include <QList>
 
-#include <BoundingBox.hpp>
 #include <PointSet.hpp>
 #include <Logger.hpp>
 
@@ -80,6 +79,14 @@ public:
 
     const PointSet<T>& getPointSet() const {
         return pointSet;
+    }
+
+    const Point<T>& getCenter() const {
+        return center;
+    }
+
+    int size() const {
+        return this->pointSet.size();
     }
 
 };

@@ -9,6 +9,18 @@
 
 namespace PROGRAM_NAMESPACE {
 
+enum class POINT_POSITION : int {
+    TOP_LEFT,
+    TOP_MIDDLE,
+    TOP_RIGHT,
+    MIDDLE_LEFT,
+    INSIDE,
+    MIDDLE_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_MIDDLE,
+    BOTTOM_RIGHT
+};
+
 template <typename T>
 class BoundingBox {
 private:
@@ -16,6 +28,8 @@ private:
     Point<T> M;
 
 public:
+
+
     BoundingBox() :
         m(std::numeric_limits<T>::max(), std::numeric_limits<T>::max()),
         M(std::numeric_limits<T>::min(), std::numeric_limits<T>::min()) {
@@ -44,6 +58,55 @@ public:
         if (other.getY() > M.getY()) M.setY(other.getY());
 
     }
+
+    bool isPointInside(const Point<T>& p) {
+        return (p.getX()>=m.getX() && p.getY()>=m.getY()) &&
+                (p.getX()<M.getX() && p.getY()<M.getY());
+    }
+
+    POINT_POSITION getPointPosition(const Point<T>& p) {
+
+        T x = p.getX();
+        T y = p.getY();
+
+        T minX = m.getX();
+        T minY = m.getY();
+
+        T maxX = M.getX();
+        T maxY = M.getY();
+
+        if (x < minX) {
+
+            if (y < minY)
+                return POINT_POSITION::BOTTOM_LEFT;
+            else if (y >= maxY)
+                return POINT_POSITION::TOP_LEFT;
+            else
+                return POINT_POSITION::MIDDLE_LEFT;
+
+        } else if (x >= maxX) {
+
+            if (y < minY)
+                return POINT_POSITION::BOTTOM_RIGHT;
+            else if (y >= maxY)
+                return POINT_POSITION::TOP_RIGHT;
+            else
+                return POINT_POSITION::MIDDLE_RIGHT;
+
+        } else {
+
+            if (y < minY)
+                return POINT_POSITION::BOTTOM_MIDDLE;
+            else if (y >= maxY)
+                return POINT_POSITION::TOP_MIDDLE;
+            else
+                return POINT_POSITION::INSIDE;
+
+        }
+
+    }
+
+
 
 };
 

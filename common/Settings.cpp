@@ -468,7 +468,7 @@ bool Settings::validateSettings() const {
     /* NOTE NIC 30/10/2018 - per ora il controllo delle analogiche
      * viene fatto solamente sul PLC
      */
-    // TODO NIC 15/12/2018: controllare che gli ingressi POWER e CYCLE siano presenti
+    // TODO NIC 15/12/2018 - controllare che gli ingressi POWER e CYCLE siano presenti
 
     // key = ingresso
     // value = chiave ridondante
