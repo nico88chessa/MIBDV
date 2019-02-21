@@ -1,22 +1,4 @@
 SET(ITEMS
-    Types
-    DigitalInput
-    DigitalOutput
-    AnalogInput
-    DigitalInputValue
-    DigitalOutputValue
-    AnalogInputValue
-    Error
-    GalilCNStatusBean
-    GalilPLCStatusBean
-    MotionBean
-    Point
-    PointSet
-    Tile
-    Grid
-    BoundingBox
-    StackedTile
-    Filter
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -51,6 +33,7 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
+    json
 )
 
 FOREACH(item ${SUB_FOLDERS})
