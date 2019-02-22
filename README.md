@@ -8,11 +8,19 @@ la selezione del modo di build avviene al momento del make.
 (MSVC e' un compilatore che usa piu' configurazioni - multiconfiguration tools)
 
 Per importare in QtCreator il progetto correttamente, seguire le seguenti istruzioni:
-- modalita' Debug, tutto ok
+
+- modalita' Debug
+  bisogna modificare il modo con cui QtCreator crea il progetto nel seguente modo:
+  1. eliminare il Build Step di Default
+  2. creare un Build Step / Custom process step e compilare i seguenti campi:
+  command: cmake.exe
+  arguments: --build . --target ALL_BUILD --config Debug
+  working directory: %{buildDir}
+  
 - modalita' Release
   bisogna modificare il modo con cui QtCreator crea il progetto nel seguente modo:
   1. eliminare il Build Step di Default
-  2. creare un Buil Step / Custom process step e compilare i seguenti campi:
+  2. creare un Build Step / Custom process step e compilare i seguenti campi:
   command: cmake.exe
   arguments: --build . --target ALL_BUILD --config Release
   working directory: %{buildDir}
