@@ -32,33 +32,6 @@
    <property name="verticalSpacing">
     <number>10</number>
    </property>
-   <item row="1" column="0" colspan="2">
-    <widget class="MDLineEdit" name="leFilePath">
-     <property name="minimumSize">
-      <size>
-       <width>200</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="label" stdset="0">
-      <string>Path File</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1">
-    <widget class="QPushButton" name="pbStopProcess">
-     <property name="text">
-      <string>Stop</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QPushButton" name="pbStartProcess">
-     <property name="text">
-      <string>Start</string>
-     </property>
-    </widget>
-   </item>
    <item row="10" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -72,42 +45,90 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="1">
-    <widget class="QWidget" name="wNeighborhood" native="true">
+   <item row="9" column="1">
+    <widget class="QPushButton" name="pbStopProcess">
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="MDLineEdit" name="leFilePath">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="label" stdset="0">
+      <string>Path File</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QPushButton" name="pbStartProcess">
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QWidget" name="wRandom" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="styleSheet">
       <string notr="true">background-color: rgb(170, 255, 255);</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
+     <layout class="QGridLayout" name="gridLayout_3">
       <item row="2" column="0">
-       <widget class="QCheckBox" name="cbNHShuffleStackedTiles">
-        <property name="text">
-         <string>Shuffle layer tiles</string>
-        </property>
-        <property name="label" stdset="0">
-         <string>Shuffle tile</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="MDSpinBox" name="sbNHMinDistance">
-        <property name="label" stdset="0">
-         <string>Minimum distance [um]</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="cbNHChoice">
-        <property name="text">
-         <string>Neighborhood</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="cbNHShuffleRowTiles">
+       <widget class="QCheckBox" name="cbRShuffleRowTiles">
         <property name="text">
          <string>Shuffle all row tiles</string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="MDSpinBox" name="sbRPointsPerTile">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="label" stdset="0">
+         <string>Points per Tile</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="cbRandomChoice">
+        <property name="text">
+         <string>Random</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -260,51 +281,59 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="MDDoubleSpinBox" name="dsbAngleMrad">
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <double>200.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.001000000000000</double>
+        </property>
+        <property name="label" stdset="0">
+         <string>Angle [mrad]</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QWidget" name="wRandom" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
+   <item row="3" column="1">
+    <widget class="QWidget" name="wNeighborhood" native="true">
      <property name="styleSheet">
       <string notr="true">background-color: rgb(170, 255, 255);</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
+     <layout class="QGridLayout" name="gridLayout_4">
       <item row="2" column="0">
-       <widget class="QCheckBox" name="cbRShuffleRowTiles">
+       <widget class="QCheckBox" name="cbNHShuffleStackedTiles">
         <property name="text">
-         <string>Shuffle all row tiles</string>
+         <string>Shuffle layer tiles</string>
+        </property>
+        <property name="label" stdset="0">
+         <string>Shuffle tile</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="MDSpinBox" name="sbRPointsPerTile">
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
+       <widget class="MDSpinBox" name="sbNHMinDistance">
         <property name="label" stdset="0">
-         <string>Points per Tile</string>
+         <string>Minimum distance [um]</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QCheckBox" name="cbRandomChoice">
+       <widget class="QCheckBox" name="cbNHChoice">
         <property name="text">
-         <string>Random</string>
+         <string>Neighborhood</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="cbNHShuffleRowTiles">
+        <property name="text">
+         <string>Shuffle all row tiles</string>
         </property>
        </widget>
       </item>

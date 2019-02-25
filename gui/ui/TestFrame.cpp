@@ -67,6 +67,11 @@ void TestFrameLogic::startProcess() {
 
     int waitTimeMs = qPtr->ui->sbWaitTime->value();
     int waitTimeAfterYMovementMs = qPtr->ui->sbWaitTimeYMovement->value();
+    double angleMRad = qPtr->ui->dsbAngleMrad->value();
+
+    float angleRad = angleMRad * 0.001;
+    traceInfo() << "Angolo rotazione [mrad]: " << angleMRad;
+    traceInfo() << "Angolo rotazione [rad]: " << angleRad;
 
 //    if (moveAxisYEachTile && moveAxisYEachLayerTile) {
 //        DialogAlert diag;
@@ -167,7 +172,7 @@ void TestFrameLogic::startProcess() {
 #ifdef FLAG_SCANNER_HEAD_PRESENT
     scanner->addLaserEntry(dwell, width, powerpercent, numberOfPulses);
     scanner->guide(false);
-    scanner->laser(imlw::LaserAction::Enable);
+//    scanner->laser(imlw::LaserAction::Enable);
 #endif
     // fine configurazione testa scansione ipg
 
@@ -375,7 +380,7 @@ void TestFrameLogic::startProcess() {
                 break;
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
-            scanner->laser(imlw::LaserAction::Disable);
+//            scanner->laser(imlw::LaserAction::Disable);
             scanner->laser(imlw::LaserAction::Enable);
 #endif
             std::list<imlw::Point> listOfPoints;
@@ -389,11 +394,12 @@ void TestFrameLogic::startProcess() {
                 listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
 
             imlw::PointList outputPoints(listOfPoints);
+            outputPoints.rotate(angleRad);
 #ifdef FLAG_SCANNER_HEAD_PRESENT
             scanner->output(outputPoints);
             listOfPoints.clear();
 
-            scanner->laser(imlw::LaserAction::Enable);
+//            scanner->laser(imlw::LaserAction::Enable);
             scanner->laser(imlw::LaserAction::Disable);
 #endif
             QEventLoop loopIO;

@@ -42,6 +42,8 @@ private:
     static constexpr int TEST_FRAME_OFFSET_Y_MAX = 1200;
     static constexpr int TEST_FRAME_POINTS_DISTANCE_UM_MIN = 100;
     static constexpr int TEST_FRAME_POINTS_DISTANCE_UM_MAX = 100000;
+    static constexpr int TEST_FRAME_ANGLE_MRAD_MIN = -200;
+    static constexpr int TEST_FRAME_ANGLE_MRAD_MAX = 200;
     static constexpr double TEST_FRAME_DSB_STEP = 0.1;
 
     Ui::TestFrame *ui;

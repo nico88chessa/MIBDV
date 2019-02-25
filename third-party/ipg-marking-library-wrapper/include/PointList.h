@@ -22,6 +22,10 @@ namespace ipg_marking_library_wrapper {
         int count() const;
         Point element(int i);
         void shift(float x, float y, float z);
+        void rotate(double z);
+        void rotate(double x, double y, double z);
+        void rotate(float z);
+        void rotate(float x, float y, float z);
 
         void* getManagedPtr();
         void releaseManagedPtr();
