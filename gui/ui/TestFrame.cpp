@@ -541,6 +541,10 @@ void TestFrame::setupUi() {
     ui->sbRPointsPerTile->setRange(TEST_FRAME_POINTS_PER_TILE_MIN, TEST_FRAME_POINTS_PER_TILE_MAX);
     ui->sbNHMinDistance->setRange(TEST_FRAME_POINTS_DISTANCE_UM_MIN, TEST_FRAME_POINTS_DISTANCE_UM_MAX);
 
+    ui->dsbAngleMrad->setRange(TEST_FRAME_ANGLE_MRAD_MIN, TEST_FRAME_ANGLE_MRAD_MAX);
+    ui->dsbAngleMrad->setDecimals(3);
+    ui->dsbAngleMrad->setSingleStep(TEST_FRAME_ANGLE_STEP);
+
     traceExit;
 
 }

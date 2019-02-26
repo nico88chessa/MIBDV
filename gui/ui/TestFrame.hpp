@@ -45,6 +45,7 @@ private:
     static constexpr int TEST_FRAME_ANGLE_MRAD_MIN = -200;
     static constexpr int TEST_FRAME_ANGLE_MRAD_MAX = 200;
     static constexpr double TEST_FRAME_DSB_STEP = 0.1;
+    static constexpr double TEST_FRAME_ANGLE_STEP = 0.001;
 
     Ui::TestFrame *ui;
     TestFrameLogic* dPtr;
