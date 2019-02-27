@@ -2,6 +2,7 @@ SET(ITEMS
     Constants
     Datatype
     Utils
+    TypeTraits
 )
 
 FOREACH(ITEM ${ITEMS})

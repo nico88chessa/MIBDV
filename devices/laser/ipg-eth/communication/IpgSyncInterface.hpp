@@ -4,10 +4,12 @@
 #include <QHostAddress>
 #include <QPointer>
 
-#include "../communication/SocketSyncExecutor.hpp"
+#include <communication/ethernet/SocketSyncExecutor.hpp>
 #include "../marshalling/Marshallers.hpp"
 
 namespace ipg {
+
+namespace ce = communication::ethernet;
 
 class IpgSyncInterface : public QObject {
     Q_OBJECT
@@ -17,7 +19,7 @@ public:
     typedef const IpgSyncInterface* ConstPtr;
 
 private:
-    QPointer<AbstractSyncExecutor> syncExecutor;
+    QPointer<ce::AbstractSyncExecutor> syncExecutor;
     bool isConnected;
 
 private slots:
@@ -40,7 +42,7 @@ public:
 
     IpgSyncInterface(QObject* parent = nullptr) : QObject(parent), isConnected(false) {
 
-        this->syncExecutor = new SocketSyncExecutor();
+        this->syncExecutor = new ce::SocketSyncExecutor();
 
         connect(syncExecutor, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(socketErrorTrace(QAbstractSocket::SocketError)));
         connect(syncExecutor, SIGNAL(connected()), this, SLOT(socketConnected()));
@@ -51,7 +53,7 @@ public:
     ~IpgSyncInterface() {
 
         if (!syncExecutor.isNull()) {
-            static_cast<SocketSyncExecutor::Ptr>(syncExecutor.data())->closeConnection();
+            static_cast<ce::SocketSyncExecutor::Ptr>(syncExecutor.data())->closeConnection();
             delete syncExecutor;
         }
 
@@ -59,9 +61,9 @@ public:
 
     bool connectToLaser(const QString& ip, quint16 port) {
 
-        static_cast<SocketSyncExecutor::Ptr>(this->syncExecutor.data())->setupConnection(ip, port);
+        static_cast<ce::SocketSyncExecutor::Ptr>(this->syncExecutor.data())->setupConnection(ip, port);
 
-        if (!static_cast<SocketSyncExecutor::Ptr>(syncExecutor.data())->createConnection())
+        if (!static_cast<ce::SocketSyncExecutor::Ptr>(syncExecutor.data())->createConnection())
             return false;
 
         return true;
@@ -71,7 +73,7 @@ public:
     bool disconnectLaser() {
 
         if (!syncExecutor.isNull())
-            static_cast<SocketSyncExecutor::Ptr>(this->syncExecutor.data())->closeConnection();
+            static_cast<ce::SocketSyncExecutor::Ptr>(this->syncExecutor.data())->closeConnection();
 
         return true;
 

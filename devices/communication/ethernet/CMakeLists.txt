@@ -1,9 +1,14 @@
 SET(ITEMS
-    AbstractConnectedDeviceInspector
-    AbstractDevice
-    AbstractDeviceConnectionWatcher
-    AbstractDeviceInspector
-    )
+    AbstractMarshaller
+    AbstractAsyncExecutor
+    AbstractReceiver
+    AbstractSender
+    AbstractSyncExecutor
+    SocketSyncExecutor
+    MarshallerInterface
+    Constants
+    TypeTraits
+)
 
 FOREACH(ITEM ${ITEMS})
     IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.ui")
@@ -37,9 +42,6 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    communication
-    motion
-    laser
 )
 
 FOREACH(item ${SUB_FOLDERS})
@@ -47,6 +49,3 @@ FOREACH(item ${SUB_FOLDERS})
     INCLUDE_DIRECTORIES(${item})
     ADD_SUBDIRECTORY(${item})
 ENDFOREACH(item)
-
-
-

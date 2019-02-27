@@ -2,13 +2,15 @@
 #define ABSTRACT_ASYNC_EXECUTOR_HPP
 
 #include <QByteArray>
+#include <Logger.hpp>
 
-#include "../marshalling/MarshallerInterface.hpp"
-#include "../communication/AbstractSender.hpp"
-#include "../communication/AbstractReceiver.hpp"
-#include "../utility/Constants.hpp"
+#include "MarshallerInterface.hpp"
+#include "AbstractSender.hpp"
+#include "AbstractReceiver.hpp"
 
-namespace ipg {
+namespace communication {
+
+namespace ethernet {
 
 static const int ASYNC_EXECUTOR_MARSHALLING_ERROR = 1;
 static const int ASYNC_EXECUTOR_SEND_ERROR = 6;
@@ -25,6 +27,9 @@ static const int ASYNC_EXECUTOR_SEND_ERROR = 6;
  * Receiver per la ricezione.
  *
  */
+
+namespace pn = PROGRAM_NAMESPACE;
+
 class AbstractAsyncExecutor : public QObject {
     Q_OBJECT
 
@@ -59,7 +64,7 @@ public:
 
         if (!marshaller->marshall(&input, bytes)) {
             delete marshaller;
-            qWarning() << "  - Abstract async executor: errore nel metodo marshall.";
+            pn::traceWarn() << "  - Abstract async executor: errore nel metodo marshall.";
             return ASYNC_EXECUTOR_MARSHALLING_ERROR;
         }
 
@@ -67,7 +72,7 @@ public:
         int errorCode = sender->sendData(bytes);
         if (errorCode > 0) {
             delete marshaller;
-            qWarning() << "  - Abstract async executor: errore nel metodo sendData con codice errore:" << errorCode;
+            pn::traceWarn() << "  - Abstract async executor: errore nel metodo sendData con codice errore:" << errorCode;
             return ASYNC_EXECUTOR_SEND_ERROR;
         }
 
@@ -90,6 +95,8 @@ public slots:
     virtual int receive() = 0;
 
 };
+
+}
 
 }
 

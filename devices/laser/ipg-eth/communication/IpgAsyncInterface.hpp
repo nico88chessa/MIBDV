@@ -4,13 +4,15 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 
-#include "AbstractSender.hpp"
-#include "AbstractReceiver.hpp"
+#include <communication/ethernet/AbstractSender.hpp>
+#include <communication/ethernet/AbstractReceiver.hpp>
 #include "IpgAsyncExecutor.hpp"
 
 namespace ipg {
 
-class SenderImpl : public AbstractSender {
+namespace ce = communication::ethernet;
+
+class SenderImpl : public ce::AbstractSender {
     Q_OBJECT
 
 public:
@@ -23,7 +25,7 @@ private:
 public:
 
     SenderImpl(QTcpSocket* _s, QObject* parent = nullptr) :
-        AbstractSender(parent),
+        ce::AbstractSender(parent),
         socket(_s) {
     }
 
@@ -45,7 +47,7 @@ public slots:
 };
 
 
-class ReceiverImpl : public AbstractReceiver {
+class ReceiverImpl : public ce::AbstractReceiver {
     Q_OBJECT
 
 public:
@@ -57,7 +59,7 @@ private:
 
 public:
 
-    ReceiverImpl(QTcpSocket* _s, QObject* parent = nullptr) : AbstractReceiver(parent), socket(_s) {
+    ReceiverImpl(QTcpSocket* _s, QObject* parent = nullptr) : ce::AbstractReceiver(parent), socket(_s) {
 
         connect(socket, SIGNAL(readyRead()), this, SIGNAL(dataArrives()));
 
@@ -95,9 +97,9 @@ public:
 
 private:
     QTcpSocket* socket;
-    AbstractSender::Ptr sender;
-    AbstractReceiver::Ptr receiver;
-    AbstractAsyncExecutor::Ptr asyncExecutor;
+    ce::AbstractSender::Ptr sender;
+    ce::AbstractReceiver::Ptr receiver;
+    ce::AbstractAsyncExecutor::Ptr asyncExecutor;
 
 signals:
     void getNetworkSettingsSignal(ipg::GetNetworkSettingsOutput);

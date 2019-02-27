@@ -312,6 +312,13 @@ protected:
 
 };
 
+template <>
+struct isIpgMarshaller<GetAlarmCounterMarshaller> {
+    static constexpr bool value = true;
+    using inputType = GetAlarmCounterInput;
+    using outputType = GetAlarmCounterOutput;
+};
+
 }
 
 #endif // GET_ALARM_COUNTER_MARSHALLER_HPP

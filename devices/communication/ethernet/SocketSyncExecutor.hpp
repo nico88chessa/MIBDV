@@ -4,10 +4,12 @@
 #include <QTcpSocket>
 #include <QTimer>
 
-#include "../communication/AbstractSyncExecutor.hpp"
-#include "../utility/Constants.hpp"
+#include "AbstractSyncExecutor.hpp"
+#include "Constants.hpp"
 
-namespace ipg {
+namespace communication {
+
+namespace ethernet {
 
 static const int SOCKET_SYNC_EXECUTOR_SOCKET_CONNECTION_ERROR = 1;
 static const int SOCKET_SYNC_EXECUTOR_WRITE_TIMEOUT_ERROR = 2;
@@ -137,6 +139,7 @@ public slots:
 
 };
 
+}
 
 }
 

@@ -5,10 +5,6 @@
 
 namespace ipg {
 
-// variabili di default per la parte socket
-static constexpr int CONNECTION_DEFAULT_PORT = 5100;
-static constexpr char CONNECTION_DEFAULT_IP[] = "192.168.100.1";
-
 //static constexpr int CONNECTION_DEFAULT_PORT = 80;
 //static constexpr char CONNECTION_DEFAULT_IP[] = "192.168.1.1";
 

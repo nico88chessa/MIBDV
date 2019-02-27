@@ -1,8 +1,10 @@
 #ifndef IPG_ASYNC_EXECUTOR_HPP
 #define IPG_ASYNC_EXECUTOR_HPP
 
-#include "../communication/AbstractAsyncExecutor.hpp"
+#include <communication/ethernet/AbstractAsyncExecutor.hpp>
+#include <communication/ethernet/MarshallerInterface.hpp>
 #include "../marshalling/Marshallers.hpp"
+#include "../utility/Constants.hpp"
 
 namespace ipg {
 
@@ -13,7 +15,9 @@ static const int IPG_ASYNC_EXECUTOR_MARSHALLER_FACTORY_ERROR = 4;
 static const int IPG_ASYNC_EXECUTOR_BEAN_FACTORY_ERROR = 5;
 static const int IPG_ASYNC_EXECUTOR_UNMARSHALL_ERROR = 6;
 
-class IpgAsyncExecutor : public AbstractAsyncExecutor {
+namespace ce = communication::ethernet;
+
+class IpgAsyncExecutor : public ce::AbstractAsyncExecutor {
     Q_OBJECT
 
 public:
@@ -22,9 +26,9 @@ public:
 
 protected:
 
-    MarshallerInterface::Ptr marshallerFactory(int i) {
+    ce::MarshallerInterface::Ptr marshallerFactory(int i) {
 
-        MarshallerInterface::Ptr marshaller = nullptr;
+        ce::MarshallerInterface::Ptr marshaller = nullptr;
 
         switch (i) {
         case COMMAND_GET_NETWORK_SETTINGS: marshaller = new GetNetworkSettingsMarshaller(); break;
@@ -88,7 +92,7 @@ protected:
 
 public:
 
-    IpgAsyncExecutor(AbstractSender::Ptr _s, AbstractReceiver::Ptr _r, QObject* parent = nullptr) :
+    IpgAsyncExecutor(ce::AbstractSender::Ptr _s, ce::AbstractReceiver::Ptr _r, QObject* parent = nullptr) :
         AbstractAsyncExecutor(_s, _r, parent) { }
 
 public slots:
@@ -147,7 +151,7 @@ public slots:
                 return IPG_ASYNC_EXECUTOR_CRC16_ERROR;
             }
 
-            MarshallerInterface::Ptr marshaller = this->marshallerFactory(answer);
+            ce::MarshallerInterface::Ptr marshaller = this->marshallerFactory(answer);
             if (marshaller == nullptr) {
                 qWarning() << "  - Ipg async executor: errore nel factoring marshaller.";
                 return IPG_ASYNC_EXECUTOR_MARSHALLER_FACTORY_ERROR;

@@ -8,7 +8,10 @@
 #include <MotionBean.hpp>
 #include <GalilCNStatusBean.hpp>
 
+#include <communication/ethernet/TypeTraits.hpp>
+
 #include <Types.hpp>
+#include <devices/laser/ipg-eth/marshalling/Marshallers.hpp>
 
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
@@ -59,10 +62,27 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     using namespace PROGRAM_NAMESPACE;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
+    using namespace communication::ethernet;
+    namespace ce = communication::ethernet;
+
+    bool value1 = ce::isMarshaller<int>::value;
+    bool value2 = ce::isMarshaller<float>::value;
+    bool value3 = ce::isMarshaller<ipg::GetAlarmCounterMarshaller>::value;
+    bool value4 = std::is_base_of<ce::MarshallerInterface, ipg::GetAlarmCounterMarshaller>::value;
+    bool value5 = ce::isMarshaller<ipg::IpgMarshaller<int, int>>::value;
+    bool value6 = std::is_base_of<ce::MarshallerInterface, ipg::IpgMarshaller<int, int>>::value;
+    bool value7 = ce::isMarshaller<ce::AbstractMarshaller<int, int>>::value;
+    bool value8 = ce::isMarshallerInterface<ipg::IpgMarshaller<int, int>>::value;
+    bool value9 = ce::isMarshallerInterface<ipg::GetAlarmCounterMarshaller>::value;
+    bool value10 = ce::isAbstractMarshaller<ipg::GetAlarmCounterMarshaller>::value;
+    bool value11 = ce::isAbstractMarshaller<ipg::IpgMarshaller<int, int>>::value;
+    bool value12 = ipg::isIpgMarshaller<ipg::GetAlarmCounterMarshaller>::value;
+
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);
     QCoreApplication::setApplicationName(PROGRAM_NAMESPACE::APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(PROGRAM_NAMESPACE::APPLICATION_VERSION);
+
 
     registerMetatypes();
 

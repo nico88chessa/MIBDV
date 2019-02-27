@@ -4,7 +4,9 @@
 #include <QByteArray>
 #include <QObject>
 
-namespace ipg {
+namespace communication {
+
+namespace ethernet {
 
 /**
  * @class AbstractReceiver
@@ -45,6 +47,8 @@ signals:
     void dataArrives();
 
 };
+
+}
 
 }
 

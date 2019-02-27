@@ -4,7 +4,9 @@
 #include <QByteArray>
 #include <QObject>
 
-namespace ipg {
+namespace communication {
+
+namespace ethernet {
 
 /**
  * @brief The AbstractSender class
@@ -35,6 +37,8 @@ public slots:
     virtual int sendData(const QByteArray& data) = 0;
 
 };
+
+}
 
 }
 

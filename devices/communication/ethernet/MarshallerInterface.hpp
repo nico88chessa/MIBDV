@@ -3,7 +3,9 @@
 
 #include <QByteArray>
 
-namespace ipg {
+namespace communication {
+
+namespace ethernet {
 
 class MarshallerInterface {
 
@@ -15,11 +17,17 @@ public:
 
     virtual ~MarshallerInterface() { }
 
-    virtual bool marshall(const void* i, QByteArray& b) = 0;
+    virtual bool marshall(const void* input, QByteArray& b) = 0;
 
-    virtual bool unmarshall(const QByteArray& b, void* o) = 0;
+    virtual bool unmarshall(const QByteArray& b, void* output) = 0;
+
+    virtual void* instanceInput() = 0;
+
+    virtual void* instanceOutput() = 0;
 
 };
+
+}
 
 }
 

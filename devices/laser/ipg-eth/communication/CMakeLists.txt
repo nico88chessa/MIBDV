@@ -1,12 +1,7 @@
 SET(ITEMS
-    AbstractAsyncExecutor
-    AbstractReceiver
-    AbstractSender
-    AbstractSyncExecutor
     IpgAsyncExecutor
     IpgAsyncInterface
     IpgSyncInterface
-    SocketSyncExecutor
 )
 
 FOREACH(ITEM ${ITEMS})

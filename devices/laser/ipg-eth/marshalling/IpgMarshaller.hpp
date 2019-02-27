@@ -1,15 +1,18 @@
 #ifndef IPG_MARSHALLER_HPP
 #define IPG_MARSHALLER_HPP
 
-#include "../marshalling/MarshallerInterface.hpp"
+#include <communication/ethernet/AbstractMarshaller.hpp>
 #include "../beans/InputBean.hpp"
 #include "../beans/OutputBean.hpp"
 #include "../utility/Utils.hpp"
+#include "../utility/TypeTraits.hpp"
 
 namespace ipg {
 
+namespace ce = communication::ethernet;
+
 template <typename I, typename O>
-class IpgMarshaller : public MarshallerInterface {
+class IpgMarshaller : public ce::AbstractMarshaller<I,O> {
 
 protected:
 
@@ -29,7 +32,7 @@ protected:
 
     }
 
-    bool marshall(const I* input, QByteArray& bytes) {
+    virtual bool marshall(const I* input, QByteArray& bytes) override {
 
         bytes.clear();
 
@@ -55,7 +58,7 @@ protected:
 //        qDebug() << "marshall before crc16 bytes: " << bytes;
 
         const unsigned char* bytes4Crc16 = reinterpret_cast<const unsigned char*>(bytes.constData());
-        if (bytes4Crc16 == NULL)
+        if (bytes4Crc16 == nullptr)
             return false;
 
         IPG_USHORT crc16 = Utils::getCrc16(bytes4Crc16, bytes.size());
@@ -69,7 +72,7 @@ protected:
 
     }
 
-    bool unmarshall(const QByteArray& bytes, O* output) {
+    virtual bool unmarshall(const QByteArray& bytes, O* output) override {
 
         // offset dei singoli campi
         const int offsets[4] = {0, 2, 4, 8};
@@ -120,25 +123,7 @@ protected:
 
     }
 
-public:
-
-    bool marshall(const void* i, QByteArray& b) {
-
-        const I* inputCast = static_cast<const I*>(i);
-        return this->marshall(inputCast, b);
-
-    }
-
-    bool unmarshall(const QByteArray& b, void* o) {
-
-        O* outputCast = static_cast<O*>(o);
-        return this->unmarshall(b, outputCast);
-
-    }
-
 };
-
-
 
 }
 

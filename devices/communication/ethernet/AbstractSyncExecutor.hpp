@@ -4,10 +4,12 @@
 #include <QByteArray>
 #include <QDebug>
 
-#include "../marshalling/MarshallerInterface.hpp"
-#include "../utility/Constants.hpp"
+#include "MarshallerInterface.hpp"
+#include "Constants.hpp"
 
-namespace ipg {
+namespace communication {
+
+namespace ethernet {
 
 static const int SYNC_EXECUTOR_MARSHALLING_ERROR = 1;
 static const int SYNC_EXECUTOR_UNMARSHALLING_ERROR = 2;
@@ -86,6 +88,8 @@ public:
     }
 
 };
+
+}
 
 }
 
