@@ -39,7 +39,8 @@ protected:
         QDataStream stream(&bytes, QIODevice::WriteOnly);
         stream.setByteOrder(QDataStream::LittleEndian);
 
-        InputBean::ConstPtr inputBean = static_cast<InputBean::ConstPtr>(input);
+        // TODO NIC 27/02/2019 - rimettere static_cast se possibile
+        InputBean::ConstPtr inputBean = reinterpret_cast<InputBean::ConstPtr>(input);
 
         stream << inputBean->getCommand();
         stream << inputBean->getReserved();
@@ -80,7 +81,8 @@ protected:
         QDataStream stream(bytes);
         stream.setByteOrder(QDataStream::LittleEndian);
 
-        OutputBean::Ptr outputBean = static_cast<OutputBean::Ptr>(output);
+        // TODO NIC 27/02/2019 - rimettere static_cast se possibile
+        OutputBean::Ptr outputBean = reinterpret_cast<OutputBean::Ptr>(output);
 
         IPG_USHORT answer;
         IPG_USHORT executionCode;
