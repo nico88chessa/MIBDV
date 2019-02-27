@@ -29,6 +29,10 @@ private:
     DigitalOutputStatus digitalOutputStatus;
     AnalogInputStatus analogInputStatus;
 
+private:
+    DigitalInputStatus digitalInputLastValues;
+    bool isFirst;
+
     QTimer refreshTimer;
     bool needSignaler;
 
@@ -57,6 +61,8 @@ private:
     void updateStatus(const GalilCNStatusBean& status);
     void updateStatus(const GalilPLCStatusBean& status);
 
+    void analizeIO();
+
 private slots:
     void process();
 
@@ -67,6 +73,14 @@ public slots:
     void updateIOStatus(DeviceKey k, const QVariant& status);
 
 signals:
+
+    void powerOffSignal();
+    void powerOnSignal();
+    void cycleOffSignal();
+    void cycleOnSignal();
+    void markInProgressOnSignal();
+    void markInProgressOffSignal();
+
     void statusSignal(
             const DigitalInputStatus& digitalInputs,
             const DigitalOutputStatus& digitalOutputs,

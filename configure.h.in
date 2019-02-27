@@ -2,17 +2,21 @@
 #define CONFIGURE_IN_H
 
 #define PROGRAM_NAMESPACE @PROGRAM_NAMESPACE@
+#ifdef _MSC_VER
+#define MAYBE_UNUSED
+#else
 #define MAYBE_UNUSED __attribute__((unused))
+#endif
 
 namespace PROGRAM_NAMESPACE {
 
-constexpr char APPLICATION_NAME[] = "@PROJECT_NAME@";
-constexpr char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
-constexpr char ORGANIZATION[] = "@ORGANIZATION@";
+static const char APPLICATION_NAME[] = "@PROJECT_NAME@";
+static const char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
+static const char ORGANIZATION[] = "@ORGANIZATION@";
 
-constexpr char LOG_PATH[] = "@LOG_PATH@";
+static const char LOG_PATH[] = "@LOG_PATH@";
 
-constexpr char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
+static const char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
 
 constexpr int MAX_NUM_LOG_FILES = 5;
 

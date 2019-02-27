@@ -21,7 +21,7 @@ private:
     using S = typename PROGRAM_NAMESPACE::isCN<T>::statusType;
     using E = typename PROGRAM_NAMESPACE::isCN<T>::errorType;
 
-    constexpr typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr cnImpl() {
+    typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr cnImpl() {
         return static_cast<typename PROGRAM_NAMESPACE::AbstractCN<S,E>::Ptr>(cn.data());
     }
 

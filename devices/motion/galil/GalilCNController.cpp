@@ -9,7 +9,7 @@ using namespace PROGRAM_NAMESPACE;
 
 GalilCNController::GalilCNController() :
     handler(new GCon), isInitialized(false), connected(false),
-    numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0), handleCode("") {
+    numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0), handleCode(""), customHomeAxisX(false) {
 
     traceEnter;
 
@@ -57,7 +57,9 @@ int GalilCNController::getRecord(GalilCNStatusBean& record) {
 
 }
 
-void GalilCNController::setupController(int numDigitalInput, int numDigitalOutput, int numAnalogInput) {
+void GalilCNController::setupController(
+        int numDigitalInput, int numDigitalOutput, int numAnalogInput,
+        bool customHomeAxisX) {
 
     traceEnter;
 
@@ -67,6 +69,7 @@ void GalilCNController::setupController(int numDigitalInput, int numDigitalOutpu
     this->numDigitalInput = numDigitalInput;
     this->numDigitalOutput = numDigitalOutput;
     this->numAnalogInput = numAnalogInput;
+    this->customHomeAxisX = customHomeAxisX;
 
     isInitialized = true;
 
@@ -593,7 +596,12 @@ int GalilCNController::homingX(spdCNType speed, accCNType acc, accCNType dec) {
     if (result != G_NO_ERROR)
         return result;
 
-    QString command = QString("FE%1").arg(GalilCNController::letterFromAxis(a));
+    QString command = "";
+    if (!customHomeAxisX)
+        command = QString("HM%1").arg(GalilCNController::letterFromAxis(a));
+    else
+        command = QString("XQ #HOME%1,7").arg(GalilCNController::letterFromAxis(a));
+
     traceDebug() << "Invio comando:" << command;
 #ifdef FLAG_CN_PRESENT
     result = GCmd(handle(), command.toStdString().data());

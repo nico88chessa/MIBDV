@@ -34,11 +34,12 @@ private:
     int numDigitalInput;
     int numDigitalOutput;
     int numAnalogInput;
+    bool customHomeAxisX;
     QString handleCode;
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 
-    static constexpr char letterFromAxis(Axis v) {
+    static char letterFromAxis(Axis v) {
         switch (v) {
         case Axis::X: return 'A';
         case Axis::Y: return 'B';
@@ -65,7 +66,8 @@ public:
 
     void setupController(int numDigitalInput,
                          int numDigitalOutput,
-                         int numAnalogInput);
+                         int numAnalogInput,
+                         bool customHomeAxisX);
     bool connect(const QString& ip);
     int getRecord(GalilCNStatusBean& record);
     virtual int getDigitalInput(int input, int& inputStatus);

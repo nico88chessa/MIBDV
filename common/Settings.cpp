@@ -5,9 +5,9 @@ using namespace PROGRAM_NAMESPACE;
 #include <Logger.hpp>
 #include <Utils.hpp>
 
-constexpr char Settings::ARRAY_DIGITAL_INPUT[];
-constexpr char Settings::ARRAY_DIGITAL_OUTPUT[];
-constexpr char Settings::ARRAY_ANALOG_INPUT[];
+const char* Settings::ARRAY_DIGITAL_INPUT = "DigitalInput";
+const char* Settings::ARRAY_DIGITAL_OUTPUT = "DigitalOutput";
+const char* Settings::ARRAY_ANALOG_INPUT = "AnalogInput";
 
 Settings::Settings() {
 
@@ -196,6 +196,7 @@ void Settings::loadValuesFromFile() {
         galilCNNumberAnalogInput = settings.value(GALIL_CN_NUMBER_ANALOG_INPUT, GALIL_CN_NUMBER_ANALOG_INPUT_DFLT).value<int>();
         galilCNNumberAnalogOutput = settings.value(GALIL_CN_NUMBER_ANALOG_OUTPUT, GALIL_CN_NUMBER_ANALOG_OUTPUT_DFLT).value<int>();
         galilCNIpAddress = settings.value(GALIL_CN_IP_ADDRESS, GALIL_CN_IP_ADDRESS_DFLT).value<QString>();
+        galilCNOptionCustomHomeAxisX = settings.value(GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X, GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X_DFLT).value<bool>();
     }
 
     // se il plc e' di tipo galil, carico i parametri del galil)
@@ -364,6 +365,7 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_CN_NUMBER_DIGITAL_OUTPUT, galilCNNumberDigitalOutput);
         settings.setValue(GALIL_CN_NUMBER_ANALOG_INPUT, galilCNNumberAnalogInput);
         settings.setValue(GALIL_CN_NUMBER_ANALOG_OUTPUT, galilCNNumberAnalogOutput);
+        settings.setValue(GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X, galilCNOptionCustomHomeAxisX);
     } else
         settings.remove(GALIL_CN_PREFIX);
 
@@ -466,7 +468,7 @@ bool Settings::validateSettings() const {
     /* NOTE NIC 30/10/2018 - per ora il controllo delle analogiche
      * viene fatto solamente sul PLC
      */
-    // TODO NIC 15/12/2018: controllare che gli ingressi POWER e CYCLE siano presenti
+    // TODO NIC 15/12/2018 - controllare che gli ingressi POWER e CYCLE siano presenti
 
     // key = ingresso
     // value = chiave ridondante
@@ -522,7 +524,6 @@ bool Settings::validateSettings() const {
             traceErr() << "Errore IO per Galil PLC: piu' dispositivi collegati all'uscita" << i;
             isValid = false;
         }
-
 
     for (int i: digitalOutputCN.keys())
         if (digitalOutputCN.values(i).size()>1) {

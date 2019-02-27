@@ -286,102 +286,202 @@ public:
     }
 
     bool getProgramRunning() const { return programRunning; }
+    void setProgramRunning(bool value) { programRunning = value; }
     bool getWaitingInputFromINCommand() const { return waitingInputFromINCommand; }
+    void setWaitingInputFromINCommand(bool value) { waitingInputFromINCommand = value; }
     bool getTraceOn() const { return traceOn; }
+    void setTraceOn(bool value) { traceOn = value; }
     bool getEchoOn() const { return echoOn; }
+    void setEchoOn(bool value) { echoOn = value; }
     unsigned char getErrorCode() const { return errorCode; }
+    void setErrorCode(unsigned char value) { errorCode = value; }
+
     bool getAxisALatchOccured() const { return axisALatchOccured; }
+    void setAxisALatchOccured(bool value) { axisALatchOccured = value; }
     bool getAxisAStateLatchInput() const { return axisAStateLatchInput; }
+    void setAxisAStateLatchInput(bool value) { axisAStateLatchInput = value; }
     bool getAxisAForwardLimit() const { return axisAForwardLimit; }
+    void setAxisAForwardLimit(bool value) { axisAForwardLimit = value; }
     bool getAxisAReverseLimit() const { return axisAReverseLimit; }
+    void setAxisAReverseLimit(bool value) { axisAReverseLimit = value; }
     bool getAxisAHomeInput() const { return axisAHomeInput; }
+    void setAxisAHomeInput(bool value) { axisAHomeInput = value; }
     bool getAxisASMJumperInstalled() const { return axisASMJumperInstalled; }
+    void setAxisASMJumperInstalled(bool value) { axisASMJumperInstalled = value; }
     bool getAxisAMoveInProgress() const { return axisAMoveInProgress; }
+    void setAxisAMoveInProgress(bool value) { axisAMoveInProgress = value; }
     bool getAxisAMotionPAPR() const { return axisAMotionPAPR; }
+    void setAxisAMotionPAPR(bool value) { axisAMotionPAPR = value; }
     bool getAxisAMotionPA() const { return axisAMotionPA; }
+    void setAxisAMotionPA(bool value) { axisAMotionPA = value; }
     bool getAxisAFeInProgress() const { return axisAFeInProgress; }
+    void setAxisAFeInProgress(bool value) { axisAFeInProgress = value; }
     bool getAxisAHmInProgress() const { return axisAHmInProgress; }
+    void setAxisAHmInProgress(bool value) { axisAHmInProgress = value; }
     bool getAxisAHm1Complete() const { return axisAHm1Complete; }
+    void setAxisAHm1Complete(bool value) { axisAHm1Complete = value; }
     bool getAxisAHm2Complete() const { return axisAHm2Complete; }
+    void setAxisAHm2Complete(bool value) { axisAHm2Complete = value; }
     bool getAxisACoordMotion() const { return axisACoordMotion; }
+    void setAxisACoordMotion(bool value) { axisACoordMotion = value; }
     bool getAxisANegativeDirectionMove() const { return axisANegativeDirectionMove; }
+    void setAxisANegativeDirectionMove(bool value) { axisANegativeDirectionMove = value; }
     bool getAxisAContourMotion() const { return axisAContourMotion; }
+    void setAxisAContourMotion(bool value) { axisAContourMotion = value; }
     bool getAxisAMotionIsSlewing() const { return axisAMotionIsSlewing; }
+    void setAxisAMotionIsSlewing(bool value) { axisAMotionIsSlewing = value; }
     bool getAxisAMotionStop2STorLimitSwitch() const { return axisAMotionStop2STorLimitSwitch; }
+    void setAxisAMotionStop2STorLimitSwitch(bool value) { axisAMotionStop2STorLimitSwitch = value; }
     bool getAxisAMotionMakingFinaleEcal() const { return axisAMotionMakingFinaleEcal; }
+    void setAxisAMotionMakingFinaleEcal(bool value) { axisAMotionMakingFinaleEcal = value; }
     bool getAxisALatchArmed() const { return axisALatchArmed; }
+    void setAxisALatchArmed(bool value) { axisALatchArmed = value; }
     bool getAxisAOffOnErrorArmed() const { return axisAOffOnErrorArmed; }
+    void setAxisAOffOnErrorArmed(bool value) { axisAOffOnErrorArmed = value; }
     bool getAxisAMotorOff() const { return axisAMotorOff; }
+    void setAxisAMotorOff(bool value) { axisAMotorOff = value; }
     unsigned char getAxisAStopCode() const { return axisAStopCode; }
+    void setAxisAStopCode(unsigned char value) { axisAStopCode = value; }
     int getAxisAReferencePosition() const { return axisAReferencePosition; }
+    void setAxisAReferencePosition(int value) { axisAReferencePosition = value; }
     int getAxisAMotorPosition() const { return axisAMotorPosition; }
+    void setAxisAMotorPosition(int value) { axisAMotorPosition = value; }
     int getAxisAPositionError() const { return axisAPositionError; }
+    void setAxisAPositionError(int value) { axisAPositionError = value; }
     int getAxisAAuxPosition() const { return axisAAuxPosition; }
+    void setAxisAAuxPosition(int value) { axisAAuxPosition = value; }
     int getAxisAVelocity() const { return axisAVelocity; }
+    void setAxisAVelocity(int value) { axisAVelocity = value; }
+    void setAxisATorque(short value) { axisATorque = value; }
     short getAxisATorque() const { return axisATorque; }
     unsigned short getAxisAAnalogIn() const { return axisAAnalogIn; }
+    void setAxisAAnalogIn(unsigned short value) { axisAAnalogIn = value; }
+
     bool getAxisBLatchOccured() const { return axisBLatchOccured; }
+    void setAxisBLatchOccured(bool value) { axisBLatchOccured = value; }
     bool getAxisBStateLatchInput() const { return axisBStateLatchInput; }
+    void setAxisBStateLatchInput(bool value) { axisBStateLatchInput = value; }
     bool getAxisBForwardLimit() const { return axisBForwardLimit; }
+    void setAxisBForwardLimit(bool value) { axisBForwardLimit = value; }
     bool getAxisBReverseLimit() const { return axisBReverseLimit; }
+    void setAxisBReverseLimit(bool value) { axisBReverseLimit = value; }
     bool getAxisBHomeInput() const { return axisBHomeInput; }
+    void setAxisBHomeInput(bool value) { axisBHomeInput = value; }
     bool getAxisBSMJumperInstalled() const { return axisBSMJumperInstalled; }
+    void setAxisBSMJumperInstalled(bool value) { axisBSMJumperInstalled = value; }
     bool getAxisBMoveInProgress() const { return axisBMoveInProgress; }
+    void setAxisBMoveInProgress(bool value) { axisBMoveInProgress = value; }
     bool getAxisBMotionPAPR() const { return axisBMotionPAPR; }
+    void setAxisBMotionPAPR(bool value) { axisBMotionPAPR = value; }
     bool getAxisBMotionPA() const { return axisBMotionPA; }
+    void setAxisBMotionPA(bool value) { axisBMotionPA = value; }
     bool getAxisBFeInProgress() const { return axisBFeInProgress; }
+    void setAxisBFeInProgress(bool value) { axisBFeInProgress = value; }
     bool getAxisBHmInProgress() const { return axisBHmInProgress; }
+    void setAxisBHmInProgress(bool value) { axisBHmInProgress = value; }
     bool getAxisBHm1Complete() const { return axisBHm1Complete; }
+    void setAxisBHm1Complete(bool value) { axisBHm1Complete = value; }
     bool getAxisBHm2Complete() const { return axisBHm2Complete; }
+    void setAxisBHm2Complete(bool value) { axisBHm2Complete = value; }
     bool getAxisBCoordMotion() const { return axisBCoordMotion; }
+    void setAxisBCoordMotion(bool value) { axisBCoordMotion = value; }
     bool getAxisBNegativeDirectionMove() const { return axisBNegativeDirectionMove; }
+    void setAxisBNegativeDirectionMove(bool value) { axisBNegativeDirectionMove = value; }
     bool getAxisBContourMotion() const { return axisBContourMotion; }
+    void setAxisBContourMotion(bool value) { axisBContourMotion = value; }
     bool getAxisBMotionIsSlewing() const { return axisBMotionIsSlewing; }
+    void setAxisBMotionIsSlewing(bool value) { axisBMotionIsSlewing = value; }
     bool getAxisBMotionStop2STorLimitSwitch() const { return axisBMotionStop2STorLimitSwitch; }
+    void setAxisBMotionStop2STorLimitSwitch(bool value) { axisBMotionStop2STorLimitSwitch = value; }
     bool getAxisBMotionMakingFinaleEcal() const { return axisBMotionMakingFinaleEcal; }
+    void setAxisBMotionMakingFinaleEcal(bool value) { axisBMotionMakingFinaleEcal = value; }
     bool getAxisBLatchArmed() const { return axisBLatchArmed; }
+    void setAxisBLatchArmed(bool value) { axisBLatchArmed = value; }
     bool getAxisBOffOnErrorArmed() const { return axisBOffOnErrorArmed; }
+    void setAxisBOffOnErrorArmed(bool value) { axisBOffOnErrorArmed = value; }
     bool getAxisBMotorOff() const { return axisBMotorOff; }
+    void setAxisBMotorOff(bool value) { axisBMotorOff = value; }
     unsigned char getAxisBStopCode() const { return axisBStopCode; }
+    void setAxisBStopCode(unsigned char value) { axisBStopCode = value; }
     int getAxisBReferencePosition() const { return axisBReferencePosition; }
+    void setAxisBReferencePosition(int value) { axisBReferencePosition = value; }
     int getAxisBMotorPosition() const { return axisBMotorPosition; }
+    void setAxisBMotorPosition(int value) { axisBMotorPosition = value; }
     int getAxisBPositionError() const { return axisBPositionError; }
+    void setAxisBPositionError(int value) { axisBPositionError = value; }
     int getAxisBAuxPosition() const { return axisBAuxPosition; }
+    void setAxisBAuxPosition(int value) { axisBAuxPosition = value; }
     int getAxisBVelocity() const { return axisBVelocity; }
+    void setAxisBVelocity(int value) { axisBVelocity = value; }
     short getAxisBTorque() const { return axisBTorque; }
+    void setAxisBTorque(short value) { axisBTorque = value; }
     unsigned short getAxisBAnalogIn() const { return axisBAnalogIn; }
+    void setAxisBAnalogIn(unsigned short value) { axisBAnalogIn = value; }
+
     bool getAxisCLatchOccured() const { return axisCLatchOccured; }
+    void setAxisCLatchOccured(bool value) { axisCLatchOccured = value; }
     bool getAxisCStateLatchInput() const { return axisCStateLatchInput; }
+    void setAxisCStateLatchInput(bool value) { axisCStateLatchInput = value; }
     bool getAxisCForwardLimit() const { return axisCForwardLimit; }
+    void setAxisCForwardLimit(bool value) { axisCForwardLimit = value; }
     bool getAxisCReverseLimit() const { return axisCReverseLimit; }
+    void setAxisCReverseLimit(bool value) { axisCReverseLimit = value; }
     bool getAxisCHomeInput() const { return axisCHomeInput; }
+    void setAxisCHomeInput(bool value) { axisCHomeInput = value; }
     bool getAxisCSMJumperInstalled() const { return axisCSMJumperInstalled; }
+    void setAxisCSMJumperInstalled(bool value) { axisCSMJumperInstalled = value; }
     bool getAxisCMoveInProgress() const { return axisCMoveInProgress; }
+    void setAxisCMoveInProgress(bool value) { axisCMoveInProgress = value; }
     bool getAxisCMotionPAPR() const { return axisCMotionPAPR; }
+    void setAxisCMotionPAPR(bool value) { axisCMotionPAPR = value; }
     bool getAxisCMotionPA() const { return axisCMotionPA; }
+    void setAxisCMotionPA(bool value) { axisCMotionPA = value; }
     bool getAxisCFeInProgress() const { return axisCFeInProgress; }
+    void setAxisCFeInProgress(bool value) { axisCFeInProgress = value; }
     bool getAxisCHmInProgress() const { return axisCHmInProgress; }
+    void setAxisCHmInProgress(bool value) { axisCHmInProgress = value; }
     bool getAxisCHm1Complete() const { return axisCHm1Complete; }
+    void setAxisCHm1Complete(bool value) { axisCHm1Complete = value; }
     bool getAxisCHm2Complete() const { return axisCHm2Complete; }
+    void setAxisCHm2Complete(bool value) { axisCHm2Complete = value; }
     bool getAxisCCoordMotion() const { return axisCCoordMotion; }
+    void setAxisCCoordMotion(bool value) { axisCCoordMotion = value; }
     bool getAxisCNegativeDirectionMove() const { return axisCNegativeDirectionMove; }
+    void setAxisCNegativeDirectionMove(bool value) { axisCNegativeDirectionMove = value; }
     bool getAxisCContourMotion() const { return axisCContourMotion; }
+    void setAxisCContourMotion(bool value) { axisCContourMotion = value; }
     bool getAxisCMotionIsSlewing() const { return axisCMotionIsSlewing; }
+    void setAxisCMotionIsSlewing(bool value) { axisCMotionIsSlewing = value; }
     bool getAxisCMotionStop2STorLimitSwitch() const { return axisCMotionStop2STorLimitSwitch; }
+    void setAxisCMotionStop2STorLimitSwitch(bool value) { axisCMotionStop2STorLimitSwitch = value; }
     bool getAxisCMotionMakingFinaleEcal() const { return axisCMotionMakingFinaleEcal; }
+    void setAxisCMotionMakingFinaleEcal(bool value) { axisCMotionMakingFinaleEcal = value; }
     bool getAxisCLatchArmed() const { return axisCLatchArmed; }
+    void setAxisCLatchArmed(bool value) { axisCLatchArmed = value; }
     bool getAxisCOffOnErrorArmed() const { return axisCOffOnErrorArmed; }
+    void setAxisCOffOnErrorArmed(bool value) { axisCOffOnErrorArmed = value; }
     bool getAxisCMotorOff() const { return axisCMotorOff; }
+    void setAxisCMotorOff(bool value) { axisCMotorOff = value; }
     unsigned short getAxisCStatus() const { return axisCStatus; }
+    void setAxisCStatus(unsigned short value) { axisCStatus = value; }
     unsigned char getAxisCSwitches() const { return axisCSwitches; }
+    void setAxisCSwitches(unsigned char value) { axisCSwitches = value; }
     unsigned char getAxisCStopCode() const { return axisCStopCode; }
+    void setAxisCStopCode(unsigned char value) { axisCStopCode = value; }
     int getAxisCReferencePosition() const { return axisCReferencePosition; }
+    void setAxisCReferencePosition(int value) { axisCReferencePosition = value; }
     int getAxisCMotorPosition() const { return axisCMotorPosition; }
+    void setAxisCMotorPosition(int value) { axisCMotorPosition = value; }
     int getAxisCPositionError() const { return axisCPositionError; }
+    void setAxisCPositionError(int value) { axisCPositionError = value; }
     int getAxisCAuxPosition() const { return axisCAuxPosition; }
+    void setAxisCAuxPosition(int value) { axisCAuxPosition = value; }
     int getAxisCVelocity() const { return axisCVelocity; }
+    void setAxisCVelocity(int value) { axisCVelocity = value; }
     short getAxisCTorque() const { return axisCTorque; }
+    void setAxisCTorque(short value) { axisCTorque = value; }
     unsigned short getAxisCAnalogIn() const { return axisCAnalogIn; }
+    void setAxisCAnalogIn(unsigned short value) { axisCAnalogIn = value; }
 
     // NOTE NIC 03/01/2019: gli I/O del galil CN a differenza del PLC partono da 1 e non da 0
     bool getDigitalInput(int i) const {
@@ -395,7 +495,11 @@ public:
         return digitalOutputs[i-1];
     }
 
+
+
+
 };
+
 
 }
 

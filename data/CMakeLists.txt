@@ -10,6 +10,13 @@ SET(ITEMS
     GalilCNStatusBean
     GalilPLCStatusBean
     MotionBean
+    Point
+    PointSet
+    Tile
+    Grid
+    BoundingBox
+    StackedTile
+    Filter
     )
 
 FOREACH(ITEM ${ITEMS})

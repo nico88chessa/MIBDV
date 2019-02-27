@@ -54,6 +54,8 @@ void MotionFrameLogic::moveX() {
 
     traceEnter;
 
+    traceInfo() << "Inizio move asse X";
+
     if (!this->checkCycle())
         return;
 
@@ -64,8 +66,12 @@ void MotionFrameLogic::moveX() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -76,50 +82,39 @@ void MotionFrameLogic::moveX() {
         t.setSingleShot(true);
         t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_POWER_OFF;
-            }
-        });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_CYCLE_OFF;
-            }
-        });
-        QMetaObject::Connection c3 = connect(motionManager.data(), &MotionManager::axisXMotorOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_MOTOR_X_OFF;
-            }
-        });
-        QMetaObject::Connection c4 = connect(&t, &QTimer::timeout, [&]() {
+
+        QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
             if (!qPtr->motionBean.getAxisXMoveInProgress()) {
                 if (loop.isRunning()) {
-                    loop.quit();
                     res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+                    loop.quit();
                 }
             }
         });
-        QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisXMotionStopSignal, [&]() {
+        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
+                if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+                else
+                    res = MOTION_MANAGER_MOTION_X_STOP_ERROR;
                 loop.quit();
-                res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
             }
         });
+
         t.start();
         loop.exec();
         t.stop();
-        QObject::disconnect(c5);
-        QObject::disconnect(c4);
-        QObject::disconnect(c3);
-        QObject::disconnect(c2);
         QObject::disconnect(c1);
+        QObject::disconnect(c2);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore move asse X - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
         }
 
@@ -133,6 +128,8 @@ void MotionFrameLogic::moveY() {
 
     traceEnter;
 
+    traceInfo() << "Inizio move asse Y";
+
     if (!this->checkCycle())
         return;
 
@@ -143,63 +140,56 @@ void MotionFrameLogic::moveY() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
     } else {
-
+    
         QEventLoop loop;
         QTimer t;
         t.setSingleShot(true);
         t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_POWER_OFF;
-            }
-        });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_CYCLE_OFF;
-            }
-        });
-        QMetaObject::Connection c3 = connect(motionManager.data(), &MotionManager::axisYMotorOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_MOTOR_Y_OFF;
-            }
-        });
-        QMetaObject::Connection c4 = connect(&t, &QTimer::timeout, [&]() {
+
+        QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
             if (!qPtr->motionBean.getAxisYMoveInProgress()) {
                 if (loop.isRunning()) {
-                    loop.quit();
                     res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                    loop.quit();
                 }
             }
             t.stop();
         });
-        QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisYMotionStopSignal, [&]() {
+        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
+                if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                else
+                    res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
                 loop.quit();
-                res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
             }
         });
+
         t.start();
         loop.exec();
         t.stop();
-        QObject::disconnect(c5);
-        QObject::disconnect(c4);
-        QObject::disconnect(c3);
-        QObject::disconnect(c2);
         QObject::disconnect(c1);
+        QObject::disconnect(c2);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore move asse Y - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
         }
 
@@ -213,6 +203,8 @@ void MotionFrameLogic::moveZ() {
 
     traceEnter;
 
+    traceInfo() << "Inizio move asse Z";
+
     if (!this->checkCycle())
         return;
 
@@ -223,63 +215,57 @@ void MotionFrameLogic::moveZ() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
     } else {
 
+        QString stopErrorDescription;
         QEventLoop loop;
         QTimer t;
         t.setSingleShot(true);
         t.setInterval(TIMER_CHECK_MOTION_MS);
         int res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_POWER_OFF;
-            }
-        });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_CYCLE_OFF;
-            }
-        });
-        QMetaObject::Connection c3 = connect(motionManager.data(), &MotionManager::axisZMotorOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_MOTOR_Z_OFF;
-            }
-        });
-        QMetaObject::Connection c4 = connect(&t, &QTimer::timeout, [&]() {
+
+        QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
             if (!qPtr->motionBean.getAxisZMoveInProgress()) {
                 if (loop.isRunning()) {
-                    loop.quit();
                     res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+                    loop.quit();
                 }
             }
             t.stop();
         });
-        QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisZMotionStopSignal, [&]() {
+        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
+                if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+                else
+                    res = MOTION_MANAGER_MOTION_Z_STOP_ERROR;
                 loop.quit();
-                res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
             }
         });
+
         t.start();
         loop.exec();
         t.stop();
-        QObject::disconnect(c5);
-        QObject::disconnect(c4);
-        QObject::disconnect(c3);
-        QObject::disconnect(c2);
         QObject::disconnect(c1);
+        QObject::disconnect(c2);
 
         if (motionManager->isErr(res)) {
+
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore move asse Z - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
         }
 
@@ -297,8 +283,12 @@ void MotionFrameLogic::stopX() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -316,8 +306,12 @@ void MotionFrameLogic::stopY() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -335,8 +329,12 @@ void MotionFrameLogic::stopZ() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -350,6 +348,8 @@ void MotionFrameLogic::homeAxes() {
 
     traceEnter;
 
+    traceInfo() << "Inizio procedura homing assi";
+
     if (!this->checkCycle())
         return;
 
@@ -358,8 +358,12 @@ void MotionFrameLogic::homeAxes() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando home asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         return;
 
@@ -367,55 +371,55 @@ void MotionFrameLogic::homeAxes() {
 
         qPtr->isHomingAxes = true;
         QEventLoop loop;
+        QTimer t;
+        t.setSingleShot(true);
+        t.setInterval(TIMER_CHECK_MOTION_MS);
         res = MOTION_MANAGER_NO_ERR;
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::powerOffSignal, [&]() {
+
+        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::axisZHomingComplete, [&]{
             if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_POWER_OFF;
-            }
-        });
-        QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::cycleOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_CYCLE_OFF;
-            }
-        });
-        QMetaObject::Connection c3 = connect(motionManager.data(), &MotionManager::axisZMotorOffSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
-                res = MOTION_MANAGER_MOTOR_Z_OFF;
-            }
-        });
-        QMetaObject::Connection c4 = connect(motionManager.data(), &MotionManager::axisZMotionStopSignal, [&]() {
-            if (loop.isRunning()) {
-                loop.quit();
                 res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
-            }
-        });
-        QMetaObject::Connection c5 = connect(motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal, [&]() {
-            if (loop.isRunning()) {
                 loop.quit();
-                res = MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY;
             }
         });
+        QMetaObject::Connection c2 = connect(&t, &QTimer::timeout, [&]() {
+            if (loop.isRunning()) {
+                // controllo se l'asse si sta muovendo
+                if (!qPtr->motionBean.getAxisZMoveInProgress()) {
+                    // se e' fermo, controllo come si e' fermato controllando il codice di errore
+                    if (qPtr->motionBean.getAxisZStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
+                        res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+                    else
+                        res = MOTION_MANAGER_MOTION_Z_STOP_ERROR;
+                    loop.quit();
+                }
+            }
+        });
+        QMetaObject::Connection c3 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal), [&](MotionStopCode sc) {
+            if (loop.isRunning()) {
+                if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+                else
+                    res = MOTION_MANAGER_MOTION_Z_STOP_ERROR;
+                loop.quit();
+            }
+        });
+
+        t.start();
         loop.exec();
-        QObject::disconnect(c5);
-        QObject::disconnect(c4);
-        QObject::disconnect(c3);
-        QObject::disconnect(c2);
+        t.stop();
         QObject::disconnect(c1);
+        QObject::disconnect(c2);
+        QObject::disconnect(c3);
 
         if (motionManager->isErr(res)) {
-            DialogAlert diag;
-            diag.setupLabels("Error", MotionManager::decodeError(res));
-            diag.exec();
-            qPtr->isHomingAxes = false;
-            return;
-        }
 
-        if (res != MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY) {
+            QString descrErr = MotionManager::decodeError(res);
+            traceErr() << "Errore home asse Z - codice:" << res;
+            traceErr() << "Descrizione:" << descrErr;
+
             DialogAlert diag;
-            diag.setupLabels("Error", tr("Homing Z non completato"));
+            diag.setupLabels("Error", descrErr);
             diag.exec();
             qPtr->isHomingAxes = false;
             return;
@@ -427,8 +431,12 @@ void MotionFrameLogic::homeAxes() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando home asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         qPtr->isHomingAxes = false;
         return;
@@ -439,15 +447,144 @@ void MotionFrameLogic::homeAxes() {
 
     if (motionManager->isErr(res)) {
 
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando home asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descrErr);
         diag.exec();
         qPtr->isHomingAxes = false;
         return;
 
     }
 
+    QEventLoop loop;
+    QTimer tx, ty;
+    tx.setSingleShot(true);
+    tx.setInterval(TIMER_CHECK_MOTION_MS);
+    ty.setSingleShot(true);
+    ty.setInterval(TIMER_CHECK_MOTION_MS);
+    int resX = MOTION_MANAGER_NO_ERR;
+    int resY = MOTION_MANAGER_NO_ERR;
+    bool isAxisXMoving = true;
+    bool isAxisYMoving = true;
+
+
+    QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::axisXHomingComplete, [&]{
+        if (loop.isRunning()) {
+            isAxisXMoving = false;
+            resX = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+            if (!(isAxisXMoving || isAxisYMoving))
+                loop.quit();
+        }
+    });
+    QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::axisYHomingComplete, [&]{
+        if (loop.isRunning()) {
+            isAxisYMoving = false;
+            resY = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+            if (!(isAxisXMoving || isAxisYMoving))
+                loop.quit();
+        }
+    });
+    QMetaObject::Connection c3 = connect(&tx, &QTimer::timeout, [&]() {
+        if (loop.isRunning()) {
+            // controllo se l'asse si sta muovendo
+            if (!qPtr->motionBean.getAxisXMoveInProgress()) {
+                isAxisXMoving = false;
+                // se e' fermo, controllo come si e' fermato controllando il codice di errore
+                if (qPtr->motionBean.getAxisXStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    resX = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+                else
+                    resX = MOTION_MANAGER_MOTION_X_STOP_ERROR;
+                if (!(isAxisXMoving || isAxisYMoving))
+                    loop.quit();
+            }
+        }
+    });
+    QMetaObject::Connection c4 = connect(&ty, &QTimer::timeout, [&]() {
+        if (loop.isRunning()) {
+            // controllo se l'asse si sta muovendo
+            if (!qPtr->motionBean.getAxisYMoveInProgress()) {
+                isAxisYMoving = false;
+                // se e' fermo, controllo come si e' fermato controllando il codice di errore
+                if (qPtr->motionBean.getAxisYStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    resY = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                else
+                    resY = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
+                if (!(isAxisXMoving || isAxisYMoving))
+                    loop.quit();
+            }
+        }
+    });
+    QMetaObject::Connection c5 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
+        if (loop.isRunning()) {
+            isAxisXMoving = false;
+            if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                resX = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
+            else
+                resX = MOTION_MANAGER_MOTION_X_STOP_ERROR;
+            if (!(isAxisXMoving || isAxisYMoving))
+                loop.quit();
+        }
+    });
+    QMetaObject::Connection c6 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
+        if (loop.isRunning()) {
+            isAxisYMoving = false;
+            if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                resY = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+            else
+                resY = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
+            if (!(isAxisXMoving || isAxisYMoving))
+                loop.quit();
+        }
+    });
+
+    tx.start();
+    ty.start();
+    loop.exec();
+    tx.stop();
+    ty.stop();
+
+    QObject::disconnect(c1);
+    QObject::disconnect(c2);
+    QObject::disconnect(c3);
+    QObject::disconnect(c4);
+    QObject::disconnect(c5);
+    QObject::disconnect(c6);
+
+    if (motionManager->isErr(resX)) {
+
+        QString descrErr = MotionManager::decodeError(resX);
+        traceErr() << "Errore home asse Z - codice:" << resX;
+        traceErr() << "Descrizione:" << descrErr;
+
+        DialogAlert diag;
+        diag.setupLabels("Error", descrErr);
+        diag.exec();
+        qPtr->isHomingAxes = false;
+        return;
+    }
+
+    if (motionManager->isErr(resY)) {
+
+        QString descrErr = MotionManager::decodeError(resY);
+        traceErr() << "Errore home asse Z - codice:" << resY;
+        traceErr() << "Descrizione:" << descrErr;
+
+        DialogAlert diag;
+        diag.setupLabels("Error", descrErr);
+        diag.exec();
+        qPtr->isHomingAxes = false;
+        return;
+    }
+
     qPtr->isHomingAxes = false;
+
+    DialogAlert diag;
+    diag.setupLabels("Info", tr("Homing completato con successo"));
+    diag.exec();
+
     traceExit;
 
 }
@@ -456,11 +593,17 @@ void MotionFrameLogic::stopAxes() {
 
     traceEnter;
 
+    traceInfo() << "Inizio procedura stop assi";
+
     int res = motionManager->stopY();
     if (motionManager->isErr(res)) {
 
+        QString descr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Y - codice:" << res;
+        traceErr() << "Descrizione:" << descr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descr);
         diag.exec();
         return;
 
@@ -469,8 +612,12 @@ void MotionFrameLogic::stopAxes() {
     res = motionManager->stopX();
     if (motionManager->isErr(res)) {
 
+        QString descr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse X - codice:" << res;
+        traceErr() << "Descrizione:" << descr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descr);
         diag.exec();
         return;
 
@@ -479,8 +626,12 @@ void MotionFrameLogic::stopAxes() {
     res = motionManager->stopZ();
     if (motionManager->isErr(res)) {
 
+        QString descr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando stop asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descr;
+
         DialogAlert diag;
-        diag.setupLabels("Error", MotionManager::decodeError(res));
+        diag.setupLabels("Error", descr);
         diag.exec();
         return;
 
@@ -576,13 +727,16 @@ MotionFrame::MotionFrame(QWidget *parent) :
 }
 
 MotionFrame::~MotionFrame() {
+    delete dPtr;
     delete ui;
 }
 
-void MotionFrame::setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager) {
+void MotionFrame::setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
+                               const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager) {
 
     traceEnter;
     dPtr->setupMotionManager(motionManager);
+    dPtr->setupIOManager(ioManager);
     traceExit;
 
 }
@@ -639,4 +793,3 @@ void MotionFrame::updateUI() {
     traceExit;
 
 }
-

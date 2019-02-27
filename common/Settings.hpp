@@ -19,9 +19,9 @@ public:
     using ConstPtr = const Settings*;
 
 private:
-    static constexpr char ARRAY_DIGITAL_INPUT[] = "DigitalInput";
-    static constexpr char ARRAY_DIGITAL_OUTPUT[] = "DigitalOutput";
-    static constexpr char ARRAY_ANALOG_INPUT[] = "AnalogInput";
+    static const char* ARRAY_DIGITAL_INPUT;
+    static const char* ARRAY_DIGITAL_OUTPUT;
+    static const char* ARRAY_ANALOG_INPUT;
 
 private:
     Settings();
@@ -97,6 +97,7 @@ public:
     int getGalilCNNumberAnalogInput() const { return galilCNNumberAnalogInput; }
     int getGalilCNNumberAnalogOutput() const { return galilCNNumberAnalogOutput; }
     QString getGalilCNIpAddress() const { return galilCNIpAddress; }
+    bool getGalilCNOptionCustomHomeAxisX() const { return galilCNOptionCustomHomeAxisX; }
 
     int getGalilPLCConnectionTimeoutMs() const { return galilPLCConnectionTimeoutMs; }
     int getGalilPLCStatusRefreshIntervalMs() const { return galilPLCStatusRefreshIntervalMs; }
@@ -111,7 +112,6 @@ public:
     DeviceKey getMachineCNType() const { return machineCNType; }
     DeviceKey getMachinePLCType() const { return machinePLCType; }
     int getMachineIORefreshIntervalMs() const { return machineIORefreshIntervalMs; }
-
 
 
 private:
@@ -180,6 +180,7 @@ private:
     int galilCNNumberAnalogInput;
     int galilCNNumberAnalogOutput;
     QString galilCNIpAddress;
+    bool galilCNOptionCustomHomeAxisX;
 
     // GALIL PLC PARAMETERS
     int galilPLCConnectionTimeoutMs;

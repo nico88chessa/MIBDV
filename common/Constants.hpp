@@ -145,6 +145,7 @@ constexpr char GALIL_CN_NUMBER_DIGITAL_OUTPUT[] = "GalilCN/NumberDigitalOutput";
 constexpr char GALIL_CN_NUMBER_ANALOG_INPUT[] = "GalilCN/NumberAnalogcInput";
 constexpr char GALIL_CN_NUMBER_ANALOG_OUTPUT[] = "GalilCN/NumberAnalogcOutput";
 constexpr char GALIL_CN_IP_ADDRESS[] = "GalilCN/IpAddress";
+constexpr char GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X[] = "GalilCN/Option/CustomHomeAxisX";
 
 constexpr int GALIL_CN_CONNECTION_TIMEOUT_MS_DFLT = 1000;
 constexpr int GALIL_CN_STATUS_REFRESH_INTERVAL_MS_DFLT = 100;
@@ -155,6 +156,7 @@ constexpr int GALIL_CN_NUMBER_DIGITAL_OUTPUT_DFLT = 8;
 constexpr int GALIL_CN_NUMBER_ANALOG_INPUT_DFLT = 0;
 constexpr int GALIL_CN_NUMBER_ANALOG_OUTPUT_DFLT = 0;
 constexpr char GALIL_CN_IP_ADDRESS_DFLT[] = "169.254.12.10";
+constexpr bool GALIL_CN_OPTION_CUSTOM_HOME_AXIS_X_DFLT = false;
 
 constexpr char GALIL_PLC_PREFIX[] = "GalilPLC";
 constexpr char GALIL_PLC_CONNECTION_TIMEOUT_MS[] = "GalilPLC/ConnectionTimeoutMs";

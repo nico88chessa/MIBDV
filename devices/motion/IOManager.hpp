@@ -19,6 +19,10 @@
 
 namespace PROGRAM_NAMESPACE {
 
+using IOCommandErr = int;
+
+static constexpr IOCommandErr IO_MANAGER_NO_ERR = PROGRAM_ERR_START_CODE + 1;
+
 class IOManager : public QObject {
     Q_OBJECT
 
@@ -95,6 +99,12 @@ public slots:
 
 
 signals:
+    void powerOffSignal();
+    void powerOnSignal();
+    void cycleOffSignal();
+    void cycleOnSignal();
+    void markInProgressOnSignal();
+    void markInProgressOffSignal();
 
 };
 

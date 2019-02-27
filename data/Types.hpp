@@ -1,9 +1,11 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+
 // type traits
-#include <configure.h>
+#include <QMetaType>
 #include <QMap>
+#include <configure.h>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -72,6 +74,14 @@ enum class IOType : int {
     GENERIC_ANALOG_INPUT,                   // generic analog input
 };
 
+enum class MotionStopCode : int {
+    MOTION_NAN,
+    MOTION_IS_RUNNING,
+    MOTION_STOP_CORRECTLY,
+    MOTION_STOP_COMMAND,
+    MOTION_STOP_ON_ERROR
+};
+
 template <DeviceKey>
 struct deviceKeyTraits {
     static constexpr bool value = false;
@@ -91,5 +101,7 @@ struct deviceKeyTraits<DeviceKey::GALIL_PLC> {
 };
 
 }
+
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::MotionStopCode)
 
 #endif // TYPES_HPP

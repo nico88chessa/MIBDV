@@ -52,6 +52,7 @@ void registerMetatypes() {
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputStatus>("DigitalInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("DigitalOutputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("AnalogInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("MotionStopCode");
 
     traceExit;
 

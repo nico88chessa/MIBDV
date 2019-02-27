@@ -4,9 +4,10 @@
 #include <QSharedPointer>
 #include <QFrame>
 
-#include <devices/motion/MotionManager.hpp>
+#include <motion/IOManager.hpp>
+#include <motion/MotionManager.hpp>
 #include <MotionBean.hpp>
-#include <devices/motion/IOInspector.hpp>
+#include <motion/IOInspector.hpp>
 
 class MotionFrameLogic;
 
@@ -25,7 +26,7 @@ public:
 
 private:
     static constexpr int MOTION_FRAME_CYCLE_ERR = PROGRAM_NAMESPACE::PROGRAM_ERR_START_CODE + 1;
-    static constexpr int MOTION_FRAME_DSB_MIN_VALUE = -100000;
+    static constexpr int MOTION_FRAME_DSB_MIN_VALUE = 0;
     static constexpr int MOTION_FRAME_DSB_MAX_VALUE = 100000;
 
     Ui::MotionFrame *ui;
@@ -49,7 +50,8 @@ public:
     explicit MotionFrame(QWidget *parent = nullptr);
     ~MotionFrame();
 
-    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager);
+    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
+            const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
 
 private:
     void setupUi();
