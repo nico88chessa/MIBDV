@@ -118,6 +118,7 @@ void TestFrameLogic::startProcess() {
     file.readLine();
     file.readLine();
 
+    // leggo tutti i punti e li aggiungo al pointSet set
     mibdv::PointSetI set(pointsNumber);
     bool okX;
     bool okY;
@@ -166,7 +167,7 @@ void TestFrameLogic::startProcess() {
 
 
     float powerpercent = 100.0;
-    float width =  0.5f / frequency;
+    float width =  1.0f / frequency;
     float dwell = width;
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
@@ -178,12 +179,12 @@ void TestFrameLogic::startProcess() {
 
 
     // creo la griglia (in tile)
-
     PointI m = set.getMin();
     PointI M = set.getMax();
     int w = M.getX() - m.getX();
     int h = M.getY() - m.getY();
 
+    // la grigli la creo suddividendola in tile
     GridI grid(m, w, h, tileSizeMm*1000);
 
     for (auto&& p: set.getVector())
@@ -233,7 +234,7 @@ void TestFrameLogic::startProcess() {
             QEventLoop loop;
             QTimer t;
             t.setSingleShot(true);
-            t.setInterval(500);
+            t.setInterval(1000);
 
             res = MOTION_MANAGER_NO_ERR;
 
@@ -342,7 +343,7 @@ void TestFrameLogic::startProcess() {
                     QEventLoop loop;
                     QTimer t;
                     t.setSingleShot(true);
-                    t.setInterval(500);
+                    t.setInterval(1000);
 
                     res = MOTION_MANAGER_NO_ERR;
 
@@ -388,6 +389,7 @@ void TestFrameLogic::startProcess() {
             offset.setX(-offset.getX());
             offset.setY(-offset.getY());
             PointSetI movePoints = ComputationUtils::movePointSet(currentTile.getPointSet(), offset);
+            movePoints = ComputationUtils::axisBase2HeadBase(movePoints);
             const QVector<PointI>& vectorPoints = movePoints.getVector();
 
             for (auto&& p: vectorPoints)

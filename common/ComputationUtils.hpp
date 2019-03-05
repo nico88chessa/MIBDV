@@ -60,6 +60,21 @@ public:
         return movePointSet(other, move);
     }
 
+    /**
+     * il sistema di coordinate della testa laser e'
+     * ruotato di 180 gradi rispetto al sistema di coordinate
+     * delle movimentazioni
+     */
+    template <typename T>
+    static PointSet<T> axisBase2HeadBase(const PointSet<T>& ps) {
+
+        PointSet<T> pointSetHeadBase;
+        for (const Point<T>& pointAxis: ps.getVector())
+            pointSetHeadBase.addPoint(-pointAxis.getX(), -pointAxis.getY());
+        return  pointSetHeadBase;
+
+    }
+
     template <typename T>
     static QList<PointSet<T>> splitPointSet(const PointSet<T>& other, int pointPerSet) {
 
