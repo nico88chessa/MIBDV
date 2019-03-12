@@ -610,3 +610,29 @@ QTreeView::branch:open:has-children:has-siblings  {
     color: red;
 }*/
 
+/******************/
+/* MDBreadCrumb
+/******************/
+
+.MDBreadCrumb {
+    max-height: 46px;
+    qproperty-focusPolicy: NoFocus;
+    background-color: transparent;
+    qproperty-spacing: 0;
+}
+
+.MDBreadCrumb .QPushButton {
+    background-color: transparent;
+    color: black;
+    border: 1px solid blue;
+    padding: 0px 16px;
+    margin: 6px 8px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    min-width: 50px;
+    min-height: 32px;
+    max-height: 32px;
+    font-size: 14px;
+    font-weight: 600;
+}

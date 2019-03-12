@@ -6,6 +6,7 @@ SET(ITEMS
     MDComboBox
     MDSpinBox
     MDDoubleSpinBox
+    MDBreadCrumb
     )
 
 FOREACH(ITEM ${ITEMS})

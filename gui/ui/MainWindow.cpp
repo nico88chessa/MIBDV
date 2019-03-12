@@ -100,6 +100,8 @@ void MainWindow::setupSignalsAndSlots() const {
             ui->stackedWidget->setCurrentWidget(ui->pageMotion);
         else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageIO);
+        else if (QString(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER).compare(text) == 0)
+            ui->stackedWidget->setCurrentWidget(ui->pageFileExplorer);
 
     });
 
@@ -160,17 +162,21 @@ void MainWindow::setupUiLeftPanel() {
     MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/icons/black-theme/add_alert");
     MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/icons/black-theme/input");
     MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":icons/black-theme/pan_tool");
+    MDCustomItem::Ptr fileExplorer = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER, ":/icons/black-theme/add_alert");
 
     QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
     QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);
     QListWidgetItem* motionItem = new QListWidgetItem(ui->listItem);
+    QListWidgetItem* fileExplorerItem = new QListWidgetItem(ui->listItem);
 
     ui->listItem->addItem(alertItem);
     ui->listItem->addItem(ioItem);
     ui->listItem->addItem(motionItem);
+    ui->listItem->addItem(fileExplorerItem);
     ui->listItem->setItemWidget(alertItem, alert);
     ui->listItem->setItemWidget(ioItem, io);
     ui->listItem->setItemWidget(motionItem, motion);
+    ui->listItem->setItemWidget(fileExplorerItem, fileExplorer);
 
     traceExit;
 
