@@ -79,6 +79,7 @@ private slots:
 
 signals:
     void itemClicked(const QString& item);
+    void pathClicked(const QString& path);
 
 };
 

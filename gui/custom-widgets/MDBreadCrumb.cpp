@@ -259,15 +259,11 @@ void MDBreadCrumb::updateButtonsUi() {
 
 void MDBreadCrumb::manageClickEvent(int index) {
 
-    QString res = dPtr->getPath(index);
-    //QString res;
-    //for (const QString& str : itemList)
-    //    if (res.isEmpty())
-    //        res.append(str);
-    //    else
-    //        res.append("//").append(str);
+    QString path = dPtr->getPath(index);
+    QString item = dPtr->getKey(index);
 
-    emit itemClicked(res);
+    emit itemClicked(item);
+    emit pathClicked(path);
 
 }
 
