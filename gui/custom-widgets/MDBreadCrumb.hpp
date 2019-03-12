@@ -26,6 +26,7 @@ private:
     int maxTailSize;
 
     static const int MAX_TAIL_SIZE_DFLT = 3;
+    static const char* PATH_DELIMITER;
 
 public:
     MDBreadCrumbPrivate(const QString& rootName = ROOT_NAME_DFLT,
@@ -34,6 +35,7 @@ public:
     void addItem(const QString& item);
     QStringList getItem(int index) const;
     QString getKey(int index) const;
+    QString getPath(int index) const;
     void removeItem(int index);
     void removeLast();
     int size() const;
@@ -43,6 +45,7 @@ public:
     QStringList getCollapsedGroup() const;
     QStringList getTail() const;
     int getMaxTailSize() const;
+
 };
 
 }

@@ -6,9 +6,10 @@
 #include <QMouseEvent>
 #include <QLabel>
 
-const char* MDBreadCrumb::DOTS = "...";
-
 using namespace internal;
+
+const char* MDBreadCrumbPrivate::PATH_DELIMITER = "//";
+const char* MDBreadCrumb::DOTS = "...";
 
 /*** MDBreadCrumbPrivate ***/
 
@@ -47,6 +48,20 @@ QString MDBreadCrumbPrivate::getKey(int index) const {
         return items.at(index).itemKey;
     return QString();
 
+}
+
+QString MDBreadCrumbPrivate::getPath(int index) const {
+
+    QStringList listItem = this->getItem(index);
+    QString res;
+    int i = 0;
+    for (QString& str: listItem) {
+        res.append(str);
+        if (!(i == listItem.size() - 1))
+            res.append(PATH_DELIMITER);
+        ++i;
+    }
+    return res;
 }
 
 void MDBreadCrumbPrivate::removeItem(int index) {
@@ -244,13 +259,13 @@ void MDBreadCrumb::updateButtonsUi() {
 
 void MDBreadCrumb::manageClickEvent(int index) {
 
-    QStringList itemList = dPtr->getItem(index);
-    QString res;
-    for (const QString& str : itemList)
-        if (res.isEmpty())
-            res.append(str);
-        else
-            res.append("//").append(str);
+    QString res = dPtr->getPath(index);
+    //QString res;
+    //for (const QString& str : itemList)
+    //    if (res.isEmpty())
+    //        res.append(str);
+    //    else
+    //        res.append("//").append(str);
 
     emit itemClicked(res);
 
