@@ -29,7 +29,7 @@
    <property name="spacing">
     <number>10</number>
    </property>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QPushButton" name="pbRemove">
      <property name="text">
       <string>Remove</string>
@@ -39,7 +39,7 @@
    <item row="0" column="0">
     <widget class="QWidget" name="bcPath" native="true"/>
    </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <widget class="QComboBox" name="comboBox">
      <item>
       <property name="text">
@@ -58,7 +58,7 @@
      </item>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="6" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -71,7 +71,7 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QPushButton" name="pbAdd">
      <property name="text">
       <string>Add</string>
@@ -91,6 +91,9 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="MDFileExplorerWidget" name="lvExplorer"/>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -98,6 +101,11 @@
    <class>MDBreadCrumb</class>
    <extends>QListWidget</extends>
    <header>gui/custom-widgets/mdbreadcrumb.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>MDFileExplorerWidget</class>
+   <extends>QListView</extends>
+   <header>gui/custom-widgets/MDFileExplorerWidget.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

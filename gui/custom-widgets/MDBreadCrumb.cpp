@@ -10,58 +10,44 @@ using namespace internal;
 
 const char* MDBreadCrumbPrivate::PATH_DELIMITER = "//";
 const char* MDBreadCrumb::DOTS = "...";
+const char* MDBreadCrumb::DEFAULT_ROOT_NAME = "Root";
 
-/*** MDBreadCrumbPrivate ***/
+/***********************************************
+ *   M D  B R E A D C R U M B  P R I V A T E
+ ***********************************************/
 
-MDBreadCrumbPrivate::MDBreadCrumbPrivate(const QString& rootName, int tailSize) :
+MDBreadCrumbPrivate::MDBreadCrumbPrivate(int tailSize) :
     maxTailSize(tailSize), items() {
 
-    addItem(rootName);
-
 }
 
-void MDBreadCrumbPrivate::addItem(const QString& item) {
+void MDBreadCrumbPrivate::addItem(const QString& key, const QString& value) {
 
     Item newItem;
-    newItem.itemKey = item;
-    if (size() == 0)
-        newItem.itemValue.append(item);
-    else {
-        newItem.itemValue = items.last().itemValue;
-        newItem.itemValue.append(item);
-    }
+    newItem.key = key;
+    newItem.value = value;
     items.append(newItem);
-
-}
-
-QStringList MDBreadCrumbPrivate::getItem(int index) const {
-
-    if (index < size())
-        return items.at(index).itemValue;
-    return QStringList();
 
 }
 
 QString MDBreadCrumbPrivate::getKey(int index) const {
 
     if (index < size())
-        return items.at(index).itemKey;
+        return items.at(index).key;
     return QString();
 
 }
 
-QString MDBreadCrumbPrivate::getPath(int index) const {
+QString MDBreadCrumbPrivate::getValue(int index) const {
 
-    QStringList listItem = this->getItem(index);
-    QString res;
-    int i = 0;
-    for (QString& str: listItem) {
-        res.append(str);
-        if (!(i == listItem.size() - 1))
-            res.append(PATH_DELIMITER);
-        ++i;
-    }
-    return res;
+    if (index < size())
+        return items.at(index).value;
+    return QString();
+
+}
+
+void MDBreadCrumbPrivate::removeAll() {
+    items.clear();
 }
 
 void MDBreadCrumbPrivate::removeItem(int index) {
@@ -85,14 +71,16 @@ int MDBreadCrumbPrivate::size() const {
     return items.size();
 }
 
+bool MDBreadCrumbPrivate::isEmpty() const {
+    return size() == 0;
+}
+
 bool MDBreadCrumbPrivate::hasCollapsedGroup() const {
     return (items.size() - 1) > maxTailSize;
 }
 
-QString MDBreadCrumbPrivate::getRoot() const {
-    if (!items.isEmpty())
-        return items.at(0).itemKey;
-    return QString();
+QString MDBreadCrumbPrivate::getRootKey() const {
+    return this->getKey(0);
 }
 
 QStringList MDBreadCrumbPrivate::getCollapsedGroup() const {
@@ -100,9 +88,8 @@ QStringList MDBreadCrumbPrivate::getCollapsedGroup() const {
     QStringList temp;
     if (hasCollapsedGroup()) {
         int collapsedGroupSize = size() - 1 - (maxTailSize - 1);
-//        temp = items.mid(1, collapsedGroupSize);
-        temp = items.last().itemValue.mid(1, collapsedGroupSize);
-//        temp = items.at(size() - maxTailSize).itemValue;
+        for (int i=0; i<collapsedGroupSize; ++i)
+            temp.append(getKey(i+1));
     }
     return temp;
 
@@ -112,16 +99,11 @@ QStringList MDBreadCrumbPrivate::getTail() const {
 
     QStringList temp;
 
-    if (hasCollapsedGroup()) {
-        int index = this->size() - maxTailSize + 1;
-        int count = maxTailSize - 1;
-//        temp = items.mid(index, count);
-        temp = items.last().itemValue.mid(index, count);
-    } else {
-        int count = this->size() - 1;
-//        temp = items.mid(1, count);
-        temp = items.last().itemValue.mid(1, count);
-    }
+    int indexStart = hasCollapsedGroup() ? this->size() - (maxTailSize - 1) : 1;
+    int count = hasCollapsedGroup() ? maxTailSize - 1 : this->size() - 1;
+
+    for (int c = 0; c < count; ++c ,++indexStart)
+        temp.append(getKey(indexStart));
 
     return temp;
 }
@@ -133,10 +115,13 @@ int MDBreadCrumbPrivate::getMaxTailSize() const {
 
 
 
-/*** MDBreadCrumb ***/
+/********************************
+ *   M D  B R E A D C R U M B
+ ********************************/
 
 MDBreadCrumb::MDBreadCrumb(QWidget* parent) :
-    dPtr(new internal::MDBreadCrumbPrivate()), QListWidget(parent) {
+    dPtr(new internal::MDBreadCrumbPrivate()), QListWidget(parent),
+    rootName(DEFAULT_ROOT_NAME), currentPath("") {
 
     setupUi();
     updateButtonsUi();
@@ -144,24 +129,81 @@ MDBreadCrumb::MDBreadCrumb(QWidget* parent) :
 
 }
 
-void MDBreadCrumb::addItem(const QString& item) {
+void MDBreadCrumb::updatePath(const QString& path) {
 
-    dPtr->addItem(item);
+    QDir pathDir(path);
+
+    QString nativePath = pathDir.fromNativeSeparators(path);
+    QString nativeRoot = rootPath.fromNativeSeparators(path);
+
+    if (currentPath.compare(nativePath) == 0)
+        return;
+
+    dPtr->removeAll();
+    QList<Item> items;
+
+    // verifico se rootPath e' padre di nativePath
+    while (pathDir.absolutePath().indexOf(rootPath.absolutePath()) != -1) {
+
+        Item currentItem;
+        if (pathDir == rootPath)
+            currentItem.key = rootName;
+        else
+            currentItem.key = pathDir.dirName();
+        currentItem.value = pathDir.absolutePath();
+
+        items.push_front(currentItem);
+        pathDir.cdUp();
+
+    }
+
+    currentPath = nativePath;
+
+    for (Item& i: items)
+        dPtr->addItem(i.key, i.value);
+
     this->updateButtonsUi();
-    this->setupSignalsAndSlots();
+
+}
+
+void MDBreadCrumb::setRoot(const QString& rootName, const QString& rootPath) {
+    this->setRoot(rootName, QDir(rootPath));
+}
+
+void MDBreadCrumb::setRoot(const QString& rootName, const QDir& rootPath) {
+    this->rootName = rootName;
+    this->rootPath = rootPath;
+}
+
+QString MDBreadCrumb::getRootName() const {
+    return rootName;
+}
+
+void MDBreadCrumb::addItem(const QString& item, const QString& path) {
+
+    dPtr->addItem(item, path);
+    this->updateButtonsUi();
+    this->setupButtonsSignalsAndSlots();
 }
 
 void MDBreadCrumb::removeLast() {
 
     dPtr->removeLast();
     this->updateButtonsUi();
-    this->setupSignalsAndSlots();
+    this->setupButtonsSignalsAndSlots();
 
 }
 
 void MDBreadCrumb::setupSignalsAndSlots() {
 
-//    connect(this, &MDBreadCrumb::itemClicked, this, &MDBreadCrumb::manageClickEvent);
+    // altri segnali da gestire non riguardanti i pulsanti dinamici ivanno inseriti qui
+    setupButtonsSignalsAndSlots();
+
+
+}
+
+void MDBreadCrumb::setupButtonsSignalsAndSlots() {
+
     // prima di tutto, rimuovo tutte le connessioni (i pulsanti vengono ricreati ogni volta)
     for (QMetaObject::Connection& c: connections)
         disconnect(c);
@@ -198,7 +240,6 @@ void MDBreadCrumb::setupSignalsAndSlots() {
 
     }
 
-
 }
 
 void MDBreadCrumb::setupUi() {
@@ -214,7 +255,11 @@ void MDBreadCrumb::setupUi() {
 void MDBreadCrumb::updateButtonsUi() {
 
     this->clear();
-    QString root = dPtr->getRoot();
+
+    if (dPtr->isEmpty())
+        return;
+
+    QString root = dPtr->getRootKey();
 
     QPushButton* rootButton = new QPushButton(root, this);
     rootButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -255,41 +300,16 @@ void MDBreadCrumb::updateButtonsUi() {
 
     }
 
+    this->setupButtonsSignalsAndSlots();
+
 }
 
 void MDBreadCrumb::manageClickEvent(int index) {
 
-    QString path = dPtr->getPath(index);
     QString item = dPtr->getKey(index);
+    QString path = dPtr->getValue(index);
 
     emit itemClicked(item);
     emit pathClicked(path);
 
 }
-
-//void MDBreadCrumb::manageClickEvent(QListWidgetItem* item) {
-
-//    QObject* sender = QObject::sender();
-
-
-//    QWidget* w = this->itemWidget(item);
-//    QPushButton* pb = qobject_cast<QPushButton*>(w);
-//    if (pb) {
-//        pb->showMenu();
-//    }
-//}
-
-//void MDBreadCrumb::mousePressEvent(QMouseEvent* event) {
-
-//    if (event->button() == Qt::LeftButton){
-//        QListWidgetItem* widgetItem = this->itemAt(event->pos());
-//        QWidget* w = this->itemWidget(widgetItem);
-//        QPushButton* pb = qobject_cast<QPushButton*>(w);
-//        if (pb) {
-//            pb->showMenu();
-//        }
-
-//    } else {
-//        QListWidget::mousePressEvent(event);
-//    }
-//}

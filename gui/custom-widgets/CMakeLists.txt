@@ -7,6 +7,8 @@ SET(ITEMS
     MDSpinBox
     MDDoubleSpinBox
     MDBreadCrumb
+    MDFileExplorerWidget
+    MDFileExplorerWidgetLogic
     )
 
 FOREACH(ITEM ${ITEMS})

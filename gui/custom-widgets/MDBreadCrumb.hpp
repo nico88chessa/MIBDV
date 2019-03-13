@@ -4,8 +4,15 @@
 #include <QListWidget>
 #include <QStringList>
 #include <QVector>
+#include <QDir>
 
 namespace internal {
+
+struct Item {
+public:
+    QString key; // singola stringa
+    QString value; // prefisso contenente tutte le stringhe 'genitori'
+};
 
 class MDBreadCrumbPrivate {
 public:
@@ -16,12 +23,6 @@ public:
     static constexpr char* ROOT_NAME_DFLT = "Root";
 
 private:
-    struct Item {
-    public:
-        QString itemKey; // singola stringa
-        QStringList itemValue; // prefisso contenente tutte le stringhe 'genitori'
-    };
-
     QVector<Item> items;
     int maxTailSize;
 
@@ -29,19 +30,19 @@ private:
     static const char* PATH_DELIMITER;
 
 public:
-    MDBreadCrumbPrivate(const QString& rootName = ROOT_NAME_DFLT,
-                        int tailSize = MAX_TAIL_SIZE_DFLT);
+    MDBreadCrumbPrivate(int tailSize = MAX_TAIL_SIZE_DFLT);
 
-    void addItem(const QString& item);
-    QStringList getItem(int index) const;
+    void addItem(const QString& key, const QString& value);
     QString getKey(int index) const;
-    QString getPath(int index) const;
+    QString getValue(int index) const;
+    void removeAll();
     void removeItem(int index);
     void removeLast();
     int size() const;
+    bool isEmpty() const;
     bool hasCollapsedGroup() const;
 
-    QString getRoot() const;
+    QString getRootKey() const;
     QStringList getCollapsedGroup() const;
     QStringList getTail() const;
     int getMaxTailSize() const;
@@ -60,22 +61,30 @@ public:
 private:
     internal::MDBreadCrumbPrivate* dPtr;
     QList<QMetaObject::Connection> connections;
+    QString rootName;
+    QString currentPath;
+    QDir rootPath;
 
     static const char* DOTS;
+    static const char* DEFAULT_ROOT_NAME;
 
 public:
     MDBreadCrumb(QWidget *parent = Q_NULLPTR);
-    void addItem(const QString& item);
-    void removeLast();
+    void updatePath(const QString& path);
+    void setRoot(const QString& rootName, const QString& rootPath);
+    void setRoot(const QString& rootName, const QDir& rootPath);
+    QString getRootName() const;
 
 private:
+    void addItem(const QString& item, const QString& path);
+    void removeLast();
     void setupSignalsAndSlots();
+    void setupButtonsSignalsAndSlots();
     void setupUi();
     void updateButtonsUi();
 
 private slots:
     void manageClickEvent(int index);
-//    void manageClickEvent(QListWidgetItem* item);
 
 signals:
     void itemClicked(const QString& item);

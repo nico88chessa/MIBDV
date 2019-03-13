@@ -17,6 +17,14 @@ public:
 
 private:
     Ui::FileExplorerFrame *ui;
+
+private:
+    void setupSignalsAndSlots();
+
+private slots:
+    void updateBreadCrumb(const QString& folderPath);
+    void updateFileExplorer(const QString& folderPath);
+
 };
 
 #endif // FILEEXPLORERFRAME_HPP
