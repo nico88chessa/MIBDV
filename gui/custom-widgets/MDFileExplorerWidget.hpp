@@ -5,6 +5,7 @@
 #include <QListView>
 #include <QString>
 
+
 class MDFileExplorerWidgetLogic;
 
 class MDFileExplorerWidget : public QListView {
@@ -28,9 +29,11 @@ public slots:
 
 private:
     void setupSignalsAndSlots();
+    bool event(QEvent* event);
 
 signals:
     void currentSubFolderSignal(const QString& folderPath);
+    void currentItemPathListSignal(const QStringList& items);
 
 };
 

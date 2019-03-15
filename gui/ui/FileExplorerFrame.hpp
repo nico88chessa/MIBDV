@@ -1,7 +1,11 @@
 #ifndef FILEEXPLORERFRAME_HPP
 #define FILEEXPLORERFRAME_HPP
 
+#include <QDataWidgetMapper>
 #include <QFrame>
+
+#include <custom-widgets/ItemDetailDelegate.hpp>
+#include <custom-widgets/ItemDetailModel.hpp>
 
 namespace Ui {
 class FileExplorerFrame;
@@ -17,6 +21,9 @@ public:
 
 private:
     Ui::FileExplorerFrame *ui;
+    ItemDetailModel* model;
+    ItemDetailDelegate* delegate;
+    QDataWidgetMapper* mapper;
 
 private:
     void setupSignalsAndSlots();

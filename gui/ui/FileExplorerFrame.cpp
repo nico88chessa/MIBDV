@@ -9,11 +9,20 @@ FileExplorerFrame::FileExplorerFrame(QWidget *parent) :
 
     ui->setupUi(this);
 
-    QString rootPath = "C://Users//nicola//workspace";
+    QString rootPath = "C:/Users/nicola/Desktop/Spool";
 
     this->ui->breadCrumb->setRoot("/", rootPath);
     this->ui->breadCrumb->updatePath(rootPath);
     ui->lvExplorer->setPath(rootPath);
+
+    mapper = new QDataWidgetMapper(this);
+    delegate = new ItemDetailDelegate(this);
+    model = new ItemDetailModel();
+
+    mapper->setItemDelegate(delegate);
+    mapper->setModel(model);
+    mapper->addMapping(this->ui->idwTest, 0);
+
 
     this->setupSignalsAndSlots();
 
@@ -27,6 +36,34 @@ void FileExplorerFrame::setupSignalsAndSlots() {
 
     static int cont = 1;
 
+    connect(ui->pbAdd, &QPushButton::clicked, [&]() {
+
+        static int count = 0;
+        if (count % 2) {
+
+            ItemDetailFolderBean bean;
+            bean.setName("ciao");
+            bean.setNumItems(1);
+            model->addData(QVariant::fromValue(bean));
+
+        } else {
+
+            ItemDetailFilterBean bean;
+            bean.setName("oaic");
+            bean.setNumberOfPoints(count);
+            bean.setMinPoint(PROGRAM_NAMESPACE::PointI(1, 1));
+            bean.setMaxPoint(PROGRAM_NAMESPACE::PointI(2, 2));
+            model->addData(QVariant::fromValue(bean));
+
+        }
+        ++count;
+
+    });
+    connect(ui->pbRemove, &QPushButton::clicked, [&]() {
+        static int count = 0;
+        if (count < mapper->model()->rowCount())
+            this->mapper->setCurrentIndex(count++);
+    });
 //    connect(ui->pbAdd, &QPushButton::clicked, [&]{
 //        this->ui->breadCrumb->addItem(QString("prova - %1").arg(cont++), "test");
 //    });
@@ -39,8 +76,6 @@ void FileExplorerFrame::setupSignalsAndSlots() {
 }
 
 void FileExplorerFrame::updateBreadCrumb(const QString& folderPath) {
-
-    // qui devo verificare se sulla breadcrumb devo aggiungere o rimuovere degli item
     this->ui->breadCrumb->updatePath(folderPath);
 }
 

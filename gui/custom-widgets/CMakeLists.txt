@@ -9,6 +9,10 @@ SET(ITEMS
     MDBreadCrumb
     MDFileExplorerWidget
     MDFileExplorerWidgetLogic
+    ItemDetailWidget
+    ItemDetailDelegate
+    ItemDetailModel
+    ItemDetailBeans
     )
 
 FOREACH(ITEM ${ITEMS})

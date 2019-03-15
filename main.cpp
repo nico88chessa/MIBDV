@@ -1,6 +1,12 @@
 #include <QApplication>
 #include <QFontDatabase>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <core/json/AbstractJsonParser.hpp>
+#include <core/json/FilterJsonParser.hpp>
+
+
 #include <Settings.hpp>
 #include <gui/ui/MainWindow.hpp>
 #include <Logger.hpp>
@@ -9,6 +15,7 @@
 #include <GalilCNStatusBean.hpp>
 
 #include <Types.hpp>
+#include <custom-widgets/ItemDetailBeans.hpp>
 
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
@@ -50,10 +57,51 @@ void registerMetatypes() {
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("DigitalOutputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("AnalogInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("MotionStopCode");
+    qRegisterMetaType<ItemDetailFolderBean>("ItemDetailFolderBean");
+    qRegisterMetaType<ItemDetailFilterBean>("ItemDetailFilterBean");
 
     traceExit;
 
 }
+
+//int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
+
+//    using namespace PROGRAM_NAMESPACE;
+//    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+
+////    QFile file("C:\\Users\\nicola\\Desktop\\F15-60x60-ordinato - Copia.json");
+//    QFile file("C:\\Users\\nicola\\Desktop\\a4-2 - Copia.json");
+
+////    QFile file("C:\\Users\\nicola\\Desktop\\test.json");
+//    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+//        traceErr() << "Impossibile aprire il file";
+//        exit(-1);
+//    }
+
+//    QString array = file.readAll();
+//    file.close();
+
+//    IAbstractJsonParser::Ptr parser = new FilterJsonParser();
+//    Filter test;
+//    parser->decodeJson(array.toUtf8(), &test);
+//    QByteArray temp = array.toUtf8();
+
+
+
+////    QJsonDocument doc = QJsonDocument::fromJson(array.toUtf8());
+////    if (doc.isNull()) {
+////        traceErr() << "Err parsing json";
+////        exit(-1);
+////    }
+
+////    QJsonObject obj = doc.object();
+////    for (auto&& it=obj.constBegin(); it!=obj.constEnd(); ++it) {
+////        traceDebug() << "test";
+////        exit(-1);
+////    }
+
+
+//}
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
