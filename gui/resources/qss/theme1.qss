@@ -408,3 +408,15 @@ QTreeView::branch {
     margin: 0px:
 }
 */
+
+
+/*
+ * MDTwoLineItem (compact)
+ */
+
+.MDTwoLineItem {
+    background-color: white;
+    background-clip: border;
+    color: black;
+    qproperty-secondaryLabelColor: gray;
+}

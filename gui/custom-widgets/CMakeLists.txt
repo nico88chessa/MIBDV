@@ -9,6 +9,7 @@ SET(ITEMS
     MDBreadCrumb
     MDFileExplorerWidget
     MDFileExplorerWidgetLogic
+    MDTwoLineItem
     ItemDetailWidget
     ItemDetailDelegate
     ItemDetailModel
