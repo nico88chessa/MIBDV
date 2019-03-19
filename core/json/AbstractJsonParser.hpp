@@ -26,6 +26,8 @@ public:
 
     virtual JsonParserError decodeJson(const QByteArray& res, void* object) = 0;
 
+    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& res, void* object) = 0;
+
 };
 
 
@@ -41,15 +43,22 @@ protected:
 
     virtual JsonParserError decodeJson(const QByteArray& input, T* obj) = 0;
 
+    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& input, T* obj) = 0;
+
 public:
-    JsonParserError encodeJson(const void* object, QByteArray& output) {
+    JsonParserError encodeJson(const void* object, QByteArray& output) final {
         auto objCast = static_cast<const T*>(object);
         return encodeJson(objCast, output);
     }
 
-    JsonParserError decodeJson(const QByteArray& input, void* object) {
+    JsonParserError decodeJson(const QByteArray& input, void* object) final {
         auto objCast = static_cast<T*>(object);
         return decodeJson(input, objCast);
+    }
+
+    JsonParserError decodeJsonHeaderOnly(const QByteArray& input, void* object) final {
+        auto objCast = static_cast<T*>(object);
+        return decodeJsonHeaderOnly(input, objCast);
     }
 
 };

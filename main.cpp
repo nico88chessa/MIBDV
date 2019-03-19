@@ -15,7 +15,6 @@
 #include <GalilCNStatusBean.hpp>
 
 #include <Types.hpp>
-#include <custom-widgets/ItemDetailBeans.hpp>
 
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
@@ -45,6 +44,10 @@ void loadCustomFont() {
 
 void registerMetatypes() {
 
+    // NOTE NIC 18/03/2019 - qui vanno registrati i tipi custom che devono essere gestiti
+    // dalle connessioni Signal / Slot
+    // Non e' necessario registrare i tipi se utilizzati solo come QVariant
+
     using namespace PROGRAM_NAMESPACE;
 
     traceEnter;
@@ -57,8 +60,6 @@ void registerMetatypes() {
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("DigitalOutputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("AnalogInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("MotionStopCode");
-    qRegisterMetaType<ItemDetailFolderBean>("ItemDetailFolderBean");
-    qRegisterMetaType<ItemDetailFilterBean>("ItemDetailFilterBean");
 
     traceExit;
 

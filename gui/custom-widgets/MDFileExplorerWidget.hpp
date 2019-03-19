@@ -19,6 +19,7 @@ public:
 
 private:
     MDFileExplorerWidgetLogic* dPtr;
+    bool isTapAndHoldEventInProgress;
 
 public:
     explicit MDFileExplorerWidget(QWidget* parent = Q_NULLPTR);
@@ -32,9 +33,18 @@ private:
     bool event(QEvent* event);
 
 signals:
-    void currentSubFolderSignal(const QString& folderPath);
-    void currentItemPathListSignal(const QStringList& items);
+    void currentFolderSignal(const QString& folderPath);
+    void currentItemSignal(const QString& path);
 
+    void itemsPathSignal(const QStringList& items);
+    void changeFolderRequestSignal(const QString& folderPath);
+
+
+    // QWidget interface
+protected:
+    void mousePressEvent(QMouseEvent* event);
 };
+
+
 
 #endif // MDFILEEXPLORERWIDGET_HPP

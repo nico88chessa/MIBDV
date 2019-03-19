@@ -1,13 +1,15 @@
 #include "MDFileExplorerWidgetLogic.hpp"
 #include "MDFileExplorerWidget.hpp"
 
+#include <QKeyEvent>
 #include <QEvent>
 #include <QGestureEvent>
+#include <Logger.hpp>
 
 
-/*************************************************************
+/*
  *    M O D E L  V A L I D A T O R  F I L T E R
- *************************************************************/
+ */
 
 ModelValidatorFilter::ModelValidatorFilter(QObject *parent) :
     QSortFilterProxyModel(parent) { }
@@ -46,10 +48,9 @@ bool ModelValidatorFilter::filterAcceptsRow(int sourceRow, const QModelIndex& so
 }
 
 
-
-/*************************************************************
+/*
  *    M D  F I L E  E X P L O R E R  W I D G E T  L O G I C
- *************************************************************/
+ */
 
 MDFileExplorerWidgetLogic::MDFileExplorerWidgetLogic(const QString& rootPath) :
     model(Q_NULLPTR), filter(Q_NULLPTR) {
@@ -89,9 +90,7 @@ bool MDFileExplorerWidgetLogic::isDir(const QModelIndex& index) const {
 QString MDFileExplorerWidgetLogic::getPath(const QModelIndex& index) {
 
     QModelIndex sourceModelIndex = filter->mapToSource(index);
-    if (model->isDir(sourceModelIndex))
-        return this->model->filePath(sourceModelIndex);
-    return QString();
+    return this->model->filePath(sourceModelIndex);
 
 }
 
@@ -105,13 +104,13 @@ QAbstractItemModel* MDFileExplorerWidgetLogic::getModel() {
 }
 
 
-
-/****************************************************
+/*
  *    M D  F I L E  E X P L O R E R  W I D G E T
- ****************************************************/
+ */
 
 MDFileExplorerWidget::MDFileExplorerWidget(QWidget* parent) :
-    QListView(parent), dPtr(new MDFileExplorerWidgetLogic()) {
+    QListView(parent), dPtr(new MDFileExplorerWidgetLogic()),
+    isTapAndHoldEventInProgress(false) {
 
     dPtr->qPtr = this;
     this->setModel(dPtr->getModel());
@@ -133,7 +132,8 @@ void MDFileExplorerWidget::setPath(const QString& path) {
     dPtr->setPath(path);
     QModelIndex index = dPtr->getIndex(path);
     this->setRootIndex(index);
-    emit currentSubFolderSignal(test.fromNativeSeparators(test.absolutePath()));
+    emit currentFolderSignal(test.fromNativeSeparators(test.absolutePath()));
+    emit currentItemSignal("");
 
 }
 
@@ -142,10 +142,20 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
     connect(this, &MDFileExplorerWidget::clicked, [&](const QModelIndex &index) {
 
         if (dPtr->isDir(index)) {
-            QString dirPath = this->dPtr->getPath(index);
-            this->setPath(dirPath);
-            emit currentSubFolderSignal(dirPath);
+
+            if (!this->isTapAndHoldEventInProgress) {
+                QString path = this->dPtr->getPath(index);
+                this->setPath(path);
+                emit currentFolderSignal(path);
+            }
+
+        } else {
+
+            QString itemPath = this->dPtr->getPath(index);
+            emit currentItemSignal(itemPath);
+
         }
+
     });
 
     connect(this->dPtr->model, &QFileSystemModel::directoryLoaded, [&](const QString& path) {
@@ -160,11 +170,11 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
             QModelIndex currentfilterModelIndex = this->dPtr->filter->index(i, 0, filterModelIndex);
             QModelIndex currentSourceModelIndex = this->dPtr->filter->mapToSource(currentfilterModelIndex);
             QFileInfo fileInfo = this->dPtr->model->fileInfo(currentSourceModelIndex);
-            itemsPath.append(path);
+            itemsPath.append(fileInfo.absoluteFilePath());
         }
 
         if (!itemsPath.isEmpty())
-            emit currentItemPathListSignal(itemsPath);
+            emit itemsPathSignal(itemsPath);
 
     });
 
@@ -172,17 +182,48 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
 
 bool MDFileExplorerWidget::event(QEvent* event) {
 
-    // TODO NIC 15/03/2019 - Valutare come farlo
-//    if (event->type() == QEvent::Gesture) {
+    using namespace PROGRAM_NAMESPACE;
 
-//        QGestureEvent* gEvent = static_cast<QGestureEvent*>(event);
-//        if (QGesture* gesture = gEvent->gesture(Qt::TapAndHoldGesture)) {
-//            int ciao = 0;
-//            return false;
-//        }
+    traceDebug() << "Event: " << event->type();
 
-//    }
+    if (event->type() == QEvent::Gesture) {
+
+        // NOTE NIC 18/03/2019- alla fine di questo evento, viene generato l'evento MouseRelease
+        // che (guardare codice Qt) genera il segnale emit clicked();
+
+        QGestureEvent* gestureEvent = static_cast<QGestureEvent*>(event);
+        if (QGesture* gesture = gestureEvent->gesture(Qt::TapAndHoldGesture)) {
+            isTapAndHoldEventInProgress = true;
+            QModelIndex newIdx = currentIndex();
+            QString itemPath = this->dPtr->getPath(newIdx);
+            emit currentItemSignal(itemPath);
+            return false;
+        }
+
+    } else if (event->type() == QEvent::KeyPress) {
+
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        QModelIndex oldIdx = currentIndex();
+        QListView::event(event);
+        QModelIndex newIdx = currentIndex();
+
+        if (oldIdx.row() != newIdx.row()) {
+            QString itemPath = this->dPtr->getPath(newIdx);
+            emit currentItemSignal(itemPath);
+        }
+        return false;
+
+    }
 
     return QListView::event(event);
 
+}
+
+void MDFileExplorerWidget::mousePressEvent(QMouseEvent* event) {
+
+    // NOTE NIC 19/03/2018 - al click del mouse, resetto il flag per capire
+    // se l'azione che sto facendo e' un singolo click oppure
+
+    isTapAndHoldEventInProgress = false;
+    QListView::mousePressEvent(event);
 }
