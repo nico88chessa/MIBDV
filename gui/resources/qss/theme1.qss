@@ -408,3 +408,36 @@ QTreeView::branch {
     margin: 0px:
 }
 */
+
+
+/*
+ * MDBreadCrumb
+ */
+
+.MDBreadCrumb {
+    background-color: transparent;
+}
+
+.MDBreadCrumb .QPushButton {
+    background-color: transparent;
+    color: black;
+    border-color: blue;
+}
+
+
+/*
+ * File Explorer Frame
+ */
+
+.FileExplorerFrame #top {
+    border-bottom-color: transparent;
+    background-color: transparent;
+}
+
+.FileExplorerFrame #content {
+    background-color: pink;
+}
+
+.FileExplorerFrame #lvExplorer {
+    background-color: transparent;
+}

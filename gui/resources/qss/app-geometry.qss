@@ -178,3 +178,22 @@ QTabWidget {
 /*.IOFrame #saDigitalIO QWidget {
     min-height: 40px;
 }*/
+
+
+/*
+ * File Explorer Frame
+ */
+
+.FileExplorerFrame #top {
+    min-height: 48px;
+    max-height: 48px;
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+}
+
+.FileExplorerFrame #content {
+    border: none;
+}
+
+.FileExplorerFrame #lvExplorer {
+}

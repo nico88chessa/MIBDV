@@ -610,29 +610,25 @@ QTreeView::branch:open:has-children:has-siblings  {
     color: red;
 }*/
 
-/******************/
-/* MDBreadCrumb
-/******************/
+/*
+ * MDBreadCrumb
+ */
 
 .MDBreadCrumb {
-    max-height: 46px;
+    max-height: 40px;
     qproperty-focusPolicy: NoFocus;
-    background-color: transparent;
     qproperty-spacing: 0;
 }
 
 .MDBreadCrumb .QPushButton {
-    background-color: transparent;
-    color: black;
-    border: 1px solid blue;
-    padding: 0px 16px;
-    margin: 6px 8px;
     border-width: 1px;
     border-style: solid;
     border-radius: 2px;
+    padding: 0px 16px;
+    margin: 6px 8px;
     min-width: 50px;
-    min-height: 32px;
-    max-height: 32px;
+    min-height: 26px;
+    max-height: 26px;
     font-size: 14px;
     font-weight: 600;
 }
