@@ -21,7 +21,6 @@ void ItemDetailFilterWidget::model2View(const ItemDetailFilterBean& bean) {
 
     leNumberOfPoints->setText(QString::number(bean.getNumberOfPoints()));
     leName->setText(bean.getName());
-//    leNumberOfPoints->setText(bean.getName());
     minPoint->setText(QString::number(bean.getMinPoint().getX()) + " - " + QString::number(bean.getMinPoint().getY()));
     maxPoint->setText(QString::number(bean.getMaxPoint().getX()) + " - " + QString::number(bean.getMaxPoint().getY()));
 
@@ -58,8 +57,6 @@ void ItemDetailFilterWidget::setupUi() {
     gridLayout->addWidget(minPoint, 2, 0, 1, 1);
     gridLayout->addWidget(maxPoint, 3, 0, 1, 1);
     gridLayout->addItem(verticalSpacer, 4, 0, 1, 1);
-
-//    this->setLayout(gridLayout);
 
 }
 
@@ -101,8 +98,6 @@ void ItemDetailFolderWidget::setupUi() {
     gridLayout->addWidget(leName, 0, 0, 1, 1);
     gridLayout->addWidget(leItemsCount, 1, 0, 1, 1);
     gridLayout->addItem(verticalSpacer, 2, 0, 1, 1);
-
-//    this->setLayout(gridLayout);
 
 }
 
@@ -197,7 +192,6 @@ QModelIndex ItemDetailModel::findPath(const QString& path) const {
     if (found)
         return index;
     return this->index(0, 0);
-//    return QModelIndex();
 
 }
 
@@ -229,16 +223,6 @@ void ItemDetailDelegate::setEditorData(QWidget* editor, const QModelIndex& index
         itemDetailWidget->showWidget(data);
         return;
     }
-
-//    if (data.canConvert<ItemDetailBean>()) {
-
-//        ItemDetailBean bean = qvariant_cast<ItemDetailBean>(data);
-//        ItemDetailWidget* itemWidget = qobject_cast<ItemDetailWidget*>(editor);
-//        itemWidget->testLineEdit->setText(bean.getText1());
-//        itemWidget->testLineEdit2->setText(bean.getText2());
-//        return;
-
-//    }
 
     QStyledItemDelegate::setEditorData(editor, index);
 
@@ -307,7 +291,7 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
     this->model->clear();
 
     using namespace PROGRAM_NAMESPACE;
-    IAbstractJsonParser::Ptr parser = new FilterJsonParser();
+    QScopedPointer<IAbstractJsonParser> parser(new FilterJsonParser());
 
     for (const QString& item: itemsPath) {
 
@@ -361,8 +345,6 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
 
     }
 
-    delete parser;
-
 }
 
 void ItemDetailWidget::setCurrentPath(const QString& itemPath) {
@@ -379,7 +361,6 @@ void ItemDetailWidget::setupSignalsAndSlots() {
 void ItemDetailWidget::setupUi() {
 
     gridLayout = new QGridLayout(this);
-//    this->setLayout(gridLayout);
 
     stackedWidget = new QStackedWidget(this);
 

@@ -5,10 +5,12 @@
 #include <QEvent>
 #include <QGestureEvent>
 #include <Logger.hpp>
+#include <gui/ui/DialogAlert.hpp>
+#include <gui/ui/DialogRename.hpp>
 
 
 /*
- *    M O D E L  V A L I D A T O R  F I L T E R
+ *    M O D E L   V A L I D A T O R   F I L T E R
  */
 
 ModelValidatorFilter::ModelValidatorFilter(QObject *parent) :
@@ -49,7 +51,7 @@ bool ModelValidatorFilter::filterAcceptsRow(int sourceRow, const QModelIndex& so
 
 
 /*
- *    M D  F I L E  E X P L O R E R  W I D G E T  L O G I C
+ *    M D   F I L E   E X P L O R E R   W I D G E T   L O G I C
  */
 
 MDFileExplorerWidgetLogic::MDFileExplorerWidgetLogic(const QString& rootPath) :
@@ -87,10 +89,24 @@ bool MDFileExplorerWidgetLogic::isDir(const QModelIndex& index) const {
 
 }
 
-QString MDFileExplorerWidgetLogic::getPath(const QModelIndex& index) {
+QString MDFileExplorerWidgetLogic::getPath(const QModelIndex& index) const {
 
     QModelIndex sourceModelIndex = filter->mapToSource(index);
     return this->model->filePath(sourceModelIndex);
+
+}
+
+QString MDFileExplorerWidgetLogic::getFilename(const QModelIndex& index) const {
+
+    QModelIndex sourceModelIndex = filter->mapToSource(index);
+    return this->model->fileName(sourceModelIndex);
+
+}
+
+QFileInfo MDFileExplorerWidgetLogic::getFileInfo(const QModelIndex& index) const {
+
+    QModelIndex sourceModelIndex = filter->mapToSource(index);
+    return this->model->fileInfo(sourceModelIndex);
 
 }
 
@@ -105,7 +121,7 @@ QAbstractItemModel* MDFileExplorerWidgetLogic::getModel() {
 
 
 /*
- *    M D  F I L E  E X P L O R E R  W I D G E T
+ *    M D   F I L E   E X P L O R E R   W I D G E T
  */
 
 MDFileExplorerWidget::MDFileExplorerWidget(QWidget* parent) :
@@ -113,7 +129,7 @@ MDFileExplorerWidget::MDFileExplorerWidget(QWidget* parent) :
     isTapAndHoldEventInProgress(false) {
 
     dPtr->qPtr = this;
-    this->setModel(dPtr->getModel());
+    this->setModel(dPtr->filter);
     this->setupSignalsAndSlots();
     this->grabGesture(Qt::TapAndHoldGesture);
 
@@ -133,7 +149,67 @@ void MDFileExplorerWidget::setPath(const QString& path) {
     QModelIndex index = dPtr->getIndex(path);
     this->setRootIndex(index);
     emit currentFolderSignal(test.fromNativeSeparators(test.absolutePath()));
-    emit currentItemSignal("");
+
+}
+
+void MDFileExplorerWidget::clearSelection() {
+
+    QListView::clearSelection();
+    emit selectionClearSignal();
+
+}
+
+void MDFileExplorerWidget::removeCurrentItem() {
+
+    QModelIndex index = this->currentIndex();
+    QFileInfo fileInfo = dPtr->getFileInfo(index);
+
+    QScopedPointer<DialogAlert> dialog(new DialogAlert);
+    // TODO NIC 22/03/2019 - spostare stringhe in costanti traducibili
+    dialog->setupLabels("Cancellazione file", QString("Confermare cancellazione file %1?").arg(fileInfo.fileName()));
+
+    if (dialog->exec() == QDialog::Accepted) {
+        this->clearSelection();
+        dPtr->model->remove(dPtr->filter->mapToSource(index));
+    }
+
+}
+
+void MDFileExplorerWidget::renameCurrentItem() {
+
+    QModelIndex index = this->currentIndex();
+    QFileInfo fileInfo = dPtr->getFileInfo(index);
+
+    QScopedPointer<DialogRename> dialog(new DialogRename);
+    dialog->setupFilename(fileInfo.fileName());
+
+    if (dialog->exec() == QDialog::Accepted) {
+
+        if (fileInfo.isDir()) {
+
+            QDir d(fileInfo.absoluteDir());
+            if (!d.rename(fileInfo.fileName(), dialog->getFilename())) {
+                QScopedPointer<DialogAlert> dialog(new DialogAlert);
+                // TODO NIC 22/03/2019 - spostare stringhe in costanti traducibili
+                dialog->setupLabels("Error", "Impossibile rinominare il file");
+                dialog->exec();
+            }
+
+        } else {
+
+            QString renameFile = fileInfo.absolutePath();
+            renameFile.append("/").append(dialog->getFilename());
+            QFile f(fileInfo.absoluteFilePath());
+            if (!f.rename(renameFile)) {
+                QScopedPointer<DialogAlert> dialog(new DialogAlert);
+                // TODO NIC 22/03/2019 - spostare stringhe in costanti traducibili
+                dialog->setupLabels("Error", "Impossibile rinominare il file");
+                dialog->exec();
+            }
+
+        }
+
+    }
 
 }
 
@@ -141,18 +217,18 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
 
     connect(this, &MDFileExplorerWidget::clicked, [&](const QModelIndex &index) {
 
-        if (dPtr->isDir(index)) {
+        /* NOTE NIC 22/03/2019 - controllo che il click non sia a seguito dell'evento Tap and Hold;
+         * se si, non faccio nulla, in quanto all'interno dell'evento stesso genero il segnale currentItemSignal(..)
+         */
+        if (!this->isTapAndHoldEventInProgress) {
 
-            if (!this->isTapAndHoldEventInProgress) {
-                QString path = this->dPtr->getPath(index);
+            QString path = this->dPtr->getPath(index);
+
+            if (dPtr->isDir(index)) {
                 this->setPath(path);
                 emit currentFolderSignal(path);
-            }
-
-        } else {
-
-            QString itemPath = this->dPtr->getPath(index);
-            emit currentItemSignal(itemPath);
+            } else
+                emit currentItemSignal(path);
 
         }
 
@@ -173,6 +249,8 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
             itemsPath.append(fileInfo.absoluteFilePath());
         }
 
+        this->clearSelection();
+
         if (!itemsPath.isEmpty())
             emit itemsPathSignal(itemsPath);
 
@@ -188,7 +266,7 @@ bool MDFileExplorerWidget::event(QEvent* event) {
 
     if (event->type() == QEvent::Gesture) {
 
-        // NOTE NIC 18/03/2019- alla fine di questo evento, viene generato l'evento MouseRelease
+        // NOTE NIC 18/03/2019 - alla fine di questo evento, viene generato l'evento MouseRelease
         // che (guardare codice Qt) genera il segnale emit clicked();
 
         QGestureEvent* gestureEvent = static_cast<QGestureEvent*>(event);
@@ -197,7 +275,7 @@ bool MDFileExplorerWidget::event(QEvent* event) {
             QModelIndex newIdx = currentIndex();
             QString itemPath = this->dPtr->getPath(newIdx);
             emit currentItemSignal(itemPath);
-            return false;
+            return true;
         }
 
     } else if (event->type() == QEvent::KeyPress) {
@@ -211,7 +289,7 @@ bool MDFileExplorerWidget::event(QEvent* event) {
             QString itemPath = this->dPtr->getPath(newIdx);
             emit currentItemSignal(itemPath);
         }
-        return false;
+        return true;
 
     }
 

@@ -18,6 +18,8 @@
         <file alias="play_circle_filled">icons/black-theme/baseline_play_circle_filled_black_24dp.png</file>
         <file alias="lens">icons/black-theme/baseline_lens_black_24dp.png</file>
         <file alias="panorama_fish_eye">icons/black-theme/baseline_panorama_fish_eye_black_24dp.png</file>
+        <file alias="delete_forever">icons/black-theme/baseline_delete_forever_black_48dp.png</file>
+        <file alias="rename">icons/black-theme/rename_icon-icons_24d.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>

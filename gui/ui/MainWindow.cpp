@@ -431,7 +431,7 @@ void MainWindow::initCNConnectionWatcher() {
     if (cnConnectionWatcher.isNull())
         return;
 
-    // NOTE NIC 21/12/2018: non creo un thread a parte perche' il device e' associato al thread main;
+    // NOTE NIC 21/12/2018 - non creo un thread a parte perche' il device e' associato al thread main;
     // usare il device in un altro thread potrebbe creare problemi
 
     /*****************************************************************
@@ -468,7 +468,7 @@ void MainWindow::initPLCConnectionWatcher() {
     if (plcConnectionWatcher.isNull())
         return;
 
-    // NOTE NIC 21/12/2018: non creo un thread a parte perche' il device e' associato al thread main;
+    // NOTE NIC 21/12/2018 - non creo un thread a parte perche' il device e' associato al thread main;
     // usare il device in un altro thread potrebbe creare problemi
 
     /*****************************************************************

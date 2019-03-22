@@ -21,6 +21,7 @@ private:
 
 private:
     void setupSignalsAndSlots();
+    void setupUi();
 
 private slots:
     void updateBreadCrumb(const QString& folderPath);

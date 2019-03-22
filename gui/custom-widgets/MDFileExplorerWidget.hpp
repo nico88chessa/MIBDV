@@ -1,9 +1,7 @@
 #ifndef MDFILEEXPLORERWIDGET_HPP
 #define MDFILEEXPLORERWIDGET_HPP
 
-#include <QFileSystemModel>
 #include <QListView>
-#include <QString>
 
 
 class MDFileExplorerWidgetLogic;
@@ -27,6 +25,9 @@ public:
 
 public slots:
     void setPath(const QString& path);
+    void clearSelection();
+    void removeCurrentItem();
+    void renameCurrentItem();
 
 private:
     void setupSignalsAndSlots();
@@ -39,10 +40,11 @@ signals:
     void itemsPathSignal(const QStringList& items);
     void changeFolderRequestSignal(const QString& folderPath);
 
+    void selectionClearSignal();
 
-    // QWidget interface
 protected:
     void mousePressEvent(QMouseEvent* event);
+
 };
 
 

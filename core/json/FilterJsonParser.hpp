@@ -32,7 +32,7 @@ private:
 protected:
     virtual JsonParserError encodeJson(const Filter* obj, QByteArray& output) {
 
-        // TODO NIC - 19/02/2018
+        // TODO NIC 19/02/2018
         traceEnter;
         traceExit;
         return JSON_PARSER_NO_ERROR;

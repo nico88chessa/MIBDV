@@ -1,13 +1,13 @@
-#include "DialogAlert.hpp"
-#include "ui_DialogAlert.h"
+#include "DialogRename.hpp"
+#include "ui_DialogRename.h"
 
 #include <Logger.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 
-DialogAlert::DialogAlert(QWidget *parent) :
+DialogRename::DialogRename(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DialogAlert) {
+    ui(new Ui::DialogRename) {
 
     this->setupUi();
 
@@ -15,11 +15,11 @@ DialogAlert::DialogAlert(QWidget *parent) :
 
 }
 
-DialogAlert::~DialogAlert() {
+DialogRename::~DialogRename() {
     delete ui;
 }
 
-void DialogAlert::setupUi() {
+void DialogRename::setupUi() {
 
     ui->setupUi(this);
 
@@ -30,24 +30,32 @@ void DialogAlert::setupUi() {
 
 }
 
-void DialogAlert::setupLabels(const QString& title, const QString& content) {
+void DialogRename::setupFilename(const QString& filename) {
 
     traceEnter;
 
-    ui->lTitle->setText(title);
-    ui->lContent->setText(content);
+    ui->leNewFilename->setText(filename);
 
     traceExit;
 
 }
 
-void DialogAlert::setupSignalsAndSlots() {
+void DialogRename::setupSignalsAndSlots() {
 
     traceEnter;
 
     connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
     connect(ui->pbOk, &QPushButton::clicked, this, &QDialog::accept);
 
+    traceExit;
+
+}
+
+QString DialogRename::getFilename() const {
+
+    traceEnter;
+    QString filename = this->ui->leNewFilename->text();
+    return filename;
     traceExit;
 
 }

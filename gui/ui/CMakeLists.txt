@@ -6,6 +6,7 @@ SET(ITEMS
     IOFrame
     IOFrameLogic
     DialogAlert
+    DialogRename
     FileExplorerFrame
     )
 

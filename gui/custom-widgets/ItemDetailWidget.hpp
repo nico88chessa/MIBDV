@@ -38,16 +38,13 @@ public:
 
 private:
     QStackedWidget* stackedWidget;
+    QGridLayout* gridLayout;
+
     QMap<ItemDetailType, QWidget*> map; // mappa itemDetailEnum / widget
 
     ItemDetailModel* model;
     ItemDetailDelegate* delegate;
     QDataWidgetMapper* mapper;
-
-    QGridLayout* gridLayout;
-    MDLineEdit* testLineEdit;
-    MDLineEdit* testLineEdit2;
-    QSpacerItem* verticalSpacer;
 
 public:
     ItemDetailWidget(QWidget* parent = Q_NULLPTR);

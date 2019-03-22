@@ -52,7 +52,7 @@ public:
     GalilPLCStatusBean() { }
 
     /**
-     * NOTE NIC 31/10/2018: questa e' una copy-initialization;
+     * NOTE NIC 31/10/2018 - questa e' una copy-initialization;
      * tuttavia nel compilatore gcc viene ottmizzata come una direct-initialization
      * metto explicit per forzare l'uso del tipo GalilPLCStatusBean;
      * vedere \ref GalilPLCController::getRecord

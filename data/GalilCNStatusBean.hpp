@@ -483,7 +483,7 @@ public:
     unsigned short getAxisCAnalogIn() const { return axisCAnalogIn; }
     void setAxisCAnalogIn(unsigned short value) { axisCAnalogIn = value; }
 
-    // NOTE NIC 03/01/2019: gli I/O del galil CN a differenza del PLC partono da 1 e non da 0
+    // NOTE NIC 03/01/2019 - gli I/O del galil CN a differenza del PLC partono da 1 e non da 0
     bool getDigitalInput(int i) const {
         if (i<1 || i>=GALIL_CN_DIGITAL_INPUTS)
             throw DigitalInputOutOfBoundException();

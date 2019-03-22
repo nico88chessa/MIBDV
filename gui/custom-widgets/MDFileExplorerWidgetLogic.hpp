@@ -6,9 +6,9 @@
 #include <QSortFilterProxyModel>
 
 
-/*************************************************************
+/*
  *    M O D E L  V A L I D A T O R  F I L T E R
- *************************************************************/
+ */
 
 class ModelValidatorFilter : public QSortFilterProxyModel {
     Q_OBJECT
@@ -26,9 +26,9 @@ protected:
 };
 
 
-/**************************************************************
+/*
  *    M D  F I L E  E X P L O R E R  W I D G E T  L O G I C
- **************************************************************/
+ */
 
 class MDFileExplorerWidget;
 
@@ -52,7 +52,9 @@ public:
 
 protected:
     bool isDir(const QModelIndex& index) const;
-    QString getPath(const QModelIndex& index);
+    QString getPath(const QModelIndex& index) const;
+    QString getFilename(const QModelIndex& index) const;
+    QFileInfo getFileInfo(const QModelIndex& index) const;
     QModelIndex getIndex(const QString& path) const;
     inline QAbstractItemModel* getModel();
 

@@ -7,7 +7,7 @@ FileExplorerFrame::FileExplorerFrame(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::FileExplorerFrame) {
 
-    ui->setupUi(this);
+    this->setupUi();
 
     QString rootPath = "C:/Users/nicola/Desktop/Spool";
 
@@ -25,13 +25,34 @@ FileExplorerFrame::~FileExplorerFrame() {
 
 void FileExplorerFrame::setupSignalsAndSlots() {
 
-    static int cont = 1;
-
     connect(ui->lvExplorer, &MDFileExplorerWidget::currentFolderSignal, this, &FileExplorerFrame::updateBreadCrumb);
-    connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, ui->idwTest, &ItemDetailWidget::setCurrentPath);
-    connect(ui->lvExplorer, &MDFileExplorerWidget::itemsPathSignal, ui->idwTest, &ItemDetailWidget::updateModelData);
+    connect(ui->lvExplorer, &MDFileExplorerWidget::currentFolderSignal, [&]() {
+        ui->itwDetail->setCurrentPath("");
+    });
+    connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, [&]() {
+        this->ui->pbDelete->setEnabled(true);
+        this->ui->pbRename->setEnabled(true);
+    });
+    connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, ui->itwDetail, &ItemDetailWidget::setCurrentPath);
+    connect(ui->lvExplorer, &MDFileExplorerWidget::itemsPathSignal, ui->itwDetail, &ItemDetailWidget::updateModelData);
+    connect(ui->lvExplorer, &MDFileExplorerWidget::selectionClearSignal, [&]() {
+        ui->itwDetail->setCurrentPath("");
+        this->ui->pbDelete->setEnabled(false);
+        this->ui->pbRename->setEnabled(false);
+    });
 
     connect(ui->breadCrumb, &MDBreadCrumb::pathClicked, this, &FileExplorerFrame::updateFileExplorer);
+
+    connect(ui->pbDelete, &QPushButton::clicked, ui->lvExplorer, &MDFileExplorerWidget::removeCurrentItem);
+    connect(ui->pbRename, &QPushButton::clicked, ui->lvExplorer, &MDFileExplorerWidget::renameCurrentItem);
+
+}
+
+void FileExplorerFrame::setupUi() {
+
+    ui->setupUi(this);
+    this->ui->pbDelete->setEnabled(false);
+    this->ui->pbRename->setEnabled(false);
 
 }
 

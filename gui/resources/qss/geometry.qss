@@ -611,13 +611,19 @@ QTreeView::branch:open:has-children:has-siblings  {
 }*/
 
 /*
- * MDBreadCrumb
+ * M D B R E A D C R U M B
  */
 
 .MDBreadCrumb {
     max-height: 40px;
     qproperty-focusPolicy: NoFocus;
     qproperty-spacing: 0;
+    min-width: 600px;
+    max-width: 600px;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    margin: 0px;
 }
 
 .MDBreadCrumb .QPushButton {
