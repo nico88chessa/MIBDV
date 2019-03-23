@@ -146,12 +146,6 @@ protected:
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 
-        QJsonValue coordinate = jsonObj.value(FILTER_JSON_NUMBER_COORDINATE_KEY);
-        if (coordinate.isUndefined()) {
-            traceErr() << "Chiave Coordinate non presente nel file json";
-            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
-        }
-
         // imposto il numero di punti
         obj->setNumOfPoints(numberOfPoints.toInt());
 

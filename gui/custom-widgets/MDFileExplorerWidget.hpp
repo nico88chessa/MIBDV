@@ -3,8 +3,7 @@
 
 #include <QListView>
 
-
-class MDFileExplorerWidgetLogic;
+#include <model/FilterFileExplorerModel.hpp>
 
 class MDFileExplorerWidget : public QListView {
     Q_OBJECT
@@ -13,11 +12,9 @@ public:
     using Ptr = MDFileExplorerWidget*;
     using ConstPtr = const MDFileExplorerWidget*;
 
-    friend class MDFileExplorerWidgetLogic;
-
 private:
-    MDFileExplorerWidgetLogic* dPtr;
     bool isTapAndHoldEventInProgress;
+    FilterFileExplorerModel::Ptr model;
 
 public:
     explicit MDFileExplorerWidget(QWidget* parent = Q_NULLPTR);

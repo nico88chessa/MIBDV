@@ -1,4 +1,3 @@
-#include "MDFileExplorerWidgetLogic.hpp"
 #include "MDFileExplorerWidget.hpp"
 
 #include <QKeyEvent>
@@ -10,133 +9,22 @@
 
 
 /*
- *    M O D E L   V A L I D A T O R   F I L T E R
- */
-
-ModelValidatorFilter::ModelValidatorFilter(QObject *parent) :
-    QSortFilterProxyModel(parent) { }
-
-ModelValidatorFilter::~ModelValidatorFilter() { }
-
-bool ModelValidatorFilter::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const {
-
-    QFileSystemModel* fileSystemModel = qobject_cast<QFileSystemModel*>(this->sourceModel());
-    QModelIndex index = this->sourceModel()->index(sourceRow, 0, sourceParent);
-
-    QFileInfo info = fileSystemModel->fileInfo(index);
-
-    if (info.isFile()) {
-
-        // inizio i controlli
-
-        // controllo l'estensione
-        if (!(QString("json").compare(info.completeSuffix(), Qt::CaseInsensitive)==0))
-            return false;
-
-        // controllo che non inizi con la tilde
-        QString fileName = info.fileName();
-        if (fileName.startsWith('~'))
-            return false;
-
-        QString filePath = info.path();
-        QString tempFilePath = QString("%1/~%2").arg(filePath).arg(fileName);
-        QFile checkTemp(tempFilePath);
-        if (checkTemp.exists())
-            return false;
-
-    }
-    return true;
-
-}
-
-
-/*
- *    M D   F I L E   E X P L O R E R   W I D G E T   L O G I C
- */
-
-MDFileExplorerWidgetLogic::MDFileExplorerWidgetLogic(const QString& rootPath) :
-    model(Q_NULLPTR), filter(Q_NULLPTR) {
-
-    this->model = new QFileSystemModel();
-    this->filter = new ModelValidatorFilter();
-    this->filter->setSourceModel(model);
-    if (!rootPath.isEmpty())
-        setPath(rootPath);
-
-}
-
-MDFileExplorerWidgetLogic::~MDFileExplorerWidgetLogic() {
-
-    delete this->model;
-    delete this->filter;
-
-}
-
-void MDFileExplorerWidgetLogic::setPath(const QString& path) {
-    model->setRootPath(path);
-}
-
-QString MDFileExplorerWidgetLogic::currentPath() const {
-    return model->rootPath();
-}
-
-bool MDFileExplorerWidgetLogic::isDir(const QModelIndex& index) const {
-
-    QModelIndex modelIndex = filter->mapToSource(index);
-    if (model->isDir(modelIndex))
-        return true;
-    return false;
-
-}
-
-QString MDFileExplorerWidgetLogic::getPath(const QModelIndex& index) const {
-
-    QModelIndex sourceModelIndex = filter->mapToSource(index);
-    return this->model->filePath(sourceModelIndex);
-
-}
-
-QString MDFileExplorerWidgetLogic::getFilename(const QModelIndex& index) const {
-
-    QModelIndex sourceModelIndex = filter->mapToSource(index);
-    return this->model->fileName(sourceModelIndex);
-
-}
-
-QFileInfo MDFileExplorerWidgetLogic::getFileInfo(const QModelIndex& index) const {
-
-    QModelIndex sourceModelIndex = filter->mapToSource(index);
-    return this->model->fileInfo(sourceModelIndex);
-
-}
-
-QModelIndex MDFileExplorerWidgetLogic::getIndex(const QString& path) const {
-    QModelIndex index = filter->mapFromSource(model->index(path));
-    return index;
-}
-
-QAbstractItemModel* MDFileExplorerWidgetLogic::getModel() {
-    return filter;
-}
-
-
-/*
  *    M D   F I L E   E X P L O R E R   W I D G E T
  */
 
 MDFileExplorerWidget::MDFileExplorerWidget(QWidget* parent) :
-    QListView(parent), dPtr(new MDFileExplorerWidgetLogic()),
-    isTapAndHoldEventInProgress(false) {
+    QListView(parent),
+    isTapAndHoldEventInProgress(false),
+    model(new FilterFileExplorerModel) {
 
-    dPtr->qPtr = this;
-    this->setModel(dPtr->filter);
+    this->setModel(model);
     this->setupSignalsAndSlots();
     this->grabGesture(Qt::TapAndHoldGesture);
 
 }
 
 MDFileExplorerWidget::~MDFileExplorerWidget() {
-    delete dPtr;
+    delete model;
 }
 
 void MDFileExplorerWidget::setPath(const QString& path) {
@@ -145,8 +33,8 @@ void MDFileExplorerWidget::setPath(const QString& path) {
     if (!test.exists())
         return;
 
-    dPtr->setPath(path);
-    QModelIndex index = dPtr->getIndex(path);
+    model->setRootPath(path);
+    QModelIndex index = model->getIndex(path);
     this->setRootIndex(index);
     emit currentFolderSignal(test.fromNativeSeparators(test.absolutePath()));
 
@@ -162,7 +50,7 @@ void MDFileExplorerWidget::clearSelection() {
 void MDFileExplorerWidget::removeCurrentItem() {
 
     QModelIndex index = this->currentIndex();
-    QFileInfo fileInfo = dPtr->getFileInfo(index);
+    QFileInfo fileInfo = model->getFileInfo(index);
 
     QScopedPointer<DialogAlert> dialog(new DialogAlert);
     // TODO NIC 22/03/2019 - spostare stringhe in costanti traducibili
@@ -170,15 +58,14 @@ void MDFileExplorerWidget::removeCurrentItem() {
 
     if (dialog->exec() == QDialog::Accepted) {
         this->clearSelection();
-        dPtr->model->remove(dPtr->filter->mapToSource(index));
+        model->remove(index);
     }
 
 }
 
 void MDFileExplorerWidget::renameCurrentItem() {
 
-    QModelIndex index = this->currentIndex();
-    QFileInfo fileInfo = dPtr->getFileInfo(index);
+    QFileInfo fileInfo = model->getFileInfo(this->currentIndex());
 
     QScopedPointer<DialogRename> dialog(new DialogRename);
     dialog->setupFilename(fileInfo.fileName());
@@ -222,9 +109,9 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
          */
         if (!this->isTapAndHoldEventInProgress) {
 
-            QString path = this->dPtr->getPath(index);
+            QString path = model->getPath(index);
 
-            if (dPtr->isDir(index)) {
+            if (model->isDir(index)) {
                 this->setPath(path);
                 emit currentFolderSignal(path);
             } else
@@ -234,18 +121,16 @@ void MDFileExplorerWidget::setupSignalsAndSlots() {
 
     });
 
-    connect(this->dPtr->model, &QFileSystemModel::directoryLoaded, [&](const QString& path) {
+    connect(this->model, &FilterFileExplorerModel::directoryLoaded, [&](const QString& path) {
 
-        QModelIndex sourceModelIndex = this->dPtr->model->index(path);
-        QModelIndex filterModelIndex = this->dPtr->filter->mapFromSource(sourceModelIndex);
-        int rowCount = this->dPtr->filter->rowCount(filterModelIndex);
+        QModelIndex index = model->getIndex(path);
+        int rowCount = model->rowCount(index);
 
         QStringList itemsPath;
 
         for (int i=0; i<rowCount; ++i) {
-            QModelIndex currentfilterModelIndex = this->dPtr->filter->index(i, 0, filterModelIndex);
-            QModelIndex currentSourceModelIndex = this->dPtr->filter->mapToSource(currentfilterModelIndex);
-            QFileInfo fileInfo = this->dPtr->model->fileInfo(currentSourceModelIndex);
+            QModelIndex currentIndex = model->index(i, 0, index);
+            QFileInfo fileInfo = this->model->getFileInfo(currentIndex);
             itemsPath.append(fileInfo.absoluteFilePath());
         }
 
@@ -273,20 +158,19 @@ bool MDFileExplorerWidget::event(QEvent* event) {
         if (QGesture* gesture = gestureEvent->gesture(Qt::TapAndHoldGesture)) {
             isTapAndHoldEventInProgress = true;
             QModelIndex newIdx = currentIndex();
-            QString itemPath = this->dPtr->getPath(newIdx);
+            QString itemPath = this->model->getPath(newIdx);
             emit currentItemSignal(itemPath);
             return true;
         }
 
     } else if (event->type() == QEvent::KeyPress) {
 
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
         QModelIndex oldIdx = currentIndex();
         QListView::event(event);
         QModelIndex newIdx = currentIndex();
 
         if (oldIdx.row() != newIdx.row()) {
-            QString itemPath = this->dPtr->getPath(newIdx);
+            QString itemPath = this->model->getPath(newIdx);
             emit currentItemSignal(itemPath);
         }
         return true;
