@@ -462,3 +462,12 @@ QTreeView::branch {
     qproperty-icon: url(:/icons/black-theme/rename);
 }
 
+ * MDTwoLineItem (compact)
+ */
+
+.MDTwoLineItem {
+    background-color: white;
+    background-clip: border;
+    color: black;
+    qproperty-secondaryLabelColor: gray;
+}

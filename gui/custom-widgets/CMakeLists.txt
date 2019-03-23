@@ -10,6 +10,7 @@ SET(ITEMS
     MDFileExplorerWidget
     MDFileExplorerWidgetLogic
     ItemDetailWidgetPrivate
+    MDTwoLineItem
     ItemDetailWidget
     )
 
