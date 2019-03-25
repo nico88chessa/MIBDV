@@ -29,11 +29,11 @@ void FileExplorerFrame::setupSignalsAndSlots() {
     connect(ui->lvExplorer, &MDFileExplorerWidget::currentFolderSignal, [&]() {
         ui->itwDetail->setCurrentPath("");
     });
-    connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, [&]() {
+    connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, [&](const QString& filePath) {
         this->ui->pbDelete->setEnabled(true);
         this->ui->pbRename->setEnabled(true);
+        this->ui->itwDetail->setCurrentPath(filePath);
     });
-    connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, ui->itwDetail, &ItemDetailWidget::setCurrentPath);
     connect(ui->lvExplorer, &MDFileExplorerWidget::itemsPathSignal, ui->itwDetail, &ItemDetailWidget::updateModelData);
     connect(ui->lvExplorer, &MDFileExplorerWidget::selectionClearSignal, [&]() {
         ui->itwDetail->setCurrentPath("");

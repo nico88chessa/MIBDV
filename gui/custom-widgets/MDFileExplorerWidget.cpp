@@ -21,6 +21,13 @@ MDFileExplorerWidget::MDFileExplorerWidget(QWidget* parent) :
     this->setupSignalsAndSlots();
     this->grabGesture(Qt::TapAndHoldGesture);
 
+    /* TODO NIC 25/03/2019 - multi selezione
+     * implementare multi selezione e rimozione di item
+     * questo richiedera' lo spostamento del model alla class
+     * FileExplorerFrame
+     */
+    //    this->setSelectionMode(SelectionMode::ExtendedSelection);
+
 }
 
 MDFileExplorerWidget::~MDFileExplorerWidget() {
@@ -33,6 +40,9 @@ void MDFileExplorerWidget::setPath(const QString& path) {
     if (!test.exists())
         return;
 
+    /* TODO NIC 25/03/2019 - set root path va chiamato una volta sola
+     * da rivedere la logica con la multiselezione
+     */
     model->setRootPath(path);
     QModelIndex index = model->getIndex(path);
     this->setRootIndex(index);
