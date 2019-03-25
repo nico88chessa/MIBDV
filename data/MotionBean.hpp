@@ -10,7 +10,7 @@
 namespace PROGRAM_NAMESPACE {
 
 /**
- * NOTE NIC: sarebbe interessante controllare che il motion bean sia
+ * NOTE NIC - sarebbe interessante controllare che il motion bean sia
  */
 
 class MotionBean {
@@ -84,7 +84,7 @@ public:
     template<typename T>
     MotionBean(const T& bean) {
 
-        // NOTE Nic: qui ci andranno tutti i bean dei CN da implementare
+        // NOTE NIC - qui ci andranno tutti i bean dei CN da implementare
         traceEnter;
 
         static_assert(std::is_same<T, PROGRAM_NAMESPACE::GalilCNStatusBean>::value, "Motion bean type not valid");

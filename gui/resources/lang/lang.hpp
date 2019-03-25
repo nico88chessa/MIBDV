@@ -7,6 +7,7 @@ static const char MAINWINDOW_MDCUSTOMITEM_ALERT[] = QT_TRANSLATE_NOOP("mibdv", "
 static const char MAINWINDOW_MDCUSTOMITEM_IO[] = QT_TRANSLATE_NOOP("mibdv", "IO");
 static const char MAINWINDOW_MDCUSTOMITEM_MOTION[] = QT_TRANSLATE_NOOP("mibdv", "Motion");
 static const char MAINWINDOW_MDCUSTOMITEM_TEST_FORI[] = QT_TRANSLATE_NOOP("mibdv", "Test Fori");
+static const char MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER[] = QT_TRANSLATE_NOOP("mibdv", "File Explorer");
 
 static const char UTILS_IOTYPE_POWER[] = QT_TRANSLATE_NOOP("mibdv", "Power");
 static const char UTILS_IOTYPE_CYCLE[] = QT_TRANSLATE_NOOP("mibdv", "Cycle");

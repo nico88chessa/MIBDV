@@ -228,7 +228,6 @@ void IOFrame::paintEvent(QPaintEvent* event) {
     for (int i=0; i<glAnalogIO->rowCount(); ++i)
         glAnalogIO->setRowMinimumHeight(i, rowMinHeight);
 
-
 }
 
 void IOFrame::updateUI() {

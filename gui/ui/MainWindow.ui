@@ -93,6 +93,18 @@
              <height>704</height>
             </rect>
            </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="pageFileExplorer">
+          <widget class="FileExplorerFrame" name="frameFileExplorer">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>824</width>
+             <height>704</height>
+            </rect>
+           </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>
@@ -257,6 +269,12 @@
    <class>TestFrame</class>
    <extends>QFrame</extends>
    <header>gui/ui/TestFrame.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FileExplorerFrame</class>
+   <extends>QFrame</extends>
+   <header>gui/ui/FileExplorerFrame.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

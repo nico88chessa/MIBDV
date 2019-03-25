@@ -8,6 +8,8 @@ SET(ITEMS
     DialogAlert
     TestFrame
     TestFrameLogic
+    DialogRename
+    FileExplorerFrame
     )
 
 FOREACH(ITEM ${ITEMS})

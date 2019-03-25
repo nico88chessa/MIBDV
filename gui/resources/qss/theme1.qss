@@ -176,9 +176,9 @@ QWidget:!enabled {
 
 
 
-/*******************************************/
-/* QSlider
-/*******************************************/
+/*
+ * Q S L I D E R
+ */
 
 QSlider::groove:horizontal {
     background-color: green;
@@ -213,11 +213,9 @@ QSlider::add-page:vertical {
 }
 
 
-
-
-/******************/
-/* QComboBox
-/******************/
+/*
+ * Q C O M B O B O X
+ */
 
 .QComboBox {
     background-color: white;
@@ -239,9 +237,9 @@ QSlider::add-page:vertical {
 
 
 
-/******************/
-/* QPushButton
-/******************/
+/*
+ * Q P U S H B U T T O N
+ */
 
 
 .QPushButton {
@@ -258,9 +256,9 @@ QSlider::add-page:vertical {
 
 
 
-/******************/
-/* QRadioButton
-/******************/
+/*
+ * Q R A D I O B U T T O N
+ */
 
 QRadioButton {
     /*color: green;*/
@@ -408,3 +406,68 @@ QTreeView::branch {
     margin: 0px:
 }
 */
+
+
+/*
+ * M D B R E A D C R U M B
+ */
+
+.MDBreadCrumb {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+
+.MDBreadCrumb .QPushButton {
+    background-color: transparent;
+    color: black;
+    border-color: blue;
+}
+
+
+/*
+ * F I L E   E X P L O R E R   F R A M E
+ */
+
+.FileExplorerFrame #top {
+    border-bottom-color: transparent;
+    background-color: transparent;
+}
+
+.FileExplorerFrame #content {
+    background-color: pink;
+}
+
+.FileExplorerFrame #lvExplorer {
+    background-color: transparent;
+    border-right-color: gray;
+}
+
+.FileExplorerFrame #top #pbDelete,
+.FileExplorerFrame #top #pbRename {
+    background-color: yellow;
+    padding: 12px 0px 12px 16px;
+    qproperty-text: "";
+    qproperty-iconSize: 24px;
+}
+
+.FileExplorerFrame #top #pbDelete:!enabled,
+.FileExplorerFrame #top #pbRename:!enabled {
+    background-color: lightgray;
+}
+
+.FileExplorerFrame #top #pbDelete {
+    qproperty-icon: url(:/icons/black-theme/delete_forever);
+}
+
+.FileExplorerFrame #top #pbRename {
+    qproperty-icon: url(:/icons/black-theme/rename);
+}
+
+ * MDTwoLineItem (compact)
+ */
+
+.MDTwoLineItem {
+    background-color: white;
+    background-clip: border;
+    color: black;
+    qproperty-secondaryLabelColor: gray;
+}

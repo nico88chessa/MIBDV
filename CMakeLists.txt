@@ -23,6 +23,13 @@ ELSEIF(CMAKE_SIZEOF_VOID_P EQUAL 4)
 ENDIF()
 MESSAGE("ARCHITECTURE: ${ARCHITECTURE}")
 
+IF (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    SET(ARCHITECTURE "x64")
+ELSEIF(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    SET(ARCHITECTURE "x86")
+ENDIF()
+MESSAGE("ARCHITECTURE: ${ARCHITECTURE}")
+
 IF(FLAG_DEBUG_OPTION)
     ADD_DEFINITIONS(-DFLAG_DEBUG)
 ELSE()
@@ -212,6 +219,7 @@ SET(UPDATE_TS CACHE BOOL "") # questo lo setto qui cosi poi lo posso modificare 
 SET(PROJECT_QSS_PATH "" CACHE INTERNAL "path of qss files") # questo serve per sviluppare il CSS a runtime senza usare il file .qrc (binario)
 
 SET(PROJECT_FOLDERS
+    "${PROJECT_SOURCE_DIR}/core"
     "${PROJECT_SOURCE_DIR}/data"
     "${PROJECT_SOURCE_DIR}/common"
     "${PROJECT_SOURCE_DIR}/devices"

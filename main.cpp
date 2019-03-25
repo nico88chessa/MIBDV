@@ -45,6 +45,10 @@ void loadCustomFont() {
 
 void registerMetatypes() {
 
+    // NOTE NIC 18/03/2019 - qui vanno registrati i tipi custom che devono essere gestiti
+    // dalle connessioni Signal / Slot
+    // Non e' necessario registrare i tipi se utilizzati solo come QVariant
+
     using namespace PROGRAM_NAMESPACE;
 
     traceEnter;
@@ -128,7 +132,7 @@ int mainTestFori(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
-    using namespace ipg_marking_library_wrapper;
+    //using namespace ipg_marking_library_wrapper;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
 //    std::string err;

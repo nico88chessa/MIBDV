@@ -610,3 +610,51 @@ QTreeView::branch:open:has-children:has-siblings  {
     color: red;
 }*/
 
+/*
+ * M D B R E A D C R U M B
+ */
+
+.MDBreadCrumb {
+    max-height: 40px;
+    qproperty-focusPolicy: NoFocus;
+    qproperty-spacing: 0;
+    min-width: 600px;
+    max-width: 600px;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    margin: 0px;
+}
+
+.MDBreadCrumb .QPushButton {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    padding: 0px 16px;
+    margin: 6px 8px;
+    min-width: 50px;
+    min-height: 26px;
+    max-height: 26px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/*
+ * MDTwoLineItem (compact)
+ */
+
+.MDTwoLineItem {
+    border: none;
+    font-size: 13px;
+    font-weight: 400;
+    min-height: 42px; /* 60 - 13 - 5 = 42 */
+    max-height: 42px;
+    qproperty-secondaryLabelFontSize: 13;
+    qproperty-labelX: 4;
+    qproperty-labelY: -1;
+    qproperty-labelDistance: 20;
+    padding: 13px 16px 5px;
+    margin: 0px;
+    qproperty-alignment: AlignLeft, AlignTop
+}

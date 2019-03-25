@@ -6,6 +6,11 @@ SET(ITEMS
     MDComboBox
     MDSpinBox
     MDDoubleSpinBox
+    MDBreadCrumb
+    MDFileExplorerWidget
+    ItemDetailWidgetPrivate
+    MDTwoLineItem
+    ItemDetailWidget
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -52,13 +57,13 @@ FOREACH(item ${SUB_FOLDERS})
     ADD_SUBDIRECTORY(${item})
 ENDFOREACH(item)
 
-FIND_PACKAGE(Qt5Widgets REQUIRED)
-SET(CMAKE_AUTOMOC ON)
+#FIND_PACKAGE(Qt5Widgets REQUIRED)
+#SET(CMAKE_AUTOMOC ON)
 
-ADD_LIBRARY(TestPlugin SHARED
-    ${HEADERS}
-    ${SOURCES}
-    ${UI_FILES}
-    )
-TARGET_LINK_LIBRARIES(TestPlugin PRIVATE
-    Qt5::Widgets)
+#ADD_LIBRARY(TestPlugin SHARED
+#    ${HEADERS}
+#    ${SOURCES}
+#    ${UI_FILES}
+#    )
+#TARGET_LINK_LIBRARIES(TestPlugin PRIVATE
+#    Qt5::Widgets)

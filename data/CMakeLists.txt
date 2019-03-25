@@ -16,6 +16,7 @@ SET(ITEMS
     Grid
     BoundingBox
     StackedTile
+    Filter
     )
 
 FOREACH(ITEM ${ITEMS})
