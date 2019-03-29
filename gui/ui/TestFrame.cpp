@@ -1,7 +1,6 @@
 #include "TestFrame.hpp"
 #include "ui_TestFrame.h"
 
-
 #include <vector>
 #include <QVector>
 
@@ -17,6 +16,8 @@
 #include <third-party/ipg-marking-library-wrapper/include/PointList.h>
 
 #include <Logger.hpp>
+
+#include <json/FilterJsonParser.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -113,34 +114,46 @@ void TestFrameLogic::startProcess() {
         return;
     }
 
-    QString firstLine(file.readLine());
-    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
-    file.readLine();
-    file.readLine();
+    QString fileData = file.readAll();
+    file.close();
 
+    QScopedPointer<IAbstractJsonParser> parser(new FilterJsonParser());
+    Filter filter;
+    parser->decodeJson(fileData.toUtf8(), &filter);
+
+    int pointsNumber = filter.getNumOfPoints();
+//    mibdv::PointSetI set(pointsNumber);
+
+//    for (auto&& p: filter.getPoints())
+//        set.addPoint(p);
+
+
+//    QString firstLine(file.readLine());
+//    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
+//    file.readLine();
+//    file.readLine();
     // leggo tutti i punti e li aggiungo al pointSet set
-    mibdv::PointSetI set(pointsNumber);
-    bool okX;
-    bool okY;
-    int count = 0;
-    int fixedSize = 10;
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine().trimmed();
-        QList<QByteArray> lineSplit = line.split(';');
-        if (lineSplit.size()>1) {
-            int x = lineSplit.at(0).toInt(&okX);
-            int y = lineSplit.at(1).toInt(&okY);
-            if (!(okX && okY)) {
-                traceErr() << "Errore nella lettura del file";
-                DialogAlert diag;
-                diag.setupLabels("Error", "Errore nella lettura del file");
-                diag.exec();
-                return;
-            }
-            set.addPoint(x, y);
+//    bool okX;
+//    bool okY;
+//    int count = 0;
+//    int fixedSize = 10;
+//    while (!file.atEnd()) {
+//        QByteArray line = file.readLine().trimmed();
+//        QList<QByteArray> lineSplit = line.split(';');
+//        if (lineSplit.size()>1) {
+//            int x = lineSplit.at(0).toInt(&okX);
+//            int y = lineSplit.at(1).toInt(&okY);
+//            if (!(okX && okY)) {
+//                traceErr() << "Errore nella lettura del file";
+//                DialogAlert diag;
+//                diag.setupLabels("Error", "Errore nella lettura del file");
+//                diag.exec();
+//                return;
+//            }
+//            set.addPoint(x, y);
 
-        }
-    }
+//        }
+//    }
 
     // inizio configurazione testa scansione ipg
 
@@ -179,18 +192,19 @@ void TestFrameLogic::startProcess() {
 
 
     // creo la griglia (in tile)
-    PointI m = set.getMin();
-    PointI M = set.getMax();
+    PointI m = filter.getMin();
+    PointI M = filter.getMax();
     int w = M.getX() - m.getX();
     int h = M.getY() - m.getY();
 
-    // la grigli la creo suddividendola in tile
+    // la griglia la creo suddividendola in tile
     GridI grid(m, w, h, tileSizeMm*1000);
 
-    for (auto&& p: set.getVector())
+    for (auto&& p: filter.getPoints())
         grid.addPoint(p);
 
     int countTile = 0;
+    return;
 
     // griglia creata
 
@@ -518,11 +532,21 @@ void TestFrame::updateDigitalInputStatus(const DigitalInputStatus& i) {
 
 }
 
+void TestFrame::setFilePath(const QString& filePath) {
+
+    traceEnter;
+    ui->leFilePath->setText(filePath);
+    traceExit;
+
+}
+
 void TestFrame::setupUi() {
 
     traceEnter;
 
     ui->setupUi(this);
+
+    ui->leFilePath->setReadOnly(true);
 
     ui->sbFrequency->setRange(TEST_FRAME_MIN_FREQUENCY, TEST_FRAME_MAX_FREQUENCY);
     ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);

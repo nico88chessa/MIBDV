@@ -69,11 +69,11 @@ bool FilterFileExplorerModel::filterAcceptsRow(int sourceRow, const QModelIndex&
         if (fileName.startsWith('~'))
             return false;
 
-        QString filePath = info.path();
-        QString tempFilePath = QString("%1/~%2").arg(filePath).arg(fileName);
-        QFile checkTemp(tempFilePath);
-        if (checkTemp.exists())
-            return false;
+        //QString filePath = info.path();
+        //QString tempFilePath = QString("%1/~%2").arg(filePath).arg(fileName);
+        //QFile checkTemp(tempFilePath);
+        //if (checkTemp.exists())
+        //    return false;
 
     }
     return true;

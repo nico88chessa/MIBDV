@@ -155,6 +155,16 @@ void MainWindow::setupSignalsAndSlots() const {
 
             });
 
+            connect(this, &MainWindow::currentFileSignal, [tf](const QString& filePath) {
+                QMetaObject::invokeMethod(tf, "setFilePath", Qt::QueuedConnection,
+                                          Q_ARG(const QString&, filePath));
+
+            });
+
+        } else if (auto&& fef = current->findChild<FileExplorerFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
+
+            connect(fef, &FileExplorerFrame::currentFileSignal, this, &MainWindow::currentFileSignal);
+
         }
 
     }

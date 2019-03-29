@@ -62,6 +62,7 @@ public:
 public slots:
     void updateMotionBean(const PROGRAM_NAMESPACE::MotionBean& b);
     void updateDigitalInputStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& i);
+    void setFilePath(const QString& filePath);
 
 private:
     void setupUi();

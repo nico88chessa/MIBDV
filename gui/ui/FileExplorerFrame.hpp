@@ -8,9 +8,12 @@ namespace Ui {
 class FileExplorerFrame;
 }
 
-class FileExplorerFrame : public QFrame
-{
+class FileExplorerFrame : public QFrame {
     Q_OBJECT
+
+public:
+    using Ptr = FileExplorerFrame*;
+    using ConstPtr = const FileExplorerFrame*;
 
 public:
     explicit FileExplorerFrame(QWidget *parent = nullptr);
@@ -18,6 +21,7 @@ public:
 
 private:
     Ui::FileExplorerFrame *ui;
+    QString currentItemPath;
 
 private:
     void setupSignalsAndSlots();
@@ -26,6 +30,9 @@ private:
 private slots:
     void updateBreadCrumb(const QString& folderPath);
     void updateFileExplorer(const QString& folderPath);
+
+signals:
+    void currentFileSignal(const QString& filePath);
 
 };
 

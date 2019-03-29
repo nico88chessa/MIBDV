@@ -2,6 +2,7 @@
 #include "ItemDetailWidget.hpp"
 
 #include <json/FilterJsonParser.hpp>
+#include <json/Utils.hpp>
 #include <QDir>
 
 
@@ -296,8 +297,8 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
     for (const QString& item: itemsPath) {
 
         QFileInfo fileInfo(item);
-        if (fileInfo.exists()) {
 
+        if (fileInfo.exists()) {
             if (fileInfo.isDir()) {
 
                 QDir dir(item);
@@ -312,14 +313,15 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
             } else if (fileInfo.isFile()) {
 
                 QString filePath = fileInfo.absoluteFilePath();
-                QFile file(filePath);
-                if (!file.open(QFile::ReadOnly | QFile::Text)) {
-                    traceErr() << "Impossibile aprire il file:" << fileInfo.fileName();
-                    continue;
-                }
+//                QFile file(filePath);
+//                if (!file.open(QFile::ReadOnly | QFile::Text)) {
+//                    traceErr() << "Impossibile aprire il file:" << fileInfo.fileName();
+//                    continue;
+//                }
 
-                QString bytes = file.readAll();
-                file.close();
+//                QString bytes = file.readAll();
+                QString bytes = JsonUtils::readFilterHeaderFromJsonFile(filePath);
+//                file.close();
 
                 Filter flt;
                 JsonParserError err;

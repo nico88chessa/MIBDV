@@ -71,6 +71,7 @@ signals:
     void ioStatusUpdateSignal(const PROGRAM_NAMESPACE::DigitalInputStatus& digitalInputs,
                               const PROGRAM_NAMESPACE::DigitalOutputStatus& digitalOutputs,
                               const PROGRAM_NAMESPACE::AnalogInputStatus& analogInputs);
+    void currentFileSignal(const QString& filePath);
 
 };
 

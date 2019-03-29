@@ -5,7 +5,8 @@
 
 FileExplorerFrame::FileExplorerFrame(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::FileExplorerFrame) {
+    ui(new Ui::FileExplorerFrame),
+    currentItemPath() {
 
     this->setupUi();
 
@@ -32,19 +33,27 @@ void FileExplorerFrame::setupSignalsAndSlots() {
     connect(ui->lvExplorer, &MDFileExplorerWidget::currentItemSignal, [&](const QString& filePath) {
         this->ui->pbDelete->setEnabled(true);
         this->ui->pbRename->setEnabled(true);
+        this->ui->pbSetFile->setEnabled(true);
         this->ui->itwDetail->setCurrentPath(filePath);
+        currentItemPath = filePath;
     });
+
     connect(ui->lvExplorer, &MDFileExplorerWidget::itemsPathSignal, ui->itwDetail, &ItemDetailWidget::updateModelData);
     connect(ui->lvExplorer, &MDFileExplorerWidget::selectionClearSignal, [&]() {
         ui->itwDetail->setCurrentPath("");
         this->ui->pbDelete->setEnabled(false);
         this->ui->pbRename->setEnabled(false);
+        this->ui->pbSetFile->setEnabled(false);
     });
 
     connect(ui->breadCrumb, &MDBreadCrumb::pathClicked, this, &FileExplorerFrame::updateFileExplorer);
 
     connect(ui->pbDelete, &QPushButton::clicked, ui->lvExplorer, &MDFileExplorerWidget::removeCurrentItem);
     connect(ui->pbRename, &QPushButton::clicked, ui->lvExplorer, &MDFileExplorerWidget::renameCurrentItem);
+
+    connect(ui->pbSetFile, &QPushButton::clicked, [&]() {
+        emit this->currentFileSignal(this->currentItemPath);
+    });
 
 }
 
