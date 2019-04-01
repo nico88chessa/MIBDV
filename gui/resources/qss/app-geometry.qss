@@ -198,6 +198,11 @@ QTabWidget {
     border: none;
 }
 
+.FileExplorerFrame #bottom {
+    min-height: 48px;
+    max-height: 48px;
+}
+
 .FileExplorerFrame #lvExplorer {
     padding: 2px 0px;
     border: none;

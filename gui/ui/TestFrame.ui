@@ -362,12 +362,12 @@
  <tabstops>
   <tabstop>leFilePath</tabstop>
   <tabstop>sbTileSize</tabstop>
-  <tabstop>dsbOffsetX</tabstop>
-  <tabstop>sbPulses</tabstop>
-  <tabstop>sbWaitTime</tabstop>
   <tabstop>dsbAngleMrad</tabstop>
+  <tabstop>dsbOffsetX</tabstop>
   <tabstop>dsbOffsetY</tabstop>
+  <tabstop>sbPulses</tabstop>
   <tabstop>sbFrequency</tabstop>
+  <tabstop>sbWaitTime</tabstop>
   <tabstop>sbWaitTimeYMovement</tabstop>
   <tabstop>cbRandomChoice</tabstop>
   <tabstop>sbRPointsPerTile</tabstop>

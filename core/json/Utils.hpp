@@ -22,6 +22,8 @@ public:
         header.append(file.readLine());
         header.append(file.readLine());
         header.append(file.readLine());
+        header.append(file.readLine());
+        header.append(file.readLine());
         QString lastLine = file.readLine();
         lastLine = lastLine.left(lastLine.size()-2);
         header.append(lastLine);
