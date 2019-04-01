@@ -5,7 +5,7 @@
 #include <QDebug>
 
 #include "configure.h"
-#include <Point.hpp>
+#include <BoundingBox.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -16,8 +16,7 @@ public:
 
 private:
     int numOfPoints;
-    PointI max;
-    PointI min;
+    BoundingBoxI boundingBox;
     QVector<PointI> points;
 
 public:

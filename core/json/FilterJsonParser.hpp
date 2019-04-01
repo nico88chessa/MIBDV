@@ -17,8 +17,9 @@
 namespace PROGRAM_NAMESPACE {
 
 static constexpr char* FILTER_JSON_NUMBER_OF_POINTS_KEY = "NumberOfPoints";
-static constexpr char* FILTER_JSON_NUMBER_MAX_KEY = "Max";
-static constexpr char* FILTER_JSON_NUMBER_MIN_KEY = "Min";
+static constexpr char* FILTER_JSON_BOUNDING_BOX_OBJ_KEY = "BoundingBox";
+static constexpr char* FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY = "Min";
+static constexpr char* FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY = "Max";
 static constexpr char* FILTER_JSON_NUMBER_COORDINATE_KEY = "Coordinate";
 
 class FilterJsonParser : public AbstractJsonParser<Filter> {
@@ -56,15 +57,22 @@ protected:
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 
-        QJsonValue minPoint = jsonObj.value(FILTER_JSON_NUMBER_MIN_KEY);
+        QJsonValue boundingBox = jsonObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_KEY);
+        if (boundingBox.isUndefined()) {
+            traceErr() << "Chiave BoundingBox non presente nel file json";
+            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+        }
+        QJsonObject boundingBoxObj = boundingBox.toObject();
+
+        QJsonValue minPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY);
         if (minPoint.isUndefined()) {
-            traceErr() << "Chiave Min non presente nel file json";
+            traceErr() << "Chiave BoundingBox Min non presente nel file json";
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 
-        QJsonValue maxPoint = jsonObj.value(FILTER_JSON_NUMBER_MAX_KEY);
+        QJsonValue maxPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY);
         if (maxPoint.isUndefined()) {
-            traceErr() << "Chiave Max non presente nel file json";
+            traceErr() << "Chiave BoundingBox Max non presente nel file json";
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 
@@ -134,15 +142,22 @@ protected:
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 
-        QJsonValue minPoint = jsonObj.value(FILTER_JSON_NUMBER_MIN_KEY);
+        QJsonValue boundingBox = jsonObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_KEY);
+        if (boundingBox.isUndefined()) {
+            traceErr() << "Chiave BoundingBox non presente nel file json";
+            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+        }
+        QJsonObject boundingBoxObj = boundingBox.toObject();
+
+        QJsonValue minPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY);
         if (minPoint.isUndefined()) {
-            traceErr() << "Chiave Min non presente nel file json";
+            traceErr() << "Chiave BoundingBox Min non presente nel file json";
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 
-        QJsonValue maxPoint = jsonObj.value(FILTER_JSON_NUMBER_MAX_KEY);
+        QJsonValue maxPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY);
         if (maxPoint.isUndefined()) {
-            traceErr() << "Chiave Max non presente nel file json";
+            traceErr() << "Chiave BoundingBox Max non presente nel file json";
             return JSON_PARSER_ERROR_KEY_NOT_FOUND;
         }
 

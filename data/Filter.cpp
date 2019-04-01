@@ -2,22 +2,22 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-Filter::Filter() : numOfPoints(0), min(), max(), points() {
+Filter::Filter() : numOfPoints(0), boundingBox(), points() {
 }
 
 int Filter::getNumOfPoints() const { return numOfPoints; }
 
 void Filter::setNumOfPoints(int value) { numOfPoints = value; }
 
-PointI Filter::getMax() const { return max; }
+PointI Filter::getMax() const { return boundingBox.getMax(); }
 
-void Filter::setMax(const PointI& value) { max = value; }
+void Filter::setMax(const PointI& value) { boundingBox.setMax(value); }
 
 void Filter::setMax(int x, int y) { this->setMax(PointI(x, y)); }
 
-PointI Filter::getMin() const { return min; }
+PointI Filter::getMin() const { return boundingBox.getMin(); }
 
-void Filter::setMin(const PointI& value) { min = value; }
+void Filter::setMin(const PointI& value) { boundingBox.setMin(value); }
 
 void Filter::setMin(int x, int y) { this->setMin(PointI(x, y)); }
 

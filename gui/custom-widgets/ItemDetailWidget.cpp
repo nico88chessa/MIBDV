@@ -22,6 +22,8 @@ void ItemDetailFilterWidget::model2View(const ItemDetailFilterBean& bean) {
 
     leNumberOfPoints->setText(QString::number(bean.getNumberOfPoints()));
     leName->setText(bean.getName());
+    leWidth->setText(QString::number(bean.getMaxPoint().getX() - bean.getMinPoint().getX()));
+    leHeight->setText(QString::number(bean.getMaxPoint().getY() - bean.getMinPoint().getY()));
     minPoint->setText(QString::number(bean.getMinPoint().getX()) + " - " + QString::number(bean.getMinPoint().getY()));
     maxPoint->setText(QString::number(bean.getMaxPoint().getX()) + " - " + QString::number(bean.getMaxPoint().getY()));
 
@@ -43,21 +45,41 @@ void ItemDetailFilterWidget::setupUi() {
     leNumberOfPoints->setLabel("Number of Points");
     leNumberOfPoints->setReadOnly(true);
 
+    lArea = new QLabel(this);
+    lArea->setText("Area");
+    lArea->setProperty(ItemDetailFilterWidget::QLABEL_TYPE_KEY, ItemDetailFilterWidget::QLABEL_TYPE_VALUE);
+
+    leWidth = new MDLineEdit(this);
+    leWidth->setLabel("Width [um]");
+    leWidth->setReadOnly(true);
+
+    leHeight = new MDLineEdit(this);
+    leHeight->setLabel("Height [um]");
+    leHeight->setReadOnly(true);
+
+    lBoundingBox = new QLabel(this);
+    lBoundingBox->setText("Bounding Box");
+    lBoundingBox->setProperty(ItemDetailFilterWidget::QLABEL_TYPE_KEY, ItemDetailFilterWidget::QLABEL_TYPE_VALUE);
+
     minPoint = new MDLineEdit(this);
-    minPoint->setLabel("Min Point");
+    minPoint->setLabel("Min Point (x - y) [um]");
     minPoint->setReadOnly(true);
 
     maxPoint = new MDLineEdit(this);
-    maxPoint->setLabel("Max Point");
+    maxPoint->setLabel("Max Point (x - y) [um]");
     maxPoint->setReadOnly(true);
 
     verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     gridLayout->addWidget(leName, 0, 0, 1, 1);
     gridLayout->addWidget(leNumberOfPoints, 1, 0, 1, 1);
-    gridLayout->addWidget(minPoint, 2, 0, 1, 1);
-    gridLayout->addWidget(maxPoint, 3, 0, 1, 1);
-    gridLayout->addItem(verticalSpacer, 4, 0, 1, 1);
+    gridLayout->addWidget(lArea, 2, 0, 1, 1);
+    gridLayout->addWidget(leWidth, 3, 0, 1, 1);
+    gridLayout->addWidget(leHeight, 4, 0, 1, 1);
+    gridLayout->addWidget(lBoundingBox, 5, 0, 1, 1);
+    gridLayout->addWidget(minPoint, 6, 0, 1, 1);
+    gridLayout->addWidget(maxPoint, 7, 0, 1, 1);
+    gridLayout->addItem(verticalSpacer, 8, 0, 1, 1);
 
 }
 
