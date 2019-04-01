@@ -5,6 +5,7 @@
 #include <QAbstractListModel>
 #include <QMetaType>
 #include <QString>
+#include <QLabel>
 
 #include <Point.hpp>
 #include <QGridLayout>
@@ -116,8 +117,16 @@ public:
     using ConstPtr = const ItemDetailFilterWidget*;
 
 private:
+    static constexpr char* QLABEL_TYPE_KEY = "type";
+    static constexpr char* QLABEL_TYPE_VALUE = "subheader";
+
+private:
     QGridLayout* gridLayout;
     MDLineEdit* leName;
+    QLabel* lArea;
+    MDLineEdit* leWidth;
+    MDLineEdit* leHeight;
+    QLabel* lBoundingBox;
     MDLineEdit* leNumberOfPoints;
     MDLineEdit* minPoint;
     MDLineEdit* maxPoint;
