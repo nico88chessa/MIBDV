@@ -1,6 +1,8 @@
 #ifndef IPG_LASER_TEMP_IPG_ASYNC_EXECUTOR_HPP
 #define IPG_LASER_TEMP_IPG_ASYNC_EXECUTOR_HPP
 
+#include <Logger.hpp>
+
 #include <laser-ipg-temporary/communication/abstract_async_executor.hpp>
 #include <laser-ipg-temporary/marshalling/marshallers.hpp>
 
@@ -95,6 +97,8 @@ public slots:
 
     virtual int receive() {
 
+        using namespace PROGRAM_NAMESPACE;
+
         const int offsets[4] = {0, 2, 4, 8};
 
         while (receiver->hasData()) {
@@ -104,11 +108,9 @@ public slots:
             // qui leggo l'header
             int errorCode = receiver->readBytes(stream1, offsets[3]);
             if ( errorCode > 0 ) {
-                qWarning() << "  - Ipg async executor: errore nella lettura dell'header con codice errore:" << errorCode;
+                traceWarn() << "Ipg async executor: errore nella lettura dell'header con codice errore:" << errorCode;
                 return IPG_ASYNC_EXECUTOR_HEADER_RECEIVE_ERROR;
             }
-
-//            qDebug() << "  - Ipg async executor: byte ricevuti:" << stream1;
 
             QDataStream streamHeader(stream1);
             streamHeader.setByteOrder(QDataStream::LittleEndian);
@@ -125,7 +127,7 @@ public slots:
             QByteArray stream2; // stream2 riguarda la parte dati e il codice CRC16
             errorCode = receiver->readBytes(stream2, dataSize+2);
             if (errorCode > 0) {
-                qWarning() << "  - Ipg async executor: errore nella lettura dei dati con codice errore:" << errorCode;
+                traceWarn() << "Ipg async executor: errore nella lettura dei dati con codice errore:" << errorCode;
                 return IPG_ASYNC_EXECUTOR_DATA_RECEIVE_ERROR;
             }
 
@@ -143,25 +145,25 @@ public slots:
             // controllo che il crc16 sia lo stesso fra inviato e calcolato
 //            const QByteArray& data = fullData.mid(0, dataSize);
             if (crc16Bytes != getCrc16(reinterpret_cast<const unsigned char*>(fullData.constData()), fullData.size()-2)) {
-                qWarning() << "  - Ipg async executor: errore nel controllo codice CRC16.";
+                traceWarn() << "Ipg async executor: errore nel controllo codice CRC16.";
                 return IPG_ASYNC_EXECUTOR_CRC16_ERROR;
             }
 
             MarshallerInterface::Ptr marshaller = this->marshallerFactory(answer);
             if (marshaller == NULL) {
-                qWarning() << "  - Ipg async executor: errore nel factoring marshaller.";
+                traceWarn() << "Ipg async executor: errore nel factoring marshaller.";
                 return IPG_ASYNC_EXECUTOR_MARSHALLER_FACTORY_ERROR;
             }
 
             OutputBean::Ptr outputBean = this->outputBeanFactory(answer);
             if (outputBean == NULL) {
-                qWarning() << "  - Ipg async executor: errore nel factoring bean.";
+                traceWarn() << "Ipg async executor: errore nel factoring bean.";
                 return IPG_ASYNC_EXECUTOR_BEAN_FACTORY_ERROR;
             }
 
             if (dataSize > 0)
                 if (!marshaller->unmarshall(fullData, outputBean)) {
-                    qWarning() << "  - Ipg async executor: errore nella fase di unmarshaller.";
+                    traceWarn() << "Ipg async executor: errore nella fase di unmarshaller.";
                     return IPG_ASYNC_EXECUTOR_UNMARSHALL_ERROR;
                 }
 

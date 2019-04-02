@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 #include <QTimer>
+#include <Logger.hpp>
 
 #include <laser-ipg-temporary/communication/abstract_sync_executor.hpp>
 #include <laser-ipg-temporary/utility/constants.hpp>
@@ -46,20 +47,21 @@ protected:
 
     virtual int syncCaller(const QByteArray& bytesIn, QByteArray& bytesOut) {
 
+        using namespace PROGRAM_NAMESPACE;
         if (!QTcpSocket::ConnectedState == socket.state()) {
-            qWarning() << "  - SocketSyncExecutor: socket connection KO";
+            traceWarn() << "SocketSyncExecutor: socket connection KO";
             return SOCKET_SYNC_EXECUTOR_SOCKET_CONNECTION_ERROR;
         }
 
         socket.write(bytesIn);
 
         if (!socket.waitForBytesWritten(CONNECTION_MAX_WRITE_TIME_MS)) {
-            qWarning() << "  - SocketSyncExecutor: timeout invio dati";
+            traceWarn() << "SocketSyncExecutor: timeout invio dati";
             return SOCKET_SYNC_EXECUTOR_WRITE_TIMEOUT_ERROR;
         }
 
         if (!socket.waitForReadyRead(CONNECTION_MAX_READ_TIME_MS)) {
-            qWarning() << "  - SocketSyncExecutor: timeout ricezione dati";
+            traceWarn() << "SocketSyncExecutor: timeout ricezione dati";
             return SOCKET_SYNC_EXECUTOR_READ_TIMEOUT_ERROR;
         }
 
@@ -100,22 +102,24 @@ public:
 
     void setupConnection(QString ipAddress, quint16 portNumber) {
 
+        using namespace PROGRAM_NAMESPACE;
         if (QTcpSocket::UnconnectedState == socket.state()) {
 
             this->ip = ipAddress;
             this->port = portNumber;
 
         } else
-            qWarning() << "  - SocketSyncExecutor: socket gia connesso all'host" << this->ip << ":" << this->port;
+            traceWarn() << "SocketSyncExecutor: socket gia connesso all'host" << this->ip << ":" << this->port;
 
     }
 
     bool createConnection() {
 
+        using namespace PROGRAM_NAMESPACE;
         socket.connectToHost(this->ip, this->port);
 
         if (!socket.waitForConnected(CONNECTION_DEFAULT_TIMEOUT_MS)) {
-            qDebug() << " - SocketSyncExecutor: connection refused nel metodo create connection";
+            traceErr() << "SocketSyncExecutor: connection refused nel metodo create connection";
             return false;
         }
 
@@ -128,8 +132,8 @@ public:
 public slots:
 
     void closeConnection() {
-
-        qDebug() << "  - SocketSyncExecutor: disconnessione automatica";
+        using namespace PROGRAM_NAMESPACE;
+        traceDebug() << "SocketSyncExecutor: disconnessione automatica";
         standbyTimer.stop();
         socket.close();
 

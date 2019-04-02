@@ -2,6 +2,7 @@
 #define IPG_LASER_TEMP_ABSTRACT_ASYNC_EXECUTOR_HPP
 
 #include <QByteArray>
+#include <Logger.hpp>
 
 #include <laser-ipg-temporary/marshalling/marshaller_interface.hpp>
 #include <laser-ipg-temporary/communication/abstract_sender.hpp>
@@ -53,21 +54,21 @@ public:
     template <typename I, typename M>
     int send(const I& input) {
 
+        using namespace PROGRAM_NAMESPACE;
         MarshallerInterface::Ptr marshaller = new M();
 
         QByteArray bytes;
 
         if (!marshaller->marshall(&input, bytes)) {
             delete marshaller;
-            qWarning() << "  - Abstract async executor: errore nel metodo marshall.";
+            traceWarn() << "Abstract async executor: errore nel metodo marshall.";
             return ASYNC_EXECUTOR_MARSHALLING_ERROR;
         }
 
-//        qDebug() << "  - Abstract async executor: spedisco:" << bytes;
         int errorCode = sender->sendData(bytes);
         if (errorCode > 0) {
             delete marshaller;
-            qWarning() << "  - Abstract async executor: errore nel metodo sendData con codice errore:" << errorCode;
+            traceWarn() << "Abstract async executor: errore nel metodo sendData con codice errore:" << errorCode;
             return ASYNC_EXECUTOR_SEND_ERROR;
         }
 

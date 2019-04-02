@@ -3,6 +3,7 @@
 
 #include <QHostAddress>
 #include <QPointer>
+#include <Logger.hpp>
 
 #include <laser-ipg-temporary/communication/socket_sync_executor.hpp>
 #include <laser-ipg-temporary/marshalling/marshallers.hpp>
@@ -23,17 +24,20 @@ private:
 private slots:
 
     void socketErrorTrace(QAbstractSocket::SocketError er) {
-        qDebug() << "  - Ipg sync interface: errore socket; codice errore: " << er;
+        using namespace PROGRAM_NAMESPACE;
+        traceErr() << "Ipg sync interface: errore socket; codice errore: " << er;
     }
 
     void socketConnected() {
+        using namespace PROGRAM_NAMESPACE;
         this->isConnected = true;
-        qDebug() << "  - Ipg sync interface: connessione avvenuto con successo. ";
+        traceInfo() << "Ipg sync interface: connessione avvenuto con successo. ";
     }
 
     void socketDisconnected() {
+        using namespace PROGRAM_NAMESPACE;
         this->isConnected = false;
-        qDebug() << "  - Ipg sync interface: disconnessione comunicazione.";
+        traceInfo() << "Ipg sync interface: disconnessione comunicazione.";
     }
 
 public:
@@ -79,9 +83,10 @@ public:
 
     bool getLaserId(GetLaserIdOutput& laserId, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -97,9 +102,10 @@ public:
 
     bool getNetworkSettings(GetNetworkSettingsOutput& networkSettings, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -115,9 +121,10 @@ public:
 
     bool setIpSettings(const QString& ip, quint16 port, const QString& mask, const QString& gateway, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -156,9 +163,10 @@ public:
 
     bool setCommandTimeout(quint32 timeoutMs, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -178,9 +186,10 @@ public:
 
     bool getCriticalErrorCounter(GetCriticalErrorCounterOutput& criticalErrorCounter, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -196,9 +205,10 @@ public:
 
     bool getLaserModelInfo(GetLaserModelInfoOutput& laserModelInfo, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -214,9 +224,10 @@ public:
 
     bool getLaserSoftwareInfo(GetLaserSoftwareInfoOutput& laserSoftwareInfo, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -232,9 +243,10 @@ public:
 
     bool getModeParameter(quint16 indexMode, GetModeParameterOutput& getModeParameter, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -253,9 +265,10 @@ public:
 
     bool getAlarmCounter(GetAlarmCounterOutput& alarmCounters, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -282,9 +295,10 @@ public:
             SetLaserInterfaceOutput& result,
             IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -324,9 +338,10 @@ public:
             SetLaserInterfaceOutput& result,
             IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -365,9 +380,10 @@ public:
             quint16& miConfig,
             IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -395,9 +411,10 @@ public:
 
     bool reset(IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -414,9 +431,10 @@ public:
 
     bool resetCriticalError(const QString& ipgServiceString, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -436,9 +454,10 @@ public:
 
     bool setModeIndex(quint16 mode, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -458,9 +477,10 @@ public:
 
     bool setPsMode(bool powerSupply, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -480,9 +500,10 @@ public:
 
     bool setGlMode(bool guideLaser, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -502,9 +523,10 @@ public:
 
     bool setFrequency(float frequency, bool& result, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -528,9 +550,10 @@ public:
 
     bool setPower(float power, bool& result, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -554,9 +577,10 @@ public:
 
     bool setEE(bool emission, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -576,9 +600,10 @@ public:
 
     bool setEM(bool modulation, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 
@@ -598,9 +623,10 @@ public:
 
     bool getLaserStatus(GetLaserStatusOutput& laserStatus, IPG_USHORT& executionCode) {
 
+        using namespace PROGRAM_NAMESPACE;
         executionCode = 0;
         if (syncExecutor.isNull()) {
-            qDebug() << "  - Ipg sync interface non e' stato inizializzato";
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
             return false;
         }
 

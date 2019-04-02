@@ -1,6 +1,8 @@
 #ifndef IPG_LASER_TEMP_IPG_MARSHALLER_HPP
 #define IPG_LASER_TEMP_IPG_MARSHALLER_HPP
 
+#include <Logger.hpp>
+
 #include <laser-ipg-temporary/marshalling/marshaller_interface.hpp>
 #include <laser-ipg-temporary/beans/input_bean.hpp>
 #include <laser-ipg-temporary/beans/output_bean.hpp>
@@ -51,9 +53,6 @@ protected:
 
         stream.writeRawData(dataBytes.constData(), dataBytes.size());
 
-//        qDebug() << "marshall before crc16 byte size: " << bytes.size();
-//        qDebug() << "marshall before crc16 bytes: " << bytes;
-
         const unsigned char* bytes4Crc16 = reinterpret_cast<const unsigned char*>(bytes.constData());
         if (bytes4Crc16 == NULL)
             return false;
@@ -61,16 +60,13 @@ protected:
         IPG_USHORT crc16 = getCrc16(bytes4Crc16, bytes.size());
         stream << crc16;
 
-//        qDebug() << "marshall byte size: " << bytes.size();
-//        qDebug() << "marshall bytes: " << bytes;
-//        qDebug() << "marshall crc16: " << crc16;
-
         return true;
 
     }
 
     bool unmarshall(const QByteArray& bytes, O* output) {
 
+        using namespace PROGRAM_NAMESPACE;
         // offset dei singoli campi
         const int offsets[4] = {0, 2, 4, 8};
 
@@ -93,14 +89,10 @@ protected:
         streamCrc16 >> crc16Bytes;
         outputBean->setCrc16(crc16Bytes);
 
-//        qDebug() << "unmarshall crc16: " << outputBean->getCrc16();
-//        qDebug() << "unmarshall bytes: " << bytes;
-//        qDebug() << "unmarshall byte size: " << bytes.size();
-
         // controllo che il crc16 sia lo stesso fra inviato e calcolato
         const QByteArray& data = bytes.mid(0, bytes.size()-2);
         if (crc16Bytes != getCrc16(reinterpret_cast<const unsigned char*>(data.constData()), data.size())) {
-            qWarning() << "  - Errore nel controllo codice CRC16 in IpgMarshaller.";
+            traceWarn() << "Errore nel controllo codice CRC16 in IpgMarshaller.";
             return false;
         }
 

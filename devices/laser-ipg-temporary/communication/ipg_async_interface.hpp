@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 #include <QHostAddress>
+#include <Logger.hpp>
 
 #include <laser-ipg-temporary/communication/abstract_sender.hpp>
 #include <laser-ipg-temporary/communication/abstract_receiver.hpp>
@@ -128,17 +129,20 @@ signals:
 public slots:
 
     void connectedHandler() {
-        qDebug() << "  - Ipg async interface: connessione avvenuta con successo.";
+        using namespace PROGRAM_NAMESPACE;
+        traceInfo() << "Ipg async interface: connessione avvenuta con successo.";
         emit connectedSignal();
     }
 
     void disconnectHandler() {
-        qDebug() << "  - Ipg async interface: disconnessione avvenuta.";
+        using namespace PROGRAM_NAMESPACE;
+        traceInfo() << "Ipg async interface: disconnessione avvenuta.";
         emit disconnectedSignal();
     }
 
     void errorHandler(QAbstractSocket::SocketError error) {
-        qDebug() << "  - Ipg async interface: errore socket" << error;
+        using namespace PROGRAM_NAMESPACE;
+        traceErr() << "Ipg async interface: errore socket" << error;
         emit errorSignal(error);
     }
 
@@ -189,10 +193,11 @@ public:
 
     bool connectToLaser(const QString& address, quint16 port) {
 
+        using namespace PROGRAM_NAMESPACE;
         socket->connectToHost(address, port);
 
         if (!socket->waitForConnected(CONNECTION_DEFAULT_TIMEOUT_MS)) {
-            qDebug() << "  - Ipg async interface: connessione rifiutata.";
+            traceErr() << "Ipg async interface: connessione rifiutata.";
             return false;
         }
 

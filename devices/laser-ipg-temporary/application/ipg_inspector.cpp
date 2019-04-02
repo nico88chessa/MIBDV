@@ -1,4 +1,5 @@
 #include "ipg_inspector.h"
+#include <Logger.hpp>
 
 using namespace ipg;
 
@@ -46,10 +47,11 @@ void IpgInspector::setRefreshTime(int refreshTime) {
 
 void IpgInspector::setStandbyTime(int standbyMaxTime) {
 
+    using namespace PROGRAM_NAMESPACE;
     int refreshTimerInterval = refreshTimer.interval();
 
     if (standbyMaxTime < refreshTimerInterval) {
-        qDebug() << "  - Ipg inspector: standby time troppo basso; lo imposto a 5 volte il tempo di refresh.";
+        traceDebug() << "Ipg inspector: standby time troppo basso; lo imposto a 5 volte il tempo di refresh.";
         standbyMaxTime = refreshTimerInterval * 5;
     }
 
@@ -59,19 +61,21 @@ void IpgInspector::setStandbyTime(int standbyMaxTime) {
 
 IpgInspector::~IpgInspector() {
 
-    qDebug() << "  - Ipg inspector: in eliminazione.";
+    using namespace PROGRAM_NAMESPACE;
+    traceDebug() << "Ipg inspector: in eliminazione.";
     refreshTimer.stop();
     standbyTimer.stop();
-    qDebug() << "  - Ipg inspector: timer fermato.";
+    traceDebug() << "Ipg inspector: timer fermato.";
     laserAsyncInterface.closeConnection();
-    qDebug() << "  - Ipg inspector: eliminato.";
+    traceDebug() << "Ipg inspector: eliminato.";
 
 }
 
 void IpgInspector::process() {
 
+    using namespace PROGRAM_NAMESPACE;
     if (!laserAsyncInterface.getLaserStatus())
-        qDebug() << "  - Ipg inspector: errore nella chiamata tcp per avere lo stato";
+        traceWarn() << "Ipg inspector: errore nella chiamata tcp per avere lo stato";
 
 }
 
@@ -126,7 +130,8 @@ void IpgInspector::startProcess() {
 
 void IpgInspector::stopProcess() {
 
-    qDebug() << "  - Ipg inspector: fermo il processo.";
+    using namespace PROGRAM_NAMESPACE;
+    traceDebug() << "Ipg inspector: fermo il processo.";
     disconnect(this, SIGNAL(disconnectedSignal()), this, SLOT(restartProcess()));
 
     if (standbyTimer.isActive())

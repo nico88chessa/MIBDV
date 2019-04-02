@@ -3,6 +3,7 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <Logger.hpp>
 
 #include <laser-ipg-temporary/marshalling/marshaller_interface.hpp>
 #include <laser-ipg-temporary/utility/constants.hpp>
@@ -51,33 +52,30 @@ public:
     template <typename I, typename O, typename M>
     int execute(const I& input, O& output) {
 
+        using namespace PROGRAM_NAMESPACE;
         MarshallerInterface::Ptr marshaller = new M();
 
         QByteArray bytesIn;
 
         if (!marshaller->marshall(&input, bytesIn)) {
             delete marshaller;
-            qWarning() << "  - Errore SyncExecutor nel metodo marshall.";
+            traceWarn() << "Errore SyncExecutor nel metodo marshall.";
             return SYNC_EXECUTOR_MARSHALLING_ERROR;
         }
-
-//        qDebug() << "bytesInput: " << bytesIn;
 
         QByteArray bytesOut;
         int errorCode = syncCaller(bytesIn, bytesOut);
         if (errorCode > 0) {
             delete marshaller;
-            qWarning() << "  - Errore SyncExecutor nel metodo syncCaller con codice errore:" << errorCode;
+            traceWarn() << "Errore SyncExecutor nel metodo syncCaller con codice errore:" << errorCode;
             return SYNC_EXECUTOR_SEND_ERROR;
         }
 
         if (!marshaller->unmarshall(bytesOut, &output)) {
             delete marshaller;
-            qWarning() << "  - Errore SyncExecutor nel metodo unmarshall.";
+            traceWarn() << "Errore SyncExecutor nel metodo unmarshall.";
             return SYNC_EXECUTOR_UNMARSHALLING_ERROR;
         }
-
-//        qDebug() << "bytesOutput: " << bytesOut;
 
         delete marshaller;
 
