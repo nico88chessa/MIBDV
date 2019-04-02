@@ -1,16 +1,28 @@
 SET(ITEMS
-    AbstractDevice
-    AbstractDeviceInspector
-    AbstractConnectedDeviceInspector
-    AbstractMotionInspector
-    MotionInspectorImpl
-    AbstractPLC
-    AbstractCN
-    AbstractDeviceConnectionWatcher
-    IOManager
-    IOInspector
-    MotionManager
-    MotionManagerImpl
+    get_alarm_counter_marshaller
+    get_critical_error_counter_marshaller
+    get_laser_id_marshaller
+    get_laser_interface_marshaller
+    get_laser_model_info_marshaller
+    get_laser_software_info_marshaller
+    get_laser_status_marshaller
+    get_mode_parameter_marshaller
+    get_network_settings_marshaller
+    ipg_marshaller
+    marshallers
+    marshaller_interface
+    reset_critical_error_marshaller
+    reset_marshaller
+    set_command_timeout_marshaller
+    set_ee_marshaller
+    set_em_marshaller
+    set_frequency_marshaller
+    set_gl_mode_marshaller
+    set_ip_settings_marshaller
+    set_laser_interface_marshaller
+    set_mode_index_marshaller
+    set_power_marshaller
+    set_ps_mode_marshaller
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -30,6 +42,10 @@ FOREACH(ITEM ${ITEMS})
         SET(QRC_FILES ${QRC_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qrc")
     ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qrc")
 
+    IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qss")
+        SET(QSS_FILES ${QSS_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qss")
+    ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qss")
+
 ENDFOREACH(ITEM)
 
 SET(PROJECT_SOURCES ${PROJECT_SOURCES} ${SOURCES} CACHE INTERNAL "")
@@ -45,8 +61,6 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    galil
-    laser-ipg-temporary
 )
 
 FOREACH(item ${SUB_FOLDERS})

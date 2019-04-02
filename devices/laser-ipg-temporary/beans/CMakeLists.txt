@@ -1,16 +1,27 @@
 SET(ITEMS
-    AbstractDevice
-    AbstractDeviceInspector
-    AbstractConnectedDeviceInspector
-    AbstractMotionInspector
-    MotionInspectorImpl
-    AbstractPLC
-    AbstractCN
-    AbstractDeviceConnectionWatcher
-    IOManager
-    IOInspector
-    MotionManager
-    MotionManagerImpl
+    get_alarm_counter
+    get_critical_error_counter
+    get_laser_id
+    get_laser_interface
+    get_laser_model_info
+    get_laser_software_info
+    get_laser_status
+    get_mode_parameter
+    get_network_settings
+    input_bean
+    output_bean
+    reset
+    reset_critical_error
+    set_command_timeout
+    set_ee
+    set_em
+    set_frequency
+    set_gl_mode
+    set_ip_settings
+    set_laser_interface
+    set_mode_index
+    set_power
+    set_ps_mode
     )
 
 FOREACH(ITEM ${ITEMS})
@@ -30,6 +41,10 @@ FOREACH(ITEM ${ITEMS})
         SET(QRC_FILES ${QRC_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qrc")
     ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qrc")
 
+    IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qss")
+        SET(QSS_FILES ${QSS_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qss")
+    ENDIF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ITEM}.qss")
+
 ENDFOREACH(ITEM)
 
 SET(PROJECT_SOURCES ${PROJECT_SOURCES} ${SOURCES} CACHE INTERNAL "")
@@ -45,8 +60,6 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QRC_FILES: ${PROJECT_QRC_FILES}")
 MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
-    galil
-    laser-ipg-temporary
 )
 
 FOREACH(item ${SUB_FOLDERS})
