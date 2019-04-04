@@ -2,6 +2,7 @@ SET(ITEMS
     constants
     datatype
     utils
+    IpgYLPNLaserConfiguration
     )
 
 FOREACH(ITEM ${ITEMS})

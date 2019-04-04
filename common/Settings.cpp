@@ -245,7 +245,9 @@ void Settings::loadValuesFromFile() {
     traceDebug() << "axisZOperativeAccMms2:" << axisZOperativeAccMms2;
     traceDebug() << "axisZOperativeDecMms2:" << axisZOperativeDecMms2;
 
-    traceExit;
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    ipgYLPNLaserIpAddress = settings.value(IPG_YLPN_ETHERNET_LASER_IP, IPG_YLPN_ETHERNET_LASER_IP_DFLT).value<QString>();
+    ipgYLPNLaserPort = settings.value(IPG_YLPN_ETHERNET_LASER_PORT, IPG_YLPN_ETHERNET_LASER_PORT_DFLT).value<quint16>();
 
 }
 
@@ -383,6 +385,10 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_PLC_NUMBER_ANALOG_OUTPUT, galilPLCNumberAnalogOutput);
     } else
         settings.remove(GALIL_PLC_PREFIX);
+
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    settings.setValue(IPG_YLPN_ETHERNET_LASER_IP, ipgYLPNLaserIpAddress);
+    settings.setValue(IPG_YLPN_ETHERNET_LASER_PORT, ipgYLPNLaserPort);
 
     settings.sync();
 

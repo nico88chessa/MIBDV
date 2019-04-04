@@ -5,6 +5,7 @@
 
 #include <MotionManager.hpp>
 #include <IOManager.hpp>
+#include <laser-ipg-temporary/communication/ipg_sync_interface.hpp>
 
 class TestFrame;
 
@@ -21,9 +22,10 @@ private:
     TestFrame* qPtr;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
+    QSharedPointer<ipg::IpgSyncInterface> ipgInterface;
 
     bool isProcessStopped;
-
+    bool isLaserInitialized;
 
 public:
     TestFrameLogic();
@@ -31,10 +33,13 @@ public:
 
     void setupMotionManager(const QSharedPointer<mibdv::MotionManager>& motionManager);
     void setupIOManager(const QSharedPointer<mibdv::IOManager>& ioManager);
+    void setupLaserIpgYLPN(const QSharedPointer<ipg::IpgSyncInterface>& ipgInterface);
 
 private slots:
     void startProcess();
     void stopProcess();
+
+    void changeGuideLaserState();
 
 };
 

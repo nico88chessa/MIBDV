@@ -14,6 +14,9 @@
 #include <AbstractDeviceConnectionWatcher.hpp>
 #include <AbstractMotionInspector.hpp>
 
+#include <laser-ipg-temporary/communication/ipg_sync_interface.hpp>
+#include <laser-ipg-temporary/utility/IpgYLPNLaserConfiguration.hpp>
+
 namespace Ui {
 class MainWindow;
 }
@@ -37,6 +40,9 @@ private:
     QSharedPointer<PROGRAM_NAMESPACE::IAbstractDevice> plc; // utilizzato da motionManager e ioManager
     QScopedPointer<PROGRAM_NAMESPACE::AbstractDeviceConnectionWatcher> cnConnectionWatcher;
     QScopedPointer<PROGRAM_NAMESPACE::AbstractDeviceConnectionWatcher> plcConnectionWatcher;
+
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    QSharedPointer<ipg::IpgSyncInterface> ipgInterface;
 
 public:
 
@@ -65,6 +71,9 @@ private slots:
     void startDevices();
     void stopDevices();
 
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    void initIpgYLPNLaser();
+
 signals:
     void motionStatusUpdateSignal(const QVariant& status);
     void galilPLCStatusUpdateSignal(const QVariant& status);
@@ -72,6 +81,9 @@ signals:
                               const PROGRAM_NAMESPACE::DigitalOutputStatus& digitalOutputs,
                               const PROGRAM_NAMESPACE::AnalogInputStatus& analogInputs);
     void currentFileSignal(const QString& filePath);
+
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    void laserIpgYLPNinitializedSignal();
 
 };
 

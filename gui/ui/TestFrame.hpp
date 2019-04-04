@@ -2,11 +2,13 @@
 #define TESTFRAME_HPP
 
 #include <QFrame>
+#include <QTabWidget>
 
 #include <IOManager.hpp>
 #include <MotionManager.hpp>
 #include <MotionBean.hpp>
 #include <DigitalInputValue.hpp>
+#include <laser-ipg-temporary/communication/ipg_sync_interface.hpp>
 
 class TestFrameLogic;
 
@@ -47,26 +49,35 @@ private:
     static constexpr double TEST_FRAME_DSB_STEP = 0.1;
     static constexpr double TEST_FRAME_ANGLE_STEP = 0.001;
 
+    static constexpr int TEST_FRAME_LASER_MIN_POWER = 0;
+    static constexpr int TEST_FRAME_LASER_MAX_POWER = 100;
+    static constexpr int TEST_FRAME_LASER_POWER_STEP = 1;
+
     Ui::TestFrame *ui;
     TestFrameLogic* dPtr;
     PROGRAM_NAMESPACE::MotionBean motionBean;
     PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
+    bool laserParametersChanged;
 
 public:
     explicit TestFrame(QWidget *parent = nullptr);
     void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
-            const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
+            const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager,
+            const QSharedPointer<ipg::IpgSyncInterface>& ipgInterface);
     ~TestFrame();
-
 
 public slots:
     void updateMotionBean(const PROGRAM_NAMESPACE::MotionBean& b);
     void updateDigitalInputStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& i);
     void setFilePath(const QString& filePath);
+    void laserIpgYLPNConfigurationReady();
 
 private:
     void setupUi();
     void setupSignalsAndSlots();
+    void updateTabLaserLabel(bool setAsterisk);
+
+    bool eventFilter(QObject *object, QEvent *event);
 
 };
 

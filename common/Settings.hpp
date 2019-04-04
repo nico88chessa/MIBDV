@@ -113,6 +113,11 @@ public:
     DeviceKey getMachinePLCType() const { return machinePLCType; }
     int getMachineIORefreshIntervalMs() const { return machineIORefreshIntervalMs; }
 
+    // WARNING NIC 03/04/2019 - variabili laser YLPN (da rifare)
+    QString getIpgYLPNLaserIpAddress() const { return ipgYLPNLaserIpAddress; }
+    void setIpgYLPNLaserIpAddress(const QString& value) { ipgYLPNLaserIpAddress = value; }
+    quint16 getIpgYLPNLaserPort() const { return ipgYLPNLaserPort; }
+    void setIpgYLPNLaserPort(const quint16& value) { ipgYLPNLaserPort = value; }
 
 private:
     // ASSE X
@@ -192,6 +197,10 @@ private:
     int galilPLCNumberAnalogInput;
     int galilPLCNumberAnalogOutput;
     QString galilPLCIpAddress;
+
+    // WARNING NIC 03/04/2019 - variabili laser YLPN (da rifare)
+    QString ipgYLPNLaserIpAddress;
+    quint16 ipgYLPNLaserPort;
 
 };
 

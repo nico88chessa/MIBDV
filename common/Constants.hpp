@@ -179,6 +179,12 @@ constexpr int GALIL_PLC_NUMBER_ANALOG_INPUT_DFLT = 8;
 constexpr int GALIL_PLC_NUMBER_ANALOG_OUTPUT_DFLT = 0;
 constexpr char GALIL_PLC_IP_ADDRESS_DFLT[] = "169.254.12.11";
 
+constexpr char IPG_YLPN_ETHERNET_LASER_PREFIX[] = "IpgYLPNEthernetLaser";
+constexpr char IPG_YLPN_ETHERNET_LASER_IP[] = "IpgYLPNEthernetLaser/IpAddress";
+constexpr char IPG_YLPN_ETHERNET_LASER_PORT[] = "IpgYLPNEthernetLaser/Port";
+
+constexpr char IPG_YLPN_ETHERNET_LASER_IP_DFLT[] = "169.254.12.12";
+constexpr quint16 IPG_YLPN_ETHERNET_LASER_PORT_DFLT = 5100;
 
 }
 

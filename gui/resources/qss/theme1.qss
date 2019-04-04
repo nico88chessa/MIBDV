@@ -253,6 +253,10 @@ QSlider::add-page:vertical {
     color: red;
 }
 
+.QPushButton::disabled {
+    background-color: rgba(128, 128, 128, 0.5);
+}
+
 
 
 

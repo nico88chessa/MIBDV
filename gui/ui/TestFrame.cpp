@@ -14,8 +14,10 @@
 
 #include <third-party/ipg-marking-library-wrapper/include/Scanner.h>
 #include <third-party/ipg-marking-library-wrapper/include/PointList.h>
+#include <laser-ipg-temporary/utility/IpgYLPNLaserConfiguration.hpp>
 
 #include <Logger.hpp>
+#include <QMouseEvent>
 
 #include <json/FilterJsonParser.hpp>
 
@@ -26,9 +28,8 @@ using namespace PROGRAM_NAMESPACE;
  *********************************************/
 
 TestFrameLogic::TestFrameLogic() :
-    isProcessStopped(false) {
-
-}
+    isProcessStopped(false),
+    isLaserInitialized(false) { }
 
 TestFrameLogic::~TestFrameLogic() { }
 
@@ -44,6 +45,14 @@ void TestFrameLogic::setupIOManager(const QSharedPointer<IOManager>& ioManager) 
 
     traceEnter;
     this->ioManager = ioManager;
+    traceExit;
+
+}
+
+void TestFrameLogic::setupLaserIpgYLPN(const QSharedPointer<ipg::IpgSyncInterface>& ipgInterface) {
+
+    traceEnter;
+    this->ipgInterface = ipgInterface;
     traceExit;
 
 }
@@ -120,6 +129,7 @@ void TestFrameLogic::startProcess() {
     QScopedPointer<IAbstractJsonParser> parser(new FilterJsonParser());
     Filter filter;
     parser->decodeJson(fileData.toUtf8(), &filter);
+    QApplication::processEvents();
 
     int pointsNumber = filter.getNumOfPoints();
 //    mibdv::PointSetI set(pointsNumber);
@@ -204,7 +214,6 @@ void TestFrameLogic::startProcess() {
         grid.addPoint(p);
 
     int countTile = 0;
-    return;
 
     // griglia creata
 
@@ -476,6 +485,27 @@ void TestFrameLogic::stopProcess() {
     traceExit;
 }
 
+void TestFrameLogic::changeGuideLaserState() {
+
+    traceEnter;
+
+    bool currentGuideLaserStatus = qPtr->ui->cbGuideLaser->isChecked();
+    bool valueToSet = !currentGuideLaserStatus;
+
+    ipg::IPG_USHORT res;
+
+    if (!this->ipgInterface->setGlMode(valueToSet, res)) {
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile settare il diodo rosso");
+        diag.exec();
+        return;
+    }
+
+
+    traceExit;
+
+}
+
 
 
 /**********************************************
@@ -484,7 +514,8 @@ void TestFrameLogic::stopProcess() {
 
 TestFrame::TestFrame(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::TestFrame), dPtr(new TestFrameLogic()) {
+    ui(new Ui::TestFrame), dPtr(new TestFrameLogic()),
+    laserParametersChanged(false) {
 
     traceEnter;
 
@@ -497,13 +528,14 @@ TestFrame::TestFrame(QWidget *parent) :
 
 }
 
-void TestFrame::setupDevices(
-        const QSharedPointer<MotionManager> &motionManager,
-        const QSharedPointer<IOManager> &ioManager) {
+void TestFrame::setupDevices(const QSharedPointer<MotionManager> &motionManager,
+        const QSharedPointer<IOManager> &ioManager,
+        const QSharedPointer<ipg::IpgSyncInterface>& ipgInterface) {
 
     traceEnter;
     dPtr->setupMotionManager(motionManager);
     dPtr->setupIOManager(ioManager);
+    dPtr->setupLaserIpgYLPN(ipgInterface);
     traceExit;
 
 }
@@ -540,11 +572,39 @@ void TestFrame::setFilePath(const QString& filePath) {
 
 }
 
+void TestFrame::laserIpgYLPNConfigurationReady() {
+
+    traceEnter;
+
+    IpgYLPNLaserConfiguration& configuration = IpgYLPNLaserConfiguration::instance();
+    for (auto&& item: configuration.getModes())
+        ui->cbLaserPulseWidth->addItem(QString::number(item.pulseDuration), qRound(item.pulseDuration));
+
+    ui->cbLaserPulseWidth->setCurrentIndex(configuration.getCurrentModeIndex());
+    ui->sbLaserPower->setValue(qRound(configuration.getCurrentPower()));
+
+    ui->hsLaserPower->setEnabled(true);
+    ui->sbLaserFrequency->setEnabled(true);
+    ui->hsLaserFrequency->setEnabled(true);
+    ui->cbLaserPulseWidth->setEnabled(true);
+    ui->sbLaserPower->setEnabled(true);
+    ui->pbGuideLaser->setEnabled(true);
+    ui->pbSet->setEnabled(true);
+    ui->pbReset->setEnabled(true);
+
+    dPtr->isLaserInitialized = true;
+
+    traceExit;
+
+}
+
 void TestFrame::setupUi() {
 
     traceEnter;
 
     ui->setupUi(this);
+
+    ui->tabWidget->tabBar()->installEventFilter(this);
 
     ui->leFilePath->setReadOnly(true);
 
@@ -571,6 +631,22 @@ void TestFrame::setupUi() {
     ui->dsbAngleMrad->setDecimals(3);
     ui->dsbAngleMrad->setSingleStep(TEST_FRAME_ANGLE_STEP);
 
+    ui->sbLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
+    ui->hsLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
+    ui->hsLaserPower->setSingleStep(TEST_FRAME_LASER_POWER_STEP);
+
+    ui->cbGuideLaser->setEnabled(false);
+    ui->cbLaserInitialized->setEnabled(false);
+    ui->hsLaserPower->setEnabled(false);
+    ui->sbLaserFrequency->setEnabled(false);
+    ui->hsLaserFrequency->setEnabled(false);
+    ui->cbLaserPulseWidth->setEnabled(false);
+    ui->sbLaserPower->setEnabled(false);
+    ui->pbGuideLaser->setEnabled(false);
+    ui->pbSet->setEnabled(false);
+    ui->pbReset->setEnabled(false);
+
+
     traceExit;
 
 }
@@ -581,6 +657,189 @@ void TestFrame::setupSignalsAndSlots() {
     connect(ui->pbStartProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::startProcess);
     connect(ui->pbStopProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::stopProcess);
 
+    // signals/slots della tab laser
+    connect(ui->sbLaserPower, static_cast<void (MDSpinBox::*)(int)>(&MDSpinBox::valueChanged), [&](int value) {
+        this->ui->hsLaserPower->setValue(value);
+        laserParametersChanged = true;
+        this->updateTabLaserLabel(true);
+    });
+    connect(ui->hsLaserPower, &QSlider::valueChanged, [&](int value) {
+        this->ui->sbLaserPower->setValue(value);
+        laserParametersChanged = true;
+        this->updateTabLaserLabel(true);
+    });
+    connect(ui->sbLaserFrequency, static_cast<void (MDSpinBox::*)(int)>(&MDSpinBox::valueChanged), [&](int value) {
+        this->ui->hsLaserFrequency->setValue(value);
+        laserParametersChanged = true;
+        this->updateTabLaserLabel(true);
+    });
+    connect(ui->hsLaserFrequency, &QSlider::valueChanged, [&](int value) {
+        this->ui->sbLaserFrequency->setValue(value);
+        laserParametersChanged = true;
+        this->updateTabLaserLabel(true);
+    });
+    connect(ui->cbLaserPulseWidth, static_cast<void (MDComboBox::*)(int)>(&MDComboBox::currentIndexChanged), [&](int index) {
+        IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
+        IpgYLPNLaserConfiguration::Mode currentMode = laserConfiguration.getMode(index);
+        ui->sbLaserFrequency->setRange(laserConfiguration.getMode(index).minFrequency, laserConfiguration.getMode(index).maxFrequency);
+        ui->sbLaserFrequency->setValue(laserConfiguration.getMode(index).nominalFrequency);
+        ui->hsLaserFrequency->setRange(laserConfiguration.getMode(index).minFrequency, laserConfiguration.getMode(index).maxFrequency);
+        ui->hsLaserFrequency->setValue(laserConfiguration.getMode(index).nominalFrequency);
+        laserParametersChanged = true;
+        this->updateTabLaserLabel(true);
+    });
+
+    connect(ui->pbSet, &QPushButton::clicked, [&]() {
+        int power = ui->sbLaserPower->value();
+        int frequency = ui->sbLaserFrequency->value();
+        int modeIndex = ui->cbLaserPulseWidth->currentIndex();
+
+        IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
+        laserConfiguration.setCurrentPower(power);
+        laserConfiguration.setCurrentModeIndex(modeIndex);
+        laserConfiguration.setCurrentFrequency(frequency);
+        laserParametersChanged = false;
+        this->updateTabLaserLabel(false);
+
+    });
+
+    connect(ui->pbReset, &QPushButton::clicked, [&]() {
+
+        if (dPtr->isLaserInitialized) {
+            IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
+            int laserPower = qRound(laserConfiguration.getCurrentPower());
+            this->ui->hsLaserPower->setValue(laserPower);
+            ui->sbLaserPower->setValue(laserPower);
+
+            int currentModeIndex = laserConfiguration.getCurrentModeIndex();
+            int currentFrequency = laserConfiguration.getCurrentFrequency();
+            ui->sbLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
+            ui->sbLaserFrequency->setValue(currentFrequency);
+
+            ui->hsLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
+            ui->hsLaserFrequency->setValue(currentFrequency);
+        }
+
+        laserParametersChanged = false;
+        this->updateTabLaserLabel(false);
+
+    });
+
+    connect(ui->pbGuideLaser, &QPushButton::clicked, dPtr, &TestFrameLogic::changeGuideLaserState);
+
+//    connect(ui->tabWidget, &QTabWidget::currentChanged, [&](int index) {
+
+//        if (this->laserParametersChanged) {
+//            int currentIndex = ui->tabWidget->currentIndex();
+//            if ((currentIndex == 1) && (index != 1)) {
+
+
+//                DialogAlert diag;
+//                diag.setupLabels("Warning", "Se non si impostano i parametri del laser, verranno ripristinati gli ultimi salvati. Continuare?");
+
+//                if (diag.exec() == QDialog::Accepted) {
+
+//                    IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
+//                    int laserPower = qRound(laserConfiguration.getCurrentPower());
+//                    this->ui->hsLaserPower->setValue(laserPower);
+//                    ui->sbLaserPower->setValue(laserPower);
+
+//                    int currentModeIndex = laserConfiguration.getCurrentModeIndex();
+//                    int currentFrequency = laserConfiguration.getCurrentFrequency();
+//                    ui->sbLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
+//                    ui->sbLaserFrequency->setValue(currentFrequency);
+
+//                    ui->hsLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
+//                    ui->hsLaserFrequency->setValue(currentFrequency);
+
+//                    laserParametersChanged = false;
+//                    this->updateTabUiLaserChanged(false);
+
+//                } else {
+
+//                    ui->tabWidget->setCurrentIndex(1);
+
+//                }
+//            }
+//        }
+
+//    });
+
     traceExit;
+
+}
+
+void TestFrame::updateTabLaserLabel(bool setAsterisk) {
+
+    int tabLaserIndex = 1;
+    QString tabText = ui->tabWidget->tabText(tabLaserIndex);
+
+    if (!(tabText.right(1).compare("*") == 0) && setAsterisk)
+        ui->tabWidget->setTabText(tabLaserIndex, tabText.append("*"));
+
+    if ((tabText.right(1).compare("*") == 0) && !setAsterisk)
+        ui->tabWidget->setTabText(tabLaserIndex, tabText.left(tabText.size()-1));
+
+}
+
+bool TestFrame::eventFilter(QObject* object, QEvent* event) {
+
+    // NOTE NIC 04/04/2019 - filtro gli eventi del cambio tab;
+    // se modifico qualche parametro e non lo imposto, informo l'utente che i dati
+    // saranno resettati con una dialog
+    if (qobject_cast<QTabBar*>(object)) {
+
+        // abilito solamente il click del mouse
+        if (event->type() == QEvent::Wheel || event->type() == QEvent::KeyPress)
+            return true;
+
+        if (this->laserParametersChanged) {
+
+            if (event->type() == QEvent::MouseButtonPress) {
+
+                int currentIndex = ui->tabWidget->currentIndex();
+
+                if (currentIndex == 1) {
+                    auto mouseEvent = static_cast<QMouseEvent*>(event);
+                    auto tabBar = ui->tabWidget->tabBar();
+                    int tabIndex = tabBar->tabAt(mouseEvent->pos());
+
+                    if (tabIndex != currentIndex) {
+                        DialogAlert diag;
+                        diag.setupLabels("Warning", "Se non si impostano i parametri del laser,\r\nverranno ripristinati gli ultimi salvati. Continuare?");
+                        if (diag.exec() == QDialog::Rejected)
+                            return true;
+                        else {
+
+                            if (dPtr->isLaserInitialized) {
+
+                                IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
+                                int laserPower = qRound(laserConfiguration.getCurrentPower());
+                                this->ui->hsLaserPower->setValue(laserPower);
+                                ui->sbLaserPower->setValue(laserPower);
+
+                                int currentModeIndex = laserConfiguration.getCurrentModeIndex();
+                                int currentFrequency = laserConfiguration.getCurrentFrequency();
+                                ui->sbLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
+                                ui->sbLaserFrequency->setValue(currentFrequency);
+
+                                ui->hsLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
+                                ui->hsLaserFrequency->setValue(currentFrequency);
+
+                            }
+                            laserParametersChanged = false;
+                            this->updateTabLaserLabel(false);
+
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
+    return QFrame::eventFilter(object, event);
 
 }
