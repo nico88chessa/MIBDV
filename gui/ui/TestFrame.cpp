@@ -583,6 +583,13 @@ void TestFrame::laserIpgYLPNConfigurationReady() {
     ui->cbLaserPulseWidth->setCurrentIndex(configuration.getCurrentModeIndex());
     ui->sbLaserPower->setValue(qRound(configuration.getCurrentPower()));
 
+    // NOTE NIC 04/04/2019 - quando imposto setCurrentIndex, in automatico viene generato il signal
+    // currentIndexChanged, che mi imposta anche gli altri valori delle widget e mi aggiunge
+    // l'asterisco nel tab; allora rimuovo l'asterisco con la funzione updateTabLaserLabel(false);
+    // e' brutto, ma e' una cosa provvisoria...
+
+    this->updateTabLaserLabel(false);
+
     ui->hsLaserPower->setEnabled(true);
     ui->sbLaserFrequency->setEnabled(true);
     ui->hsLaserFrequency->setEnabled(true);
@@ -591,7 +598,7 @@ void TestFrame::laserIpgYLPNConfigurationReady() {
     ui->pbGuideLaser->setEnabled(true);
     ui->pbSet->setEnabled(true);
     ui->pbReset->setEnabled(true);
-
+    ui->cbLaserInitialized->setChecked(true);
     dPtr->isLaserInitialized = true;
 
     traceExit;
@@ -646,7 +653,6 @@ void TestFrame::setupUi() {
     ui->pbSet->setEnabled(false);
     ui->pbReset->setEnabled(false);
 
-
     traceExit;
 
 }
@@ -681,10 +687,10 @@ void TestFrame::setupSignalsAndSlots() {
     connect(ui->cbLaserPulseWidth, static_cast<void (MDComboBox::*)(int)>(&MDComboBox::currentIndexChanged), [&](int index) {
         IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
         IpgYLPNLaserConfiguration::Mode currentMode = laserConfiguration.getMode(index);
-        ui->sbLaserFrequency->setRange(laserConfiguration.getMode(index).minFrequency, laserConfiguration.getMode(index).maxFrequency);
-        ui->sbLaserFrequency->setValue(laserConfiguration.getMode(index).nominalFrequency);
-        ui->hsLaserFrequency->setRange(laserConfiguration.getMode(index).minFrequency, laserConfiguration.getMode(index).maxFrequency);
-        ui->hsLaserFrequency->setValue(laserConfiguration.getMode(index).nominalFrequency);
+        ui->sbLaserFrequency->setRange(currentMode.minFrequency, currentMode.maxFrequency);
+        ui->sbLaserFrequency->setValue(currentMode.nominalFrequency);
+        ui->hsLaserFrequency->setRange(currentMode.minFrequency, currentMode.maxFrequency);
+        ui->hsLaserFrequency->setValue(currentMode.nominalFrequency);
         laserParametersChanged = true;
         this->updateTabLaserLabel(true);
     });

@@ -41,6 +41,7 @@ public:
     void addMode(float pulseDuration, float nominalFrequency, float minFrequency, float maxFrequency) {
 
         Mode newMode;
+        newMode.pulseDuration = pulseDuration;
         newMode.minFrequency = minFrequency;
         newMode.maxFrequency = maxFrequency;
         newMode.nominalFrequency = nominalFrequency;

@@ -164,6 +164,8 @@ void MainWindow::setupSignalsAndSlots() const {
 
             });
 
+            connect(this, &MainWindow::laserIpgYLPNinitializedSignal, tf, &TestFrame::laserIpgYLPNConfigurationReady);
+
         } else if (auto&& fef = current->findChild<FileExplorerFrame::Ptr>(QString(), Qt::FindDirectChildrenOnly)) {
 
             connect(fef, &FileExplorerFrame::currentFileSignal, this, &MainWindow::currentFileSignal);
@@ -360,6 +362,10 @@ void MainWindow::initDevices() {
         initPLCConnectionWatcher();
 
     }
+
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    if (ipgInterface.isNull())
+        ipgInterface.reset(new ipg::IpgSyncInterface());
 
     traceExit;
 
@@ -610,12 +616,11 @@ void MainWindow::stopDevices() {
 
 void MainWindow::initIpgYLPNLaser() {
 
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+
     traceEnter;
 
     traceInfo() << "Start inizializzazione laser ipg YLPN";
-
-    if (ipgInterface.isNull())
-        ipgInterface.reset(new ipg::IpgSyncInterface());
 
     Settings& instance = Settings::instance();
 
@@ -650,7 +655,8 @@ void MainWindow::initIpgYLPNLaser() {
         IpgYLPNLaserConfiguration::Mode mode;
         mode.minFrequency = output.getMinimumFrequency();
         mode.maxFrequency = output.getMaximumFrequency();
-        mode.nominalFrequency = output.getMaximumFrequency();
+        mode.nominalFrequency = output.getNominalPulseEnergy();
+        mode.pulseDuration = output.getNominalPulseDuration();
         modes.append(mode);
     }
 
