@@ -15,30 +15,45 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="leftMargin">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>4</number>
    </property>
    <property name="spacing">
-    <number>0</number>
+    <number>4</number>
    </property>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabPrint">
       <attribute name="title">
        <string>Print</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>4</number>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="MDLineEdit" name="leFilePath">
          <property name="minimumSize">
@@ -68,10 +83,16 @@
            <number>0</number>
           </property>
           <property name="topMargin">
-           <number>10</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
            <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
           </property>
           <item row="0" column="0">
            <widget class="MDSpinBox" name="sbTileSize">
@@ -159,27 +180,8 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="MDSpinBox" name="sbFrequency">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="label" stdset="0">
-             <string>Frequency [Khz]</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="0">
-           <widget class="MDSpinBox" name="sbWaitTime">
+           <widget class="MDSpinBox" name="sbTileTime">
             <property name="minimumSize">
              <size>
               <width>300</width>
@@ -193,7 +195,7 @@
              </size>
             </property>
             <property name="label" stdset="0">
-             <string>Wait time tile [ms]</string>
+             <string>Tile time [ms]</string>
             </property>
            </widget>
           </item>
@@ -216,6 +218,33 @@
          </layout>
         </widget>
        </item>
+       <item row="4" column="1">
+        <widget class="QPushButton" name="pbStopProcess">
+         <property name="text">
+          <string>Stop</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>239</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QPushButton" name="pbStartProcess">
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
         <widget class="QWidget" name="wRandom" native="true">
          <property name="minimumSize">
@@ -228,10 +257,32 @@
           <string notr="true">background-color: rgb(170, 255, 255);</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
           <item row="2" column="0">
            <widget class="QCheckBox" name="cbRShuffleRowTiles">
             <property name="text">
              <string>Shuffle all row tiles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="cbRandomChoice">
+            <property name="text">
+             <string>Random</string>
             </property>
            </widget>
           </item>
@@ -251,13 +302,6 @@
             </property>
             <property name="label" stdset="0">
              <string>Points per Tile</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="cbRandomChoice">
-            <property name="text">
-             <string>Random</string>
             </property>
            </widget>
           </item>
@@ -283,6 +327,21 @@
           <string notr="true">background-color: rgb(170, 255, 255);</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
           <item row="0" column="0">
            <widget class="QCheckBox" name="cbNHChoice">
             <property name="text">
@@ -331,31 +390,18 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QPushButton" name="pbStartProcess">
-         <property name="text">
-          <string>Start</string>
+        <widget class="MDLineEdit" name="leTileTimeMeasure">
+         <property name="label" stdset="0">
+          <string>Tile time measure [ms]</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QPushButton" name="pbStopProcess">
-         <property name="text">
-          <string>Stop</string>
+        <widget class="MDLineEdit" name="leStackTimeMeasure">
+         <property name="label" stdset="0">
+          <string>Stack time measure  [ms]</string>
          </property>
         </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>239</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -364,6 +410,21 @@
        <string>Laser</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <property name="spacing">
+        <number>4</number>
+       </property>
        <item row="0" column="0">
         <widget class="QFrame" name="laserContentFrame">
          <property name="frameShape">
@@ -373,6 +434,21 @@
           <enum>QFrame::Plain</enum>
          </property>
          <layout class="QGridLayout" name="gridLayout_7">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
           <item row="2" column="0">
            <widget class="QSlider" name="hsLaserFrequency">
             <property name="orientation">
@@ -401,14 +477,28 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="1" column="0" colspan="2">
            <widget class="MDComboBox" name="cbLaserPulseWidth">
             <property name="labelText" stdset="0">
              <string>Pulse width</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="3" column="0" colspan="2">
+           <widget class="QCheckBox" name="cbLaserInitialized">
+            <property name="text">
+             <string>Laser Initialized</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QCheckBox" name="cbGuideLaser">
+            <property name="text">
+             <string>Guide Laser</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
            <spacer name="verticalSpacer_4">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -420,20 +510,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="cbGuideLaser">
-            <property name="text">
-             <string>Guide Laser</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="cbLaserInitialized">
-            <property name="text">
-             <string>Laser Initialized</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -447,6 +523,21 @@
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
           <item row="0" column="2">
            <widget class="QPushButton" name="pbReset">
             <property name="text">
@@ -518,8 +609,7 @@
   <tabstop>dsbOffsetX</tabstop>
   <tabstop>dsbOffsetY</tabstop>
   <tabstop>sbPulses</tabstop>
-  <tabstop>sbFrequency</tabstop>
-  <tabstop>sbWaitTime</tabstop>
+  <tabstop>sbTileTime</tabstop>
   <tabstop>sbWaitTimeYMovement</tabstop>
   <tabstop>cbRandomChoice</tabstop>
   <tabstop>sbRPointsPerTile</tabstop>

@@ -239,3 +239,13 @@ MDFileExplorerWidget {
     background-color: purple;
     color: white;
 }
+
+/*
+ * T E S T   F R A M E
+ */
+
+
+.TestFrame .MDSpinBox {
+    min-width: 70px;
+}
+

@@ -2,7 +2,6 @@
 #define IPG_LASER_TEMP_ABSTRACT_SYNC_EXECUTOR_HPP
 
 #include <QByteArray>
-#include <QDebug>
 #include <Logger.hpp>
 
 #include <laser-ipg-temporary/marshalling/marshaller_interface.hpp>

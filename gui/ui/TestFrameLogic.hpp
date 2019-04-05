@@ -35,6 +35,10 @@ public:
     void setupIOManager(const QSharedPointer<mibdv::IOManager>& ioManager);
     void setupLaserIpgYLPN(const QSharedPointer<ipg::IpgSyncInterface>& ipgInterface);
 
+private:
+    bool setupLaserOn();
+    bool setupLaserOff();
+
 private slots:
     void startProcess();
     void stopProcess();

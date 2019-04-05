@@ -1,4 +1,4 @@
-#include "TestFrame.hpp"
+    #include "TestFrame.hpp"
 #include "ui_TestFrame.h"
 
 #include <vector>
@@ -18,6 +18,7 @@
 
 #include <Logger.hpp>
 #include <QMouseEvent>
+#include <QElapsedTimer>
 
 #include <json/FilterJsonParser.hpp>
 
@@ -57,6 +58,184 @@ void TestFrameLogic::setupLaserIpgYLPN(const QSharedPointer<ipg::IpgSyncInterfac
 
 }
 
+bool TestFrameLogic::setupLaserOn() {
+
+    traceEnter;
+
+    // prima di ogni comando aggiundo dei ritardi di 200ms
+    // per evitare di inviare troppo velocemente comandi al laser;
+
+    Settings& settings = Settings::instance();
+
+    if (!ipgInterface->getIsConnected())
+        if (!ipgInterface->connectToLaser(settings.getIpgYLPNLaserIpAddress(), settings.getIpgYLPNLaserPort())) {
+            traceErr() << "Impossibile connettersi al laser IPG";
+            DialogAlert diag;
+            diag.setupLabels("Error", "Impossibile connettersi al laser IPG");
+            diag.exec();
+            return false;
+        }
+    traceInfo() << "Connessione al laser avvenuta con successo";
+
+    ipg::IPG_USHORT executionCode = 0;
+
+    /*
+         * NOTE NIC 28/11/2018
+         * prima di settare emissione enable a on, lo setto a OFF;
+         * infatti se faccio il reset ma sono in questa condizione:
+         * 1. power supply off
+         * 2. emission on
+         * anche facendo il reset e dando power supply on,
+         * il laser non va in ready; questo perche' il power supply funziona
+         * sse il segnale di emission enable e' a OFF
+         * allora prima di tutto imposto emissione enable a OFF
+         */
+    this->thread()->msleep(200);
+    if (!ipgInterface->setEE(false, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile inviare il comando emission OFF";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile inviare il comando emission OFF");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Emissione enable: OFF";
+
+    this->thread()->msleep(200);
+    // reset errori
+    if (!ipgInterface->reset(executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile inviare il comando di reset al laser";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile inviare il comando di reset al laser");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Reset errori OK";
+
+    IpgYLPNLaserConfiguration& laserConf = IpgYLPNLaserConfiguration::instance();
+    int pulse = laserConf.getMode(laserConf.getCurrentModeIndex()).pulseDuration;
+    int power = laserConf.getCurrentPower();
+
+    // imposto il modo
+    if (!ipgInterface->setModeIndex(laserConf.getCurrentModeIndex(), executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile impostare la modalita' selezionata";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile inviare il comando di reset al laser");
+        diag.exec();
+        return false;
+    }
+    traceInfo() << "Larghezza impulso impostata: " << pulse;
+
+    this->thread()->msleep(200);
+
+    // imposto la frequenza
+    bool result;
+    if (!ipgInterface->setFrequency(laserConf.getCurrentFrequency(), result, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile impostare la frequenza del laser";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile inviare il comando di reset al laser");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Impostato PRR: " << laserConf.getCurrentFrequency();
+
+    this->thread()->msleep(200);
+
+    // imposto la potenza del laser
+    if (!ipgInterface->setPower(power, result, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile impostare la potenza del laser";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile impostare la potenza del laser");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Potenza laser: " << power;
+
+    this->thread()->msleep(200);
+
+    // abilito l'emissione
+    if (!ipgInterface->setEE(true, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile abilitare l'emissione del laser";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile impostare la potenza del laser");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Emissione abilitata";
+
+    traceExit;
+    return true;
+
+}
+
+bool TestFrameLogic::setupLaserOff() {
+
+    traceEnter;
+
+    Settings& settings = Settings::instance();
+
+    if (!ipgInterface->getIsConnected())
+        if (!ipgInterface->connectToLaser(settings.getIpgYLPNLaserIpAddress(), settings.getIpgYLPNLaserPort())) {
+            traceErr() << "Impossibile connettersi al laser IPG";
+            DialogAlert diag;
+            diag.setupLabels("Error", "Impossibile connettersi al laser IPG");
+            diag.exec();
+            return false;
+        }
+    traceInfo() << "Connessione al laser avvenuta con successo";
+
+    ipg::IPG_USHORT executionCode = 0;
+
+    this->thread()->msleep(200);
+    if (!ipgInterface->setEE(false, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile inviare il comando emission OFF";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile inviare il comando emission OFF");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Impostato emissione a OFF";
+
+    this->thread()->msleep(200);
+
+    bool result;
+    // imposto la potenza del laser
+    if (!ipgInterface->setPower(0, result, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile impostare la potenza del laser a 0";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile impostare la potenza del laser a 0");
+        diag.exec();
+        return false;
+    }
+
+    traceInfo() << "Impostato potenza a 0";
+
+    traceExit;
+    return true;
+
+}
+
 void TestFrameLogic::startProcess() {
 
     traceEnter;
@@ -70,12 +249,12 @@ void TestFrameLogic::startProcess() {
     double offsetYmm = qPtr->ui->dsbOffsetY->value();
 
     int numberOfPulses = qPtr->ui->sbPulses->value();
-    int frequency = qPtr->ui->sbFrequency->value() * 1000;
+    int frequency = qPtr->ui->sbLaserFrequency->value() * 1000;
 
     //bool moveAxisYEachTile = qPtr->ui->cbMoveYEachTile->isChecked();
     //bool moveAxisYEachLayerTile = qPtr->ui->cbMoveYEachStackedTile->isChecked();
 
-    int waitTimeMs = qPtr->ui->sbWaitTime->value();
+    int waitTimeMs = qPtr->ui->sbTileTime->value();
     int waitTimeAfterYMovementMs = qPtr->ui->sbWaitTimeYMovement->value();
     double angleMRad = qPtr->ui->dsbAngleMrad->value();
 
@@ -130,44 +309,18 @@ void TestFrameLogic::startProcess() {
     Filter filter;
     parser->decodeJson(fileData.toUtf8(), &filter);
     QApplication::processEvents();
+    qApp->processEvents();
 
     int pointsNumber = filter.getNumOfPoints();
-//    mibdv::PointSetI set(pointsNumber);
 
-//    for (auto&& p: filter.getPoints())
-//        set.addPoint(p);
-
-
-//    QString firstLine(file.readLine());
-//    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
-//    file.readLine();
-//    file.readLine();
-    // leggo tutti i punti e li aggiungo al pointSet set
-//    bool okX;
-//    bool okY;
-//    int count = 0;
-//    int fixedSize = 10;
-//    while (!file.atEnd()) {
-//        QByteArray line = file.readLine().trimmed();
-//        QList<QByteArray> lineSplit = line.split(';');
-//        if (lineSplit.size()>1) {
-//            int x = lineSplit.at(0).toInt(&okX);
-//            int y = lineSplit.at(1).toInt(&okY);
-//            if (!(okX && okY)) {
-//                traceErr() << "Errore nella lettura del file";
-//                DialogAlert diag;
-//                diag.setupLabels("Error", "Errore nella lettura del file");
-//                diag.exec();
-//                return;
-//            }
-//            set.addPoint(x, y);
-
-//        }
-//    }
 
     // inizio configurazione testa scansione ipg
-
     ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1);
+
+#ifdef FLAG_IPG_YLPN_LASER_PRESENT
+    if (!this->setupLaserOn())
+        return;
+#endif
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
     const std::vector<imlw::ScannerInfo>& scannerList = imlw::Scanner::scanners();
@@ -213,12 +366,18 @@ void TestFrameLogic::startProcess() {
     for (auto&& p: filter.getPoints())
         grid.addPoint(p);
 
+    qApp->processEvents();
     int countTile = 0;
 
     // griglia creata
 
+    QElapsedTimer tileMeasureTimer;
+    QElapsedTimer stackedTileMeasureTimer;
+
     // ciclo su tutte le righe
     for (int r=0; r<grid.getRows(); ++r) {
+
+        stackedTileMeasureTimer.start();
 
         // mi prendo la riga i-esima
         const QVector<TileI>& row = grid.getRow(r);
@@ -236,6 +395,7 @@ void TestFrameLogic::startProcess() {
         traceDebug() << "Spostamento asse lungo l'asse X totale: " << moveXum << "um";
         traceDebug() << "Spostamento asse lungo l'asse X totale: " << moveXmm << "mm";
 
+        qApp->processEvents();
         int res = this->motionManager->moveX(moveXmm);
 
         if (motionManager->isErr(res)) {
@@ -331,6 +491,8 @@ void TestFrameLogic::startProcess() {
 
         for (auto&& currentTile: sl) {
 
+            tileMeasureTimer.start();
+
             // dalla lista, inizio a stampare ogni singolo tile
             int yUm = currentTile.getBoundingBox().getMin().getY();
             int offsetYum = offsetYmm * 1000;
@@ -347,6 +509,7 @@ void TestFrameLogic::startProcess() {
 
             if (lastMoveYmm != moveYmm) {
 
+                qApp->processEvents();
                 res = this->motionManager->moveY(moveYmm);
                 lastMoveYmm = moveYmm;
 
@@ -366,13 +529,14 @@ void TestFrameLogic::startProcess() {
                     QEventLoop loop;
                     QTimer t;
                     t.setSingleShot(true);
-                    t.setInterval(1000);
+                    t.setInterval(100);
 
                     res = MOTION_MANAGER_NO_ERR;
 
                     QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
-                        if (!qPtr->motionBean.getAxisYMoveInProgress()) {
-                            if (loop.isRunning()) {
+                        if (loop.isRunning()) {
+                            qApp->processEvents();
+                            if (!qPtr->motionBean.getAxisYMoveInProgress()) {
                                 res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
                                 loop.quit();
                             }
@@ -395,10 +559,12 @@ void TestFrameLogic::startProcess() {
                     QObject::disconnect(c2);
 
                     this->thread()->msleep(waitTimeAfterYMovementMs);
+                    qApp->processEvents();
                 }
             }
 
-            this->thread()->msleep(waitTimeMs);
+//            this->thread()->msleep(waitTimeMs);
+            qApp->processEvents();
 
             if (isProcessStopped)
                 break;
@@ -420,6 +586,14 @@ void TestFrameLogic::startProcess() {
 
             imlw::PointList outputPoints(listOfPoints);
             outputPoints.rotate(angleRad);
+
+            QTimer waitTimeTimer;
+            waitTimeTimer.setInterval(waitTimeMs);
+            waitTimeTimer.setSingleShot(true);
+            waitTimeTimer.start();
+
+            qApp->processEvents();
+
 #ifdef FLAG_SCANNER_HEAD_PRESENT
             scanner->output(outputPoints);
             listOfPoints.clear();
@@ -429,33 +603,72 @@ void TestFrameLogic::startProcess() {
 #endif
             QEventLoop loopIO;
             QTimer t;
-            t.setSingleShot(true);
-            t.setInterval(1000);
+            t.setInterval(100);
 
+            /*
+             * NOTE NIC 05/04/2019 - il funzionamento teorico e' il seguente:
+             * una volta inviato i punti alla testa, aspetto 2 eventi:
+             * 1. tempo attesa tile non scada
+             * 2. segnale che la testa ha finito di stampare
+             * se il tempo di attesa tile e' scaduto ma la testa sta ancora stampando,
+             * faccio partire un terzo timer con intervallo di 100ms, che interroga lo stato della testa
+             * se arriva il segnale che la testa ha finito di stampare ma il tempo di attesa
+             * non e' ancora scaduto, aspetto che scada il tempo di attesa
+             * Se nessuna delle due condizioni e' soddisfatta, si occupera' il timer di 100ms
+             * a interrompere l'eventLoop
+             */
             QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
-                if (loopIO.isRunning())
+                if (loopIO.isRunning()) {
+                    qApp->processEvents();
                     if (qPtr->digitalInputStatus[IOType::MARK_IN_PROGRESS].getValue() == false)
                         loopIO.quit();
+                }
             });
             QMetaObject::Connection c2 = connect(ioManager.data(), &IOManager::markInProgressOffSignal, [&]() {
-                if (loopIO.isRunning())
-                    loopIO.quit();
+                if (loopIO.isRunning()) {
+                    if (!waitTimeTimer.isActive())
+                        loopIO.quit();
+                }
+
+            });
+            QMetaObject::Connection c3 = connect(&waitTimeTimer, &QTimer::timeout, [&]() {
+                if (loopIO.isRunning()) {
+                    qApp->processEvents();
+                    if (qPtr->digitalInputStatus[IOType::MARK_IN_PROGRESS].getValue() == false)
+                        loopIO.quit();
+                    else
+                        t.start();
+                }
             });
 
-            t.start();
+//            t.start();
             loopIO.exec();
             t.stop();
+            waitTimeTimer.stop();
+
+            qint64 tileTimeMeasureMs = tileMeasureTimer.elapsed();
+            qPtr->ui->leTileTimeMeasure->setText(QString::number(tileTimeMeasureMs));
+
             listOfPoints.clear();
             ++countTile;
             QObject::disconnect(c1);
             QObject::disconnect(c2);
+            QObject::disconnect(c3);
 
         }
+
+        qint64 stackedTileMeasureMs = stackedTileMeasureTimer.elapsed();
+        qPtr->ui->leStackTimeMeasure->setText(QString::number(stackedTileMeasureMs));
 
         if (isProcessStopped)
             break;
 
     }
+
+#ifdef FLAG_IPG_YLPN_LASER_PRESENT
+    if (!this->setupLaserOff())
+        return;
+#endif
 
     ioManager->unsetDigitalOutput(IOType::COMPRESSED_AIR_1);
 
@@ -624,15 +837,16 @@ void TestFrame::setupUi() {
     ui->setupUi(this);
 
     ui->tabWidget->tabBar()->installEventFilter(this);
+    ui->tabWidget->setCurrentIndex(0);
 
     ui->leFilePath->setReadOnly(true);
 
-    ui->sbFrequency->setRange(TEST_FRAME_MIN_FREQUENCY, TEST_FRAME_MAX_FREQUENCY);
+//    ui->sbFrequency->setRange(TEST_FRAME_MIN_FREQUENCY, TEST_FRAME_MAX_FREQUENCY);
     ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
 
     ui->sbTileSize->setRange(TEST_FRAME_TILE_SIZE_MIN, TEST_FRAME_TILE_SIZE_MAX);
 
-    ui->sbWaitTime->setRange(TEST_FRAME_WAIT_TIME_MS_MIN, TEST_FRAME_WAIT_TIME_MS_MAX);
+    ui->sbTileTime->setRange(TEST_FRAME_WAIT_TIME_MS_MIN, TEST_FRAME_WAIT_TIME_MS_MAX);
     ui->sbWaitTimeYMovement->setRange(TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MIN, TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MAX);
 
     ui->dsbOffsetX->setRange(TEST_FRAME_OFFSET_X_MIN, TEST_FRAME_OFFSET_X_MAX);
@@ -654,6 +868,10 @@ void TestFrame::setupUi() {
     ui->hsLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
     ui->hsLaserPower->setSingleStep(TEST_FRAME_LASER_POWER_STEP);
 
+    ui->leStackTimeMeasure->setReadOnly(true);
+    ui->leTileTimeMeasure->setReadOnly(true);
+
+#ifdef FLAG_IPG_YLPN_LASER_PRESENT
     ui->cbGuideLaser->setEnabled(false);
     ui->cbLaserInitialized->setEnabled(false);
     ui->hsLaserPower->setEnabled(false);
@@ -664,6 +882,7 @@ void TestFrame::setupUi() {
     ui->pbGuideLaser->setEnabled(false);
     ui->pbSet->setEnabled(false);
     ui->pbReset->setEnabled(false);
+#endif
 
     traceExit;
 
