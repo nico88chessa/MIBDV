@@ -494,6 +494,17 @@ void TestFrameLogic::changeGuideLaserState() {
 
     ipg::IPG_USHORT res;
 
+    Settings& settings = Settings::instance();
+
+    if (!this->ipgInterface->getIsConnected()) {
+        if (!this->ipgInterface->connectToLaser(settings.getIpgYLPNLaserIpAddress(), settings.getIpgYLPNLaserPort())) {
+            DialogAlert diag;
+            diag.setupLabels("Error", "Impossibile connettersi al laser");
+            diag.exec();
+            return;
+        }
+    }
+
     if (!this->ipgInterface->setGlMode(valueToSet, res)) {
         DialogAlert diag;
         diag.setupLabels("Error", "Impossibile settare il diodo rosso");
@@ -501,6 +512,7 @@ void TestFrameLogic::changeGuideLaserState() {
         return;
     }
 
+    qPtr->ui->cbGuideLaser->setChecked(valueToSet);
 
     traceExit;
 

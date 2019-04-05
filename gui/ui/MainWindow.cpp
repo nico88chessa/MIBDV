@@ -655,7 +655,7 @@ void MainWindow::initIpgYLPNLaser() {
         IpgYLPNLaserConfiguration::Mode mode;
         mode.minFrequency = output.getMinimumFrequency();
         mode.maxFrequency = output.getMaximumFrequency();
-        mode.nominalFrequency = output.getNominalPulseEnergy();
+        mode.nominalFrequency = output.getNominalFrequency();
         mode.pulseDuration = output.getNominalPulseDuration();
         modes.append(mode);
     }
