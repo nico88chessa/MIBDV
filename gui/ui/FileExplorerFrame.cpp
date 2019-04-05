@@ -2,6 +2,11 @@
 #include "ui_FileExplorerFrame.h"
 
 #include <QDir>
+#include <Settings.hpp>
+#include <Logger.hpp>
+
+
+using namespace PROGRAM_NAMESPACE;
 
 FileExplorerFrame::FileExplorerFrame(QWidget *parent) :
     QFrame(parent),
@@ -9,21 +14,31 @@ FileExplorerFrame::FileExplorerFrame(QWidget *parent) :
 
     this->setupUi();
 
-    QString rootPath = "C:/Users/nicola/Desktop/Spool";
+    Settings& settings = Settings::instance();
 
-    this->ui->breadCrumb->setRoot("/", rootPath);
-    this->ui->breadCrumb->updatePath(rootPath);
-    ui->lvExplorer->setPath(rootPath);
+    traceEnter;
+
+    traceInfo() << "Spool path:" << settings.getUiSpoolPath();
+
+    this->ui->breadCrumb->setRoot("/", settings.getUiSpoolPath());
+    this->ui->breadCrumb->updatePath(settings.getUiSpoolPath());
+    ui->lvExplorer->setPath(settings.getUiSpoolPath());
 
     this->setupSignalsAndSlots();
+
+    traceExit;
 
 }
 
 FileExplorerFrame::~FileExplorerFrame() {
+    traceEnter;
     delete ui;
+    traceExit;
 }
 
 void FileExplorerFrame::setupSignalsAndSlots() {
+
+    traceEnter;
 
     connect(ui->lvExplorer, &MDFileExplorerWidget::currentFolderSignal, this, &FileExplorerFrame::updateBreadCrumb);
     connect(ui->lvExplorer, &MDFileExplorerWidget::currentFolderSignal, [&]() {
@@ -46,13 +61,19 @@ void FileExplorerFrame::setupSignalsAndSlots() {
     connect(ui->pbDelete, &QPushButton::clicked, ui->lvExplorer, &MDFileExplorerWidget::removeCurrentItem);
     connect(ui->pbRename, &QPushButton::clicked, ui->lvExplorer, &MDFileExplorerWidget::renameCurrentItem);
 
+    traceExit;
+
 }
 
 void FileExplorerFrame::setupUi() {
 
+    traceEnter;
+
     ui->setupUi(this);
     this->ui->pbDelete->setEnabled(false);
     this->ui->pbRename->setEnabled(false);
+
+    traceExit;
 
 }
 

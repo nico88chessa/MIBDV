@@ -212,6 +212,8 @@ void Settings::loadValuesFromFile() {
         galilPLCIpAddress = settings.value(GALIL_PLC_IP_ADDRESS, GALIL_PLC_IP_ADDRESS_DFLT).value<QString>();
     }
 
+    uiSpoolPath = settings.value(UI_SPOOL_PATH, UI_SPOOL_PATH_DFLT).value<QString>();
+
     traceDebug() << "axisXStepPerMm:" << axisXStepPerMm;
     traceDebug() << "axisXMinPosMm:" << axisXMinPosMm;
     traceDebug() << "axisXMaxPosMm:" << axisXMaxPosMm;
@@ -383,6 +385,8 @@ void Settings::writeValuesToFile() {
         settings.setValue(GALIL_PLC_NUMBER_ANALOG_OUTPUT, galilPLCNumberAnalogOutput);
     } else
         settings.remove(GALIL_PLC_PREFIX);
+
+    settings.setValue(UI_SPOOL_PATH, uiSpoolPath);
 
     settings.sync();
 

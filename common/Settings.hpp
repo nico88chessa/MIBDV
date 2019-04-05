@@ -113,6 +113,7 @@ public:
     DeviceKey getMachinePLCType() const { return machinePLCType; }
     int getMachineIORefreshIntervalMs() const { return machineIORefreshIntervalMs; }
 
+    QString getUiSpoolPath() const { return uiSpoolPath; }
 
 private:
     // ASSE X
@@ -169,6 +170,9 @@ private:
     DeviceKey machineCNType;
     DeviceKey machinePLCType;
     int machineIORefreshIntervalMs;
+
+    // UI
+    QString uiSpoolPath;
 
     // GALIL CN PARAMETERS
     int galilCNConnectionTimeoutMs;

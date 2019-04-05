@@ -10,15 +10,17 @@
 
 namespace PROGRAM_NAMESPACE {
 
-static const char APPLICATION_NAME[] = "@PROJECT_NAME@";
-static const char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
-static const char ORGANIZATION[] = "@ORGANIZATION@";
+static constexpr char APPLICATION_NAME[] = "@PROJECT_NAME@";
+static constexpr char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
+static constexpr char ORGANIZATION[] = "@ORGANIZATION@";
 
-static const char LOG_PATH[] = "@LOG_PATH@";
+static constexpr char LOG_PATH[] = "@LOG_PATH@";
 
-static const char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
+static constexpr char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
 
-constexpr int MAX_NUM_LOG_FILES = 5;
+static constexpr char SPOOL_PATH_DFLT[] = "@SPOOL_PATH_DFLT@";
+
+static constexpr int MAX_NUM_LOG_FILES = 5;
 
 }
 
