@@ -212,6 +212,8 @@ void Settings::loadValuesFromFile() {
         galilPLCIpAddress = settings.value(GALIL_PLC_IP_ADDRESS, GALIL_PLC_IP_ADDRESS_DFLT).value<QString>();
     }
 
+    uiSpoolPath = settings.value(UI_SPOOL_PATH, UI_SPOOL_PATH_DFLT).value<QString>();
+
     traceDebug() << "axisXStepPerMm:" << axisXStepPerMm;
     traceDebug() << "axisXMinPosMm:" << axisXMinPosMm;
     traceDebug() << "axisXMaxPosMm:" << axisXMaxPosMm;
@@ -389,6 +391,8 @@ void Settings::writeValuesToFile() {
     // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
     settings.setValue(IPG_YLPN_ETHERNET_LASER_IP, ipgYLPNLaserIpAddress);
     settings.setValue(IPG_YLPN_ETHERNET_LASER_PORT, ipgYLPNLaserPort);
+
+    settings.setValue(UI_SPOOL_PATH, uiSpoolPath);
 
     settings.sync();
 
