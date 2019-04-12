@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IpgmlDef.h"
+#include <iostream>
+
 
 namespace ipg_marking_library_wrapper {
     
@@ -12,12 +14,14 @@ namespace ipg_marking_library_wrapper {
 
     public:
         Point();
-        Point(const Point& other);
-        Point(Point&& other);
-        Point(void* obj);
+        Point(const Point& other); // copio l'oggetto
+        Point(Point&& other); // sposto l'oggetto
+        Point(void* other); // copio l'oggetto (uso Clone)
         Point(float x, float y);
         Point(float x, float y, float z);
         ~Point();
+
+        Point& operator=(const Point& other); // clono l'oggetto
         
         float getX() const;
         void setX(float x);
@@ -29,7 +33,7 @@ namespace ipg_marking_library_wrapper {
         void* getManagedPtr();
         void releaseManagedPtr();
 
-        //void collect();
+        IPGMARKINGLIBRARYWRAPPER_API friend std::ostream& operator<<(std::ostream& os, const Point& obj);
         
     };
 

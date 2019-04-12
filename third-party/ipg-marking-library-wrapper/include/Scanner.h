@@ -18,11 +18,12 @@
 #include "PointParameters.h"
 #include "PointParametersWrapper.h"
 #include "PointList.h"
+#include "VectorList.h"
+
 
 namespace ipg_marking_library_wrapper {
 
     class ScannerPrivate;
-    class PointParametersHandler;
 
     class IPGMARKINGLIBRARYWRAPPER_API Scanner {
     private:
@@ -43,21 +44,38 @@ namespace ipg_marking_library_wrapper {
         void lock();
         void output(PointList& list);
         void output(PointList& list, OutputPointsProperties& properties);
-        /*void output(VectorList);
-        void output(VectorList, OutputVectorsProperties);*/
+        void output(VectorList& list);
+        void output(VectorList& list, OutputVectorsProperties& properties);
         static std::vector<ScannerInfo> scanners();
         void unlock();
         void wait(float);
         void wait(WaitEvent);
         void laser(LaserAction l);
         void guide(bool guideValue);
-        void clearLaserEntry();
-        void addLaserEntry(float dwell, float width, float powerPercent, int count);
+        void ppClearLaserEntry();
         
-        void* getManagedObject();
-        void releaseManagedObject();
-
-        //void collect();
+        /*
+         * ppAddLaserEntry
+         * dwell = width
+         * width = 1.0 / frequenza
+         * powerPercent = % potenza del laser
+         * count = numero impulsi per foro
+         */
+        void ppAddLaserEntry(float dwell, float width, float powerPercent, int count);
+        void vpClearLaserEntry();
+        
+        /*
+        * ppAddLaserEntry
+        * velocity = pitch * frequency
+        * frequency =  frequenza del laser [Hz]
+        * pulseWidth = larghezza impulso del laser
+        * powerPercent = % potenza del laser
+        */
+        void vpAddLaserEntry(float velocity, float frequency, float pulseWidth, float powerPercent);
+        void park(const Point& p);
+        
+        void* getManagedPtr();
+        void releaseManagedPtr();
 
     };
 
