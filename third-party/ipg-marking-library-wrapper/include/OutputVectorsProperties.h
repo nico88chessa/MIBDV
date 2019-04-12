@@ -28,8 +28,8 @@ namespace ipg_marking_library_wrapper {
         float getPulseEnergy() const;
         float getPulseWidth() const;
 
-        void* getManagedObject();
-        void releaseManagedObject();
+        void* getManagedPtr();
+        void releaseManagedPtr();
         
     };
 
