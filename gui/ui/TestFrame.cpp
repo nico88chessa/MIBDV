@@ -338,7 +338,7 @@ void TestFrameLogic::startProcess() {
     imlw::OutputPointsProperties pointParameters(0.001f);
 
     scanner->config(pointParameters, 0.0f);
-    scanner->clearLaserEntry();
+    scanner->ppClearLaserEntry();
 #endif
 
 
@@ -347,7 +347,7 @@ void TestFrameLogic::startProcess() {
     float dwell = width;
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
-    scanner->addLaserEntry(dwell, width, powerpercent, numberOfPulses);
+    scanner->ppAddLaserEntry(dwell, width, powerpercent, numberOfPulses);
     scanner->guide(false);
 //    scanner->laser(imlw::LaserAction::Enable);
 #endif
