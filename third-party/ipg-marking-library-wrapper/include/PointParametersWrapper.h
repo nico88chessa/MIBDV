@@ -4,17 +4,30 @@
 
 namespace ipg_marking_library_wrapper {
 
+    using POINT_PARAMETERS_WRAPPER_HANDLE_PTR = void*;
+    using CONST_POINT_PARAMETERS_WRAPPER_HANDLE_PTR = const void*;
+
     class PointParametersWrapperPrivate;
+    class Scanner;
 
     class IPGMARKINGLIBRARYWRAPPER_API PointParametersWrapper {
+        friend class Scanner;
+
     private:
         PointParametersWrapperPrivate* dPtr;
 
+    private:
+        PointParametersWrapper(POINT_PARAMETERS_WRAPPER_HANDLE_PTR obj = nullptr);
+
     public:
-        PointParametersWrapper(void* ptr);
+        PointParametersWrapper(const PointParametersWrapper& other) = delete;
+        PointParametersWrapper(PointParametersWrapper&& other);
         ~PointParametersWrapper();
 
-        void addLaserEntry(float, float, float, int);
+        PointParametersWrapper& operator=(const PointParametersWrapper& other) = delete;
+        PointParametersWrapper& operator=(PointParametersWrapper&& other);
+
+        void addLaserEntry(float dwell, float width, float powerPercent, int count);
         void clearLaserEntries();
         float getLinkError();
         void setLinkError(float v);
@@ -26,6 +39,7 @@ namespace ipg_marking_library_wrapper {
         void setMode(int v);
         float getVelocity();
         void setVelocity(float v);
+
     };
 
 }
