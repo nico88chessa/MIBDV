@@ -15,10 +15,11 @@
 #include "ScannerInfo.h"
 #include "OutputPointsProperties.h"
 #include "OutputVectorsProperties.h"
-#include "PointParameters.h"
-#include "PointParametersWrapper.h"
+//#include "PointParameters.h"
 #include "PointList.h"
 #include "VectorList.h"
+#include "PointParametersWrapper.h"
+#include "VectorParametersWrapper.h"
 
 
 namespace ipg_marking_library_wrapper {
@@ -36,7 +37,7 @@ namespace ipg_marking_library_wrapper {
 
         void close();
         void config(OutputPointsProperties& properties, float pitch);
-        void config(OutputVectorsProperties);
+        void config(OutputVectorsProperties& properties);
         void exit();
         void finalize();
         bool isDone();
@@ -74,8 +75,11 @@ namespace ipg_marking_library_wrapper {
         void vpAddLaserEntry(float velocity, float frequency, float pulseWidth, float powerPercent);
         void park(const Point& p);
         
-        void* getManagedPtr();
-        void releaseManagedPtr();
+        PointParametersWrapper getPointParameters();
+        VectorParametersWrapper getVectorParameters();
+
+        /*void* getManagedPtr();
+        void releaseManagedPtr();*/
 
     };
 
