@@ -14,6 +14,7 @@ namespace ipg_marking_library_wrapper {
 
     class IPGMARKINGLIBRARYWRAPPER_API Vector {
         friend class VectorList;
+        friend class VectorWrapper;
 
     private:
         VectorPrivate* dPtr;
@@ -33,15 +34,14 @@ namespace ipg_marking_library_wrapper {
         Vector& operator=(const Vector& other);
         Vector& operator=(Vector&& other); // clono l'oggetto
 
+        operator VectorWrapper () const;
+
         float getLength() const;
         PointWrapper getStart() const;
         void setStart(const Point& start);
         PointWrapper getEnd() const;
         void setEnd(const Point& end);
         
-        //void* getManagedPtr();
-        //void releaseManagedPtr();
-
         IPGMARKINGLIBRARYWRAPPER_API friend std::ostream& operator<<(std::ostream& os, const Vector& obj);
 
         static int getPointsPerVector();

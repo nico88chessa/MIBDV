@@ -16,6 +16,7 @@ namespace ipg_marking_library_wrapper {
         friend class VectorList;
         friend class PointWrapper;
         friend class Vector;
+        friend class VectorWrapper;
 
     private:
         PointPrivate* dPtr;
