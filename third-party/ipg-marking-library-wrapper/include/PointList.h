@@ -42,9 +42,14 @@ namespace ipg_marking_library_wrapper {
         void rotate(double x, double y, double z);
         void rotate(float z);
         void rotate(float x, float y, float z);
+        std::list<PointWrapper> points();
 
-        /*void* getManagedPtr();
-        void releaseManagedPtr();*/
+        // metodi che accedono direttamente alla lista di punti;
+        // nella libreria Ipg, la proprieta' e' public per cui posso
+        // fare quello che voglio.
+        // sarebbe da fare un wrapper della lista...  ma ci vuole tempo
+        // e la cosa non e' immediata
+        void addPoint(const Point& p);
 
         IPGMARKINGLIBRARYWRAPPER_API friend std::ostream& operator<<(std::ostream& os, const PointList& obj);
 
