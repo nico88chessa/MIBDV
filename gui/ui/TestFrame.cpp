@@ -8,12 +8,17 @@
 #include "TestFrameLogic.hpp"
 #include "DialogAlert.hpp"
 
+#include <iostream>
+
 #include <Grid.hpp>
 #include <StackedTile.hpp>
 #include <ComputationUtils.hpp>
 
 #include <third-party/ipg-marking-library-wrapper/include/Scanner.h>
 #include <third-party/ipg-marking-library-wrapper/include/PointList.h>
+#include <third-party/ipg-marking-library-wrapper/include/LibraryException.h>
+#include <third-party/ipg-marking-library-wrapper/include/PointParametersWrapper.h>
+#include <third-party/ipg-marking-library-wrapper/include/VectorParametersWrapper.h>
 #include <laser-ipg-temporary/utility/IpgYLPNLaserConfiguration.hpp>
 
 #include <Logger.hpp>
@@ -79,17 +84,15 @@ bool TestFrameLogic::setupLaserOn() {
 
     ipg::IPG_USHORT executionCode = 0;
 
-    /*
-         * NOTE NIC 28/11/2018
-         * prima di settare emissione enable a on, lo setto a OFF;
-         * infatti se faccio il reset ma sono in questa condizione:
-         * 1. power supply off
-         * 2. emission on
-         * anche facendo il reset e dando power supply on,
-         * il laser non va in ready; questo perche' il power supply funziona
-         * sse il segnale di emission enable e' a OFF
-         * allora prima di tutto imposto emissione enable a OFF
-         */
+    /* NOTE NIC 28/11/2018 - prima di settare emissione enable a on, lo setto a OFF;
+     * infatti se faccio il reset ma sono in questa condizione:
+     * 1. power supply off
+     * 2. emission on
+     * anche facendo il reset e dando power supply on,
+     * il laser non va in ready; questo perche' il power supply funziona
+     * sse il segnale di emission enable e' a OFF
+     * allora prima di tutto imposto emissione enable a OFF
+     */
     this->thread()->msleep(200);
     if (!ipgInterface->setEE(false, executionCode) || executionCode > 0) {
         traceErr() << "Impossibile inviare il comando emission OFF";
@@ -236,6 +239,45 @@ bool TestFrameLogic::setupLaserOff() {
 
 }
 
+bool TestFrameLogic::getPulseEnergy(float& energyJoule) {
+
+    traceEnter;
+
+    traceInfo() << "Interrogazione stato laser";
+
+    Settings& settings = Settings::instance();
+
+    if (!ipgInterface->getIsConnected())
+        if (!ipgInterface->connectToLaser(settings.getIpgYLPNLaserIpAddress(), settings.getIpgYLPNLaserPort())) {
+            traceErr() << "Impossibile connettersi al laser IPG";
+            DialogAlert diag;
+            diag.setupLabels("Error", "Impossibile connettersi al laser IPG");
+            diag.exec();
+            return false;
+        }
+
+    traceInfo() << "Connessione al laser avvenuta con successo";
+
+    ipg::IPG_USHORT executionCode = 0;
+
+    ipg::GetLaserStatusOutput status;
+    if (!ipgInterface->getLaserStatus(status, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile interrogare lo stato del laser";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile interrogare lo stato del laser");
+        diag.exec();
+        return false;
+    }
+
+    energyJoule = status.getPulseEnergy() * 0.001;
+
+    traceExit;
+    return true;
+
+}
+
 void TestFrameLogic::startProcess() {
 
     traceEnter;
@@ -251,9 +293,13 @@ void TestFrameLogic::startProcess() {
     int numberOfPulses = qPtr->ui->sbPulses->value();
     int frequency = qPtr->ui->sbLaserFrequency->value() * 1000;
 
+    int circleradiusUm = qPtr->ui->sbCircleRadius->value();
+    int circleNumberOfRevolutions = qPtr->ui->sbCircleNumberRevolutions->value();
+    int circleNumberOfSides = qPtr->ui->sbCircleNumberSides->value();
+    int circlePitch = qPtr->ui->sbCirclePointsPitch->value();
+
     //bool moveAxisYEachTile = qPtr->ui->cbMoveYEachTile->isChecked();
     //bool moveAxisYEachLayerTile = qPtr->ui->cbMoveYEachStackedTile->isChecked();
-
     int waitTimeMs = qPtr->ui->sbTileTime->value();
     int waitTimeAfterYMovementMs = qPtr->ui->sbWaitTimeYMovement->value();
     double angleMRad = qPtr->ui->dsbAngleMrad->value();
@@ -290,7 +336,6 @@ void TestFrameLogic::startProcess() {
 
 
     // inizio gestione file
-
     QString filePath = qPtr->ui->leFilePath->text();
     QFile file(filePath);
 
@@ -313,14 +358,37 @@ void TestFrameLogic::startProcess() {
 
     int pointsNumber = filter.getNumOfPoints();
 
-
     // inizio configurazione testa scansione ipg
     ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1);
+
+    float energy = TestFrame::TEST_FRAME_PULSE_ENERGY_DFLT;
 
 #ifdef FLAG_IPG_YLPN_LASER_PRESENT
     if (!this->setupLaserOn())
         return;
+    if (!this->getPulseEnergy(energy))
+        return;
 #endif
+
+    TestFrame::PointShapeEnum pointShape = static_cast<TestFrame::PointShapeEnum>(qPtr->pointShapeGroup->checkedId());
+    if (pointShape == TestFrame::PointShapeEnum::UNDEFINED) {
+        traceErr() << "Non e' stato selezionato alcuna forma di punto";
+        DialogAlert diag;
+        diag.setupLabels("Error", "Forma di punto non selezionata");
+        diag.exec();
+        return;
+    }
+
+    imlw::VectorList circleVectorsWRevolutions;
+    if (pointShape == TestFrame::PointShapeEnum::CIRCLE) {
+        imlw::VectorList circleVectors(imlw::PolygonProperties(circleNumberOfSides, circleradiusUm));
+        for (int i=0; i<circleNumberOfRevolutions; ++i)
+            circleVectorsWRevolutions.append(circleVectors);
+    }
+
+
+    std::cout << "Circle point list";
+    std::cout << circleVectorsWRevolutions;
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
     const std::vector<imlw::ScannerInfo>& scannerList = imlw::Scanner::scanners();
@@ -333,26 +401,56 @@ void TestFrameLogic::startProcess() {
         return;
     }
 
+    QScopedPointer<imlw::Scanner> scanner;
     std::string err;
-    imlw::Scanner* scanner = new imlw::Scanner(scannerList[0].getName(), true, imlw::Units::MICRONS, err);
-    imlw::OutputPointsProperties pointParameters(0.001f);
 
-    scanner->config(pointParameters, 0.0f);
-    scanner->ppClearLaserEntry();
-#endif
+    try {
 
+        /*
+         * NOTE NIC 12/04/2019 - Scanner e' un oggetto RAII, quindi nel distruttore, se c'e' una connessione
+         * aperta, prima di distruggere l'oggetto viene chiusa e successivamente
+         * viene eliminato l'oggetto
+         */
 
-    float powerpercent = 100.0;
-    float width =  1.0f / frequency;
-    float dwell = width;
+        scanner.reset(new imlw::Scanner(scannerList[0].getName(), true, imlw::Units::MICRONS, err));
 
-#ifdef FLAG_SCANNER_HEAD_PRESENT
-    scanner->ppAddLaserEntry(dwell, width, powerpercent, numberOfPulses);
-    scanner->guide(false);
-//    scanner->laser(imlw::LaserAction::Enable);
-#endif
+        float powerpercent = 100.0;
+        float width =  0.5f / frequency; // old era a 1.0
+        float dwell = width;
+
+        /*
+         * NOTE NIC 15/04/2019 - per i singoli fori, configuro il laser in questo modo;
+         * per i vettori, configuro il laser con OutputVectorProperties
+         */
+        if (pointShape == TestFrame::PointShapeEnum::PULSE) {
+
+            imlw::OutputPointsProperties pointsProperties(energy);
+            scanner->config(pointsProperties, 0.0f);
+
+            imlw::PointParametersWrapper ppw = scanner->getPointParameters();
+            ppw.clearLaserEntries();
+            ppw.addLaserEntry(dwell, width, powerpercent, numberOfPulses);
+
+        } else {
+
+            imlw::OutputVectorsProperties vectorProperties(circlePitch, energy);
+            scanner->config(vectorProperties);
+
+        }
+
+        scanner->guide(false);
+
+    } catch (imlw::LibraryException& ex) {
+        traceErr() << "Eccezione in fase di connessione con testa scansione";
+        traceErr() << "Descrizione eccezione: " << ex.what();
+        DialogAlert diag;
+        diag.setupLabels("Error", ex.what());
+        diag.exec();
+        return;
+    }
+
     // fine configurazione testa scansione ipg
-
+#endif
 
     // creo la griglia (in tile)
     PointI m = filter.getMin();
@@ -407,9 +505,6 @@ void TestFrameLogic::startProcess() {
             DialogAlert diag;
             diag.setupLabels("Error", descrErr);
             diag.exec();
-#ifdef FLAG_SCANNER_HEAD_PRESENT
-            scanner->close();
-#endif
             return;
 
         } else {
@@ -566,14 +661,21 @@ void TestFrameLogic::startProcess() {
 //            this->thread()->msleep(waitTimeMs);
             qApp->processEvents();
 
+#ifdef FLAG_SCANNER_HEAD_PRESENT
+            try {
+                scanner->laser(imlw::LaserAction::Enable);
+            } catch (imlw::LibraryException& ex) {
+                traceErr() << "Eccezione testa scansione al comando laser enable";
+                traceErr() << "Descrizione eccezione: " << ex.what();
+                DialogAlert diag;
+                diag.setupLabels("Error", ex.what());
+                diag.exec();
+                isProcessStopped = true;
+            }
+#endif
             if (isProcessStopped)
                 break;
 
-#ifdef FLAG_SCANNER_HEAD_PRESENT
-//            scanner->laser(imlw::LaserAction::Disable);
-            scanner->laser(imlw::LaserAction::Enable);
-#endif
-            std::list<imlw::Point> listOfPoints;
             PointI offset = currentTile.getCenter();
             offset.setX(-offset.getX());
             offset.setY(-offset.getY());
@@ -581,26 +683,75 @@ void TestFrameLogic::startProcess() {
             movePoints = ComputationUtils::axisBase2HeadBase(movePoints);
             const QVector<PointI>& vectorPoints = movePoints.getVector();
 
-            for (auto&& p: vectorPoints)
-                listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
-
-            imlw::PointList outputPoints(listOfPoints);
-            outputPoints.rotate(angleRad);
-
             QTimer waitTimeTimer;
             waitTimeTimer.setInterval(waitTimeMs);
             waitTimeTimer.setSingleShot(true);
-            waitTimeTimer.start();
 
-            qApp->processEvents();
+            if (pointShape == TestFrame::PointShapeEnum::PULSE) {
+
+                std::list<imlw::Point> listOfPoints;
+                for (auto&& p: vectorPoints)
+                    listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
+
+                imlw::PointList outputPoints(listOfPoints);
+                outputPoints.rotate(angleRad);
+
+                waitTimeTimer.start();
+                qApp->processEvents();
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
-            scanner->output(outputPoints);
-            listOfPoints.clear();
+                try {
 
-//            scanner->laser(imlw::LaserAction::Enable);
-            scanner->laser(imlw::LaserAction::Disable);
+                    scanner->output(outputPoints);
+                    listOfPoints.clear();
+                    scanner->laser(imlw::LaserAction::Disable);
+
+                } catch (imlw::LibraryException& ex) {
+                    traceErr() << "Eccezione testa scansione al comando output punti";
+                    traceErr() << "Descrizione eccezione: " << ex.what();
+                    DialogAlert diag;
+                    diag.setupLabels("Error", ex.what());
+                    diag.exec();
+                    isProcessStopped = true;
+                }
 #endif
+
+            } else {
+
+                imlw::VectorList circles;
+                for (auto&& p: vectorPoints) {
+
+                    imlw::VectorList singleCircle;
+                    singleCircle.append(circleVectorsWRevolutions);
+                    singleCircle.shift(p.getX(), p.getY(), 0);
+                    circles.append(singleCircle);
+                }
+                circles.rotate(angleRad);
+
+                waitTimeTimer.start();
+                qApp->processEvents();
+
+#ifdef FLAG_SCANNER_HEAD_PRESENT
+                try {
+
+                    scanner->output(circles);
+                    scanner->laser(imlw::LaserAction::Disable);
+
+                } catch (imlw::LibraryException& ex) {
+                    traceErr() << "Eccezione testa scansione al comando output vettori";
+                    traceErr() << "Descrizione eccezione: " << ex.what();
+                    DialogAlert diag;
+                    diag.setupLabels("Error", ex.what());
+                    diag.exec();
+                    isProcessStopped = true;
+                }
+#endif
+
+            }
+
+            if (isProcessStopped)
+                break;
+
             QEventLoop loopIO;
             QTimer t;
             t.setInterval(100);
@@ -649,7 +800,6 @@ void TestFrameLogic::startProcess() {
             qint64 tileTimeMeasureMs = tileMeasureTimer.elapsed();
             qPtr->ui->leTileTimeMeasure->setText(QString::number(tileTimeMeasureMs));
 
-            listOfPoints.clear();
             ++countTile;
             QObject::disconnect(c1);
             QObject::disconnect(c2);
@@ -673,14 +823,18 @@ void TestFrameLogic::startProcess() {
     ioManager->unsetDigitalOutput(IOType::COMPRESSED_AIR_1);
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
-    scanner->laser(imlw::LaserAction::Disable);
-    scanner->close();
-
-    delete scanner;
+    try {
+        scanner->laser(imlw::LaserAction::Disable);
+    } catch (imlw::LibraryException& ex) {
+        traceErr() << "Eccezione laser disable con testa scansione";
+        traceErr() << "Descrizione eccezione: " << ex.what();
+        DialogAlert diag;
+        diag.setupLabels("Error", ex.what());
+        diag.exec();
+    }
 #endif
 
     // fine gestione file
-
     DialogAlert diag;
     if (isProcessStopped)
         diag.setupLabels("Info", "Processo fermato");
@@ -841,9 +995,6 @@ void TestFrame::setupUi() {
 
     ui->leFilePath->setReadOnly(true);
 
-//    ui->sbFrequency->setRange(TEST_FRAME_MIN_FREQUENCY, TEST_FRAME_MAX_FREQUENCY);
-    ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
-
     ui->sbTileSize->setRange(TEST_FRAME_TILE_SIZE_MIN, TEST_FRAME_TILE_SIZE_MAX);
 
     ui->sbTileTime->setRange(TEST_FRAME_WAIT_TIME_MS_MIN, TEST_FRAME_WAIT_TIME_MS_MAX);
@@ -864,6 +1015,24 @@ void TestFrame::setupUi() {
     ui->dsbAngleMrad->setDecimals(3);
     ui->dsbAngleMrad->setSingleStep(TEST_FRAME_ANGLE_STEP);
 
+    // point shape tab
+    pointShapeGroup =  new QButtonGroup(this);
+    ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
+
+    ui->sbCircleRadius->setRange(TEST_FRAME_CIRCLE_RADIUS_MIN, TEST_FRAME_CIRCLE_RADIUS_MAX);
+    ui->sbCircleRadius->setSingleStep(TEST_FRAME_CIRCLE_RADIUS_STEP);
+    ui->sbCircleNumberRevolutions->setRange(TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MIN, TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MAX);
+    ui->sbCircleNumberRevolutions->setSingleStep(TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_STEP);
+    ui->sbCircleNumberSides->setRange(TEST_FRAME_CIRCLE_NUM_SIDES_MIN, TEST_FRAME_CIRCLE_NUM_SIDES_MAX);
+    ui->sbCircleNumberSides->setSingleStep(TEST_FRAME_CIRCLE_NUM_SIDES_STEP);
+    ui->sbCirclePointsPitch->setRange(TEST_FRAME_CIRCLE_POINTS_PITCH_MIN, TEST_FRAME_CIRCLE_POINTS_PITCH_MAX);
+    ui->sbCirclePointsPitch->setSingleStep(TEST_FRAME_CIRCLE_POINTS_PITCH_STEP);
+
+    pointShapeGroup->addButton(ui->rbPoint, static_cast<int>(PointShapeEnum::PULSE));
+    pointShapeGroup->addButton(ui->rbCircle, static_cast<int>(PointShapeEnum::CIRCLE));
+    pointShapeGroup->button(static_cast<int>(PointShapeEnum::PULSE))->setChecked(true);
+
+    // laser tab
     ui->sbLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
     ui->hsLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
     ui->hsLaserPower->setSingleStep(TEST_FRAME_LASER_POWER_STEP);

@@ -38,6 +38,7 @@ public:
 private:
     bool setupLaserOn();
     bool setupLaserOff();
+    bool getPulseEnergy(float& energyJoule);
 
 private slots:
     void startProcess();

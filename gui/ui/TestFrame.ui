@@ -32,7 +32,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabPrint">
       <attribute name="title">
@@ -113,13 +113,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="MDSpinBox" name="sbWaitTimeYMovement">
-            <property name="label" stdset="0">
-             <string>Wait time after axis Y movement [ms]</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="MDDoubleSpinBox" name="dsbOffsetX">
             <property name="minimumSize">
@@ -161,26 +154,14 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="MDSpinBox" name="sbPulses">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
+          <item row="2" column="1">
+           <widget class="MDSpinBox" name="sbWaitTimeYMovement">
             <property name="label" stdset="0">
-             <string>Pulses</string>
+             <string>Wait time after axis Y movement [ms]</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="MDSpinBox" name="sbTileTime">
             <property name="minimumSize">
              <size>
@@ -405,6 +386,142 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabPointShape">
+      <attribute name="title">
+       <string>Point Shape</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <item row="0" column="0">
+        <widget class="QFrame" name="frPoint">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item row="2" column="0">
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="rbPoint">
+            <property name="text">
+             <string>Pulse</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="MDSpinBox" name="sbPulses">
+            <property name="label" stdset="0">
+             <string>Pulses</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QFrame" name="frCircle">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item row="3" column="0">
+           <widget class="MDSpinBox" name="sbCircleNumberSides">
+            <property name="label" stdset="0">
+             <string>Number of sides</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="MDSpinBox" name="sbCircleNumberRevolutions">
+            <property name="label" stdset="0">
+             <string>Number of revolutions</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="MDSpinBox" name="sbCircleRadius">
+            <property name="label" stdset="0">
+             <string>Radius [um]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <spacer name="verticalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="rbCircle">
+            <property name="text">
+             <string>Circle</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="MDSpinBox" name="sbCirclePointsPitch">
+            <property name="label" stdset="0">
+             <string>Points pitch [um]</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tabLaser">
       <attribute name="title">
        <string>Laser</string>
@@ -604,11 +721,11 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>leFilePath</tabstop>
   <tabstop>sbTileSize</tabstop>
   <tabstop>dsbAngleMrad</tabstop>
   <tabstop>dsbOffsetX</tabstop>
   <tabstop>dsbOffsetY</tabstop>
-  <tabstop>sbPulses</tabstop>
   <tabstop>sbTileTime</tabstop>
   <tabstop>sbWaitTimeYMovement</tabstop>
   <tabstop>cbRandomChoice</tabstop>
@@ -618,6 +735,28 @@
   <tabstop>sbNHMinDistance</tabstop>
   <tabstop>cbNHShuffleStackedTiles</tabstop>
   <tabstop>cbNHShuffleRowTiles</tabstop>
+  <tabstop>pbStartProcess</tabstop>
+  <tabstop>pbStopProcess</tabstop>
+  <tabstop>rbPoint</tabstop>
+  <tabstop>sbPulses</tabstop>
+  <tabstop>rbCircle</tabstop>
+  <tabstop>sbCircleRadius</tabstop>
+  <tabstop>sbCircleNumberRevolutions</tabstop>
+  <tabstop>sbCircleNumberSides</tabstop>
+  <tabstop>sbCirclePointsPitch</tabstop>
+  <tabstop>sbLaserPower</tabstop>
+  <tabstop>cbLaserPulseWidth</tabstop>
+  <tabstop>hsLaserFrequency</tabstop>
+  <tabstop>sbLaserFrequency</tabstop>
+  <tabstop>pbSet</tabstop>
+  <tabstop>pbGuideLaser</tabstop>
+  <tabstop>leStackTimeMeasure</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>cbGuideLaser</tabstop>
+  <tabstop>cbLaserInitialized</tabstop>
+  <tabstop>pbReset</tabstop>
+  <tabstop>leTileTimeMeasure</tabstop>
+  <tabstop>hsLaserPower</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -264,16 +264,16 @@ QSlider::add-page:vertical {
  * Q R A D I O B U T T O N
  */
 
-QRadioButton {
+.QRadioButton {
     /*color: green;*/
 }
 
-QRadioButton::indicator::unchecked {
-    image: url(:/icons/black-theme/radio_button-unchecked);
+.QRadioButton::indicator::unchecked {
+    image: url(:/icons/black-theme/radio_button_unchecked);
 }
 
-QRadioButton::indicator::checked {
-    image: url(:/icons/black-theme/radio_button-checked);
+.QRadioButton::indicator::checked {
+    image: url(:/icons/black-theme/radio_button_checked);
 }
 
 
