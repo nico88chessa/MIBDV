@@ -401,6 +401,14 @@ void TestFrameLogic::startProcess() {
         return;
     }
 
+    if (scannerList.at(0).getStatus() != imlw::ConnectionStatus::AVAILABLE) {
+        traceErr() << "Lo scanner e' nello stato di busy";
+        DialogAlert diag;
+        diag.setupLabels("Error", "Lo scanner e' nello stato di busy");
+        diag.exec();
+        return;
+    }
+
     QScopedPointer<imlw::Scanner> scanner;
     std::string err;
 
@@ -415,7 +423,7 @@ void TestFrameLogic::startProcess() {
         scanner.reset(new imlw::Scanner(scannerList[0].getName(), true, imlw::Units::MICRONS, err));
 
         float powerpercent = 100.0;
-        float width =  0.5f / frequency; // old era a 1.0
+        float width =  1.0f / frequency; // WARNING NIC 24/04/2019 - sarebbe da mettere 0.5 (chiedere a Longoni),
         float dwell = width;
 
         /*
@@ -517,6 +525,7 @@ void TestFrameLogic::startProcess() {
             res = MOTION_MANAGER_NO_ERR;
 
             QMetaObject::Connection c1 = connect(&t, &QTimer::timeout, [&]() {
+                qApp->processEvents();
                 if (!qPtr->motionBean.getAxisXMoveInProgress()) {
                     if (loop.isRunning()) {
                         res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -1205,7 +1214,7 @@ bool TestFrame::eventFilter(QObject* object, QEvent* event) {
 
                 int currentIndex = ui->tabWidget->currentIndex();
 
-                if (currentIndex == 1) {
+                if (currentIndex == TEST_FRAME_LASER_TAB_INDEX) {
                     auto mouseEvent = static_cast<QMouseEvent*>(event);
                     auto tabBar = ui->tabWidget->tabBar();
                     int tabIndex = tabBar->tabAt(mouseEvent->pos());

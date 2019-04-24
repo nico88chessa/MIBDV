@@ -69,6 +69,8 @@ private:
     static constexpr int TEST_FRAME_LASER_MAX_POWER = 100;
     static constexpr int TEST_FRAME_LASER_POWER_STEP = 1;
 
+    static constexpr int TEST_FRAME_LASER_TAB_INDEX = 2;
+
     enum class PointShapeEnum : int {
         UNDEFINED = -1,
         PULSE,
