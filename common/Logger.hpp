@@ -50,7 +50,7 @@ public:
 
 //void messageHandlerFunction(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
-#ifdef FLAG_DEBUG
+#ifdef LOG_VERBOSE
 #define traceEnter Logger::instance().enter(QT_MESSAGELOG_FUNC)
 #define traceExit Logger::instance().exit(QT_MESSAGELOG_FUNC)
 #define traceDebug Logger::instance().debug
