@@ -4,7 +4,6 @@
 
 #include "Point.h"
 #include "PointWrapper.h"
-#include "PolygonProperties.h"
 #include "PointList.h"
 
 #include <list>

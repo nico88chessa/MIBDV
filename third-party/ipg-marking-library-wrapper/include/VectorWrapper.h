@@ -11,10 +11,6 @@ namespace ipg_marking_library_wrapper {
 
     class VectorWrapperPrivate;
     
-    //class PointList;
-    //class PointListWrapper;
-    //class Point;
-
     class IPGMARKINGLIBRARYWRAPPER_API VectorWrapper {
         friend class VectorList;
         friend class VectorListWrapper;

@@ -12,11 +12,14 @@ namespace ipg_marking_library_wrapper {
     using CONST_POLYGONPROPERTIES_HANDLER = const void*;
 
     class IPGMARKINGLIBRARYWRAPPER_API PolygonProperties {
+        friend class PointList;
+        friend class VectorList;
+
     private:
         PolygonPropertiesPrivate* dPtr;
 
     private:
-        //POLYGONPROPERTIES_HANDLER getManagedPtr() const;
+        CONST_POLYGONPROPERTIES_HANDLER getManagedPtr() const;
 
     public:
         PolygonProperties(int numberOfSides, float radius);
