@@ -290,13 +290,22 @@ void TestFrameLogic::startProcess() {
     double offsetXmm = qPtr->ui->dsbOffsetX->value();
     double offsetYmm = qPtr->ui->dsbOffsetY->value();
 
-    int numberOfPulses = qPtr->ui->sbPulses->value();
     int frequency = qPtr->ui->sbLaserFrequency->value() * 1000;
 
-    int circleradiusUm = qPtr->ui->sbCircleRadius->value();
-    int circleNumberOfRevolutions = qPtr->ui->sbCircleNumberRevolutions->value();
-    int circleNumberOfSides = qPtr->ui->sbCircleNumberSides->value();
-    int circlePitch = qPtr->ui->sbCirclePointsPitch->value();
+    // point
+    int numberOfPulses = qPtr->ui->sbPointPulses->value();
+
+
+    // circle points
+    int circlePointsRadiusUm = qPtr->ui->sbCirclePointsRadius->value();
+    int circlePointsNumberOfSides = qPtr->ui->sbCirclePointsNumberSides->value();
+    int circlePointsNumberOfPulses = qPtr->ui->sbCirclePointsPulses->value();
+
+    // circle vector
+    int circleVectorRadiusUm = qPtr->ui->sbCircleVectorRadius->value();
+    int circleVectorNumberOfRevolutions = qPtr->ui->sbCircleVectorNumberRevolutions->value();
+    int circleVectorNumberOfSides = qPtr->ui->sbCircleVectorNumberSides->value();
+    int circleVectorPitch = qPtr->ui->sbCircleVectorPointsPitch->value();
 
     //bool moveAxisYEachTile = qPtr->ui->cbMoveYEachTile->isChecked();
     //bool moveAxisYEachLayerTile = qPtr->ui->cbMoveYEachStackedTile->isChecked();
@@ -380,15 +389,22 @@ void TestFrameLogic::startProcess() {
     }
 
     imlw::VectorList circleVectorsWRevolutions;
-    if (pointShape == TestFrame::PointShapeEnum::CIRCLE) {
-        imlw::VectorList circleVectors(imlw::PolygonProperties(circleNumberOfSides, circleradiusUm));
-        for (int i=0; i<circleNumberOfRevolutions; ++i)
+    if (pointShape == TestFrame::PointShapeEnum::CIRCLE_VECTOR) {
+        imlw::VectorList circleVectors(imlw::PolygonProperties(circleVectorNumberOfSides, circleVectorRadiusUm));
+        for (int i=0; i<circleVectorNumberOfRevolutions; ++i)
             circleVectorsWRevolutions.append(circleVectors);
     }
 
+    imlw::PointList singleCirclePointList;
+    if (pointShape == TestFrame::PointShapeEnum::CIRCLE_POINTS) {
+        singleCirclePointList.append(imlw::PointList(imlw::PolygonProperties(circlePointsNumberOfSides, circlePointsRadiusUm)));
+    }
 
-    std::cout << "Circle point list";
+
+    std::cout << "Circle Vector list";
     std::cout << circleVectorsWRevolutions;
+    std::cout << "Single Circle point list";
+    std::cout << singleCirclePointList;
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
     const std::vector<imlw::ScannerInfo>& scannerList = imlw::Scanner::scanners();
@@ -430,7 +446,7 @@ void TestFrameLogic::startProcess() {
          * NOTE NIC 15/04/2019 - per i singoli fori, configuro il laser in questo modo;
          * per i vettori, configuro il laser con OutputVectorProperties
          */
-        if (pointShape == TestFrame::PointShapeEnum::PULSE) {
+        if (pointShape == TestFrame::PointShapeEnum::POINT || pointShape == TestFrame::PointShapeEnum::CIRCLE_POINTS) {
 
             imlw::OutputPointsProperties pointsProperties(energy);
             scanner->config(pointsProperties, 0.0f);
@@ -439,9 +455,9 @@ void TestFrameLogic::startProcess() {
             ppw.clearLaserEntries();
             ppw.addLaserEntry(dwell, width, powerpercent, numberOfPulses);
 
-        } else {
+        } else if (pointShape == TestFrame::PointShapeEnum::CIRCLE_VECTOR) {
 
-            imlw::OutputVectorsProperties vectorProperties(circlePitch, energy);
+            imlw::OutputVectorsProperties vectorProperties(circleVectorPitch, energy);
             scanner->config(vectorProperties);
 
         }
@@ -696,7 +712,7 @@ void TestFrameLogic::startProcess() {
             waitTimeTimer.setInterval(waitTimeMs);
             waitTimeTimer.setSingleShot(true);
 
-            if (pointShape == TestFrame::PointShapeEnum::PULSE) {
+            if (pointShape == TestFrame::PointShapeEnum::POINT) {
 
                 std::list<imlw::Point> listOfPoints;
                 for (auto&& p: vectorPoints)
@@ -725,15 +741,15 @@ void TestFrameLogic::startProcess() {
                 }
 #endif
 
-            } else {
+            } else if (pointShape == TestFrame::PointShapeEnum::CIRCLE_POINTS) {
 
-                imlw::VectorList circles;
+                imlw::PointList circles;
                 for (auto&& p: vectorPoints) {
 
-                    imlw::VectorList singleCircle;
-                    singleCircle.append(circleVectorsWRevolutions);
-                    singleCircle.shift(p.getX(), p.getY(), 0);
-                    circles.append(singleCircle);
+                    imlw::PointList singleCirclePoints;
+                    singleCirclePoints.append(singleCirclePointList);
+                    singleCirclePoints.shift(p.getX(), p.getY(), 0);
+                    circles.append(singleCirclePoints);
                 }
                 circles.rotate(angleRad);
 
@@ -744,6 +760,37 @@ void TestFrameLogic::startProcess() {
                 try {
 
                     scanner->output(circles);
+                    scanner->laser(imlw::LaserAction::Disable);
+
+                } catch (imlw::LibraryException& ex) {
+                    traceErr() << "Eccezione testa scansione al comando output vettori";
+                    traceErr() << "Descrizione eccezione: " << ex.what();
+                    DialogAlert diag;
+                    diag.setupLabels("Error", ex.what());
+                    diag.exec();
+                    isProcessStopped = true;
+                }
+#endif
+
+            } else if (pointShape == TestFrame::PointShapeEnum::CIRCLE_VECTOR) {
+
+                imlw::VectorList circlesVet;
+                for (auto&& p: vectorPoints) {
+
+                    imlw::VectorList singleCircle;
+                    singleCircle.append(circleVectorsWRevolutions);
+                    singleCircle.shift(p.getX(), p.getY(), 0);
+                    circlesVet.append(singleCircle);
+                }
+                circlesVet.rotate(angleRad);
+
+                waitTimeTimer.start();
+                qApp->processEvents();
+
+#ifdef FLAG_SCANNER_HEAD_PRESENT
+                try {
+
+                    scanner->output(circlesVet);
                     scanner->laser(imlw::LaserAction::Disable);
 
                 } catch (imlw::LibraryException& ex) {
@@ -1026,20 +1073,27 @@ void TestFrame::setupUi() {
 
     // point shape tab
     pointShapeGroup =  new QButtonGroup(this);
-    ui->sbPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
+    ui->sbPointPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
 
-    ui->sbCircleRadius->setRange(TEST_FRAME_CIRCLE_RADIUS_MIN, TEST_FRAME_CIRCLE_RADIUS_MAX);
-    ui->sbCircleRadius->setSingleStep(TEST_FRAME_CIRCLE_RADIUS_STEP);
-    ui->sbCircleNumberRevolutions->setRange(TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MIN, TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MAX);
-    ui->sbCircleNumberRevolutions->setSingleStep(TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_STEP);
-    ui->sbCircleNumberSides->setRange(TEST_FRAME_CIRCLE_NUM_SIDES_MIN, TEST_FRAME_CIRCLE_NUM_SIDES_MAX);
-    ui->sbCircleNumberSides->setSingleStep(TEST_FRAME_CIRCLE_NUM_SIDES_STEP);
-    ui->sbCirclePointsPitch->setRange(TEST_FRAME_CIRCLE_POINTS_PITCH_MIN, TEST_FRAME_CIRCLE_POINTS_PITCH_MAX);
-    ui->sbCirclePointsPitch->setSingleStep(TEST_FRAME_CIRCLE_POINTS_PITCH_STEP);
+    ui->sbCirclePointsNumberSides->setRange(TEST_FRAME_CIRCLE_NUM_SIDES_MIN, TEST_FRAME_CIRCLE_NUM_SIDES_MAX);
+    ui->sbCirclePointsNumberSides->setSingleStep(TEST_FRAME_CIRCLE_NUM_SIDES_STEP);
+    ui->sbCirclePointsPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
+    ui->sbCirclePointsRadius->setRange(TEST_FRAME_CIRCLE_RADIUS_MIN, TEST_FRAME_CIRCLE_RADIUS_MAX);
+    ui->sbCirclePointsRadius->setSingleStep(TEST_FRAME_CIRCLE_RADIUS_STEP);
 
-    pointShapeGroup->addButton(ui->rbPoint, static_cast<int>(PointShapeEnum::PULSE));
-    pointShapeGroup->addButton(ui->rbCircle, static_cast<int>(PointShapeEnum::CIRCLE));
-    pointShapeGroup->button(static_cast<int>(PointShapeEnum::PULSE))->setChecked(true);
+    ui->sbCircleVectorRadius->setRange(TEST_FRAME_CIRCLE_RADIUS_MIN, TEST_FRAME_CIRCLE_RADIUS_MAX);
+    ui->sbCircleVectorRadius->setSingleStep(TEST_FRAME_CIRCLE_RADIUS_STEP);
+    ui->sbCircleVectorNumberRevolutions->setRange(TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MIN, TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MAX);
+    ui->sbCircleVectorNumberRevolutions->setSingleStep(TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_STEP);
+    ui->sbCircleVectorNumberSides->setRange(TEST_FRAME_CIRCLE_NUM_SIDES_MIN, TEST_FRAME_CIRCLE_NUM_SIDES_MAX);
+    ui->sbCircleVectorNumberSides->setSingleStep(TEST_FRAME_CIRCLE_NUM_SIDES_STEP);
+    ui->sbCircleVectorPointsPitch->setRange(TEST_FRAME_CIRCLE_POINTS_PITCH_MIN, TEST_FRAME_CIRCLE_POINTS_PITCH_MAX);
+    ui->sbCircleVectorPointsPitch->setSingleStep(TEST_FRAME_CIRCLE_POINTS_PITCH_STEP);
+
+    pointShapeGroup->addButton(ui->rbPoint, static_cast<int>(PointShapeEnum::POINT));
+    pointShapeGroup->addButton(ui->rbCirclePoints, static_cast<int>(PointShapeEnum::CIRCLE_POINTS));
+    pointShapeGroup->addButton(ui->rbCircleVector, static_cast<int>(PointShapeEnum::CIRCLE_VECTOR));
+    pointShapeGroup->button(static_cast<int>(PointShapeEnum::POINT))->setChecked(true);
 
     // laser tab
     ui->sbLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
@@ -1141,6 +1195,17 @@ void TestFrame::setupSignalsAndSlots() {
     });
 
     connect(ui->pbGuideLaser, &QPushButton::clicked, dPtr, &TestFrameLogic::changeGuideLaserState);
+
+    connect(pointShapeGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), [&](int id) {
+
+        switch (id) {
+        case PointShapeEnum::POINT: ui->swPointShapeDetails->setCurrentIndex(0); break;
+        case PointShapeEnum::CIRCLE_POINTS: ui->swPointShapeDetails->setCurrentIndex(1); break;
+        case PointShapeEnum::CIRCLE_VECTOR: ui->swPointShapeDetails->setCurrentIndex(2); break;
+        default: break;
+        }
+
+    });
 
 //    connect(ui->tabWidget, &QTabWidget::currentChanged, [&](int index) {
 

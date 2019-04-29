@@ -73,8 +73,9 @@ private:
 
     enum class PointShapeEnum : int {
         UNDEFINED = -1,
-        PULSE,
-        CIRCLE
+        POINT,
+        CIRCLE_POINTS,
+        CIRCLE_VECTOR
     };
 
     Ui::TestFrame *ui;
