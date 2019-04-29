@@ -9,9 +9,6 @@ namespace ipg_marking_library_wrapper {
     using CONST_POINT_WRAPPER_HANDLE_PTR = const void*;
 
     class PointWrapperPrivate;
-    //class PointList;
-    //class PointListWrapper;
-    //class Point;
 
     class IPGMARKINGLIBRARYWRAPPER_API PointWrapper {
         friend class PointList;
