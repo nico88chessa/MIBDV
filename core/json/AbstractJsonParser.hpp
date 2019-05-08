@@ -6,6 +6,7 @@
 
 #include <QByteArray>
 
+
 namespace PROGRAM_NAMESPACE {
 
 constexpr static int JSON_PARSER_NO_ERROR = 0;
@@ -26,7 +27,7 @@ public:
 
     virtual JsonParserError decodeJson(const QByteArray& res, void* object) = 0;
 
-    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& res, void* object) = 0;
+//    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& res, void* object) = 0;
 
 };
 
@@ -43,7 +44,7 @@ protected:
 
     virtual JsonParserError decodeJson(const QByteArray& input, T* obj) = 0;
 
-    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& input, T* obj) = 0;
+//    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& input, T* obj) = 0;
 
 public:
     JsonParserError encodeJson(const void* object, QByteArray& output) final {
@@ -56,10 +57,10 @@ public:
         return decodeJson(input, objCast);
     }
 
-    JsonParserError decodeJsonHeaderOnly(const QByteArray& input, void* object) final {
-        auto objCast = static_cast<T*>(object);
-        return decodeJsonHeaderOnly(input, objCast);
-    }
+//    JsonParserError decodeJsonHeaderOnly(const QByteArray& input, void* object) final {
+//        auto objCast = static_cast<T*>(object);
+//        return decodeJsonHeaderOnly(input, objCast);
+//    }
 
 };
 

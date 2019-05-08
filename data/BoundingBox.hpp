@@ -29,7 +29,6 @@ private:
 
 public:
 
-
     BoundingBox() :
         m(std::numeric_limits<T>::max(), std::numeric_limits<T>::max()),
         M(std::numeric_limits<T>::min(), std::numeric_limits<T>::min()) {

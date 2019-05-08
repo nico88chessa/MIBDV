@@ -7,6 +7,7 @@
 #include "configure.h"
 #include <BoundingBox.hpp>
 
+
 namespace PROGRAM_NAMESPACE {
 
 class Filter {

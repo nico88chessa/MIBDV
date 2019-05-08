@@ -125,70 +125,70 @@ protected:
 
     }
 
-    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& input, Filter* obj) {
+//    virtual JsonParserError decodeJsonHeaderOnly(const QByteArray& input, Filter* obj) {
 
-        traceEnter;
-        QJsonDocument doc = QJsonDocument::fromJson(input);
-        if (doc.isNull()) {
-            traceErr() << "Errore nella chiamata fromJson";
-            return JSON_PARSER_ERROR_DOCUMENT_PARSER;
-        }
+//        traceEnter;
+//        QJsonDocument doc = QJsonDocument::fromJson(input);
+//        if (doc.isNull()) {
+//            traceErr() << "Errore nella chiamata fromJson";
+//            return JSON_PARSER_ERROR_DOCUMENT_PARSER;
+//        }
 
-        QJsonObject jsonObj = doc.object();
+//        QJsonObject jsonObj = doc.object();
 
-        QJsonValue numberOfPoints = jsonObj.value(FILTER_JSON_NUMBER_OF_POINTS_KEY);
-        if (numberOfPoints.isUndefined()) {
-            traceErr() << "Chiave NumberOfPoints non presente nel file json";
-            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
-        }
+//        QJsonValue numberOfPoints = jsonObj.value(FILTER_JSON_NUMBER_OF_POINTS_KEY);
+//        if (numberOfPoints.isUndefined()) {
+//            traceErr() << "Chiave NumberOfPoints non presente nel file json";
+//            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+//        }
 
-        QJsonValue boundingBox = jsonObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_KEY);
-        if (boundingBox.isUndefined()) {
-            traceErr() << "Chiave BoundingBox non presente nel file json";
-            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
-        }
-        QJsonObject boundingBoxObj = boundingBox.toObject();
+//        QJsonValue boundingBox = jsonObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_KEY);
+//        if (boundingBox.isUndefined()) {
+//            traceErr() << "Chiave BoundingBox non presente nel file json";
+//            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+//        }
+//        QJsonObject boundingBoxObj = boundingBox.toObject();
 
-        QJsonValue minPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY);
-        if (minPoint.isUndefined()) {
-            traceErr() << "Chiave BoundingBox Min non presente nel file json";
-            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
-        }
+//        QJsonValue minPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY);
+//        if (minPoint.isUndefined()) {
+//            traceErr() << "Chiave BoundingBox Min non presente nel file json";
+//            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+//        }
 
-        QJsonValue maxPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY);
-        if (maxPoint.isUndefined()) {
-            traceErr() << "Chiave BoundingBox Max non presente nel file json";
-            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
-        }
+//        QJsonValue maxPoint = boundingBoxObj.value(FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY);
+//        if (maxPoint.isUndefined()) {
+//            traceErr() << "Chiave BoundingBox Max non presente nel file json";
+//            return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+//        }
 
-        // imposto il numero di punti
-        obj->setNumOfPoints(numberOfPoints.toInt());
+//        // imposto il numero di punti
+//        obj->setNumOfPoints(numberOfPoints.toInt());
 
-        // imposto il punto di minimo
-        bool okX, okY;
-        QStringList minSL = minPoint.toString().split(POINT_COORDINATES_SEPARATOR);
-        int x = minSL.at(0).toInt(&okX);
-        int y = minSL.at(1).toInt(&okY);
-        if (!okX || !okY) {
-            traceErr() << "Errore nella conversione del punto min: " << minSL;
-            return JSON_PARSER_ERROR_DATA_CONVERSION;
-        }
-        obj->setMin(x, y);
+//        // imposto il punto di minimo
+//        bool okX, okY;
+//        QStringList minSL = minPoint.toString().split(POINT_COORDINATES_SEPARATOR);
+//        int x = minSL.at(0).toInt(&okX);
+//        int y = minSL.at(1).toInt(&okY);
+//        if (!okX || !okY) {
+//            traceErr() << "Errore nella conversione del punto min: " << minSL;
+//            return JSON_PARSER_ERROR_DATA_CONVERSION;
+//        }
+//        obj->setMin(x, y);
 
-        // imposto il punto di masssimo
-        QStringList maxSL = maxPoint.toString().split(POINT_COORDINATES_SEPARATOR);
-        x = maxSL.at(0).toInt(&okX);
-        y = maxSL.at(1).toInt(&okY);
-        if (!okX || !okY) {
-            traceErr() << "Errore nella conversione del punto max: " << maxSL;
-            return JSON_PARSER_ERROR_DATA_CONVERSION;
-        }
-        obj->setMax(x, y);
+//        // imposto il punto di masssimo
+//        QStringList maxSL = maxPoint.toString().split(POINT_COORDINATES_SEPARATOR);
+//        x = maxSL.at(0).toInt(&okX);
+//        y = maxSL.at(1).toInt(&okY);
+//        if (!okX || !okY) {
+//            traceErr() << "Errore nella conversione del punto max: " << maxSL;
+//            return JSON_PARSER_ERROR_DATA_CONVERSION;
+//        }
+//        obj->setMax(x, y);
 
-        traceExit;
-        return JSON_PARSER_NO_ERROR;
+//        traceExit;
+//        return JSON_PARSER_NO_ERROR;
 
-    }
+//    }
 
 };
 

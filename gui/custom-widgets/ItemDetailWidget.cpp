@@ -1,7 +1,7 @@
 #include "ItemDetailWidgetPrivate.hpp"
 #include "ItemDetailWidget.hpp"
 
-#include <json/FilterJsonParser.hpp>
+#include <json/FilterJsonStreamDecoder.hpp>
 #include <QDir>
 
 
@@ -313,7 +313,6 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
     this->model->clear();
 
     using namespace PROGRAM_NAMESPACE;
-    QScopedPointer<IAbstractJsonParser> parser(new FilterJsonParser());
 
     for (const QString& item: itemsPath) {
 
@@ -334,18 +333,19 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
             } else if (fileInfo.isFile()) {
 
                 QString filePath = fileInfo.absoluteFilePath();
-                QFile file(filePath);
-                if (!file.open(QFile::ReadOnly | QFile::Text)) {
-                    traceErr() << "Impossibile aprire il file:" << fileInfo.fileName();
-                    continue;
-                }
+//                QFile file(filePath);
+//                if (!file.open(QFile::ReadOnly | QFile::Text)) {
+//                    traceErr() << "Impossibile aprire il file:" << fileInfo.fileName();
+//                    continue;
+//                }
 
-                QString bytes = file.readAll();
-                file.close();
+//                QString bytes = file.readAll();
+//                file.close();
 
-                Filter flt;
-                JsonParserError err;
-                if (!(err = parser->decodeJsonHeaderOnly(bytes.toUtf8(), &flt) == JSON_PARSER_NO_ERROR)) {
+                FilterStream flt;
+                QScopedPointer<IAbstractJsonStreamDecoder> parser(new FilterJsonStreamDecoder(filePath));
+                JsonStreamDecoderError err = parser->decodeHeader(&flt);
+                if (err != JSON_STREAM_DECODER_NO_ERROR) {
                     traceErr() << "Errore nel parsing del file:" << fileInfo.fileName();
                     traceErr() << "Errore parser:" << err;
                     continue;

@@ -1,6 +1,8 @@
 SET(ITEMS
     AbstractJsonParser
     FilterJsonParser
+    AbstractJsonStreamDecoder
+    FilterJsonStreamDecoder
     )
 
 FOREACH(ITEM ${ITEMS})
