@@ -5,9 +5,15 @@
 #include "Point.h"
 #include "PointWrapper.h"
 #include "PolygonProperties.h"
+#include "BoxProperties.h"
 
 #include <list>
 
+/*
+ * Note Nic: la libreria IPG non permette di fare una copia della pointlist;
+   il costruttore con parametro list<Point> usa ciascun punto come reference, non e' una deep copy;
+   per fare una deep copy, e' indispensabile usare il metodo append
+ */
 
 namespace ipg_marking_library_wrapper {
     
@@ -31,6 +37,7 @@ namespace ipg_marking_library_wrapper {
         //PointList(const PointList& copy);
         PointList(PointList&& other);
         PointList(const PolygonProperties& polygonProperties);
+        PointList(const BoxProperties& boxProperties);
         ~PointList();
 
         void append(const PointList& pl);
@@ -42,6 +49,9 @@ namespace ipg_marking_library_wrapper {
         void rotate(double x, double y, double z);
         void rotate(float z);
         void rotate(float x, float y, float z);
+        void reverseOrder();
+        void scale(float scaleFactor);
+        void scale(float x, float y, float z);
         std::list<PointWrapper> points();
 
         // metodi che accedono direttamente alla lista di punti;
@@ -52,6 +62,13 @@ namespace ipg_marking_library_wrapper {
         void addPoint(const Point& p);
 
         IPGMARKINGLIBRARYWRAPPER_API friend std::ostream& operator<<(std::ostream& os, const PointList& obj);
+
+        /*** da verificare se puo' essere utile ***/
+        // per funzionare, alla classe PointListWrapper bisogna mettere la classe PointList come friend
+        // operator PointListWrapper () {
+        //     return PointListWrapper(const_cast<POINTLIST_WRAPPER_HANDLER_PTR>(getManagedPtr()));
+        // 
+        // }
 
     };
 
