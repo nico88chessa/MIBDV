@@ -5,6 +5,7 @@
 #include "Vector.h"
 #include "VectorWrapper.h"
 #include "PolygonProperties.h"
+#include "BoxProperties.h"
 
 #include <list>
 
@@ -31,6 +32,7 @@ namespace ipg_marking_library_wrapper {
         //VectorList(const VectorList& other);
         VectorList(VectorList&& other);
         VectorList(const PolygonProperties& polygonProperties);
+        VectorList(const BoxProperties& boxProperties);
         ~VectorList();
 
         void append(const VectorList& vl);
@@ -42,6 +44,9 @@ namespace ipg_marking_library_wrapper {
         void rotate(double x, double y, double z);
         void rotate(float z);
         void rotate(float x, float y, float z);
+        void reverseOrder();
+        void scale(float scaleFactor);
+        void scale(float x, float y, float z);
         std::list<VectorWrapper> vectors();
 
         // metodi che accedono direttamente alla lista di punti;
