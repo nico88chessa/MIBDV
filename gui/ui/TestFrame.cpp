@@ -286,6 +286,10 @@ void TestFrameLogic::startProcess() {
 
     this->isProcessStopped = false;
 
+    QString format = "dd/MM/yyyy - HH:mm:ss";
+
+    QString startTime = QDateTime::currentDateTime().toString(format);
+
     int tileSizeMm = qPtr->ui->sbTileSize->value();
     double offsetXmm = qPtr->ui->dsbOffsetX->value();
     double offsetYmm = qPtr->ui->dsbOffsetY->value();
@@ -905,10 +909,16 @@ void TestFrameLogic::startProcess() {
 
     // fine gestione file
     DialogAlert diag;
+
     if (isProcessStopped)
-        diag.setupLabels("Info", "Processo fermato");
+        diag.setupLabels("Info", "Processo fermato" \
+                          "\nInizio: " + startTime + \
+                          "\nFine: " + QDateTime::currentDateTime().toString(format));
     else
-        diag.setupLabels("Info", "Bucato tutto");
+        diag.setupLabels("Info", "Bucato tutto" \
+                          "\nInizio: " + startTime + \
+                          "\nFine: " + QDateTime::currentDateTime().toString(format));
+
     diag.exec();
 
     traceExit;
