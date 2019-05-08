@@ -15,24 +15,24 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="leftMargin">
-    <number>4</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>4</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>4</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>4</number>
+    <number>0</number>
    </property>
    <property name="spacing">
-    <number>4</number>
+    <number>0</number>
    </property>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabPrint">
       <attribute name="title">
@@ -154,14 +154,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="MDSpinBox" name="sbWaitTimeYMovement">
-            <property name="label" stdset="0">
-             <string>Wait time after axis Y movement [ms]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="MDSpinBox" name="sbTileTime">
             <property name="minimumSize">
              <size>
@@ -193,6 +186,27 @@
             </property>
             <property name="label" stdset="0">
              <string>Angle [mrad]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="MDSpinBox" name="sbWaitTimeYMovement">
+            <property name="label" stdset="0">
+             <string>Wait time after axis Y movement [ms]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="MDDoubleSpinBox" name="dsbScaleX">
+            <property name="label" stdset="0">
+             <string>Scale X [%]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="MDDoubleSpinBox" name="dsbScaleY">
+            <property name="label" stdset="0">
+             <string>Scale Y [%]</string>
             </property>
            </widget>
           </item>
@@ -817,6 +831,8 @@
   <tabstop>dsbAngleMrad</tabstop>
   <tabstop>dsbOffsetX</tabstop>
   <tabstop>dsbOffsetY</tabstop>
+  <tabstop>dsbScaleX</tabstop>
+  <tabstop>dsbScaleY</tabstop>
   <tabstop>sbTileTime</tabstop>
   <tabstop>sbWaitTimeYMovement</tabstop>
   <tabstop>cbRandomChoice</tabstop>
@@ -829,19 +845,29 @@
   <tabstop>pbStartProcess</tabstop>
   <tabstop>pbStopProcess</tabstop>
   <tabstop>rbPoint</tabstop>
+  <tabstop>rbCirclePoints</tabstop>
+  <tabstop>rbCircleVector</tabstop>
+  <tabstop>sbCircleVectorRadius</tabstop>
+  <tabstop>sbCircleVectorNumberSides</tabstop>
+  <tabstop>sbCircleVectorNumberRevolutions</tabstop>
+  <tabstop>sbCircleVectorPointsPitch</tabstop>
+  <tabstop>sbPointPulses</tabstop>
+  <tabstop>sbCirclePointsRadius</tabstop>
+  <tabstop>sbCirclePointsNumberSides</tabstop>
+  <tabstop>sbCirclePointsPulses</tabstop>
+  <tabstop>hsLaserPower</tabstop>
   <tabstop>sbLaserPower</tabstop>
   <tabstop>cbLaserPulseWidth</tabstop>
   <tabstop>hsLaserFrequency</tabstop>
   <tabstop>sbLaserFrequency</tabstop>
-  <tabstop>pbSet</tabstop>
   <tabstop>pbGuideLaser</tabstop>
+  <tabstop>pbReset</tabstop>
+  <tabstop>pbSet</tabstop>
   <tabstop>leStackTimeMeasure</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>cbGuideLaser</tabstop>
-  <tabstop>cbLaserInitialized</tabstop>
-  <tabstop>pbReset</tabstop>
   <tabstop>leTileTimeMeasure</tabstop>
-  <tabstop>hsLaserPower</tabstop>
+  <tabstop>cbLaserInitialized</tabstop>
+  <tabstop>cbGuideLaser</tabstop>
  </tabstops>
  <resources/>
  <connections/>

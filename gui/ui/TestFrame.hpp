@@ -41,11 +41,18 @@ private:
     static constexpr int TEST_FRAME_OFFSET_X_MAX = 1200;
     static constexpr int TEST_FRAME_OFFSET_Y_MIN = 0;
     static constexpr int TEST_FRAME_OFFSET_Y_MAX = 1200;
+    static constexpr double TEST_FRAME_SCALE_X_DFLT = 100;
+    static constexpr double TEST_FRAME_SCALE_X_MIN = 80;
+    static constexpr double TEST_FRAME_SCALE_X_MAX = 120;
+    static constexpr double TEST_FRAME_SCALE_Y_DFLT = 100;
+    static constexpr double TEST_FRAME_SCALE_Y_MIN = 80;
+    static constexpr double TEST_FRAME_SCALE_Y_MAX = 120;
     static constexpr int TEST_FRAME_POINTS_DISTANCE_UM_MIN = 100;
     static constexpr int TEST_FRAME_POINTS_DISTANCE_UM_MAX = 100000;
     static constexpr int TEST_FRAME_ANGLE_MRAD_MIN = -200;
     static constexpr int TEST_FRAME_ANGLE_MRAD_MAX = 200;
     static constexpr double TEST_FRAME_DSB_STEP = 0.1;
+    static constexpr double TEST_FRAME_DSB_SCALE_STEP = 0.01;
     static constexpr double TEST_FRAME_ANGLE_STEP = 0.001;
 
     static constexpr int TEST_FRAME_PULSES_MIN = 1;

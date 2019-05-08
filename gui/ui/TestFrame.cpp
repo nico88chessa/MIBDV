@@ -307,6 +307,16 @@ void TestFrameLogic::startProcess() {
     int circleVectorNumberOfSides = qPtr->ui->sbCircleVectorNumberSides->value();
     int circleVectorPitch = qPtr->ui->sbCircleVectorPointsPitch->value();
 
+    float tileScaleXPercent = qPtr->ui->dsbScaleX->value();
+    float tileScaleYPercent = qPtr->ui->dsbScaleY->value();
+    float tileScaleXUnit = tileScaleXPercent * 0.01;
+    float tileScaleYUnit = tileScaleYPercent * 0.01;
+
+    traceInfo() << "Scale Tile X [%]: " << tileScaleXPercent;
+    traceInfo() << "Scale Tile Y [%]: " << tileScaleYPercent;
+    traceInfo() << "Scale Tile X [unit]: " << tileScaleXUnit;
+    traceInfo() << "Scale Tile Y [unit]: " << tileScaleXUnit;
+
     //bool moveAxisYEachTile = qPtr->ui->cbMoveYEachTile->isChecked();
     //bool moveAxisYEachLayerTile = qPtr->ui->cbMoveYEachStackedTile->isChecked();
     int waitTimeMs = qPtr->ui->sbTileTime->value();
@@ -720,6 +730,7 @@ void TestFrameLogic::startProcess() {
 
                 imlw::PointList outputPoints(listOfPoints);
                 outputPoints.rotate(angleRad);
+                outputPoints.scale(tileScaleXUnit, tileScaleYUnit, 1);
 
                 waitTimeTimer.start();
                 qApp->processEvents();
@@ -752,6 +763,7 @@ void TestFrameLogic::startProcess() {
                     circles.append(singleCirclePoints);
                 }
                 circles.rotate(angleRad);
+                circles.scale(tileScaleXUnit, tileScaleYUnit, 1);
 
                 waitTimeTimer.start();
                 qApp->processEvents();
@@ -783,6 +795,7 @@ void TestFrameLogic::startProcess() {
                     circlesVet.append(singleCircle);
                 }
                 circlesVet.rotate(angleRad);
+                circlesVet.scale(tileScaleXUnit, tileScaleYUnit, 1);
 
                 waitTimeTimer.start();
                 qApp->processEvents();
@@ -1063,6 +1076,16 @@ void TestFrame::setupUi() {
     ui->dsbOffsetY->setRange(TEST_FRAME_OFFSET_Y_MIN, TEST_FRAME_OFFSET_Y_MAX);
     ui->dsbOffsetY->setSingleStep(TEST_FRAME_DSB_STEP);
     ui->dsbOffsetY->setDecimals(3);
+
+    ui->dsbScaleX->setRange(TEST_FRAME_SCALE_X_MIN, TEST_FRAME_SCALE_X_MAX);
+    ui->dsbScaleX->setSingleStep(TEST_FRAME_DSB_SCALE_STEP);
+    ui->dsbScaleX->setDecimals(3);
+    ui->dsbScaleX->setValue(TEST_FRAME_SCALE_X_DFLT);
+
+    ui->dsbScaleY->setRange(TEST_FRAME_SCALE_Y_MIN, TEST_FRAME_SCALE_Y_MAX);
+    ui->dsbScaleY->setSingleStep(TEST_FRAME_DSB_SCALE_STEP);
+    ui->dsbScaleY->setDecimals(3);
+    ui->dsbScaleY->setValue(TEST_FRAME_SCALE_Y_DFLT);
 
     ui->sbRPointsPerTile->setRange(TEST_FRAME_POINTS_PER_TILE_MIN, TEST_FRAME_POINTS_PER_TILE_MAX);
     ui->sbNHMinDistance->setRange(TEST_FRAME_POINTS_DISTANCE_UM_MIN, TEST_FRAME_POINTS_DISTANCE_UM_MAX);

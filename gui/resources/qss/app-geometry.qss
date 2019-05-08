@@ -252,3 +252,7 @@ MDFileExplorerWidget {
 .TestFrame #frPoint {
     min-width: 400px;
 }
+
+.TestFrame #tabWidget {
+    qproperty-focusPolicy: NoFocus;
+}
