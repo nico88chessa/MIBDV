@@ -58,13 +58,13 @@ private:
     static constexpr int TEST_FRAME_PULSES_MIN = 1;
     static constexpr int TEST_FRAME_PULSES_MAX = 20000;
     static constexpr int TEST_FRAME_CIRCLE_RADIUS_MIN = 50;
-    static constexpr int TEST_FRAME_CIRCLE_RADIUS_MAX = 2000;
+    static constexpr int TEST_FRAME_CIRCLE_RADIUS_MAX = 100000; // TODO NIC 13/05/2019 - rimettere 2000
     static constexpr int TEST_FRAME_CIRCLE_RADIUS_STEP = 1;
     static constexpr int TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MIN = 1;
     static constexpr int TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MAX = 2000;
     static constexpr int TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_STEP = 1;
     static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_MIN = 3;
-    static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_MAX = 10;
+    static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_MAX = 20; // TODO NIC 13/05/2019 - rimettere 10
     static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_STEP = 1;
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MIN = 1;
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MAX = TEST_FRAME_CIRCLE_RADIUS_MAX/20; // parametro da verificare

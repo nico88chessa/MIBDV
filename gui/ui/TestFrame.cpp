@@ -381,9 +381,23 @@ void TestFrameLogic::startProcess() {
 
     int pointsNumber = filter.getNumOfPoints();
 
-    // inizio configurazione testa scansione ipg
-    ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1);
+    if (!ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1)) {
+        traceErr() << "Impossibile attivare l'aria compressa";
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile attivare l'aria compressa");
+        diag.exec();
+        return;
+    }
 
+    if (!ioManager->setDigitalOutput(IOType::SUCTION)) {
+        traceErr() << "Impossibile attivare l'aspirazione";
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile attivare l'aspirazione");
+        diag.exec();
+        return;
+    }
+
+    // inizio configurazione testa scansione ipg
     float energy = TestFrame::TEST_FRAME_PULSE_ENERGY_DFLT;
 
 #ifdef FLAG_IPG_YLPN_LASER_PRESENT
@@ -743,6 +757,7 @@ void TestFrameLogic::startProcess() {
                 try {
 
                     scanner->output(outputPoints);
+                    qApp->processEvents();
                     listOfPoints.clear();
                     scanner->laser(imlw::LaserAction::Disable);
 
@@ -776,6 +791,7 @@ void TestFrameLogic::startProcess() {
                 try {
 
                     scanner->output(circles);
+                    qApp->processEvents();
                     scanner->laser(imlw::LaserAction::Disable);
 
                 } catch (imlw::LibraryException& ex) {
@@ -808,6 +824,7 @@ void TestFrameLogic::startProcess() {
                 try {
 
                     scanner->output(circlesVet);
+                    qApp->processEvents();
                     scanner->laser(imlw::LaserAction::Disable);
 
                 } catch (imlw::LibraryException& ex) {
@@ -893,11 +910,26 @@ void TestFrameLogic::startProcess() {
         return;
 #endif
 
-    ioManager->unsetDigitalOutput(IOType::COMPRESSED_AIR_1);
+    if (!ioManager->unsetDigitalOutput(IOType::SUCTION)) {
+        traceErr() << "Impossibile attivare l'aspirazione";
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile attivare l'aspirazione");
+        diag.exec();
+        return;
+    }
+
+    if (!ioManager->unsetDigitalOutput(IOType::COMPRESSED_AIR_1)) {
+        traceErr() << "Impossibile attivare l'aria compressa";
+        DialogAlert diag;
+        diag.setupLabels("Error", "Impossibile attivare l'aria compressa");
+        diag.exec();
+        return;
+    }
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
     try {
         scanner->laser(imlw::LaserAction::Disable);
+        scanner->close();
     } catch (imlw::LibraryException& ex) {
         traceErr() << "Eccezione laser disable con testa scansione";
         traceErr() << "Descrizione eccezione: " << ex.what();
