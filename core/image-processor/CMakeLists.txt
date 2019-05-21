@@ -1,12 +1,6 @@
 SET(ITEMS
-    Logger
-    Settings
-    Constants
-    ErrorSignaler
-    ErrorManager
-    Utils
-    ComputationUtils
-    MathUtils
+    AbstractProcessor
+    RowTileProcessor
     )
 
 FOREACH(ITEM ${ITEMS})

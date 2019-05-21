@@ -7,6 +7,7 @@
 
 #include <Point.hpp>
 
+
 namespace PROGRAM_NAMESPACE {
 
 enum class POINT_POSITION : int {
@@ -105,7 +106,8 @@ public:
 
     }
 
-
+    template <typename TT>
+    friend inline bool operator==(const BoundingBox<TT>& l, const BoundingBox<TT>& r);
 
 };
 
@@ -114,6 +116,11 @@ using BoundingBoxI = BoundingBox<int>;
 using BoundingBoxUI = BoundingBox<unsigned int>;
 using BoundingBoxF = BoundingBox<float>;
 using BoundingBoxD = BoundingBox<double>;
+
+template<typename TT>
+bool operator==(const BoundingBox<TT>& l, const BoundingBox<TT>& r) {
+    return (l.m == r.m) && (l.M == r.M);
+}
 
 }
 

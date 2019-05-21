@@ -27,6 +27,7 @@ public:
         void addPoint(const PointI& p);
         void addPoint(int x, int y);
         void reset();
+        const QVector<PointI>& getPoints() const;
 
     };
 
@@ -51,7 +52,7 @@ public:
     void setStripesNumber(int value);
     int getStripeWidthUm() const;
     void setStripeWidthUm(int value);
-    void addStripe(const Stripe& stripe);
+    void setStripe(const Stripe& stripe, int index);
     const Stripe& getStripe(int index) const;
 
     friend inline QDebug operator<<(QDebug dbg, const FilterStream& fs);

@@ -34,6 +34,7 @@ MESSAGE("${CMAKE_CURRENT_SOURCE_DIR}/QSS_FILES: ${PROJECT_QSS_FILES}")
 
 SET(SUB_FOLDERS
     json
+    image-processor
 )
 
 FOREACH(item ${SUB_FOLDERS})

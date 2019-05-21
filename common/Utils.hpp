@@ -7,6 +7,7 @@
 #include <Constants.hpp>
 #include <gui/resources/lang/lang.hpp>
 
+
 namespace PROGRAM_NAMESPACE {
 
 class Utils {

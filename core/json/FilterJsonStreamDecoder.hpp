@@ -322,7 +322,8 @@ public:
         switch (currentObject()) {
 
         case OBJECT_TYPE::DATA_ARRAY_ELEMENT: {
-            f->addStripe(this->tempStripe);
+
+            f->setStripe(this->tempStripe, this->chunkToParse);
             if (parsingChunkId > chunkToParse) {
                 objectStack.pop();
                 return false;
@@ -331,8 +332,8 @@ public:
         }
 
         case OBJECT_TYPE::OBJECT_TO_SKIP: {
-            if (parent(currentIndex()) == OBJECT_TYPE::DATA_ARRAY)
-                f->addStripe(FilterStream::Stripe());
+//            if (parent(currentIndex()) == OBJECT_TYPE::DATA_ARRAY)
+//                f->addStripe(FilterStream::Stripe());
             break;
         }
 

@@ -25,13 +25,19 @@ void FilterStream::setMin(int x, int y) { this->setMin(PointI(x, y)); }
 
 int FilterStream::getStripesNumber() const { return stripesNumber; }
 
-void FilterStream::setStripesNumber(int value) { stripesNumber = value; }
+void FilterStream::setStripesNumber(int value) {
+    stripesNumber = value;
+    stripes.resize(value);
+}
 
 int FilterStream::getStripeWidthUm() const { return stripeWidthUm; }
 
 void FilterStream::setStripeWidthUm(int value) { stripeWidthUm = value; }
 
-void FilterStream::addStripe(const FilterStream::Stripe& stripe) { this->stripes.append(stripe); }
+void FilterStream::setStripe(const FilterStream::Stripe& stripe, int index) {
+    // TODO NIC 20/05/2019 - gestire il caso in cui index >= size() ( con eccezione )
+    this->stripes[index] = stripe;
+}
 
 const FilterStream::Stripe& FilterStream::getStripe(int index) const {
     return stripes.at(index);
@@ -70,6 +76,8 @@ void FilterStream::Stripe::reset() {
     points.squeeze(); // questo rilascia la memoria
 
 }
+
+const QVector<PointI>& FilterStream::Stripe::getPoints() const { return this->points; }
 
 QDebug operator<<(QDebug dbg, const FilterStream& fs) {
 
