@@ -1,9 +1,12 @@
-#include "IOInspector.hpp"
+#include "IOSignaler.hpp"
 #include "Settings.hpp"
+#include <GalilCNStatusBean.hpp>
+#include <GalilPLCStatusBean.hpp>
+
 
 using namespace PROGRAM_NAMESPACE;
 
-IOInspector::IOInspector(QObject *parent) : QObject(parent),
+IOSignaler::IOSignaler(QObject *parent) : QObject(parent),
     digitalInputLastValues(), isFirst(true),
     refreshTimer(this),
     needSignaler(false) {
@@ -35,80 +38,11 @@ IOInspector::IOInspector(QObject *parent) : QObject(parent),
     int refreshTimeMs = settings.getMachineIORefreshIntervalMs();
     refreshTimer.setInterval(refreshTimeMs);
 
-    connect(&refreshTimer, &QTimer::timeout, this, &IOInspector::process);
+    connect(&refreshTimer, &QTimer::timeout, this, &IOSignaler::process);
 
 }
 
-void IOInspector::updateStatus(const GalilCNStatusBean& status) {
-
-    traceEnter;
-
-    // TODO NIC 05/11/2018 - gestire errori IO (per gli IO che prevedono l'errore)
-    for (auto&& dInKey: digitalInputStatus.keys()) {
-        auto& dIn = digitalInputStatus[dInKey];
-        if (dIn.getDevice() == DeviceKey::GALIL_CN) {
-            bool value = status.getDigitalInput(dIn.getChannel());
-            if (dIn.getInvertLogic())
-                value = !value;
-            dIn.setValue(value);
-        }
-    }
-
-    for (auto&& dOutKey: digitalOutputStatus.keys()) {
-        auto& dOut = digitalOutputStatus[dOutKey];
-        if (dOut.getDevice() == DeviceKey::GALIL_CN) {
-            bool value = status.getDigitalOutput(dOut.getChannel());
-            if (dOut.getInvertLogic())
-                value = !value;
-            dOut.setValue(value);
-        }
-    }
-
-    needSignaler = true;
-    traceExit;
-
-}
-
-void IOInspector::updateStatus(const GalilPLCStatusBean& status) {
-
-    traceEnter;
-
-    // TODO NIC 05/11/2018 - gestire errori IO (per gli IO che prevedono l'errore)
-    for (auto&& dInKey: digitalInputStatus.keys()) {
-        auto& dIn = digitalInputStatus[dInKey];
-        if (dIn.getDevice() == DeviceKey::GALIL_PLC) {
-            bool value = status.getDigitalInput(dIn.getChannel());
-            if (dIn.getInvertLogic())
-                value = !value;
-            dIn.setValue(value);
-        }
-    }
-
-    for (auto&& dOutKey: digitalOutputStatus.keys()) {
-        auto& dOut = digitalOutputStatus[dOutKey];
-        if (dOut.getDevice() == DeviceKey::GALIL_PLC) {
-            bool value = status.getDigitalOutput(dOut.getChannel());
-            if (dOut.getInvertLogic())
-                value = !value;
-            dOut.setValue(value);
-        }
-    }
-
-    for (auto&& aInKey: analogInputStatus.keys()) {
-        auto& aIn = analogInputStatus[aInKey];
-        if (aIn.getDevice() == DeviceKey::GALIL_PLC) {
-            analogReal value = status.getAnalogInput(aIn.getChannel());
-            value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
-            aIn.setValue(value);
-        }
-    }
-
-    needSignaler = true;
-    traceExit;
-
-}
-
-void IOInspector::analizeIO() {
+void IOSignaler::analizeIO() {
 
     traceEnter;
 
@@ -155,29 +89,26 @@ void IOInspector::analizeIO() {
 
 }
 
-void IOInspector::process() {
+void IOSignaler::process() {
 
     traceEnter;
 
-    if (this->needSignaler) {
-//        emit digitalInputsStateSignal(digitalInputStatus);
-//        emit digitalOutputsStateSignal(digitalOutputStatus);
-//        emit analogInputsStateSignal(analogInputStatus);
+    if (this->needSignaler)
         emit statusSignal(digitalInputStatus, digitalOutputStatus, analogInputStatus);
-    }
+
     needSignaler = false;
 
     traceExit;
 
 }
 
-void IOInspector::restartProcess() {
+void IOSignaler::restartProcess() {
     traceEnter;
     // do nothing
     traceExit;
 }
 
-void IOInspector::startProcess() {
+void IOSignaler::startProcess() {
 
     traceEnter;
     refreshTimer.start();
@@ -186,7 +117,7 @@ void IOInspector::startProcess() {
 
 }
 
-void IOInspector::stopProcess() {
+void IOSignaler::stopProcess() {
 
     traceEnter;
 
@@ -198,20 +129,73 @@ void IOInspector::stopProcess() {
 
 }
 
-void IOInspector::updateIOStatus(DeviceKey k, const QVariant& status) {
+void IOSignaler::updateStatus(const GalilCNStatusBean& status) {
 
     traceEnter;
 
-    switch (k) {
-        case DeviceKey::GALIL_CN: this->updateStatus<DeviceKey::GALIL_CN>(status); break;
-        case DeviceKey::GALIL_PLC: this->updateStatus<DeviceKey::GALIL_PLC>(status); break;
-        case DeviceKey::NONE: break;
+    // TODO NIC 05/11/2018 - gestire errori IO (per gli IO che prevedono l'errore)
+    for (auto&& dInKey: digitalInputStatus.keys()) {
+        auto& dIn = digitalInputStatus[dInKey];
+        if (dIn.getDevice() == DeviceKey::GALIL_CN) {
+            bool value = status.getDigitalInput(dIn.getChannel());
+            if (dIn.getInvertLogic())
+                value = !value;
+            dIn.setValue(value);
+        }
+    }
+
+    for (auto&& dOutKey: digitalOutputStatus.keys()) {
+        auto& dOut = digitalOutputStatus[dOutKey];
+        if (dOut.getDevice() == DeviceKey::GALIL_CN) {
+            bool value = status.getDigitalOutput(dOut.getChannel());
+            if (dOut.getInvertLogic())
+                value = !value;
+            dOut.setValue(value);
+        }
     }
 
     this->analizeIO();
-
+    needSignaler = true;
     traceExit;
 
-    return;
+}
+
+void IOSignaler::updateStatus(const GalilPLCStatusBean& status) {
+
+    traceEnter;
+
+    // TODO NIC 05/11/2018 - gestire errori IO (per gli IO che prevedono l'errore)
+    for (auto&& dInKey: digitalInputStatus.keys()) {
+        auto& dIn = digitalInputStatus[dInKey];
+        if (dIn.getDevice() == DeviceKey::GALIL_PLC) {
+            bool value = status.getDigitalInput(dIn.getChannel());
+            if (dIn.getInvertLogic())
+                value = !value;
+            dIn.setValue(value);
+        }
+    }
+
+    for (auto&& dOutKey: digitalOutputStatus.keys()) {
+        auto& dOut = digitalOutputStatus[dOutKey];
+        if (dOut.getDevice() == DeviceKey::GALIL_PLC) {
+            bool value = status.getDigitalOutput(dOut.getChannel());
+            if (dOut.getInvertLogic())
+                value = !value;
+            dOut.setValue(value);
+        }
+    }
+
+    for (auto&& aInKey: analogInputStatus.keys()) {
+        auto& aIn = analogInputStatus[aInKey];
+        if (aIn.getDevice() == DeviceKey::GALIL_PLC) {
+            analogReal value = status.getAnalogInput(aIn.getChannel());
+            value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
+            aIn.setValue(value);
+        }
+    }
+
+    this->analizeIO();
+    needSignaler = true;
+    traceExit;
 
 }

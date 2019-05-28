@@ -8,9 +8,14 @@ SET(ITEMS
     AbstractCN
     AbstractDeviceConnectionWatcher
     IOManager
-    IOInspector
     MotionManager
     MotionManagerImpl
+    MotionSignaler
+    MotionAnalizer
+    ConnectedDeviceInspector
+    IOSignaler
+    DeviceFactory
+    InspectorStatusNotifier
     )
 
 FOREACH(ITEM ${ITEMS})

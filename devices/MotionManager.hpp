@@ -44,6 +44,9 @@ public:
     explicit MotionManager(QObject* parent = nullptr);
     ~MotionManager();
 
+    virtual bool isConnected() = 0;
+    virtual bool connect() = 0;
+
     MotionErr moveX(posType posMm);
     MotionErr moveXManual(posType posMm);
     MotionErr stopX();
@@ -77,10 +80,10 @@ protected:
     virtual bool homeZImpl(spdCNType speed, accCNType acc, accCNType dec) = 0;
 
 signals:
-    void powerOffSignal();
-    void powerOnSignal();
-    void cycleOffSignal();
-    void cycleOnSignal();
+    //void powerOffSignal();
+    //void powerOnSignal();
+    //void cycleOffSignal();
+    //void cycleOnSignal();
 
     void axisXMotorOffSignal();
     void axisXMotionStopSignal(MotionStopCode stopCode);

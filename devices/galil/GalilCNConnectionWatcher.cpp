@@ -38,10 +38,17 @@ void GalilCNConnectionWatcher::reconnectDevice() {
 
             timerKeepAlive.stop();
 
-            QString ipCN = Settings::instance().getGalilCNIpAddress();
+            Settings& s = Settings::instance();
+            QString ipCN = s.getGalilCNIpAddress();
             auto galilCN = device.staticCast<GalilCNController>().data();
+            galilCN->setupController(
+                        s.getGalilCNIpAddress(),
+                        s.getGalilCNNumberDigitalInput(),
+                        s.getGalilCNNumberDigitalOutput(),
+                        s.getGalilCNNumberAnalogInput(),
+                        s.getGalilCNOptionCustomHomeAxisX());
 
-            if (galilCN->connect(ipCN)) {
+            if (galilCN->connect()) {
                 unsigned int timeMs;
                 int res = galilCN->getKeepAliveTimeMs(&timeMs);
                 if (galilCN->isError(res)) {

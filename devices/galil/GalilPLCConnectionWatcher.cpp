@@ -38,10 +38,16 @@ void GalilPLCConnectionWatcher::reconnectDevice() {
 
             timerKeepAlive.stop();
 
-            QString ipPLC = Settings::instance().getGalilPLCIpAddress();
+            Settings& s = Settings::instance();
+            QString ipPLC = s.getGalilPLCIpAddress();
             auto galilPLC = device.staticCast<GalilPLCController>().data();
+            galilPLC->setupController(
+                        s.getGalilPLCIpAddress(),
+                        s.getGalilPLCNumberDigitalInput(),
+                        s.getGalilPLCNumberDigitalOutput(),
+                        s.getGalilPLCNumberAnalogInput());
 
-            if (galilPLC->connect(ipPLC)) {
+            if (galilPLC->connect()) {
                 unsigned int timeMs;
                 int res = galilPLC->getKeepAliveTimeMs(&timeMs);
                 if (galilPLC->isError(res)) {

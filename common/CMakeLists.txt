@@ -7,6 +7,7 @@ SET(ITEMS
     Utils
     ComputationUtils
     MathUtils
+    NamedThread
     )
 
 FOREACH(ITEM ${ITEMS})

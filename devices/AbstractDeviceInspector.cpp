@@ -56,7 +56,7 @@ void AbstractDeviceInspector::process() {
     QVariant status;
     if (getStatus(status))
         emit statusSignal(status);
-
+    emit isRunningSignal(true);
     traceExit;
 
 }
@@ -64,8 +64,10 @@ void AbstractDeviceInspector::process() {
 void AbstractDeviceInspector::startProcess() {
 
     traceEnter;
-    if (!this->beforeProcess())
+    if (!this->beforeProcess()) {
+        emit isRunningSignal(false);
         return;
+    }
     refreshTimer.start();
     emit processStartedSignal();
     traceExit;

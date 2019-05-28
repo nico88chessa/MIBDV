@@ -28,6 +28,7 @@ private:
     Ui::IOFrame *ui;
     IOFrameLogic* dPtr;
     int rowMinHeight;
+
     PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
     PROGRAM_NAMESPACE::DigitalOutputStatus digitalOutputStatus;
     PROGRAM_NAMESPACE::AnalogInputStatus analogInputStatus;
@@ -42,8 +43,6 @@ public:
 
     int getRowMinHeight() const;
     void setRowMinHeight(int value);
-
-    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
 
 private:
     void setupUi();

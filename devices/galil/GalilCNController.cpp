@@ -58,6 +58,7 @@ int GalilCNController::getRecord(GalilCNStatusBean& record) {
 }
 
 void GalilCNController::setupController(
+        const QString& ipAddress,
         int numDigitalInput, int numDigitalOutput, int numAnalogInput,
         bool customHomeAxisX) {
 
@@ -66,6 +67,7 @@ void GalilCNController::setupController(
     if (isInitialized)
         return;
 
+    this->ipAddress = ipAddress;
     this->numDigitalInput = numDigitalInput;
     this->numDigitalOutput = numDigitalOutput;
     this->numAnalogInput = numAnalogInput;
@@ -77,7 +79,7 @@ void GalilCNController::setupController(
 
 }
 
-bool GalilCNController::connect(const QString& ip) {
+bool GalilCNController::connect() {
 
     traceEnter;
 
@@ -86,7 +88,7 @@ bool GalilCNController::connect(const QString& ip) {
 
     // TODO NIC 07/11/2018 - parametrizzare da file di configurazione
     int timeout = 1000;
-    QString command = ip + QString(" -t %1").arg(timeout);
+    QString command = this->ipAddress + QString(" -t %1").arg(timeout);
 
 #ifdef FLAG_CN_PRESENT
     GReturn result = GOpen(command.toStdString().data(), handler.data());

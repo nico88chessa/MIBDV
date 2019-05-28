@@ -6,6 +6,8 @@
 
 #include <MotionManager.hpp>
 #include <IOManager.hpp>
+#include <IOSignaler.hpp>
+#include <MotionSignaler.hpp>
 
 class MotionFrame;
 
@@ -20,6 +22,8 @@ public:
 
 private:
     MotionFrame* qPtr;
+    QWeakPointer<PROGRAM_NAMESPACE::MotionSignaler> motionSignaler;
+    QWeakPointer<PROGRAM_NAMESPACE::IOSignaler> ioSignaler;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
     const int TIMER_CHECK_MOTION_MS = 500;
@@ -28,8 +32,10 @@ public:
     MotionFrameLogic();
     ~MotionFrameLogic();
 
-    void setupMotionManager(const QSharedPointer<mibdv::MotionManager>& motionManager);
-    void setupIOManager(const QSharedPointer<mibdv::IOManager>& ioManager);
+    void initialize();
+
+    //void setupMotionManager(const QSharedPointer<mibdv::MotionManager>& motionManager);
+    //void setupIOManager(const QSharedPointer<mibdv::IOManager>& ioManager);
 
 private:
     bool checkCycle();

@@ -37,6 +37,14 @@ public:
 
     }
 
+    virtual bool isConnected() override {
+        return cn->isConnected();
+    }
+
+    virtual bool connect() override {
+        return cn->connect();
+    }
+
 private:
 
     bool moveImpl(Axis a, posType pos, spdCNType speed, accCNType acc, accCNType dec) {
@@ -256,6 +264,7 @@ protected:
         return isOk;
 
     }
+
 
 };
 

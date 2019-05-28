@@ -57,13 +57,16 @@ int GalilPLCController::getRecord(GalilPLCStatusBean& record) {
 
 }
 
-void GalilPLCController::setupController(int numDigitalInput, int numDigitalOutput, int numAnalogInput) {
+void GalilPLCController::setupController(
+        const QString& ipAddress,
+        int numDigitalInput, int numDigitalOutput, int numAnalogInput) {
 
     traceEnter;
 
     if (isInitialized)
         return;
 
+    this->ipAddress = ipAddress;
     this->numDigitalInput = numDigitalInput;
     this->numDigitalOutput = numDigitalOutput;
     this->numAnalogInput = numAnalogInput;
@@ -74,7 +77,7 @@ void GalilPLCController::setupController(int numDigitalInput, int numDigitalOutp
 
 }
 
-bool GalilPLCController::connect(const QString& ip) {
+bool GalilPLCController::connect() {
 
     traceEnter;
 
@@ -83,7 +86,7 @@ bool GalilPLCController::connect(const QString& ip) {
 
     // TODO NIC 07/11/2018 - parametrizzare da file di configurazione
     int timeout = 1000;
-    QString command = ip + QString(" -t %1").arg(timeout);
+    QString command = this->ipAddress + QString(" -t %1").arg(timeout);
 
 #ifdef FLAG_PLC_PRESENT
     GReturn result = GOpen(command.toStdString().data(), handler.data());

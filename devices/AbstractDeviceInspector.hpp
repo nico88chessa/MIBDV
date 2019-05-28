@@ -45,6 +45,7 @@ signals:
     void processStartedSignal();
     void processStoppedSignal();
     void statusSignal(const QVariant& status);
+    void isRunningSignal(bool isRunning);
 
 };
 

@@ -49,6 +49,10 @@ public:
         traceExit;
     }
 
+    bool isConnected();
+
+    bool connect();
+
 private:
 
     template<typename T>

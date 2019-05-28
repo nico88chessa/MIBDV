@@ -27,6 +27,7 @@ private:
     int numDigitalOutput;
     int numAnalogInput;
     QString handleCode;
+    QString ipAddress;
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 
@@ -35,10 +36,11 @@ public:
     virtual ~GalilPLCController();
     int getRecord(GalilPLCStatusBean& status);
 
-    void setupController(int numDigitalInput,
+    void setupController(const QString& ipAddress,
+                         int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput);
-    bool connect(const QString& ip);
+    virtual bool connect() override;
     virtual int getDigitalInput(int input, int& inputStatus);
     virtual int getDigitalOutput(int output, int& outputStatus);
     virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);

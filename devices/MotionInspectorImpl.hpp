@@ -1,17 +1,20 @@
 #ifndef MOTIONINSPECTORIMPL_HPP
 #define MOTIONINSPECTORIMPL_HPP
 
-#include "AbstractMotionInspector.hpp"
+#include "AbstractConnectedDeviceInspector.hpp"
 #include "AbstractCN.hpp"
 #include <QSharedPointer>
+#include <type_traits>
 
 namespace PROGRAM_NAMESPACE {
 
 template <typename T>
-class MotionInspectorImpl : public AbstractMotionInspector {
+class MotionInspectorImpl : public AbstractConnectedDeviceInspector {
 public:
     using Ptr = MotionInspectorImpl*;
     using ConstPtr = const MotionInspectorImpl*;
+
+    using type = T;
 
 protected:
     using S = typename isCN<T>::statusType;
@@ -27,7 +30,7 @@ protected:
 
 public:
     MotionInspectorImpl(QObject* parent = nullptr) :
-        AbstractMotionInspector(parent) {
+        AbstractConnectedDeviceInspector(parent) {
 
         static_assert(isCN<T>::value, "Il device non e' un CN");
 
@@ -49,7 +52,7 @@ protected:
         bool res;
         try {
             S s = getDevicePtr()->getStatus();
-            analizeLastStatus(s);
+//            analizeLastStatus(s);
             status = QVariant::fromValue(s);
             res = true;
         } catch (NoStatusException& e) {
@@ -62,7 +65,7 @@ protected:
 
     }
 
-    bool isDeviceConnected() {
+    bool isDeviceConnected() override {
         traceEnter;
         bool isConnected = getDevicePtr()->isConnected();
         traceExit;

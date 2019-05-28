@@ -36,6 +36,7 @@ private:
     int numAnalogInput;
     bool customHomeAxisX;
     QString handleCode;
+    QString ipAddress;
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 
@@ -64,11 +65,12 @@ public:
     GalilCNController();
     virtual ~GalilCNController();
 
-    void setupController(int numDigitalInput,
+    void setupController(const QString& ipAddress,
+                         int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput,
                          bool customHomeAxisX);
-    bool connect(const QString& ip);
+    virtual bool connect() override;
     int getRecord(GalilCNStatusBean& record);
     virtual int getDigitalInput(int input, int& inputStatus);
     virtual int getDigitalOutput(int output, int& outputStatus);

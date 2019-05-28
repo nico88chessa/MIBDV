@@ -4,7 +4,12 @@
 #include "MotionFrameLogic.hpp"
 #include "DialogAlert.hpp"
 
+#include <DeviceFactory.hpp>
+#include <MotionSignaler.hpp>
+#include <IOSignaler.hpp>
+
 #include <Logger.hpp>
+
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -16,18 +21,22 @@ MotionFrameLogic::MotionFrameLogic() { }
 
 MotionFrameLogic::~MotionFrameLogic() { }
 
-void MotionFrameLogic::setupMotionManager(const QSharedPointer<MotionManager>& motionManager) {
-
+void MotionFrameLogic::initialize() {
     traceEnter;
-    this->motionManager = motionManager;
-    traceExit;
 
-}
+    this->motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    this->ioSignaler = DeviceFactoryInstance.getIOSignaler();
+    this->motionManager = DeviceFactoryInstance.instanceMotionManager();
+    this->ioManager = DeviceFactoryInstance.instanceIOManager();
 
-void MotionFrameLogic::setupIOManager(const QSharedPointer<IOManager>& ioManager) {
 
-    traceEnter;
-    this->ioManager = ioManager;
+    if (!this->motionManager->isConnected())
+        this->motionManager->connect();
+
+    if (!this->ioManager->isConnected())
+        this->ioManager->connect();
+
+
     traceExit;
 
 }
@@ -641,13 +650,31 @@ void MotionFrameLogic::stopAxes() {
 
 }
 
-/**********************************************
- *         M O T I O N  F R A M E
- *********************************************/
+
+/*
+ * M O T I O N  F R A M E
+ */
 
 void MotionFrame::setupSignalsAndSlots() {
 
     traceEnter;
+
+    auto&& motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    auto&& ioSignaler = DeviceFactoryInstance.getIOSignaler();
+
+    connect(dPtr->motionSignaler.data(), &MotionSignaler::motionBeanSignal, [&](const MotionBean& motionBean) {
+        QMetaObject::invokeMethod(this, "updateMotionBean", Qt::QueuedConnection,
+                                  Q_ARG(const mibdv::MotionBean&, motionBean));
+    });
+
+    connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
+        Q_UNUSED(b);
+        Q_UNUSED(c);
+        QMetaObject::invokeMethod(this, "updateDigitalInputStatus", Qt::QueuedConnection,
+                                  Q_ARG(const mibdv::DigitalInputStatus&, a));
+
+    });
+
 
     connect(ui->pbMoveX, &QPushButton::clicked, dPtr, &MotionFrameLogic::moveX);
     connect(ui->pbMoveY, &QPushButton::clicked, dPtr, &MotionFrameLogic::moveY);
@@ -721,6 +748,7 @@ MotionFrame::MotionFrame(QWidget *parent) :
     isHomingAxes(false) {
 
     dPtr->qPtr = this;
+    dPtr->initialize();
     this->setupUi();
     this->setupSignalsAndSlots();
 
@@ -729,16 +757,6 @@ MotionFrame::MotionFrame(QWidget *parent) :
 MotionFrame::~MotionFrame() {
     delete dPtr;
     delete ui;
-}
-
-void MotionFrame::setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
-                               const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager) {
-
-    traceEnter;
-    dPtr->setupMotionManager(motionManager);
-    dPtr->setupIOManager(ioManager);
-    traceExit;
-
 }
 
 void MotionFrame::updateMotionBean(const MotionBean& b) {
