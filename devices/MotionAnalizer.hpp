@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-#include <GalilCNStatusBean.hpp>
 #include <configure.h>
 
 
@@ -22,9 +21,12 @@ protected:
     MotionSignaler* signaler;
 
 public:
-    explicit IMotionAnalizer(QObject* parent = nullptr);
+    explicit IMotionAnalizer(QObject* parent = nullptr) :
+        QObject(parent), signaler(nullptr) { }
 
-    void setSignaler(MotionSignaler* const s);
+    void setSignaler(MotionSignaler* const s) {
+        this->signaler = s;
+    }
 
 protected:
     virtual void analizeImpl(const QVariant& status) = 0;
@@ -59,35 +61,11 @@ public:
 };
 
 
-class GalilMotionAnalizer : public AbstractAnalizer<GalilCNStatusBean> {
-private:
-    bool isFirst;
-    GalilCNStatusBean lastStatus;
-    char isFECheck;
-    bool isCustomHomeAxisX;
-
-    static constexpr char CUSTOM_HOME_AXIS_X_FE_COUNT = 2;
-
-public:
-    GalilMotionAnalizer(QObject* parent = nullptr);
-
-protected:
-    virtual void analizeImpl(const GalilCNStatusBean& newStatus) override;
-
-};
-
-
 // TRAITS
 
 template <typename T>
 struct hasAnalizerTraits {
     static constexpr bool value = false;
-};
-
-template <>
-struct hasAnalizerTraits<GalilCNStatusBean> {
-    static constexpr bool value = true;
-    using analizer = GalilMotionAnalizer;
 };
 
 }

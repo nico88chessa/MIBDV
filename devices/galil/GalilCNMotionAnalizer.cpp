@@ -1,25 +1,17 @@
-#include <MotionAnalizer.hpp>
-#include <MotionSignaler.hpp>
-
+#include "GalilCNMotionAnalizer.hpp"
+#include <devices/MotionSignaler.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 
-IMotionAnalizer::IMotionAnalizer(QObject* parent) :
-    QObject(parent), signaler(nullptr) { }
 
-void IMotionAnalizer::setSignaler(MotionSignaler* const s) {
-    this->signaler = s;
-}
-
-
-GalilMotionAnalizer::GalilMotionAnalizer(QObject* parent) :
+GalilCNMotionAnalizer::GalilCNMotionAnalizer(QObject* parent) :
     AbstractAnalizer(parent), isFirst(true), isFECheck(0), isCustomHomeAxisX(false) {
 
     Settings& s = Settings::instance();
     this->isCustomHomeAxisX = s.getGalilCNOptionCustomHomeAxisX();
 }
 
-void GalilMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
+void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
 
     traceEnter;
 

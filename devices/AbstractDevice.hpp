@@ -31,6 +31,8 @@ public:
     using Ptr = AbstractDevice*;
     using ConstPtr = const AbstractDevice*;
 
+    using status = S;
+
 public:
     virtual S getStatus() = 0;
 

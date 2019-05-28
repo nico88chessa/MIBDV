@@ -11,6 +11,7 @@
 #include <ConnectedDeviceInspector.hpp>
 #include <AbstractCN.hpp>
 #include <MotionAnalizer.hpp>
+#include <galil/GalilCNMotionAnalizer.hpp>
 
 
 namespace PROGRAM_NAMESPACE {
