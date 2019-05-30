@@ -15,6 +15,7 @@ GalilCNInspector::GalilCNInspector(QObject* parent) :
 
     getGalilCNDevicePtr()->setupController(
                 s.getGalilCNIpAddress(),
+                s.getGalilCNConnectionTimeoutMs(),
                 s.getGalilCNNumberDigitalInput(),
                 s.getGalilCNNumberDigitalOutput(),
                 s.getGalilCNNumberAnalogInput(),

@@ -15,7 +15,7 @@
 #include <devices/IOSignaler.hpp>
 #include <devices/MotionSignaler.hpp>
 #include <devices/InspectorStatusNotifier.hpp>
-
+#include <devices/DeviceConnectionWatcher.hpp>
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -43,7 +43,7 @@ DeviceFactory::~DeviceFactory() {
     ioSignaler->stopProcess();
     ioSignaler->thread()->wait();
 
-            // invio il segnale di stop
+    // invio il segnale di stop
     if (s.getMachineCNType() == DeviceKey::GALIL_CN)
         galilCNInspector->stopProcess();
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
@@ -168,6 +168,15 @@ void DeviceFactory::initIOSignaler() {
 
 }
 
+bool DeviceFactory::existsEventLoop() const {
+
+    traceEnter;
+    bool exists = QThread::currentThread()->eventDispatcher() != nullptr;
+    traceExit;
+    return exists;
+
+}
+
 DeviceFactory& DeviceFactory::instance() {
 
     static DeviceFactory df;
@@ -202,7 +211,7 @@ QWeakPointer<IOSignaler> DeviceFactory::getIOSignaler() {
 QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
 
     traceEnter;
-    QString currentThreadName = QThread::currentThread()->objectName();
+    ThreadName currentThreadName = QThread::currentThread()->objectName();
 
     if (motionManagers.contains(currentThreadName))
         return motionManagers.value(currentThreadName);
@@ -215,14 +224,27 @@ QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
             QSharedPointer<GalilCNController> galilController(new GalilCNController());
             galilController->setupController(
                         s.getGalilCNIpAddress(),
+                        s.getGalilCNConnectionTimeoutMs(),
                         s.getGalilCNNumberDigitalInput(),
                         s.getGalilCNNumberDigitalOutput(),
                         s.getGalilCNNumberAnalogInput(),
                         s.getGalilCNOptionCustomHomeAxisX());
             galilCNControllers.insert(currentThreadName, galilController);
+
         }
 
         auto&& galilController = galilCNControllers.value(currentThreadName);
+
+        if (!galilCNConnectionWatchers.contains(currentThreadName)) {
+            if (existsEventLoop()) {
+                QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher());
+                galilCNConnectionWatcher->setDevice(galilController.toWeakRef());
+                galilCNConnectionWatcher->setupTimers(s.getGalilCNCheckConnectionIntervalMs());
+                galilCNConnectionWatchers.insert(currentThreadName, galilCNConnectionWatcher);
+                galilCNConnectionWatcher->startWatcher();
+            }
+        }
+
         QSharedPointer<MotionManager> motionManager(new MotionManagerImpl<GalilCNController>(galilController.staticCast<GalilCNController>()));
 
         // segnali asse x
@@ -267,7 +289,7 @@ QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
 QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
 
     traceEnter;
-    QString currentThreadName = QThread::currentThread()->objectName();
+    ThreadName currentThreadName = QThread::currentThread()->objectName();
 
     if (ioManagers.contains(currentThreadName))
         return ioManagers.value(currentThreadName);
@@ -283,6 +305,7 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
             QSharedPointer<GalilCNController> galilController(new GalilCNController());
             galilController->setupController(
                         s.getGalilCNIpAddress(),
+                        s.getGalilCNConnectionTimeoutMs(),
                         s.getGalilCNNumberDigitalInput(),
                         s.getGalilCNNumberDigitalOutput(),
                         s.getGalilCNNumberAnalogInput(),
@@ -291,6 +314,17 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
         }
 
         auto&& galilController = galilCNControllers.value(currentThreadName);
+
+        if (!galilCNConnectionWatchers.contains(currentThreadName)) {
+            if (existsEventLoop()) {
+                QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher());
+                galilCNConnectionWatcher->setDevice(galilController.toWeakRef());
+                galilCNConnectionWatcher->setupTimers(s.getGalilCNCheckConnectionIntervalMs());
+                galilCNConnectionWatchers.insert(currentThreadName, galilCNConnectionWatcher);
+                galilCNConnectionWatcher->startWatcher();
+            }
+        }
+
         ioManager->addDevice(DeviceKey::GALIL_CN, galilController.staticCast<GalilCNController>());
 
     }
@@ -301,6 +335,7 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
             QSharedPointer<GalilPLCController> galilController(new GalilPLCController());
             galilController->setupController(
                         s.getGalilPLCIpAddress(),
+                        s.getGalilPLCConnectionTimeoutMs(),
                         s.getGalilPLCNumberDigitalInput(),
                         s.getGalilPLCNumberDigitalOutput(),
                         s.getGalilPLCNumberAnalogInput());
@@ -308,6 +343,17 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
         }
 
         auto&& galilController = galilPLCControllers.value(currentThreadName);
+
+        if (!galilPLCConnectionWatchers.contains(currentThreadName)) {
+            if (existsEventLoop()) {
+                QSharedPointer<DeviceConnectionWatcher> galilPLCConnectionWatcher(new DeviceConnectionWatcher());
+                galilPLCConnectionWatcher->setDevice(galilController.toWeakRef());
+                galilPLCConnectionWatcher->setupTimers(s.getGalilPLCCheckConnectionIntervalMs());
+                galilPLCConnectionWatchers.insert(currentThreadName, galilPLCConnectionWatcher);
+                galilPLCConnectionWatcher->startWatcher();
+            }
+        }
+
         ioManager->addDevice(DeviceKey::GALIL_PLC, galilController.staticCast<GalilPLCController>());
 
     }
@@ -320,16 +366,27 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
 void DeviceFactory::detachManagers() {
 
     traceEnter;
-    QString currentThreadName = QThread::currentThread()->objectName();
+    ThreadName currentThreadName = QThread::currentThread()->objectName();
     motionManagers.remove(currentThreadName);
     ioManagers.remove(currentThreadName);
 
     Settings& s = Settings::instance();
 
-    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
-        galilPLCControllers.remove(currentThreadName);
-    if (s.getMachinePLCType() == DeviceKey::GALIL_CN)
+    if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
         galilCNControllers.remove(currentThreadName);
+        if (galilCNConnectionWatchers.contains(currentThreadName)) {
+            galilCNConnectionWatchers.value(currentThreadName)->stopWatcher();
+            galilCNConnectionWatchers.remove(currentThreadName);
+        }
+
+    }
+    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
+        galilPLCControllers.remove(currentThreadName);
+        if (galilPLCConnectionWatchers.contains(currentThreadName)) {
+            galilPLCConnectionWatchers.value(currentThreadName)->stopWatcher();
+            galilPLCConnectionWatchers.remove(currentThreadName);
+        }
+    }
 
     traceExit;
 

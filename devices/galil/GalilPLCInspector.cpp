@@ -11,6 +11,7 @@ GalilPLCInspector::GalilPLCInspector(QObject* parent) :
     this->setDevice(new GalilPLCController());
 
     getGalilPLCDevicePtr()->setupController(s.getGalilPLCIpAddress(),
+                                            s.getGalilPLCConnectionTimeoutMs(),
                                             s.getGalilPLCNumberDigitalInput(),
                                             s.getGalilPLCNumberDigitalOutput(),
                                             s.getGalilPLCNumberAnalogInput());

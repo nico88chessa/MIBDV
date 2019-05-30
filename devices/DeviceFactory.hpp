@@ -18,6 +18,7 @@ class IOSignaler;
 class MotionManager;
 class IOManager;
 class InspectorStatusNotifier;
+class DeviceConnectionWatcher;
 
 /* TODO NIC 28/05/2019 - iniziare a gestire l'error manager
  * qui andrebbe agganciata la logica dell'error manager a vari inspector
@@ -27,6 +28,8 @@ class DeviceFactory {
 public:
     using Ptr = DeviceFactory*;
     using ConstPtr = const DeviceFactory*;
+
+    using ThreadName = QString;
 
 private:
     DeviceFactory();
@@ -49,16 +52,25 @@ private:
      */
 
     // lista di controller veri e propri
-    QMap<QString, QSharedPointer<GalilCNController>> galilCNControllers;
-    QMap<QString, QSharedPointer<GalilPLCController>> galilPLCControllers;
+    QMap<ThreadName, QSharedPointer<GalilCNController>> galilCNControllers;
+    QMap<ThreadName, QSharedPointer<GalilPLCController>> galilPLCControllers;
+
+    QMap<ThreadName, QSharedPointer<DeviceConnectionWatcher>> galilCNConnectionWatchers;
+    QMap<ThreadName, QSharedPointer<DeviceConnectionWatcher>> galilPLCConnectionWatchers;
 
     // wrapper che mascherano l'implementazione dei controller
-    QMap<QString, QSharedPointer<MotionManager>> motionManagers;
-    QMap<QString, QSharedPointer<IOManager>> ioManagers;
+    QMap<ThreadName, QSharedPointer<MotionManager>> motionManagers;
+    QMap<ThreadName, QSharedPointer<IOManager>> ioManagers;
 
 private:
     void initMotionSignaler();
     void initIOSignaler();
+
+    /**
+     * @brief existsEventLoop
+     * @return true se nel thread corrente esiste un EventLoop
+     */
+    bool existsEventLoop() const;
 
 public:
     DeviceFactory(const DeviceFactory& df) = delete;
@@ -84,6 +96,5 @@ public:
 #ifndef DeviceFactoryInstance
 #define DeviceFactoryInstance PROGRAM_NAMESPACE::DeviceFactory::instance()
 #endif
-
 
 #endif // DEVICEFACTORY_HPP

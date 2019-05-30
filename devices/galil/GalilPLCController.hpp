@@ -22,12 +22,13 @@ public:
 private:
     QScopedPointer<GCon> handler;
     bool isInitialized;
-    bool connected;
+    bool connectionStatus;
     int numDigitalInput;
     int numDigitalOutput;
     int numAnalogInput;
     QString handleCode;
     QString ipAddress;
+    int commandTimeoutMs;
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 
@@ -37,28 +38,30 @@ public:
     int getRecord(GalilPLCStatusBean& status);
 
     void setupController(const QString& ipAddress,
+                         int commandTimeoutMs,
                          int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput);
-    virtual bool connect() override;
+    virtual bool connect();
     virtual int getDigitalInput(int input, int& inputStatus);
     virtual int getDigitalOutput(int output, int& outputStatus);
     virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
     virtual int setDigitalOutput(int output, bool value);
     int getTCCode(int& tcCode);
-    bool isConnected() const;
+    virtual bool isConnected() override;
     virtual GalilPLCStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
     virtual QString decodeError(const int& errorCode);
     int getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue = nullptr); // 10 min valore default
 
 private:
+    inline bool getConnectionStatus() const { return connectionStatus; }
+    inline void setConnectionStatus(bool value) { connectionStatus = value; }
     int disconnect();
     inline GCon handle() const { return *this->handler.data(); }
     inline void writeError(int errorCode);
     inline void writeErrorIfExists(int errorCode);
     int getInputs(int bank, int& bankStatus);
-    inline void setConnected(bool value) { connected = value; }
 
 };
 

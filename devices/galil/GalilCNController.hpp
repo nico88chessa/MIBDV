@@ -30,13 +30,14 @@ public:
 private:
     QScopedPointer<GCon> handler;
     bool isInitialized;
-    bool connected;
+    bool connectionStatus;
     int numDigitalInput;
     int numDigitalOutput;
     int numAnalogInput;
     bool customHomeAxisX;
     QString handleCode;
     QString ipAddress;
+    int commandTimeoutMs;
 
     static constexpr const int NUM_IO_PER_BANK = 8;
 
@@ -66,6 +67,7 @@ public:
     virtual ~GalilCNController();
 
     void setupController(const QString& ipAddress,
+                         int commandTimeoutMs,
                          int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput,
@@ -97,20 +99,21 @@ public:
     virtual int moveToPosition(Axis a, posCNType pos, spdCNType speed, accCNType acc, accCNType dec);
     virtual int setPosition(Axis a, posCNType pos);
     int getTCCode(int& tcCode);
-    bool isConnected() const;
+    virtual bool isConnected() override;
     virtual GalilCNStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
     virtual QString decodeError(const int& errorCode);
     int getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue = nullptr); // 10 min valore default
 
 private:
+    inline bool getConnectionStatus() const { return connectionStatus; }
+    inline void setConnectionStatus(bool value) { connectionStatus = value; }
     int disconnect();
     inline GCon handle() const { return *this->handler.data(); }
     inline void writeError(int errorCode);
     inline void writeErrorIfExists(int errorCode);
     int getInputs(int bank, int& bankStatus);
     int tellSwitches(Axis a, int& value);
-    inline void setConnected(bool value) { connected = value; }
 
 };
 

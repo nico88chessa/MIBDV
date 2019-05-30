@@ -19,7 +19,7 @@ public:
     using ConstPtr = const IAbstractDevice*;
 
 public:
-    virtual bool isConnected() const = 0;
+    virtual bool isConnected() = 0;
     virtual bool connect() = 0;
     virtual ~IAbstractDevice() { }
 

@@ -3,10 +3,8 @@ SET(ITEMS
     GalilCNController
     GalilCNInspector
     GalilCNMotionAnalizer
-    GalilCNConnectionWatcher
     GalilPLCController
     GalilPLCInspector
-    GalilPLCConnectionWatcher
     )
 
 FOREACH(ITEM ${ITEMS})
