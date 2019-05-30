@@ -22,13 +22,13 @@ private:
 public:
     explicit ErrorSignaler(QObject* parent = nullptr);
 
-    virtual void addError(const Error& err, bool notify = true);
+    virtual void addError(const Error& err);
     virtual void addErrors(const QList<Error>& errors);
     virtual void removeError(const Error& err);
     virtual void removeAllErrors();
+    virtual void notifyErrors();
 
 protected:
-    virtual void notifyErrors();
     virtual bool isErrorPresent(const Error& err);
 
 signals:

@@ -8,35 +8,28 @@ ErrorSignaler::ErrorSignaler(QObject* parent) : QObject(parent) { }
 void ErrorSignaler::removeError(const Error& err) {
 
     for (Error current: errors)
-        if (err == current) {
+        if (err == current)
             errors.removeAll(current);
-            notifyErrors();
-        }
 
 }
 
 void ErrorSignaler::removeAllErrors() {
 
     this->errors.clear();
-    this->notifyErrors();
 
 }
 
 void ErrorSignaler::addErrors(const QList<Error>& errors) {
 
     for (Error current: errors)
-        this->addError(current, false);
-    this->notifyErrors();
+        this->addError(current);
 
 }
 
-void ErrorSignaler::addError(const Error& err, bool notify) {
+void ErrorSignaler::addError(const Error& err) {
 
     if (!isErrorPresent(err))
         errors.append(err);
-
-    if (notify)
-        this->notifyErrors();
 
 }
 

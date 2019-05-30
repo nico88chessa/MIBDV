@@ -6,6 +6,7 @@
 #include <QSharedPointer>
 
 #include <configure.h>
+#include <ErrorManager.hpp>
 
 
 namespace PROGRAM_NAMESPACE {
@@ -34,6 +35,9 @@ public:
 private:
     DeviceFactory();
     ~DeviceFactory();
+
+    // errorManager
+    QSharedPointer<ErrorManager> errorManager;
 
     // questo serve per controllare se gli inspector dei dispositivi funzionano
     QScopedPointer<InspectorStatusNotifier> inspectorStatusNotifier;
@@ -85,6 +89,8 @@ public:
 
     QSharedPointer<MotionManager> instanceMotionManager();
     QSharedPointer<IOManager> instanceIOManager();
+
+    QWeakPointer<ErrorManager> getErrorManager();
 
     // qui rimuove i managers / controller dal thread corrente
     void detachManagers();

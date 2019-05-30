@@ -22,13 +22,17 @@ using anlType = double;
 using posType = float;
 
 class GalilCNController;
+class GalilCNInspector;
 class GalilPLCController;
+class GalilPLCInspector;
 class DigitalInput;
 class DigitalOutput;
 class AnalogInput;
 class DigitalInputValue;
 class DigitalOutputValue;
 class AnalogInputValue;
+class IOSignaler;
+class MotionSignaler;
 
 enum class IOType;
 
@@ -43,7 +47,11 @@ using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
 enum class DeviceKey : int {
     NONE = -1,
     GALIL_CN = 0,
-    GALIL_PLC
+    GALIL_CN_INSPECTOR,
+    GALIL_PLC,
+    GALIL_PLC_INSPECTOR,
+    IO_SIGNALER,
+    MOTION_SIGNALER
 };
 
 enum class IOType : int {
@@ -95,9 +103,27 @@ struct deviceKeyTraits<DeviceKey::GALIL_CN> {
 };
 
 template <>
+struct deviceKeyTraits<DeviceKey::GALIL_CN_INSPECTOR> {
+    static constexpr bool value = true;
+    using type = GalilCNInspector;
+};
+
+template <>
 struct deviceKeyTraits<DeviceKey::GALIL_PLC> {
     static constexpr bool value = true;
     using type = GalilPLCController;
+};
+
+template <>
+struct deviceKeyTraits<DeviceKey::IO_SIGNALER> {
+    static constexpr bool value = true;
+    using type = IOSignaler;
+};
+
+template <>
+struct deviceKeyTraits<DeviceKey::MOTION_SIGNALER> {
+    static constexpr bool value = true;
+    using type = MotionSignaler;
 };
 
 }

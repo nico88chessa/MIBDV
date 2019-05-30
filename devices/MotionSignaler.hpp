@@ -11,6 +11,8 @@
 #include <ConnectedDeviceInspector.hpp>
 #include <AbstractCN.hpp>
 #include <MotionAnalizer.hpp>
+#include <ErrorManager.hpp>
+
 #include <galil/GalilCNMotionAnalizer.hpp>
 
 
@@ -23,12 +25,16 @@ public:
     using Ptr = MotionSignaler*;
     using ConstPtr = const MotionSignaler*;
 
+    // qui ci va la lista di amici (tutti gli analizer)
+    friend class GalilCNMotionAnalizer;
+
 private:
     IMotionAnalizer* analizer;
+    DECL_ERROR_SIGNALER_FRIENDS(MotionSignaler)
 
 public:
 
-    explicit MotionSignaler(QObject* parent = nullptr) : QObject(parent) { }
+    explicit MotionSignaler(QObject* parent = nullptr) : QObject(parent), errorSignaler(new ErrorSignaler()) { }
 
     template <typename I>
     void subscribeInspector(const QSharedPointer<I>& inspector) {

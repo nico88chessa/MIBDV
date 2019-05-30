@@ -1,6 +1,7 @@
 #ifndef ERRORMANAGER_HPP
 #define ERRORMANAGER_HPP
 
+#include <type_traits>
 #include <utility>
 
 #include <QObject>
@@ -10,10 +11,11 @@
 #include <Logger.hpp>
 #include <ErrorSignaler.hpp>
 
+
 #define DECL_ERROR_SIGNALER_FRIENDS(TYPE) \
     friend void ErrorManager::subscribeObject<TYPE>(TYPE& object); \
-    friend struct ErrorManager::hasErrorSignaler<TYPE>; \
     QScopedPointer<ErrorSignaler> errorSignaler;
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -23,6 +25,9 @@ class ErrorManager : public QObject {
 public:
     using Ptr = ErrorManager*;
     using ConstPtr = ErrorManager*;
+
+private:
+    QList<Error> machineErrors;
 
 public:
     explicit ErrorManager(QObject* parent = nullptr);
@@ -44,11 +49,22 @@ public:
 
     }
 
-    template <typename T>
-    struct hasErrorSignaler {
-        static constexpr bool value = std::is_same<QScopedPointer<ErrorSignaler>, decltype(T::errorSignaler)>::value;
-    };
+signals:
+    void errorListUpdated(const QList<Error> errors);
 
+};
+
+
+template <typename T, typename = void>
+struct hasErrorSignaler {
+    static constexpr bool value = false;
+};
+
+template <typename T>
+struct hasErrorSignaler<T,
+        typename std::enable_if_t<
+            std::is_same<QScopedPointer<ErrorSignaler>, decltype(T::errorSignaler)>::value> > {
+    static constexpr bool value = true;
 };
 
 

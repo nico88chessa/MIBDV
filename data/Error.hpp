@@ -8,6 +8,8 @@
 
 namespace PROGRAM_NAMESPACE {
 
+static constexpr unsigned int BIT_ID_MASK = 7;
+
 // TODO NIC 26/10/2018 - capire come gestire gli errori
 enum class ErrorType {
     INFO,
@@ -33,10 +35,11 @@ public:
         deviceKey(deviceKey), errorId(errorId),
         errorDescription(errorDescription), errorType(errorType) { }
 
-    int getErrorId() const { return errorId; }
-    QString getErrorDescription() const { return errorDescription; }
-    ErrorType getErrorType() const { return errorType; }
-    int getDeviceKey() const { return deviceKey; }
+    inline int getErrorId() const { return errorId; }
+    inline QString getErrorDescription() const { return errorDescription; }
+    inline ErrorType getErrorType() const { return errorType; }
+    inline int getDeviceKey() const { return deviceKey; }
+    inline int getErrorKey() const { return (this->getDeviceKey() << BIT_ID_MASK) + getErrorId(); }
 
     friend inline bool operator==(const Error& lhs, const Error& rhs);
 

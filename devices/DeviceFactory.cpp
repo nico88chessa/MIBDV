@@ -28,6 +28,7 @@ DeviceFactory::DeviceFactory() {
     traceEnter;
 
     inspectorStatusNotifier.reset(new InspectorStatusNotifier());
+    errorManager.reset(new ErrorManager());
     this->initMotionSignaler();
     this->initIOSignaler();
 
@@ -360,6 +361,14 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
 
     traceExit;
     return ioManager;
+
+}
+
+QWeakPointer<ErrorManager> DeviceFactory::getErrorManager() {
+
+    traceEnter;
+    return this->errorManager.toWeakRef();
+    traceExit;
 
 }
 
