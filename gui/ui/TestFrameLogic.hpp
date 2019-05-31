@@ -46,6 +46,13 @@ private slots:
 
     void changeGuideLaserState();
 
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    void initIpgYLPNLaser();
+
+signals:
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+    void laserIpgYLPNinitializedSignal();
+
 };
 
 #endif // TESTFRAMELOGIC_HPP

@@ -8,7 +8,7 @@
 using namespace PROGRAM_NAMESPACE;
 
 GalilCNController::GalilCNController() :
-    handler(new GCon), isInitialized(false), connected(false),
+    handler(new GCon), isInitialized(false), connectionStatus(false),
     numDigitalInput(0), numDigitalOutput(0), numAnalogInput(0), handleCode(""), customHomeAxisX(false) {
 
     traceEnter;
@@ -36,7 +36,7 @@ int GalilCNController::getRecord(GalilCNStatusBean& record) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -58,6 +58,8 @@ int GalilCNController::getRecord(GalilCNStatusBean& record) {
 }
 
 void GalilCNController::setupController(
+        const QString& ipAddress,
+        int commandTimeoutMs,
         int numDigitalInput, int numDigitalOutput, int numAnalogInput,
         bool customHomeAxisX) {
 
@@ -66,10 +68,12 @@ void GalilCNController::setupController(
     if (isInitialized)
         return;
 
+    this->ipAddress = ipAddress;
     this->numDigitalInput = numDigitalInput;
     this->numDigitalOutput = numDigitalOutput;
     this->numAnalogInput = numAnalogInput;
     this->customHomeAxisX = customHomeAxisX;
+    this->commandTimeoutMs = commandTimeoutMs;
 
     isInitialized = true;
 
@@ -77,16 +81,16 @@ void GalilCNController::setupController(
 
 }
 
-bool GalilCNController::connect(const QString& ip) {
+bool GalilCNController::connect() {
 
     traceEnter;
 
-    if (isConnected())
+    if (getConnectionStatus())
         return true;
 
     // TODO NIC 07/11/2018 - parametrizzare da file di configurazione
     int timeout = 1000;
-    QString command = ip + QString(" -t %1").arg(timeout);
+    QString command = QString("%1 -t %2").arg(this->ipAddress).arg(timeout);
 
 #ifdef FLAG_CN_PRESENT
     GReturn result = GOpen(command.toStdString().data(), handler.data());
@@ -101,7 +105,7 @@ bool GalilCNController::connect(const QString& ip) {
      * quindi non e' utilizzabile
      **/
     if (result == G_NO_ERROR) {
-        this->setConnected(true);
+        this->setConnectionStatus(true);
         traceInfo() << "Galil CN: connessione avvenuta";
 
         command = QString("WH");
@@ -148,7 +152,7 @@ int GalilCNController::getDigitalInput(int input, int& inputStatus) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -181,7 +185,7 @@ int GalilCNController::getDigitalOutput(int output, int& outputStatus) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -216,7 +220,7 @@ int GalilCNController::getAnalogInput(int analogInput, anlType& analogInputStatu
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -251,7 +255,7 @@ int GalilCNController::getPosition(Axis a, posCNType& pos) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -297,7 +301,7 @@ int GalilCNController::isAxisInMotion(Axis a, bool& inMotion) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -316,7 +320,7 @@ int GalilCNController::isAxisPositionError(Axis a, bool& isPositionError) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -335,7 +339,7 @@ int GalilCNController::isMotorOff(Axis a, bool& isMotorOff) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -354,7 +358,7 @@ int GalilCNController::isForwardLimit(Axis a, bool& isForwardLimit) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -373,7 +377,7 @@ int GalilCNController::isBackwardLimit(Axis a, bool& isBackwardLimit) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -392,7 +396,7 @@ int GalilCNController::isHomeAxis(Axis a, bool& isHome) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -411,7 +415,7 @@ bool GalilCNController::checkAbort(bool& isAbort) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -437,7 +441,7 @@ int GalilCNController::setDigitalOutput(int output, bool value) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -474,7 +478,7 @@ int GalilCNController::setSpeeds(Axis a, spdCNType speed) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -499,7 +503,7 @@ int GalilCNController::setAccelerations(Axis a, accCNType acc, accCNType dec) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -537,7 +541,7 @@ int GalilCNController::setMoveParameters(Axis a, spdCNType speed, accCNType acc,
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -557,7 +561,7 @@ int GalilCNController::stopAxis(Axis a) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -584,7 +588,7 @@ int GalilCNController::homingX(spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -621,7 +625,7 @@ int GalilCNController::homingY(spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -653,7 +657,7 @@ int GalilCNController::homingZ(spdCNType speed, accCNType acc, accCNType dec) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -685,7 +689,7 @@ int GalilCNController::homingW(MAYBE_UNUSED spdCNType speed, MAYBE_UNUSED accCNT
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -701,7 +705,7 @@ int GalilCNController::home(Axis a, spdCNType speed, accCNType acc, accCNType de
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -723,7 +727,7 @@ int GalilCNController::startMoveAxis(Axis a) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -749,7 +753,7 @@ int GalilCNController::moveToPosition(Axis a, posCNType pos, spdCNType speed, ac
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -782,7 +786,7 @@ int GalilCNController::setPosition(Axis a, posCNType pos) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -804,11 +808,25 @@ int GalilCNController::setPosition(Axis a, posCNType pos) {
 
 }
 
-bool GalilCNController::isConnected() const {
+bool GalilCNController::isConnected() {
 
     traceEnter;
-    traceExit;
-    return this->connected;
+    if (!getConnectionStatus()) {
+        traceExit;
+        return false;
+    }
+
+    QString command = QString("WH");
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    return this->getConnectionStatus();
 
 }
 
@@ -816,7 +834,7 @@ int GalilCNController::getTCCode(int& tcCode) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -859,7 +877,7 @@ int GalilCNController::getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* ne
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -907,7 +925,7 @@ int GalilCNController::getInputs(int bank, int& bankStatus) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -941,7 +959,7 @@ int GalilCNController::tellSwitches(Axis a, int& value) {
 
     traceEnter;
 
-    if (!isConnected()) {
+    if (!getConnectionStatus()) {
         traceErr() << "Galil CN: il controller non e' connesso";
         return G_CUSTOM_CN_NOT_CONNECTED;
     }
@@ -968,15 +986,16 @@ int GalilCNController::disconnect() {
 
     traceEnter;
 
-    if (!this->isConnected()) {
+    if (!this->getConnectionStatus()) {
         traceInfo() << "Galil CN: connessione non presente; nessuna disconnessione da effettuare";
         return G_NO_ERROR;
     }
 
 #ifdef FLAG_CN_PRESENT
     GReturn result = GClose(handle());
-    if (result == G_NO_ERROR)
-        this->setConnected(false);
+    // qui commento la parte di controllo errore; in ogni caso imposto la connessione come chiusa
+    //    if (result == G_NO_ERROR)
+    this->setConnectionStatus(false);
 #else
     GReturn result = G_NO_ERROR;
 #endif

@@ -1,13 +1,13 @@
 #ifndef GALILPLCINSPECTOR_HPP
 #define GALILPLCINSPECTOR_HPP
 
-#include "AbstractConnectedDeviceInspector.hpp"
-
+#include "ConnectedDeviceInspector.hpp"
 #include "GalilPLCController.hpp"
+
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilPLCInspector : public AbstractConnectedDeviceInspector {
+class GalilPLCInspector : public ConnectedDeviceInspector<GalilPLCController> {
     Q_OBJECT
 
 public:
@@ -16,8 +16,6 @@ public:
 
 private:
     GalilPLCStatusBean lastStatus;
-    QString ipAddress;
-    QScopedPointer<GalilPLCController> device;
 
     inline GalilPLCController::Ptr getGalilPLCDevicePtr() {
         return static_cast<GalilPLCController::Ptr>(device.data());
@@ -26,9 +24,11 @@ private:
 public:
     explicit GalilPLCInspector(QObject* parent = nullptr);
 
+    ~GalilPLCInspector() { }
+
 protected:
 
-    bool getStatus(QVariant& status);
+//    bool getStatus(QVariant& status);
 
     bool isDeviceConnected();
 

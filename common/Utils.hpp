@@ -7,6 +7,7 @@
 #include <Constants.hpp>
 #include <gui/resources/lang/lang.hpp>
 
+
 namespace PROGRAM_NAMESPACE {
 
 class Utils {
@@ -141,7 +142,11 @@ public:
         switch (device) {
             case DeviceKey::NONE: break;
             case DeviceKey::GALIL_CN: return "GALIL_CN";
+            case DeviceKey::GALIL_CN_INSPECTOR: return "GALIL_CN_INSPECTOR";
             case DeviceKey::GALIL_PLC: return "GALIL_PLC";
+            case DeviceKey::GALIL_PLC_INSPECTOR: return "GALIL_PLC_INSPECTOR";
+            case DeviceKey::IO_SIGNALER: return "IO_SIGNALER";
+            case DeviceKey::MOTION_SIGNALER: return "MOTION_SIGNALER";
         }
 
         return "NONE";
@@ -152,8 +157,16 @@ public:
 
         if (str.compare("GALIL_CN", Qt::CaseInsensitive)==0)
             return DeviceKey::GALIL_CN;
+        if (str.compare("GALIL_CN_INSPECTOR", Qt::CaseInsensitive)==0)
+            return DeviceKey::GALIL_CN_INSPECTOR;
         if (str.compare("GALIL_PLC", Qt::CaseInsensitive)==0)
             return DeviceKey::GALIL_PLC;
+        if (str.compare("GALIL_PLC_INSPECTOR", Qt::CaseInsensitive)==0)
+            return DeviceKey::GALIL_PLC_INSPECTOR;
+        if (str.compare("IO_SIGNALER", Qt::CaseInsensitive)==0)
+            return DeviceKey::IO_SIGNALER;
+        if (str.compare("MOTION_SIGNALER", Qt::CaseInsensitive)==0)
+            return DeviceKey::MOTION_SIGNALER;
 
         return DeviceKey::NONE;
 

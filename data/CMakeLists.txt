@@ -17,6 +17,7 @@ SET(ITEMS
     BoundingBox
     StackedTile
     Filter
+    FilterStream
     )
 
 FOREACH(ITEM ${ITEMS})

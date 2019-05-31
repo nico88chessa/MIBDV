@@ -2,7 +2,7 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-ErrorManager::ErrorManager(QObject* parent) : QObject(parent) {
+ErrorManager::ErrorManager(QObject* parent) : QObject(parent), machineErrors() {
 
 }
 
@@ -14,6 +14,9 @@ void ErrorManager::errorListHandler(QList<Error> test) {
 
     traceDebug() << "Test OK";
     traceDebug() << test.size();
+
+
+    emit errorListUpdated(this->machineErrors);
 
     traceExit;
 

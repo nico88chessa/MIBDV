@@ -35,7 +35,13 @@ using namespace PROGRAM_NAMESPACE;
 
 TestFrameLogic::TestFrameLogic() :
     isProcessStopped(false),
-    isLaserInitialized(false) { }
+    isLaserInitialized(false) {
+
+#ifdef FLAG_IPG_YLPN_LASER_PRESENT
+    QTimer::singleShot(1000, this, &TestFrameLogic::initIpgYLPNLaser);
+#endif
+
+}
 
 TestFrameLogic::~TestFrameLogic() { }
 
@@ -996,6 +1002,76 @@ void TestFrameLogic::changeGuideLaserState() {
 
 }
 
+void TestFrameLogic::initIpgYLPNLaser() {
+
+    traceEnter;
+    // WARNING NIC 03/04/2019 - inizio gestione temporanea laser YLPN (da rifare)
+
+    if (ipgInterface.isNull())
+        ipgInterface.reset(new ipg::IpgSyncInterface());
+
+    traceInfo() << "Start inizializzazione laser ipg YLPN";
+
+    Settings& instance = Settings::instance();
+
+    if (!ipgInterface->getIsConnected())
+        if (!ipgInterface->connectToLaser(instance.getIpgYLPNLaserIpAddress(), instance.getIpgYLPNLaserPort())) {
+            traceErr() << "Connessione al laser fallita";
+            traceErr() << "IP: " << instance.getIpgYLPNLaserIpAddress();
+            traceErr() << "Port: " << instance.getIpgYLPNLaserPort();
+            QTimer::singleShot(5000, this, &TestFrameLogic::initIpgYLPNLaser);
+            return;
+        }
+
+    ipg::GetLaserModelInfoOutput laserModelInfo;
+    ipg::IPG_USHORT res;
+    if (!ipgInterface->getLaserModelInfo(laserModelInfo, res)) {
+        traceErr() << "Errore nella chiamata a getLaserModelInfo";
+        traceErr() << "Codice errore: " << res;
+        QTimer::singleShot(5000, this, &TestFrameLogic::initIpgYLPNLaser);
+        return;
+    }
+
+    QList<IpgYLPNLaserConfiguration::Mode> modes;
+
+    for (int i=0; i<laserModelInfo.getInstalledModes(); ++i) {
+        ipg::GetModeParameterOutput output;
+        if (!ipgInterface->getModeParameter(i, output, res)) {
+            traceErr() << "Errore nella chiamata a getModeParameter";
+            traceErr() << "Codice errore: " << res;
+            QTimer::singleShot(5000, this, &TestFrameLogic::initIpgYLPNLaser);
+            return;
+        }
+        IpgYLPNLaserConfiguration::Mode mode;
+        mode.minFrequency = output.getMinimumFrequency();
+        mode.maxFrequency = output.getMaximumFrequency();
+        mode.nominalFrequency = output.getNominalFrequency();
+        mode.pulseDuration = output.getNominalPulseDuration();
+        modes.append(mode);
+    }
+
+    IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
+
+    float currentPulseDuration = laserModelInfo.getNominalPulseDuration();
+    int currentModeIndex = -1;
+    int i = 0;
+    for (auto&& mode: modes) {
+        laserConfiguration.addMode(mode.pulseDuration, mode.nominalFrequency, mode.minFrequency, mode.maxFrequency);
+        if (qRound(currentPulseDuration) == qRound(mode.pulseDuration))
+            currentModeIndex = i;
+        ++i;
+    }
+
+    laserConfiguration.setCurrentModeIndex(currentModeIndex == -1 ? 0 : currentModeIndex);
+    laserConfiguration.setCurrentFrequency(qRound(laserModelInfo.getNominalFrequency()));
+    laserConfiguration.setCurrentPower(laserConfiguration.getCurrentPower());
+    laserConfiguration.setIsInitialized(true);
+
+    emit laserIpgYLPNinitializedSignal();
+    traceInfo() << "Inizializzazione laser ipg YLPN completata con successo";
+    traceExit;
+}
+
 
 
 /**********************************************
@@ -1271,6 +1347,8 @@ void TestFrame::setupSignalsAndSlots() {
         }
 
     });
+
+    connect(dPtr, &TestFrameLogic::laserIpgYLPNinitializedSignal, this, &TestFrame::laserIpgYLPNConfigurationReady);
 
 //    connect(ui->tabWidget, &QTabWidget::currentChanged, [&](int index) {
 

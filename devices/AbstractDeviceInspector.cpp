@@ -17,7 +17,7 @@ AbstractDeviceInspector::AbstractDeviceInspector(QObject *parent) :
 AbstractDeviceInspector::~AbstractDeviceInspector() {
 
     traceEnter;
-    refreshTimer.stop();
+    stopProcess();
     traceExit;
 
 }
@@ -56,7 +56,7 @@ void AbstractDeviceInspector::process() {
     QVariant status;
     if (getStatus(status))
         emit statusSignal(status);
-
+    emit isRunningSignal(true);
     traceExit;
 
 }
@@ -64,8 +64,10 @@ void AbstractDeviceInspector::process() {
 void AbstractDeviceInspector::startProcess() {
 
     traceEnter;
-    if (!this->beforeProcess())
+    if (!this->beforeProcess()) {
+        emit isRunningSignal(false);
         return;
+    }
     refreshTimer.start();
     emit processStartedSignal();
     traceExit;
@@ -75,10 +77,11 @@ void AbstractDeviceInspector::startProcess() {
 void AbstractDeviceInspector::stopProcess() {
 
     traceEnter;
-    if (refreshTimer.isActive())
+    if (refreshTimer.isActive()) {
         refreshTimer.stop();
+        emit processStoppedSignal();
+    }
     afterStop();
-    emit processStoppedSignal();
     traceExit;
 
 }

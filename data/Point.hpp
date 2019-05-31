@@ -1,8 +1,10 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
+#include <MathUtils.hpp>
 #include <QDebug>
 #include <configure.h>
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -90,7 +92,8 @@ bool operator>=(const Point<TT> &l, const Point<TT> &r) {
 
 template<typename TT>
 bool operator==(const Point<TT> &l, const Point<TT> &r) {
-    return (l.x == r.x) && (l.y == r.y);
+    return MathUtils::almostEqual(l.x, r.x) && MathUtils::almostEqual(l.y, r.y);
+//    return (l.x == r.x) && (l.y == r.y);
 }
 
 template<typename TT>

@@ -2,15 +2,18 @@ SET(ITEMS
     AbstractDevice
     AbstractDeviceInspector
     AbstractConnectedDeviceInspector
-    AbstractMotionInspector
-    MotionInspectorImpl
     AbstractPLC
     AbstractCN
-    AbstractDeviceConnectionWatcher
+    DeviceConnectionWatcher
     IOManager
-    IOInspector
     MotionManager
     MotionManagerImpl
+    MotionSignaler
+    MotionAnalizer
+    ConnectedDeviceInspector
+    IOSignaler
+    DeviceFactory
+    InspectorStatusNotifier
     )
 
 FOREACH(ITEM ${ITEMS})

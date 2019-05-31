@@ -19,7 +19,8 @@ public:
     using ConstPtr = const IAbstractDevice*;
 
 public:
-    virtual bool isConnected() const = 0;
+    virtual bool isConnected() = 0;
+    virtual bool connect() = 0;
     virtual ~IAbstractDevice() { }
 
 };
@@ -29,6 +30,8 @@ class AbstractDevice : public IAbstractDevice {
 public:
     using Ptr = AbstractDevice*;
     using ConstPtr = const AbstractDevice*;
+
+    using status = S;
 
 public:
     virtual S getStatus() = 0;

@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QWeakPointer>
 
 #include <devices/IOManager.hpp>
+#include <IOSignaler.hpp>
 
 class IOFrame;
 
@@ -20,12 +22,13 @@ public:
 private:
     IOFrame* qPtr;
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
+    QWeakPointer<PROGRAM_NAMESPACE::IOSignaler> ioSignaler;
 
 public:
     explicit IOFrameLogic(QObject* parent = nullptr);
     ~IOFrameLogic();
 
-    void setupIOManager(const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager);
+    void initialize();
 
 private slots:
     void setDigitalOutput(PROGRAM_NAMESPACE::IOType type);

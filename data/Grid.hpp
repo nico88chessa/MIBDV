@@ -6,15 +6,21 @@
 #include <QList>
 
 #include <configure.h>
-
 #include <Tile.hpp>
+
 
 namespace PROGRAM_NAMESPACE {
 
 template <typename T>
 class Grid {
+public:
+    using Ptr = Grid<T>*;
+    using ConstPtr = const Grid<T>*;
+
+    using Row = QVector<Tile<T>>;
+
 private:
-    QVector<QVector<Tile<T>>> vet;
+    QVector<Row> vet;
     PointI start;
 
     int numTileX;
@@ -88,11 +94,11 @@ public:
         return getTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
     }
 
-    const QVector<Tile<T>>& getRow(int row) const {
+    const Row& getRow(int row) const {
         return vet.at(row);
     }
 
-    QVector<Tile<T>>& getRow(int row) {
+    Row& getRow(int row) {
         return vet[row];
     }
 
@@ -104,6 +110,10 @@ public:
     int getRows() const { return numTileX; }
 
     int getCols() const { return numTileY; }
+
+    inline int getTileIndexX (const Point<T>& p) const { return qFloor((float) (p - start).getX()/tileSize); }
+
+    inline int getTileIndexY (const Point<T>& p) const { return qFloor((float) (p - start).getY()/tileSize); }
 
 };
 

@@ -1,13 +1,17 @@
 #include <QApplication>
 #include <QFontDatabase>
 
+#include <QThread>
+
 #include <Settings.hpp>
-#include <gui/ui/MainWindow.hpp>
 #include <Logger.hpp>
+#include <gui/ui/MainWindow.hpp>
 
 #include <MotionBean.hpp>
 #include <GalilCNStatusBean.hpp>
-
+#include <GalilPLCStatusBean.hpp>
+#include <DigitalInputValue.hpp>
+#include <IOSignaler.hpp>
 #include <Types.hpp>
 
 #include <Grid.hpp>
@@ -129,18 +133,29 @@ int mainTestFori(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
 }
 
+static constexpr char* MAIN_THREAD_NAME = "Main";
+
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
     //using namespace ipg_marking_library_wrapper;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
-//    std::string err;
-//    std::vector<ScannerInfo> v = Scanner::scanners();
-
-//    std::cout << v.size();
+//    using testStatus = isDevice<GalilCNController>::statusType;
+//    testStatus prova;
+//
+//    bool v1 = isConnectedDeviceInspector<ConnectedDeviceInspector<GalilCNController>>::value;
+//    bool v2 = isCN<ConnectedDeviceInspector<GalilPLCController>::type>::value;
+//    bool v3 = isConnectedDeviceInspector<int>::value;
+////    bool v4 = isConnectedDeviceInspector<ConnectedDeviceInspector<int>>::value;
+    //bool isMotionInspectorTC = isCNInspector<ConnectedDeviceInspector<GalilCNController>>();
+    //bool isMotionInspectorTCK = isCNInspector<ConnectedDeviceInspector<GalilPLCController>>();
+//    bool isMotionInspectorTP = isPLCInspector<ConnectedDeviceInspector<GalilPLCController>>();
+//    bool isMotionInspectorTPK = isPLCInspector<ConnectedDeviceInspector<GalilCNController>>();
+    //bool isMotionInspectorT2 = isCNInspector<int>();
 
     QApplication app(argc, argv);
+    QApplication::instance()->thread()->setObjectName(MAIN_THREAD_NAME);
     QCoreApplication::setOrganizationName(PROGRAM_NAMESPACE::ORGANIZATION);
     QCoreApplication::setApplicationName(PROGRAM_NAMESPACE::APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(PROGRAM_NAMESPACE::APPLICATION_VERSION);

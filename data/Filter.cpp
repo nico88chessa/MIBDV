@@ -2,7 +2,9 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-Filter::Filter() : numOfPoints(0), boundingBox(), points() {
+Filter::Filter() :
+    numOfPoints(0), boundingBox(),
+    points() {
 }
 
 int Filter::getNumOfPoints() const { return numOfPoints; }
@@ -43,4 +45,5 @@ QDebug operator<<(QDebug dbg, const Filter& f) {
     dbg.nospace() << "Min: " << f.getMin();
     dbg.nospace() << "Max: " << f.getMax();
     return dbg;
+
 }

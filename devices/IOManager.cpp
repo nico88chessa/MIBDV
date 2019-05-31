@@ -14,6 +14,28 @@ IOManager::IOManager(QObject *parent) : QObject(parent) {
 
 }
 
+bool IOManager::isConnected() {
+    bool isConnected = true;
+    for (auto&& device: devices.values()) {
+        isConnected = isConnected && device.data()->isConnected();
+        if (!isConnected)
+            break;
+    }
+    return isConnected;
+
+}
+
+bool IOManager::connect() {
+    bool res = true;
+    for (auto&& device: devices.values()) {
+        if (device.data()->isConnected())
+            continue;
+        bool connectionOk = device.data()->connect();
+        res = res && connectionOk;
+    }
+    return res;
+}
+
 bool IOManager::setDigitalOutput(IOType type) {
 
     traceEnter;

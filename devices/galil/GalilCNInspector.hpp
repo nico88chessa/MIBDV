@@ -1,22 +1,22 @@
 #ifndef GALILCNINSPECTOR_HPP
 #define GALILCNINSPECTOR_HPP
 
-#include "MotionInspectorImpl.hpp"
+#include "ConnectedDeviceInspector.hpp"
 #include "GalilCNController.hpp"
+
 
 namespace PROGRAM_NAMESPACE {
 
-class GalilCNInspector : public MotionInspectorImpl<GalilCNController> {
+class GalilCNInspector : public ConnectedDeviceInspector<GalilCNController> {
 public:
     using Ptr = GalilCNInspector*;
     using ConstPtr = const GalilCNInspector*;
 
 private:
-    GalilCNStatusBean lastStatus;
-    QString ipAddress;
-    bool isFirst;
-    char isFECheck;
-    bool isCustomHomeAxisX;
+//    GalilCNStatusBean lastStatus;
+//    bool isFirst;
+//    char isFECheck;
+//    bool isCustomHomeAxisX;
 
     static constexpr char CUSTOM_HOME_AXIS_X_FE_COUNT = 2;
 
@@ -32,7 +32,7 @@ public:
 protected:
     bool connectDevice();
 
-    void analizeLastStatus(const S& status);
+//    void analizeLastStatus(const S& status);
 
 protected slots:
 

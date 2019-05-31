@@ -1,8 +1,7 @@
 #include "ItemDetailWidgetPrivate.hpp"
 #include "ItemDetailWidget.hpp"
 
-#include <json/FilterJsonParser.hpp>
-#include <json/Utils.hpp>
+#include <json/FilterJsonStreamDecoder.hpp>
 #include <QDir>
 
 
@@ -314,13 +313,12 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
     this->model->clear();
 
     using namespace PROGRAM_NAMESPACE;
-    QScopedPointer<IAbstractJsonParser> parser(new FilterJsonParser());
 
     for (const QString& item: itemsPath) {
 
         QFileInfo fileInfo(item);
-
         if (fileInfo.exists()) {
+
             if (fileInfo.isDir()) {
 
                 QDir dir(item);
@@ -342,12 +340,12 @@ void ItemDetailWidget::updateModelData(const QStringList& itemsPath) {
 //                }
 
 //                QString bytes = file.readAll();
-                QString bytes = JsonUtils::readFilterHeaderFromJsonFile(filePath);
 //                file.close();
 
-                Filter flt;
-                JsonParserError err;
-                if (!(err = parser->decodeJsonHeaderOnly(bytes.toUtf8(), &flt) == JSON_PARSER_NO_ERROR)) {
+                FilterStream flt;
+                QScopedPointer<IAbstractJsonStreamDecoder> parser(new FilterJsonStreamDecoder(filePath));
+                JsonStreamDecoderError err = parser->decodeHeader(&flt);
+                if (err != JSON_STREAM_DECODER_NO_ERROR) {
                     traceErr() << "Errore nel parsing del file:" << fileInfo.fileName();
                     traceErr() << "Errore parser:" << err;
                     continue;

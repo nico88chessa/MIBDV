@@ -8,28 +8,35 @@
 using namespace PROGRAM_NAMESPACE;
 
 GalilCNInspector::GalilCNInspector(QObject* parent) :
-    MotionInspectorImpl(parent), isFirst(true), isFECheck(0), isCustomHomeAxisX(false) {
+    ConnectedDeviceInspector(parent)/*, isFirst(true), isFECheck(0), isCustomHomeAxisX(false) */{
 
     Settings& s = Settings::instance();
-    ipAddress = s.getGalilCNIpAddress();
     this->setDevice(new GalilCNController());
+
+    getGalilCNDevicePtr()->setupController(
+                s.getGalilCNIpAddress(),
+                s.getGalilCNConnectionTimeoutMs(),
+                s.getGalilCNNumberDigitalInput(),
+                s.getGalilCNNumberDigitalOutput(),
+                s.getGalilCNNumberAnalogInput(),
+                s.getGalilCNOptionCustomHomeAxisX());
 
     this->setRefreshValue(s.getGalilCNStatusRefreshIntervalMs());
     this->setRestartTime(s.getGalilCNReconnectionIntervalMs());
-    this->isCustomHomeAxisX = s.getGalilCNOptionCustomHomeAxisX();
+//    this->isCustomHomeAxisX = s.getGalilCNOptionCustomHomeAxisX();
 
 }
 
 bool GalilCNInspector::connectDevice() {
 
     traceEnter;
-    bool res = getGalilCNDevicePtr()->connect(ipAddress);
+    bool res = getGalilCNDevicePtr()->connect();
     traceExit;
     return res;
 
 }
 
-void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus) {
+/*void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus) {
 
     traceEnter;
 
@@ -255,6 +262,7 @@ void GalilCNInspector::analizeLastStatus(const MotionInspectorImpl::S& newStatus
     traceExit;
 
 }
+*/
 
 void GalilCNInspector::handleDisconnection() {
     // do nothing

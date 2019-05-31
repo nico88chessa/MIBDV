@@ -251,6 +251,8 @@ void Settings::loadValuesFromFile() {
     ipgYLPNLaserIpAddress = settings.value(IPG_YLPN_ETHERNET_LASER_IP, IPG_YLPN_ETHERNET_LASER_IP_DFLT).value<QString>();
     ipgYLPNLaserPort = settings.value(IPG_YLPN_ETHERNET_LASER_PORT, IPG_YLPN_ETHERNET_LASER_PORT_DFLT).value<quint16>();
 
+    traceExit;
+
 }
 
 void Settings::writeValuesToFile() {

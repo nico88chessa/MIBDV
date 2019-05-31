@@ -3,7 +3,6 @@
 #include "ui_IOFrame.h"
 
 #include <Settings.hpp>
-
 #include <DigitalInputValue.hpp>
 #include <DigitalOutputValue.hpp>
 #include <AnalogInputValue.hpp>
@@ -11,7 +10,10 @@
 #include <gui/custom-widgets/MDDoubleSpinBox.hpp>
 #include <gui/ui/DialogAlert.hpp>
 
+#include <DeviceFactory.hpp>
+
 #include <Logger.hpp>
+
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -33,10 +35,15 @@ IOFrameLogic::~IOFrameLogic() {
 
 }
 
-void IOFrameLogic::setupIOManager(const QSharedPointer<IOManager>& ioManager) {
+void IOFrameLogic::initialize() {
 
     traceEnter;
-    this->ioManager = ioManager;
+    this->ioManager = DeviceFactoryInstance.instanceIOManager();
+    this->ioSignaler = DeviceFactoryInstance.getIOSignaler();
+
+    if (!this->ioManager->isConnected())
+        this->ioManager->connect();
+
     traceExit;
 
 }
@@ -71,21 +78,14 @@ void IOFrameLogic::unsetDigitalOutput(IOType type) {
 
 }
 
-/*******************************************
- *            I O   F R A M E
- *******************************************/
+
+/*
+ * I O   F R A M E
+ */
 
 int IOFrame::getRowMinHeight() const { return rowMinHeight; }
 
 void IOFrame::setRowMinHeight(int value) { rowMinHeight = value; }
-
-void IOFrame::setupDevices(const QSharedPointer<IOManager>& ioManager) {
-
-    traceEnter;
-    dPtr->setupIOManager(ioManager);
-    traceExit;
-
-}
 
 IOFrame::IOFrame(QWidget *parent) :
     QFrame(parent), ui(new Ui::IOFrame), dPtr(new IOFrameLogic(parent)) {
@@ -94,6 +94,8 @@ IOFrame::IOFrame(QWidget *parent) :
 
     auto&& s = Settings::instance();
     dPtr->qPtr = this;
+    dPtr->initialize();
+
     digitalInputs = s.getDigitalInputs();
     digitalOutputs = s.getDigitalOutputs();
     analogInputs = s.getAnalogInputs();
@@ -195,6 +197,13 @@ void IOFrame::setupUi() {
 void IOFrame::setupSignalsAndSlots() {
 
     traceEnter;
+
+    connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
+        QMetaObject::invokeMethod(this, "updateDigitalIOStatus", Qt::QueuedConnection,
+                                  Q_ARG(const mibdv::DigitalInputStatus&, a),
+                                  Q_ARG(const mibdv::DigitalOutputStatus&, b),
+                                  Q_ARG(const mibdv::AnalogInputStatus&, c));
+    });
 
     auto&& digitalIOSA = ui->saDigitalIOContents;
 
