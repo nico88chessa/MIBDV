@@ -35,6 +35,7 @@ private:
 public:
 
     explicit MotionSignaler(QObject* parent = nullptr) : QObject(parent), errorSignaler(new ErrorSignaler()) { }
+    ~MotionSignaler() { }
 
     template <typename I>
     void subscribeInspector(const QSharedPointer<I>& inspector) {

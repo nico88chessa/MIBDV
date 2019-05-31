@@ -24,6 +24,8 @@ private:
 public:
     explicit GalilPLCInspector(QObject* parent = nullptr);
 
+    ~GalilPLCInspector() { }
+
 protected:
 
 //    bool getStatus(QVariant& status);

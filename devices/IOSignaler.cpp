@@ -42,6 +42,14 @@ IOSignaler::IOSignaler(QObject *parent) : QObject(parent),
 
 }
 
+IOSignaler::~IOSignaler() {
+
+    traceEnter;
+    this->stopProcess();
+    traceExit;
+
+}
+
 void IOSignaler::analizeIO() {
 
     traceEnter;
@@ -112,7 +120,7 @@ void IOSignaler::startProcess() {
 
     traceEnter;
     refreshTimer.start();
-    emit processStartSignal();
+    emit processStartedSignal();
     traceExit;
 
 }
@@ -121,10 +129,11 @@ void IOSignaler::stopProcess() {
 
     traceEnter;
 
-    if (refreshTimer.isActive())
+    if (refreshTimer.isActive()) {
         refreshTimer.stop();
+        emit processStoppedSignal();
+    }
 
-    emit processStopSignal();
     traceExit;
 
 }

@@ -36,28 +36,31 @@ DeviceFactory::DeviceFactory() {
 
 }
 
-DeviceFactory::~DeviceFactory() {
+void DeviceFactory::stop() {
+
+    traceEnter;
 
     Settings& s = Settings::instance();
 
-    // prima di tutto chiudo l'IO Signaler
-    ioSignaler->stopProcess();
+    this->ioSignaler->unsubscribeAll();
+
+    QMetaObject::invokeMethod(ioSignaler.data(), "stopProcess", Qt::QueuedConnection);
     ioSignaler->thread()->wait();
 
-    // invio il segnale di stop
     if (s.getMachineCNType() == DeviceKey::GALIL_CN)
-        galilCNInspector->stopProcess();
-    if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
-        galilPLCInspector->stopProcess();
+        QMetaObject::invokeMethod(galilCNInspector.data(), "stopProcess", Qt::QueuedConnection);
+    galilCNInspector->thread();
 
-    // attendo la chiusura dei thread
-    if (s.getMachineCNType() == DeviceKey::GALIL_CN)
-        galilCNInspector->thread()->wait();
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
-        galilPLCInspector->thread()->wait();
+        QMetaObject::invokeMethod(galilPLCInspector.data(), "stopProcess", Qt::QueuedConnection);
+    galilPLCInspector->thread()->wait();
 
+
+    traceExit;
 
 }
+
+DeviceFactory::~DeviceFactory() { }
 
 void DeviceFactory::initMotionSignaler() {
 
@@ -76,15 +79,20 @@ void DeviceFactory::initMotionSignaler() {
                 galilCNInspector.reset(new GalilCNInspector());
 
                 NamedThread* thread = new NamedThread(GALIL_CN_INSPECTOR_THREAD_NAME);
-                QObject::connect(thread, &QThread::started, galilCNInspector.data(), &AbstractConnectedDeviceInspector::startProcess);
-                QObject::connect(galilCNInspector.data(), &AbstractConnectedDeviceInspector::processStoppedSignal, thread, &QThread::quit);
-                QObject::connect(thread, &QThread::finished, galilCNInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
+                QObject::connect(thread, &QThread::started, galilCNInspector.data(), &GalilCNInspector::startProcess);
+                QObject::connect(galilCNInspector.data(), &GalilCNInspector::processStoppedSignal, [thread]() {
+                    thread->quit();
+                });
+                /* NOTE NIC 31/05/2019 - non devo assolutamente associare il segnale di finished al deleteLater;
+                 * usando i QSharedPointer, si occupa il QSharedPointer stesso a eliminare l'oggetto una volta deferenziato
+                 *
+                 * QObject::connect(thread, &QThread::finished, galilCNInspector.data(), &GalilCNInspector::deleteLater);
+                 */
                 QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-                galilCNInspector.data()->moveToThread(thread);
-
                 QObject::connect(galilCNInspector.data(), &AbstractDeviceInspector::isRunningSignal,
                                  inspectorStatusNotifier.data(), &InspectorStatusNotifier::galilCNInspectorIsRunningSignal);
 
+                galilCNInspector.data()->moveToThread(thread);
                 galilCNInspector->thread()->start();
 
             }
@@ -116,13 +124,19 @@ void DeviceFactory::initIOSignaler() {
 
                 QThread* thread = new NamedThread(GALIL_CN_INSPECTOR_THREAD_NAME);
                 QObject::connect(thread, &QThread::started, galilCNInspector.data(), &AbstractConnectedDeviceInspector::startProcess);
-                QObject::connect(galilCNInspector.data(), &AbstractConnectedDeviceInspector::processStoppedSignal, thread, &QThread::quit);
-                QObject::connect(thread, &QThread::finished, galilCNInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
+                QObject::connect(galilCNInspector.data(), &AbstractConnectedDeviceInspector::processStoppedSignal, [thread]() {
+                    thread->quit();
+                });
+                /* NOTE NIC 31/05/2019 - non devo assolutamente associare il segnale di finished al deleteLater;
+                 * usando i QSharedPointer, si occupa il QSharedPointer stesso a eliminare l'oggetto una volta deferenziato
+                 *
+                 * QObject::connect(thread, &QThread::finished, galilCNInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
+                 */
                 QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-                galilCNInspector.data()->moveToThread(thread);
                 QObject::connect(galilCNInspector.data(), &AbstractDeviceInspector::isRunningSignal,
                                  inspectorStatusNotifier.data(), &InspectorStatusNotifier::galilCNInspectorIsRunningSignal);
 
+                galilCNInspector.data()->moveToThread(thread);
                 galilCNInspector->thread()->start();
 
             }
@@ -139,13 +153,19 @@ void DeviceFactory::initIOSignaler() {
 
                 QThread* thread = new NamedThread(GALIL_PLC_INSPECTOR_THREAD_NAME);
                 QObject::connect(thread, &QThread::started, galilPLCInspector.data(), &AbstractConnectedDeviceInspector::startProcess);
-                QObject::connect(galilPLCInspector.data(), &AbstractConnectedDeviceInspector::processStoppedSignal, thread, &QThread::quit);
-                QObject::connect(thread, &QThread::finished, galilPLCInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
+                QObject::connect(galilPLCInspector.data(), &AbstractConnectedDeviceInspector::processStoppedSignal, [thread]() {
+                    thread->quit();
+                });
+                /* NOTE NIC 31/05/2019 - non devo assolutamente associare il segnale di finished al deleteLater;
+                 * usando i QSharedPointer, si occupa il QSharedPointer stesso a eliminare l'oggetto una volta deferenziato
+                 *
+                 * QObject::connect(thread, &QThread::finished, galilPLCInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
+                 */
                 QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-                galilPLCInspector.data()->moveToThread(thread);
                 QObject::connect(galilPLCInspector.data(), &AbstractDeviceInspector::isRunningSignal,
                                  inspectorStatusNotifier.data(), &InspectorStatusNotifier::galilPLCInspectorIsRunningSignal);
 
+                galilPLCInspector.data()->moveToThread(thread);
                 galilPLCInspector->thread()->start();
 
             }
@@ -156,11 +176,17 @@ void DeviceFactory::initIOSignaler() {
 
         QThread* ioSignalerThread = new NamedThread(IO_SIGNALER_THREAD_NAME);
         QObject::connect(ioSignalerThread, &QThread::started, ioSignaler.data(), &IOSignaler::startProcess);
-        QObject::connect(ioSignaler.data(), &IOSignaler::processStopSignal, ioSignalerThread, &QThread::quit);
-        QObject::connect(ioSignalerThread, &QThread::finished, ioSignaler.data(), &IOSignaler::deleteLater);
+        QObject::connect(ioSignaler.data(), &IOSignaler::processStoppedSignal, [ioSignalerThread]() {
+            ioSignalerThread->quit();
+        });
+        /* NOTE NIC 31/05/2019 - non devo assolutamente associare il segnale di finished al deleteLater;
+         * usando i QSharedPointer, si occupa il QSharedPointer stesso a eliminare l'oggetto una volta deferenziato
+         *
+         * QObject::connect(ioSignalerThread, &QThread::finished, ioSignaler.data(), &IOSignaler::deleteLater);
+         */
         QObject::connect(ioSignalerThread, &QThread::finished, ioSignalerThread, &QThread::deleteLater);
-        ioSignaler.data()->moveToThread(ioSignalerThread);
 
+        ioSignaler.data()->moveToThread(ioSignalerThread);
         ioSignaler->thread()->start();
 
     }
@@ -172,7 +198,7 @@ void DeviceFactory::initIOSignaler() {
 bool DeviceFactory::existsEventLoop() const {
 
     traceEnter;
-    bool exists = QThread::currentThread()->eventDispatcher() != nullptr;
+    bool exists = QThread::currentThread() != nullptr && QThread::currentThread()->eventDispatcher() != nullptr;
     traceExit;
     return exists;
 
@@ -185,7 +211,7 @@ DeviceFactory& DeviceFactory::instance() {
 
 }
 
-InspectorStatusNotifier*DeviceFactory::getInspectorStatusNotifier() const {
+InspectorStatusNotifier* DeviceFactory::getInspectorStatusNotifier() const {
     traceEnter;
     return this->inspectorStatusNotifier.data();
     traceExit;
@@ -376,8 +402,6 @@ void DeviceFactory::detachManagers() {
 
     traceEnter;
     ThreadName currentThreadName = QThread::currentThread()->objectName();
-    motionManagers.remove(currentThreadName);
-    ioManagers.remove(currentThreadName);
 
     Settings& s = Settings::instance();
 
@@ -396,6 +420,9 @@ void DeviceFactory::detachManagers() {
             galilPLCConnectionWatchers.remove(currentThreadName);
         }
     }
+
+    motionManagers.remove(currentThreadName);
+    ioManagers.remove(currentThreadName);
 
     traceExit;
 

@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QObject>
 #include <QTimer>
+#include <QMetaObject>
 
 #include <Types.hpp>
 #include <ConnectedDeviceInspector.hpp>
@@ -34,6 +35,7 @@ private:
 private:
     DigitalInputStatus digitalInputLastValues;
     bool isFirst;
+    QList<QMetaObject::Connection> connections;
 
     QTimer refreshTimer;
     bool needSignaler;
@@ -41,6 +43,8 @@ private:
 public:
 
     explicit IOSignaler(QObject* parent = nullptr);
+
+    ~IOSignaler();
 
     template <typename I>
     void subscribeInspector(const QSharedPointer<I>& inspector) {
@@ -54,18 +58,27 @@ public:
         static_assert(isCN<typeT>::value || isPLC<typeT>::value, "Il device deve essere un CN o un PLC");
 
         if (std::is_same<GalilCNController, typeT>::value) {
-            connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
-                QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilCNStatusBean, qvariant_cast<GalilCNStatusBean>(status)));
+            auto&& c = connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
+                if (this != nullptr)
+                    QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilCNStatusBean, qvariant_cast<GalilCNStatusBean>(status)));
             });
+            connections.push_back(c);
 
         } else if (std::is_same<GalilPLCController, typeT>::value) {
-            connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
-                QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilPLCStatusBean, qvariant_cast<GalilPLCStatusBean>(status)));
+            auto&& c = connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
+                if (this != nullptr)
+                    QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilPLCStatusBean, qvariant_cast<GalilPLCStatusBean>(status)));
             });
+            connections.push_back(c);
         }
 
         traceExit;
 
+    }
+
+    void unsubscribeAll() {
+        for (auto&& c: connections)
+            QObject::disconnect(c);
     }
 
 private:
@@ -95,8 +108,8 @@ signals:
             const DigitalInputStatus& digitalInputs,
             const DigitalOutputStatus& digitalOutputs,
             const AnalogInputStatus& analogInputs);
-    void processStartSignal();
-    void processStopSignal();
+    void processStartedSignal();
+    void processStoppedSignal();
 
 };
 

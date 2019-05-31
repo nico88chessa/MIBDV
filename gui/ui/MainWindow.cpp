@@ -29,6 +29,7 @@ MainWindow::~MainWindow() {
 
     traceEnter;
 
+    DeviceFactoryInstance.stop();
     DeviceFactoryInstance.detachManagers();
     delete ui;
 

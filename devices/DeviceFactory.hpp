@@ -77,6 +77,7 @@ private:
     bool existsEventLoop() const;
 
 public:
+    void stop();
     DeviceFactory(const DeviceFactory& df) = delete;
     void operator=(const DeviceFactory& df) = delete;
 
