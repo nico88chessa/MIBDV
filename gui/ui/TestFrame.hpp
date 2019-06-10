@@ -11,7 +11,15 @@
 #include <DigitalInputValue.hpp>
 #include <laser-ipg-temporary/communication/ipg_sync_interface.hpp>
 
+
 class TestFrameLogic;
+
+enum class PointShapeEnum : int {
+    UNDEFINED = -1,
+    POINT,
+    CIRCLE_POINTS,
+    CIRCLE_VECTOR
+};
 
 namespace Ui {
 class TestFrame;
@@ -25,6 +33,9 @@ class TestFrame : public QFrame {
 public:
     using Ptr = TestFrame *;
     using ConstPtr = const TestFrame *;
+
+public:
+    static constexpr int TEST_FRAME_PULSE_ENERGY_DFLT = 1;
 
 private:
     static constexpr int TEST_FRAME_POINTS_PER_TILE_MIN = 1;
@@ -70,20 +81,12 @@ private:
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MAX = TEST_FRAME_CIRCLE_RADIUS_MAX/20; // parametro da verificare
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_STEP = 1;
 
-    static constexpr int TEST_FRAME_PULSE_ENERGY_DFLT = 1;
 
     static constexpr int TEST_FRAME_LASER_MIN_POWER = 0;
     static constexpr int TEST_FRAME_LASER_MAX_POWER = 100;
     static constexpr int TEST_FRAME_LASER_POWER_STEP = 1;
 
     static constexpr int TEST_FRAME_LASER_TAB_INDEX = 2;
-
-    enum class PointShapeEnum : int {
-        UNDEFINED = -1,
-        POINT,
-        CIRCLE_POINTS,
-        CIRCLE_VECTOR
-    };
 
     Ui::TestFrame *ui;
     QButtonGroup* pointShapeGroup;
@@ -94,9 +97,6 @@ private:
 
 public:
     explicit TestFrame(QWidget *parent = nullptr);
-    void setupDevices(const QSharedPointer<PROGRAM_NAMESPACE::MotionManager>& motionManager,
-            const QSharedPointer<PROGRAM_NAMESPACE::IOManager>& ioManager,
-            const QSharedPointer<ipg::IpgSyncInterface>& ipgInterface);
     ~TestFrame();
 
 public slots:
@@ -104,6 +104,7 @@ public slots:
     void updateDigitalInputStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& i);
     void setFilePath(const QString& filePath);
     void laserIpgYLPNConfigurationReady();
+    void showPopup(const QString& err, const QString& descr);
 
 private:
     void setupUi();

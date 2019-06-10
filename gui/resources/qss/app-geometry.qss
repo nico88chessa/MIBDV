@@ -240,10 +240,16 @@ MDFileExplorerWidget {
     color: white;
 }
 
+
 /*
  * T E S T   F R A M E
  */
 
+.TestFrame #tabPrint,
+.TestFrame #tabPointShape,
+.TestFrame #tabLaser {
+    background-color: pink;
+}
 
 .TestFrame .MDSpinBox {
     min-width: 70px;
@@ -255,4 +261,13 @@ MDFileExplorerWidget {
 
 .TestFrame #tabWidget {
     qproperty-focusPolicy: NoFocus;
+}
+
+.TestFrame .MDLineEdit,
+.TestFrame .MDLineEdit:read-only,
+.TestFrame .MDLineEdit:focus,
+.TestFrame .MDLineEdit:disabled {
+    padding: 20px 0px 8px;
+    qproperty-labelX: 14;
+    qproperty-labelY: 15;
 }

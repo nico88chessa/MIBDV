@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-#include <QThread>
+#include <common/NamedThread.hpp>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QWaitCondition>
@@ -27,7 +27,7 @@ static constexpr ProcessErrorCode PROCESSOR_THREAD_END_CODE = PROGRAM_ERR_START_
  * sarebbe da fare una classe LimitMemoryProcessorThread che gestisca questo concetto usando la condizione
  * dataFullCondition
  */
-class ProcessorThread : public QThread {
+class ProcessorThread : public NamedThread {
     Q_OBJECT
 
 public:
@@ -48,6 +48,11 @@ protected:
     bool isRunningState;
 
 public:
+
+    ProcessorThread(const QString& threadName, QObject *parent = Q_NULLPTR) :
+        NamedThread(threadName, parent),
+        pauseRequest(false), stopRequest(false), isRunningState(false),
+        processErrorCode(PROCESSOR_THREAD_NO_ERROR) { }
 
     bool isProcessEndingCorrectly(ProcessErrorCode& errorCode) const {
         QMutexLocker locker(&mutex);
@@ -130,10 +135,6 @@ protected:
         this->processErrorCode = value;
     }
 
-    ProcessorThread() :
-        pauseRequest(false), stopRequest(false), isRunningState(false),
-        processErrorCode(PROCESSOR_THREAD_NO_ERROR) { }
-
     void setIsRunning(bool value) {
         QMutexLocker locker(&mutex);
         this->isRunningState = value;
@@ -147,16 +148,19 @@ protected:
     void run() {
 
         this->setProcessErrorCode(PROCESSOR_THREAD_NO_ERROR);
+        this->setIsRunning(true);
+        emit processStarted();
 
         if (!initialize()) {
             this->setProcessErrorCode(PROCESSOR_THREAD_INITIALIZE_ERROR);
             return;
         }
 
-        this->setIsRunning(true);
-
+        emit loopRunning();
         ProcessErrorCode processErrorCodeLoop = loopProcess();
         this->setProcessErrorCode(processErrorCodeLoop);
+
+        emit processFinished();
 
         this->setIsRunning(false);
 
@@ -172,6 +176,11 @@ protected:
 
     virtual bool isSpaceAvailable() const = 0;
 
+signals:
+    void processStarted();
+    void loopRunning();
+    void processFinished();
+
 };
 
 
@@ -182,6 +191,10 @@ public:
     using ConstPtr = const AbstractProcessor*;
 
     using resultType = R;
+
+public:
+    AbstractProcessor(const QString& threadName, QObject* parent = Q_NULLPTR) :
+        ProcessorThread(threadName, parent) { }
 
 protected:
     virtual void getNextImpl(void* data) final override {
