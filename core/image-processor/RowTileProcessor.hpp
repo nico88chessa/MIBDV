@@ -36,7 +36,8 @@ private:
     int lastRowTileIndexInsert;
 
 public:
-    RowTileProcessor(const QString& filePath, int tileSizeUm) :
+    RowTileProcessor(const QString& threadName, const QString& filePath, int tileSizeUm, QObject* parent = Q_NULLPTR) :
+        AbstractProcessor(threadName, parent),
         doubleBuffer(), jsonPath(filePath), tileSizeUm(tileSizeUm) {
 
         elaboratedStripe = 0;
