@@ -83,7 +83,7 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
             } else {
 
                 if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
-                    emit signaler->axisYHomingComplete();
+                    emit signaler->axisXHomingComplete();
 
                 MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
                 if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {

@@ -108,8 +108,6 @@ bool Worker::beforeProcess() {
             return false;
         }
 
-    ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1);
-
     updateStatusAsync("Device initializiation... OK");
 
     traceExit;
@@ -414,10 +412,6 @@ bool Worker::process() {
                     filePath,
                     tileSizeUm));
 
-    fileProcessorThread->start();
-    updateStatusAsync("Starting file process thread... OK");
-
-    updateLastCommandExecute(PrintCommandExecuted::PROCESSOR_THREAD_RUN);
 
     // aspetto che il thread sia avviato
     {
@@ -429,6 +423,11 @@ bool Worker::process() {
             canContinue = true;
             localEventLoop.quit();
         });
+
+        fileProcessorThread->start();
+        updateStatusAsync("Starting file process thread... OK");
+
+        updateLastCommandExecute(PrintCommandExecuted::PROCESSOR_THREAD_RUN);
 
         localTimer.start();
         localEventLoop.exec();
@@ -866,6 +865,8 @@ bool Worker::process() {
 
             if (!continueLoop)
                 break;
+
+            updateStatusAsync("Stampa tile");
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
             try {
@@ -2517,6 +2518,7 @@ void TestFrame::setupUi() {
     pointShapeGroup->addButton(ui->rbCirclePoints, static_cast<int>(PointShapeEnum::CIRCLE_POINTS));
     pointShapeGroup->addButton(ui->rbCircleVector, static_cast<int>(PointShapeEnum::CIRCLE_VECTOR));
     pointShapeGroup->button(static_cast<int>(PointShapeEnum::POINT))->setChecked(true);
+    ui->swPointShapeDetails->setCurrentIndex(0);
 
     // laser tab
     ui->sbLaserPower->setRange(TEST_FRAME_LASER_MIN_POWER, TEST_FRAME_LASER_MAX_POWER);
@@ -2534,6 +2536,17 @@ void TestFrame::setupUi() {
     ui->pbGuideLaser->setEnabled(false);
     ui->pbSet->setEnabled(false);
     ui->pbReset->setEnabled(false);
+#else
+    ui->cbGuideLaser->setEnabled(true);
+    ui->cbLaserInitialized->setEnabled(true);
+    ui->hsLaserPower->setEnabled(true);
+    ui->sbLaserFrequency->setEnabled(true);
+    ui->hsLaserFrequency->setEnabled(true);
+    ui->cbLaserPulseWidth->setEnabled(true);
+    ui->sbLaserPower->setEnabled(true);
+    ui->pbGuideLaser->setEnabled(true);
+    ui->pbSet->setEnabled(true);
+    ui->pbReset->setEnabled(true);
 #endif
 
     traceExit;
@@ -2675,10 +2688,10 @@ void TestFrame::updateTabLaserLabel(bool setAsterisk) {
 
     QString tabText = ui->tabWidget->tabText(TEST_FRAME_LASER_TAB_INDEX);
 
-    if (!(tabText.right(TEST_FRAME_LASER_TAB_INDEX).compare("*") == 0) && setAsterisk)
+    if (!(tabText.right(1).compare("*") == 0) && setAsterisk)
         ui->tabWidget->setTabText(TEST_FRAME_LASER_TAB_INDEX, tabText.append("*"));
 
-    if ((tabText.right(TEST_FRAME_LASER_TAB_INDEX).compare("*") == 0) && !setAsterisk)
+    if ((tabText.right(1).compare("*") == 0) && !setAsterisk)
         ui->tabWidget->setTabText(TEST_FRAME_LASER_TAB_INDEX, tabText.left(tabText.size()-1));
 
 }
