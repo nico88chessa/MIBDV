@@ -23,10 +23,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDLineEdit
-/******************/
+/*
+ *  M D L I N E E D I T
+ */
 
 .MDLineEdit {
     qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
@@ -51,10 +50,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDSpinBox
-/******************/
+/*
+ *  M D S P I N B O X
+ */
 
 .MDSpinBox {
     qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
@@ -79,10 +77,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDDoubleSpinBox
-/******************/
+/*
+ *  M D D O U B L E S P I N B O X
+ */
 
 .MDDoubleSpinBox {
     qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
@@ -107,10 +104,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDComboBox
-/******************/
+/*
+ *  M D C O M B O B O X
+ */
 
 .MDComboBox {
     border-bottom-color: rgba(0, 0, 0, 42%);
@@ -175,7 +171,6 @@ QWidget:!enabled {
 
 
 
-
 /*
  * Q S L I D E R
  */
@@ -213,6 +208,7 @@ QSlider::add-page:vertical {
 }
 
 
+
 /*
  * Q C O M B O B O X
  */
@@ -236,11 +232,9 @@ QSlider::add-page:vertical {
 
 
 
-
 /*
  * Q P U S H B U T T O N
  */
-
 
 .QPushButton {
     qproperty-focusPolicy: NoFocus;
@@ -252,7 +246,6 @@ QSlider::add-page:vertical {
 .QPushButton::on {
     color: red;
 }
-
 
 
 
@@ -274,10 +267,9 @@ QRadioButton::indicator::checked {
 
 
 
-
-/******************/
-/* QCheckBox
-/******************/
+/*
+ * Q C H E C K B O X
+ */
 
 QCheckBox {
     /*color: green;*/
@@ -293,10 +285,9 @@ QCheckBox::indicator::checked {
 
 
 
-
-/******************/
-/* MDSwitchLine
-/******************/
+/*
+ * M D S W I T C H L I N E
+ */
 
 MDSwitchLine {
 /*    border: 1px solid red;*/
@@ -341,10 +332,9 @@ MDSwitchLine:!enabled {
 
 
 
-
-/******************/
-/* MDListWidget
-/******************/
+/*
+ * M D L I S T W I D G E T
+ */
 
 MDListWidget::item {
     icon: url(:/mibdv/prova);
@@ -360,10 +350,9 @@ MDListWidget::item:selected {
 
 
 
-
-/***********************/
-/* QTabWidget - QTabBar
-/***********************/
+/*
+ * Q T A B W I D G E T   -   Q T A B B A R
+ */
 
 QTabBar {
     background-color: transparent;
@@ -400,12 +389,17 @@ QTabBar::tab:!selected {
 
 
 /*
+ * Q T R E E V I E W
+ */
+
+ /*
 QTreeView::branch {
     background: red;
     padding: 0px;
     margin: 0px:
 }
 */
+
 
 
 /*
@@ -421,6 +415,7 @@ QTreeView::branch {
     color: black;
     border-color: blue;
 }
+
 
 
 /*
@@ -462,7 +457,10 @@ QTreeView::branch {
     qproperty-icon: url(:/icons/black-theme/rename);
 }
 
- * MDTwoLineItem (compact)
+
+
+/*
+ * M D T W O L I N E I T E M   ( C O M P A C T )
  */
 
 .MDTwoLineItem {
@@ -470,4 +468,24 @@ QTreeView::branch {
     background-clip: border;
     color: black;
     qproperty-secondaryLabelColor: gray;
+}
+
+
+
+/*
+ * E R R O R   I T E M   W I D G E T
+ */
+
+.ErrorItemWidget {
+    border-color: green;
+    background-color: transparent;
+    qproperty-infoIcon: url(:/icons/black-theme/info);
+    qproperty-warningIcon: url(:/icons/black-theme/warning);
+    qproperty-errorIcon: url(:/icons/black-theme/error);
+    qproperty-fatalIcon: url(:/icons/black-theme/critical);
+}
+
+.ErrorItemWidget[focusCustom="true"] {
+    color: green;
+    background-color: yellow;
 }

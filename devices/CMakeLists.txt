@@ -8,12 +8,11 @@ SET(ITEMS
     IOManager
     MotionManager
     MotionManagerImpl
-    MotionSignaler
+    MotionAnalizerFactory
     MotionAnalizer
     ConnectedDeviceInspector
     IOSignaler
     DeviceFactory
-    InspectorStatusNotifier
     )
 
 FOREACH(ITEM ${ITEMS})

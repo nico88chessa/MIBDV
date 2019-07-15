@@ -13,6 +13,11 @@
 #include <DigitalInputValue.hpp>
 #include <IOSignaler.hpp>
 #include <Types.hpp>
+#include <ErrorHandler.hpp>
+
+#include <galil/GalilCNMotionAnalizer.hpp>
+#include <MachineStatusHandler.hpp>
+
 
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
@@ -102,12 +107,22 @@ void registerMetatypes() {
 
 //}
 
+class Prova {
+
+private:
+    DECL_MACHINE_STATUS_RECEIVER(Prova)
+};
+
 static constexpr char* MAIN_THREAD_NAME = "Main";
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+
+    bool test2 = hasMachineStatusReceiver<Prova>::value;
+    bool test3 = hasMachineStatusReceiver<int>::value;
+    bool test4 = hasMachineStatusReceiver<GalilCNMotionAnalizer>::value;
 
 //    using testStatus = isDevice<GalilCNController>::statusType;
 //    testStatus prova;
@@ -121,6 +136,10 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 //    bool isMotionInspectorTP = isPLCInspector<ConnectedDeviceInspector<GalilPLCController>>();
 //    bool isMotionInspectorTPK = isPLCInspector<ConnectedDeviceInspector<GalilCNController>>();
     //bool isMotionInspectorT2 = isCNInspector<int>();
+
+
+    bool test = hasErrorSignaler<int>::value;
+    test = hasErrorSignaler<GalilCNMotionAnalizer>::value;
 
     QApplication app(argc, argv);
     QApplication::instance()->thread()->setObjectName(MAIN_THREAD_NAME);

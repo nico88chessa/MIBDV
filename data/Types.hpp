@@ -32,7 +32,7 @@ class DigitalInputValue;
 class DigitalOutputValue;
 class AnalogInputValue;
 class IOSignaler;
-class MotionSignaler;
+class MotionAnalizer;
 
 enum class IOType;
 
@@ -44,6 +44,15 @@ using DigitalInputStatus = QMap<IOType, DigitalInputValue>;
 using DigitalOutputStatus = QMap<IOType, DigitalOutputValue>;
 using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
 
+using ErrorID = int;
+
+enum class ErrorType : int {
+    INFO = 0,
+    WARNING,
+    ERROR,
+    FATAL
+};
+
 enum class DeviceKey : int {
     NONE = -1,
     GALIL_CN = 0,
@@ -51,7 +60,8 @@ enum class DeviceKey : int {
     GALIL_PLC,
     GALIL_PLC_INSPECTOR,
     IO_SIGNALER,
-    MOTION_SIGNALER
+    MOTION_ANALIZER,
+    DEVICE_CONNECTION_WATCHER
 };
 
 enum class IOType : int {
@@ -90,6 +100,12 @@ enum class MotionStopCode : int {
     MOTION_STOP_ON_ERROR
 };
 
+enum class MachineStatus : int {
+    STATUS_NAN = -1,
+    IDLE,
+    PRINTING
+};
+
 template <DeviceKey>
 struct deviceKeyTraits {
     static constexpr bool value = false;
@@ -121,9 +137,9 @@ struct deviceKeyTraits<DeviceKey::IO_SIGNALER> {
 };
 
 template <>
-struct deviceKeyTraits<DeviceKey::MOTION_SIGNALER> {
+struct deviceKeyTraits<DeviceKey::MOTION_ANALIZER> {
     static constexpr bool value = true;
-    using type = MotionSignaler;
+    using type = MotionAnalizer;
 };
 
 }

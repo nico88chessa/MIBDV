@@ -28,6 +28,7 @@ private slots:
     void manageDisconnectedDevice();
 
 signals:
+    void failedToConnectSignal();
     void connectedSignal();
     void disconnectedSignal();
 

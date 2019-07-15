@@ -9,6 +9,7 @@
 #include <Types.hpp>
 
 #include <AbstractDevice.hpp>
+#include <ErrorHandler.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -29,6 +30,10 @@ protected:
     QWeakPointer<IAbstractDevice> device;
     QTimer connectionCheckTimer;
     bool isConnected;
+
+private:
+    int instanceId;
+    DECL_ERROR_SIGNALER_FRIENDS(DeviceConnectionWatcher)
 
 public:
     explicit DeviceConnectionWatcher(QObject* parent = nullptr);

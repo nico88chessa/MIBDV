@@ -7,6 +7,8 @@
 
 namespace PROGRAM_NAMESPACE {
 
+enum class DeviceKey;
+
 class NoStatusException : public std::exception {
     const char* what() const noexcept {
         return "No status exception: status is not available from device";
@@ -22,6 +24,13 @@ public:
     virtual bool isConnected() = 0;
     virtual bool connect() = 0;
     virtual ~IAbstractDevice() { }
+
+    /* TODO NIC 15/07/2019 - valutare se usare deviceKey come parametro di template
+     * nella classe AbstractDevice; quindi, da
+     * AbstractDevice<S> portarla a AbstractDevice<S, DeviceKey> e utilizzare
+     * i traits dove necessario
+     */
+    virtual DeviceKey getDeviceKey() const = 0;
 
 };
 

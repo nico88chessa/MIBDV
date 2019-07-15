@@ -4,6 +4,8 @@
 #include "ConnectedDeviceInspector.hpp"
 #include "GalilCNController.hpp"
 
+#include <ErrorHandler.hpp>
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -18,7 +20,8 @@ private:
 //    char isFECheck;
 //    bool isCustomHomeAxisX;
 
-    static constexpr char CUSTOM_HOME_AXIS_X_FE_COUNT = 2;
+//    static constexpr char CUSTOM_HOME_AXIS_X_FE_COUNT = 2;
+    DECL_ERROR_SIGNALER_FRIENDS(GalilCNInspector)
 
     inline GalilCNController::Ptr getGalilCNDevicePtr() {
         return static_cast<GalilCNController::Ptr>(device.data());

@@ -7,7 +7,8 @@
 #include <MotionManager.hpp>
 #include <IOManager.hpp>
 #include <IOSignaler.hpp>
-#include <MotionSignaler.hpp>
+#include <devices/MotionAnalizer.hpp>
+
 
 class MotionFrame;
 
@@ -22,7 +23,7 @@ public:
 
 private:
     MotionFrame* qPtr;
-    QWeakPointer<PROGRAM_NAMESPACE::MotionSignaler> motionSignaler;
+    QWeakPointer<PROGRAM_NAMESPACE::IMotionAnalizer> motionAnalizer;
     QWeakPointer<PROGRAM_NAMESPACE::IOSignaler> ioSignaler;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;

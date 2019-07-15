@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     traceEnter;
 
+//    msn = DeviceFactoryInstance.instanceMachineStatusNotifier();
     this->setupUi();
     this->setupStyleSheets();
 
@@ -59,14 +60,15 @@ void MainWindow::setupSignalsAndSlots() const {
     connect(ui->pbRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
 
     // left panel
-
-    auto listItem = ui->listItem;
+    auto&& listItem = ui->listItem;
     connect(listItem, &MDListWidget::itemClicked, [&, listItem](QListWidgetItem* item) {
         auto itemWidget = static_cast<MDCustomItem::Ptr>(listItem->itemWidget(item));
         if (itemWidget == nullptr)
             return;
         QString text = itemWidget->text();
-        if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
+        if (QString(MAINWINDOW_MDCUSTOMITEM_ALERT).compare(text) == 0)
+            ui->stackedWidget->setCurrentWidget(ui->pageAlert);
+        else if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageMotion);
         else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageIO);
@@ -226,6 +228,11 @@ void MainWindow::setupStyleSheets() const {
     QString content = mdGeomStr + geomStr + themeStr;
 
     app->setStyleSheet(content);
+
+//    if (msn->getCurrentStatus() == MachineStatus::IDLE)
+//        msn->setCurrentStatus(MachineStatus::PRINTING);
+//    else
+//        msn->setCurrentStatus(MachineStatus::IDLE);
 
     traceExit;
 

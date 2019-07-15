@@ -146,7 +146,8 @@ public:
             case DeviceKey::GALIL_PLC: return "GALIL_PLC";
             case DeviceKey::GALIL_PLC_INSPECTOR: return "GALIL_PLC_INSPECTOR";
             case DeviceKey::IO_SIGNALER: return "IO_SIGNALER";
-            case DeviceKey::MOTION_SIGNALER: return "MOTION_SIGNALER";
+            case DeviceKey::MOTION_ANALIZER: return "MOTION_ANALIZER";
+            case DeviceKey::DEVICE_CONNECTION_WATCHER: return "DEV_CONN_WATCHER";
         }
 
         return "NONE";
@@ -165,8 +166,10 @@ public:
             return DeviceKey::GALIL_PLC_INSPECTOR;
         if (str.compare("IO_SIGNALER", Qt::CaseInsensitive)==0)
             return DeviceKey::IO_SIGNALER;
-        if (str.compare("MOTION_SIGNALER", Qt::CaseInsensitive)==0)
-            return DeviceKey::MOTION_SIGNALER;
+        if (str.compare("MOTION_ANALIZER", Qt::CaseInsensitive)==0)
+            return DeviceKey::MOTION_ANALIZER;
+        if (str.compare("DEV_CONN_WATCHER", Qt::CaseInsensitive)==0)
+            return DeviceKey::DEVICE_CONNECTION_WATCHER;
 
         return DeviceKey::NONE;
 
@@ -182,6 +185,17 @@ public:
             case MotionStopCode::MOTION_STOP_CORRECTLY: descr = tr("Motion stop correctly"); break;
             case MotionStopCode::MOTION_STOP_COMMAND: descr = tr("Motion stop command"); break;
             case MotionStopCode::MOTION_STOP_ON_ERROR: descr = tr("Motion stop on error"); break;
+        }
+        return descr;
+
+    }
+
+    static inline QString getMachineStatusDescription(const MachineStatus& status) {
+
+        QString descr = "";
+        switch (status) {
+        case MachineStatus::IDLE: descr = tr("Idle"); break;
+        case MachineStatus::PRINTING: descr = tr("Printing"); break;
         }
         return descr;
 

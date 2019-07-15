@@ -6,7 +6,7 @@
 #include <QSharedPointer>
 
 #include <configure.h>
-#include <ErrorManager.hpp>
+#include <ErrorHandler.hpp>
 
 
 namespace PROGRAM_NAMESPACE {
@@ -14,12 +14,13 @@ namespace PROGRAM_NAMESPACE {
 class GalilPLCController;
 class GalilCNController;
 class AbstractConnectedDeviceInspector;
-class MotionSignaler;
+class IMotionAnalizer;
 class IOSignaler;
 class MotionManager;
 class IOManager;
-class InspectorStatusNotifier;
 class DeviceConnectionWatcher;
+class MachineStatusDispatcher;
+class MachineStatusNotifier;
 
 /* TODO NIC 28/05/2019 - iniziare a gestire l'error manager
  * qui andrebbe agganciata la logica dell'error manager a vari inspector
@@ -39,13 +40,13 @@ private:
     // errorManager
     QSharedPointer<ErrorManager> errorManager;
 
-    // questo serve per controllare se gli inspector dei dispositivi funzionano
-    QScopedPointer<InspectorStatusNotifier> inspectorStatusNotifier;
+    // machine state dispatcher
+    QScopedPointer<MachineStatusDispatcher> machineStatusDispatcher;
 
     // oggetti per la gestione degli inspector
     QSharedPointer<AbstractConnectedDeviceInspector> galilPLCInspector;
     QSharedPointer<AbstractConnectedDeviceInspector> galilCNInspector;
-    QSharedPointer<MotionSignaler> motionSignaler;
+    QSharedPointer<IMotionAnalizer> motionAnalizer;
     QSharedPointer<IOSignaler> ioSignaler;
 
 
@@ -67,7 +68,7 @@ private:
     QMap<ThreadName, QSharedPointer<IOManager>> ioManagers;
 
 private:
-    void initMotionSignaler();
+    void initMotionAnalizer();
     void initIOSignaler();
 
     /**
@@ -83,9 +84,7 @@ public:
 
     static DeviceFactory& instance();
 
-    InspectorStatusNotifier* getInspectorStatusNotifier() const;
-
-    QWeakPointer<MotionSignaler> getMotionSignaler();
+    QWeakPointer<IMotionAnalizer> getMotionAnalizer();
     QWeakPointer<IOSignaler> getIOSignaler();
 
     QSharedPointer<MotionManager> instanceMotionManager();
@@ -93,9 +92,12 @@ public:
 
     QWeakPointer<ErrorManager> getErrorManager();
 
+    QSharedPointer<MachineStatusNotifier> instanceMachineStatusNotifier(QObject* parent = Q_NULLPTR) const;
+
     // qui rimuove i managers / controller dal thread corrente
     void detachManagers();
 
+//    MachineStatusDispatcher* getMachineStatusDispatcher() const;
 };
 
 }

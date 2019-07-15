@@ -70,7 +70,6 @@ protected:
         return isConnected;
     }
 
-
     bool connectDevice() {
         return true;
     }

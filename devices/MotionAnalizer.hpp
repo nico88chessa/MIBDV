@@ -5,10 +5,14 @@
 
 #include <configure.h>
 
+#include <Types.hpp>
+#include <MotionBean.hpp>
+
+#include <ErrorHandler.hpp>
+#include <MachineStatusHandler.hpp>
+
 
 namespace PROGRAM_NAMESPACE {
-
-class MotionSignaler;
 
 class IMotionAnalizer : public QObject {
     Q_OBJECT
@@ -17,24 +21,51 @@ public:
     using Ptr = IMotionAnalizer *;
     using ConstPtr = const IMotionAnalizer *;
 
-protected:
-    MotionSignaler* signaler;
-
 public:
     explicit IMotionAnalizer(QObject* parent = nullptr) :
-        QObject(parent), signaler(nullptr) { }
+        QObject(parent) {
 
-    void setSignaler(MotionSignaler* const s) {
-        this->signaler = s;
+        initializeErrorSignaler(this->errorSignaler, this);
+        initializeMachineStatusReceiver(this->machineStatusR, this);
+
     }
 
 protected:
     virtual void analizeImpl(const QVariant& status) = 0;
+    DECL_ERROR_SIGNALER_FRIENDS(IMotionAnalizer)
+    DECL_MACHINE_STATUS_RECEIVER(IMotionAnalizer)
 
 public slots:
     void analize(const QVariant& status) {
         analizeImpl(status);
     }
+
+signals:
+    void axisXMotorOffSignal();
+    void axisXMotionStopSignal(MotionStopCode stopCode);
+    void axisXForwardLimitSignal();
+    void axisXBackwardLimitSignal();
+    void axisXHomeInProgressStartSignal();
+    void axisXHomeInProgressStopSignal();
+    void axisXHomingComplete();
+
+    void axisYMotorOffSignal();
+    void axisYMotionStopSignal(MotionStopCode stopCode);
+    void axisYForwardLimitSignal();
+    void axisYBackwardLimitSignal();
+    void axisYHomeInProgressStartSignal();
+    void axisYHomeInProgressStopSignal();
+    void axisYHomingComplete();
+
+    void axisZMotorOffSignal();
+    void axisZMotionStopSignal(MotionStopCode stopCode);
+    void axisZForwardLimitSignal();
+    void axisZBackwardLimitSignal();
+    void axisZHomeInProgressStartSignal();
+    void axisZHomeInProgressStopSignal();
+    void axisZHomingComplete();
+
+    void motionBeanSignal(const MotionBean& motionBean);
 
 };
 
@@ -55,7 +86,7 @@ public:
     virtual void analizeImpl(const QVariant& status) override final {
         auto obj = qvariant_cast<T>(status);
         analizeImpl(obj);
-        emit signaler->motionBeanSignal(MotionBean(obj));
+        emit motionBeanSignal(MotionBean(obj));
     }
 
 };
@@ -66,8 +97,9 @@ public:
 template <typename T>
 struct hasAnalizerTraits {
     static constexpr bool value = false;
+    using analizer = void;
 };
 
 }
 
-#endif // MOTIONSIGNALER_HPP
+#endif // MOTIONANALIZER_HPP

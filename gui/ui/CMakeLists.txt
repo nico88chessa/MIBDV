@@ -1,6 +1,8 @@
 SET(ITEMS
     MainWindow
     UnmovableWindow
+    AlertFrame
+    AlertFrameLogic
     MotionFrame
     MotionFrameLogic
     IOFrame

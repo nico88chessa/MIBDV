@@ -5,7 +5,6 @@
 #include "DialogAlert.hpp"
 
 #include <DeviceFactory.hpp>
-#include <MotionSignaler.hpp>
 #include <IOSignaler.hpp>
 
 #include <Logger.hpp>
@@ -24,7 +23,7 @@ MotionFrameLogic::~MotionFrameLogic() { }
 void MotionFrameLogic::initialize() {
     traceEnter;
 
-    this->motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    this->motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
     this->ioSignaler = DeviceFactoryInstance.getIOSignaler();
     this->motionManager = DeviceFactoryInstance.instanceMotionManager();
     this->ioManager = DeviceFactoryInstance.instanceIOManager();
@@ -659,10 +658,10 @@ void MotionFrame::setupSignalsAndSlots() {
 
     traceEnter;
 
-    auto&& motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    auto&& motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
     auto&& ioSignaler = DeviceFactoryInstance.getIOSignaler();
 
-    connect(dPtr->motionSignaler.data(), &MotionSignaler::motionBeanSignal, [&](const MotionBean& motionBean) {
+    connect(dPtr->motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& motionBean) {
         QMetaObject::invokeMethod(this, "updateMotionBean", Qt::QueuedConnection,
                                   Q_ARG(const mibdv::MotionBean&, motionBean));
     });

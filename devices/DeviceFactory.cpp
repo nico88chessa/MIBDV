@@ -7,15 +7,16 @@
 #include <QApplication>
 
 #include <common/NamedThread.hpp>
+#include <common/MachineStatusHandler.hpp>
 #include <Settings.hpp>
 #include <Logger.hpp>
 
 #include <devices/galil/GalilCNInspector.hpp>
 #include <devices/galil/GalilPLCInspector.hpp>
 #include <devices/IOSignaler.hpp>
-#include <devices/MotionSignaler.hpp>
-#include <devices/InspectorStatusNotifier.hpp>
+#include <devices/MotionAnalizerFactory.hpp>
 #include <devices/DeviceConnectionWatcher.hpp>
+
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -23,13 +24,14 @@ static constexpr const char* GALIL_CN_INSPECTOR_THREAD_NAME = "GALIL_CN_INSPECTO
 static constexpr const char* GALIL_PLC_INSPECTOR_THREAD_NAME = "GALIL_PLC_INSPECTOR_THREAD";
 static constexpr const char* IO_SIGNALER_THREAD_NAME = "IO_SIGNALER_THREAD";
 
+
 DeviceFactory::DeviceFactory() {
 
     traceEnter;
 
-    inspectorStatusNotifier.reset(new InspectorStatusNotifier());
     errorManager.reset(new ErrorManager());
-    this->initMotionSignaler();
+    machineStatusDispatcher.reset(new MachineStatusDispatcher());
+    this->initMotionAnalizer();
     this->initIOSignaler();
 
     traceExit;
@@ -49,7 +51,7 @@ void DeviceFactory::stop() {
 
     if (s.getMachineCNType() == DeviceKey::GALIL_CN)
         QMetaObject::invokeMethod(galilCNInspector.data(), "stopProcess", Qt::QueuedConnection);
-    galilCNInspector->thread();
+    galilCNInspector->thread()->wait();
 
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC)
         QMetaObject::invokeMethod(galilPLCInspector.data(), "stopProcess", Qt::QueuedConnection);
@@ -62,15 +64,14 @@ void DeviceFactory::stop() {
 
 DeviceFactory::~DeviceFactory() { }
 
-void DeviceFactory::initMotionSignaler() {
+void DeviceFactory::initMotionAnalizer() {
 
     traceEnter;
 
     Settings& s = Settings::instance();
 
-    if (this->motionSignaler.isNull()) {
+    if (this->motionAnalizer.isNull()) {
 
-        motionSignaler.reset(new MotionSignaler());
 
         if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
 
@@ -89,14 +90,19 @@ void DeviceFactory::initMotionSignaler() {
                  * QObject::connect(thread, &QThread::finished, galilCNInspector.data(), &GalilCNInspector::deleteLater);
                  */
                 QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-                QObject::connect(galilCNInspector.data(), &AbstractDeviceInspector::isRunningSignal,
-                                 inspectorStatusNotifier.data(), &InspectorStatusNotifier::galilCNInspectorIsRunningSignal);
 
                 galilCNInspector.data()->moveToThread(thread);
                 galilCNInspector->thread()->start();
 
             }
-            motionSignaler->subscribeInspector(galilCNInspector.dynamicCast<GalilCNInspector>());
+            this->getErrorManager().data()->subscribeObject(*galilCNInspector.dynamicCast<GalilCNInspector>().data());
+
+            motionAnalizer.reset(MotionAnalizerFactory::createAnalizer(galilCNInspector.dynamicCast<GalilCNInspector>()));
+            this->getErrorManager().data()->subscribeObject(*motionAnalizer);
+            this->machineStatusDispatcher->addReceiverT(*motionAnalizer);
+//            motionAnalizer.reset(MotionAnalizerFactory::createAnalizer(galilCNInspector.dynamicCast<GalilPLCInspector>()));
+//            motionAnalizer.reset(new GalilCNMotionAnalizer());
+//            motionSignaler->subscribeInspector(galilCNInspector.dynamicCast<GalilCNInspector>());
 
         }
 
@@ -133,14 +139,13 @@ void DeviceFactory::initIOSignaler() {
                  * QObject::connect(thread, &QThread::finished, galilCNInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
                  */
                 QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-                QObject::connect(galilCNInspector.data(), &AbstractDeviceInspector::isRunningSignal,
-                                 inspectorStatusNotifier.data(), &InspectorStatusNotifier::galilCNInspectorIsRunningSignal);
 
                 galilCNInspector.data()->moveToThread(thread);
                 galilCNInspector->thread()->start();
 
             }
 
+            this->getErrorManager().data()->subscribeObject(*galilCNInspector.dynamicCast<GalilCNInspector>().data());
             ioSignaler->subscribeInspector(galilCNInspector.dynamicCast<GalilCNInspector>());
 
         }
@@ -162,14 +167,13 @@ void DeviceFactory::initIOSignaler() {
                  * QObject::connect(thread, &QThread::finished, galilPLCInspector.data(), &AbstractConnectedDeviceInspector::deleteLater);
                  */
                 QObject::connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-                QObject::connect(galilPLCInspector.data(), &AbstractDeviceInspector::isRunningSignal,
-                                 inspectorStatusNotifier.data(), &InspectorStatusNotifier::galilPLCInspectorIsRunningSignal);
 
                 galilPLCInspector.data()->moveToThread(thread);
                 galilPLCInspector->thread()->start();
 
             }
 
+            this->getErrorManager().data()->subscribeObject(*galilPLCInspector.dynamicCast<GalilPLCInspector>().data());
             ioSignaler->subscribeInspector(galilPLCInspector.dynamicCast<GalilPLCInspector>());
 
         }
@@ -211,19 +215,13 @@ DeviceFactory& DeviceFactory::instance() {
 
 }
 
-InspectorStatusNotifier* DeviceFactory::getInspectorStatusNotifier() const {
-    traceEnter;
-    return this->inspectorStatusNotifier.data();
-    traceExit;
-}
-
-QWeakPointer<MotionSignaler> DeviceFactory::getMotionSignaler() {
+QWeakPointer<IMotionAnalizer> DeviceFactory::getMotionAnalizer() {
 
     traceEnter;
-    if (motionSignaler.isNull())
-        initMotionSignaler();
+    if (motionAnalizer.isNull())
+        initMotionAnalizer();
     traceExit;
-    return motionSignaler.toWeakRef();
+    return motionAnalizer.toWeakRef();
 
 }
 
@@ -267,7 +265,10 @@ QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
                 QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher());
                 galilCNConnectionWatcher->setDevice(galilController.toWeakRef());
                 galilCNConnectionWatcher->setupTimers(s.getGalilCNCheckConnectionIntervalMs());
+
                 galilCNConnectionWatchers.insert(currentThreadName, galilCNConnectionWatcher);
+                this->getErrorManager().data()->subscribeObject(*galilCNConnectionWatcher.data());
+
                 galilCNConnectionWatcher->startWatcher();
             }
         }
@@ -275,34 +276,34 @@ QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
         QSharedPointer<MotionManager> motionManager(new MotionManagerImpl<GalilCNController>(galilController.staticCast<GalilCNController>()));
 
         // segnali asse x
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
-        QObject::connect(motionSignaler.data(), static_cast<void (MotionSignaler::*)(MotionStopCode)>(&MotionSignaler::axisXMotionStopSignal),
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
+        QObject::connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal),
                          motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal));
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisXHomingComplete, motionManager.data(), &MotionManager::axisXHomingComplete);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomingComplete, motionManager.data(), &MotionManager::axisXHomingComplete);
 
         // segnali asse y
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
-        QObject::connect(motionSignaler.data(), static_cast<void (MotionSignaler::*)(MotionStopCode)>(&MotionSignaler::axisYMotionStopSignal),
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
+        QObject::connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal),
                          motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal));
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisYHomingComplete, motionManager.data(), &MotionManager::axisYHomingComplete);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomingComplete, motionManager.data(), &MotionManager::axisYHomingComplete);
 
         // segnali asse z
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
-        QObject::connect(motionSignaler.data(), static_cast<void (MotionSignaler::*)(MotionStopCode)>(&MotionSignaler::axisZMotionStopSignal),
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
+        QObject::connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal),
                          motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal));
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
-        QObject::connect(motionSignaler.data(), &MotionSignaler::axisZHomingComplete, motionManager.data(), &MotionManager::axisZHomingComplete);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
+        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomingComplete, motionManager.data(), &MotionManager::axisZHomingComplete);
 
         motionManagers.insert(currentThreadName, motionManager);
 
@@ -347,7 +348,10 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
                 QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher());
                 galilCNConnectionWatcher->setDevice(galilController.toWeakRef());
                 galilCNConnectionWatcher->setupTimers(s.getGalilCNCheckConnectionIntervalMs());
+
                 galilCNConnectionWatchers.insert(currentThreadName, galilCNConnectionWatcher);
+                this->getErrorManager().data()->subscribeObject(*galilCNConnectionWatcher.data());
+
                 galilCNConnectionWatcher->startWatcher();
             }
         }
@@ -376,7 +380,10 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
                 QSharedPointer<DeviceConnectionWatcher> galilPLCConnectionWatcher(new DeviceConnectionWatcher());
                 galilPLCConnectionWatcher->setDevice(galilController.toWeakRef());
                 galilPLCConnectionWatcher->setupTimers(s.getGalilPLCCheckConnectionIntervalMs());
+
                 galilPLCConnectionWatchers.insert(currentThreadName, galilPLCConnectionWatcher);
+                this->getErrorManager().data()->subscribeObject(*galilPLCConnectionWatcher.data());
+
                 galilPLCConnectionWatcher->startWatcher();
             }
         }
@@ -395,6 +402,21 @@ QWeakPointer<ErrorManager> DeviceFactory::getErrorManager() {
     traceEnter;
     return this->errorManager.toWeakRef();
     traceExit;
+
+}
+
+QSharedPointer<MachineStatusNotifier> DeviceFactory::instanceMachineStatusNotifier(QObject* parent) const {
+
+    traceEnter;
+    if (!this->machineStatusDispatcher->canAddNotifier()) {
+        traceWarn() << "E' gia presente un Machine status Notifier";
+        return QSharedPointer<MachineStatusNotifier>();
+    }
+    QSharedPointer<MachineStatusNotifier> msn(new MachineStatusNotifier(parent));
+    msn->setCurrentStatus(this->machineStatusDispatcher->getCurrentStatus());
+    machineStatusDispatcher->addNotifier(msn);
+    traceExit;
+    return msn;
 
 }
 
@@ -427,3 +449,11 @@ void DeviceFactory::detachManagers() {
     traceExit;
 
 }
+
+//MachineStatusDispatcher::Ptr DeviceFactory::getMachineStatusDispatcher() const {
+//
+//    traceEnter;
+//    traceExit;
+//    return this->machineStatusDispatcher.data();
+//
+//}

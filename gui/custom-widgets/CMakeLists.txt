@@ -11,6 +11,7 @@ SET(ITEMS
     ItemDetailWidgetPrivate
     MDTwoLineItem
     ItemDetailWidget
+    ErrorItemWidget
     )
 
 FOREACH(ITEM ${ITEMS})
