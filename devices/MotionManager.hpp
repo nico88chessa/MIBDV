@@ -84,36 +84,6 @@ protected:
 
     virtual bool notifyResetOkImpl() = 0;
 
-signals:
-    //void powerOffSignal();
-    //void powerOnSignal();
-    //void cycleOffSignal();
-    //void cycleOnSignal();
-
-    void axisXMotorOffSignal();
-    void axisXMotionStopSignal(MotionStopCode stopCode);
-    void axisXForwardLimitSignal();
-    void axisXBackwardLimitSignal();
-    void axisXHomeInProgressStartSignal();
-    void axisXHomeInProgressStopSignal();
-    void axisXHomingComplete();
-
-    void axisYMotorOffSignal();
-    void axisYMotionStopSignal(MotionStopCode stopCode);
-    void axisYForwardLimitSignal();
-    void axisYBackwardLimitSignal();
-    void axisYHomeInProgressStartSignal();
-    void axisYHomeInProgressStopSignal();
-    void axisYHomingComplete();
-
-    void axisZMotorOffSignal();
-    void axisZMotionStopSignal(MotionStopCode stopCode);
-    void axisZForwardLimitSignal();
-    void axisZBackwardLimitSignal();
-    void axisZHomeInProgressStartSignal();
-    void axisZHomeInProgressStopSignal();
-    void axisZHomingComplete();
-
 public:
 
     static QString decodeError(MotionErr error) {

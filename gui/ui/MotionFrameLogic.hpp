@@ -35,9 +35,6 @@ public:
 
     void initialize();
 
-    //void setupMotionManager(const QSharedPointer<mibdv::MotionManager>& motionManager);
-    //void setupIOManager(const QSharedPointer<mibdv::IOManager>& ioManager);
-
 private:
     bool checkCycle();
 

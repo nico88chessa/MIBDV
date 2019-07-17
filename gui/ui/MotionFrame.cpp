@@ -99,7 +99,7 @@ void MotionFrameLogic::moveX() {
                 }
             }
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -174,7 +174,7 @@ void MotionFrameLogic::moveY() {
             }
             t.stop();
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
@@ -250,7 +250,7 @@ void MotionFrameLogic::moveZ() {
             }
             t.stop();
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
@@ -384,7 +384,7 @@ void MotionFrameLogic::homeAxes() {
         t.setInterval(TIMER_CHECK_MOTION_MS);
         res = MOTION_MANAGER_NO_ERR;
 
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::axisZHomingComplete, [&]{
+        QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomingComplete, [&]{
             if (loop.isRunning()) {
                 res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
                 loop.quit();
@@ -403,7 +403,7 @@ void MotionFrameLogic::homeAxes() {
                 }
             }
         });
-        QMetaObject::Connection c3 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c3 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
@@ -479,7 +479,7 @@ void MotionFrameLogic::homeAxes() {
     bool isAxisYMoving = true;
 
 
-    QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::axisXHomingComplete, [&]{
+    QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomingComplete, [&]{
         if (loop.isRunning()) {
             isAxisXMoving = false;
             resX = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -487,7 +487,7 @@ void MotionFrameLogic::homeAxes() {
                 loop.quit();
         }
     });
-    QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::axisYHomingComplete, [&]{
+    QMetaObject::Connection c2 = connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomingComplete, [&]{
         if (loop.isRunning()) {
             isAxisYMoving = false;
             resY = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
@@ -525,7 +525,7 @@ void MotionFrameLogic::homeAxes() {
             }
         }
     });
-    QMetaObject::Connection c5 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
+    QMetaObject::Connection c5 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
         if (loop.isRunning()) {
             isAxisXMoving = false;
             if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
@@ -536,7 +536,7 @@ void MotionFrameLogic::homeAxes() {
                 loop.quit();
         }
     });
-    QMetaObject::Connection c6 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
+    QMetaObject::Connection c6 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
         if (loop.isRunning()) {
             isAxisYMoving = false;
             if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)

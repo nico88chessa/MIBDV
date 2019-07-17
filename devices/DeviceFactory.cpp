@@ -279,36 +279,6 @@ QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
 
         QSharedPointer<MotionManager> motionManager(new MotionManagerImpl<GalilCNController>(galilController.staticCast<GalilCNController>()));
 
-        // segnali asse x
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXMotorOffSignal, motionManager.data(), &MotionManager::axisXMotorOffSignal);
-        QObject::connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal),
-                         motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal));
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXForwardLimitSignal, motionManager.data(), &MotionManager::axisXForwardLimitSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXBackwardLimitSignal, motionManager.data(), &MotionManager::axisXBackwardLimitSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStartSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisXHomeInProgressStopSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomingComplete, motionManager.data(), &MotionManager::axisXHomingComplete);
-
-        // segnali asse y
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYMotorOffSignal, motionManager.data(), &MotionManager::axisYMotorOffSignal);
-        QObject::connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal),
-                         motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal));
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYForwardLimitSignal, motionManager.data(), &MotionManager::axisYForwardLimitSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYBackwardLimitSignal, motionManager.data(), &MotionManager::axisYBackwardLimitSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStartSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisYHomeInProgressStopSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomingComplete, motionManager.data(), &MotionManager::axisYHomingComplete);
-
-        // segnali asse z
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZMotorOffSignal, motionManager.data(), &MotionManager::axisZMotorOffSignal);
-        QObject::connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal),
-                         motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal));
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZForwardLimitSignal, motionManager.data(), &MotionManager::axisZForwardLimitSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZBackwardLimitSignal, motionManager.data(), &MotionManager::axisZBackwardLimitSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomeInProgressStartSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStartSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomeInProgressStopSignal, motionManager.data(), &MotionManager::axisZHomeInProgressStopSignal);
-        QObject::connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomingComplete, motionManager.data(), &MotionManager::axisZHomingComplete);
-
         motionManagers.insert(currentThreadName, motionManager);
 
     }
