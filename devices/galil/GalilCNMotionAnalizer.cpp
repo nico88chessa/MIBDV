@@ -30,7 +30,7 @@ static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_X_DESCR[] = QT_TRANSL
 static constexpr char GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y motor is off");
 static constexpr char GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y forward limit");
 static constexpr char GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y backward limit");
-static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y Stop code errort");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y Stop code error");
 
 static constexpr char GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z motor is off");
 static constexpr char GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z forward limit");
@@ -141,20 +141,25 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         }
     }
 
-    // check forward limit asse x
-    bool isForwardLimitAxisX = newStatus.getAxisAForwardLimit();
-    if (isForwardLimitAxisX) {
-        if (isForwardLimitAxisX != oldStatus.getAxisAForwardLimit())
-            emit axisXForwardLimitSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_X_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
-    }
+    // check limiti asse x se abilitato
+    if (getCheckLimitsAxisX()) {
 
-    // check backward limit asse x
-    bool isBackwardLimitAxisX = newStatus.getAxisAReverseLimit();
-    if (isBackwardLimitAxisX) {
-        if (isBackwardLimitAxisX != oldStatus.getAxisAReverseLimit())
-            emit axisXBackwardLimitSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        // check forward limit asse x
+        bool isForwardLimitAxisX = newStatus.getAxisAForwardLimit();
+        if (isForwardLimitAxisX) {
+            if (isForwardLimitAxisX != oldStatus.getAxisAForwardLimit())
+                emit axisXForwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_X_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+        // check backward limit asse x
+        bool isBackwardLimitAxisX = newStatus.getAxisAReverseLimit();
+        if (isBackwardLimitAxisX) {
+            if (isBackwardLimitAxisX != oldStatus.getAxisAReverseLimit())
+                emit axisXBackwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
     }
 
     // check homing in progress asse x
@@ -209,20 +214,26 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         }
     }
 
-    // check forward limit asse y
-    bool isForwardLimitAxisY = newStatus.getAxisBForwardLimit();
-    if (isForwardLimitAxisY) {
-        if (isForwardLimitAxisY != oldStatus.getAxisBForwardLimit())
-            emit axisYForwardLimitSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
-    }
 
-    // check backward limit asse y
-    bool isBackwardLimitAxisY = newStatus.getAxisBReverseLimit();
-    if (isBackwardLimitAxisY) {
-        if (isBackwardLimitAxisY != oldStatus.getAxisBReverseLimit())
-            emit axisYBackwardLimitSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+    // check limiti asse y se abilitato
+    if (getCheckLimitsAxisY()) {
+
+        // check forward limit asse y
+        bool isForwardLimitAxisY = newStatus.getAxisBForwardLimit();
+        if (isForwardLimitAxisY) {
+            if (isForwardLimitAxisY != oldStatus.getAxisBForwardLimit())
+                emit axisYForwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+        // check backward limit asse y
+        bool isBackwardLimitAxisY = newStatus.getAxisBReverseLimit();
+        if (isBackwardLimitAxisY) {
+            if (isBackwardLimitAxisY != oldStatus.getAxisBReverseLimit())
+                emit axisYBackwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
     }
 
     // check homing in progress asse y
@@ -277,20 +288,25 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         }
     }
 
-    // check forward limit asse z
-    bool isForwardLimitAxisZ = newStatus.getAxisCForwardLimit();
-    if (isForwardLimitAxisZ) {
-        if (isForwardLimitAxisZ != oldStatus.getAxisCForwardLimit())
-            emit axisZForwardLimitSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
-    }
+    // check limiti asse z se abilitato
+    if (getCheckLimitsAxisX()) {
 
-    // check backward limit asse z
-    bool isBackwardLimitAxisZ = newStatus.getAxisCReverseLimit();
-    if (isBackwardLimitAxisZ) {
-        if (isBackwardLimitAxisZ != oldStatus.getAxisCReverseLimit())
-            emit axisZBackwardLimitSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        // check forward limit asse z
+        bool isForwardLimitAxisZ = newStatus.getAxisCForwardLimit();
+        if (isForwardLimitAxisZ) {
+            if (isForwardLimitAxisZ != oldStatus.getAxisCForwardLimit())
+                emit axisZForwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+        // check backward limit asse z
+        bool isBackwardLimitAxisZ = newStatus.getAxisCReverseLimit();
+        if (isBackwardLimitAxisZ) {
+            if (isBackwardLimitAxisZ != oldStatus.getAxisCReverseLimit())
+                emit axisZBackwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
     }
 
     // check homing in progress asse z

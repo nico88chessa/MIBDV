@@ -77,17 +77,33 @@ public:
     using ConstPtr = const AbstractAnalizer*;
 
 protected:
+    bool checkLimitsAxisX;
+    bool checkLimitsAxisY;
+    bool checkLimitsAxisZ;
+
+protected:
     virtual void analizeImpl(const T& newStatus) = 0;
 
 public:
     AbstractAnalizer(QObject* parent = nullptr) :
-        IMotionAnalizer(parent) { }
+        IMotionAnalizer(parent) {
+
+        Settings& s = Settings::instance();
+        checkLimitsAxisX = s.getAxisXCheckLimits();
+        checkLimitsAxisY = s.getAxisYCheckLimits();
+        checkLimitsAxisZ = s.getAxisZCheckLimits();
+
+    }
 
     virtual void analizeImpl(const QVariant& status) override final {
         auto obj = qvariant_cast<T>(status);
         analizeImpl(obj);
         emit motionBeanSignal(MotionBean(obj));
     }
+
+    inline bool getCheckLimitsAxisX() const { return checkLimitsAxisX; }
+    inline bool getCheckLimitsAxisY() const { return checkLimitsAxisY; }
+    inline bool getCheckLimitsAxisZ() const { return checkLimitsAxisZ; }
 
 };
 
@@ -99,6 +115,7 @@ struct hasAnalizerTraits {
     static constexpr bool value = false;
     using analizer = void;
 };
+
 
 }
 

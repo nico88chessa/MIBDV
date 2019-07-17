@@ -747,6 +747,17 @@ void MotionFrame::setupUi() {
     ui->pbStopY->setEnabled(true);
     ui->pbStopZ->setEnabled(true);
 
+    bool checkLimitsAxisX = s.getAxisXCheckLimits();
+    bool checkLimitsAxisY = s.getAxisYCheckLimits();
+    bool checkLimitsAxisZ = s.getAxisZCheckLimits();
+
+    ui->cbAxisXForwardLimit->setVisible(checkLimitsAxisX);
+    ui->cbAxisXReverseLimit->setVisible(checkLimitsAxisX);
+    ui->cbAxisYForwardLimit->setVisible(checkLimitsAxisY);
+    ui->cbAxisYReverseLimit->setVisible(checkLimitsAxisY);
+    ui->cbAxisZForwardLimit->setVisible(checkLimitsAxisZ);
+    ui->cbAxisZReverseLimit->setVisible(checkLimitsAxisZ);
+
     traceExit;
 
 }
