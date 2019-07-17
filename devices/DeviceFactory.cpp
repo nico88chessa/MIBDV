@@ -260,13 +260,17 @@ QSharedPointer<MotionManager> DeviceFactory::instanceMotionManager() {
 
         auto&& galilController = galilCNControllers.value(currentThreadName);
 
-        if (!galilCNConnectionWatchers.contains(currentThreadName)) {
+        DeviceConnectionWatcherKey key(currentThreadName, DeviceKey::GALIL_CN);
+
+//        if (!galilCNConnectionWatchers.contains(currentThreadName)) {
+        if (!connectionWatchers.contains(key)) {
             if (existsEventLoop()) {
-                QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher());
+                int id = connectionWatchers.size() + 1;
+                QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher(id));
                 galilCNConnectionWatcher->setDevice(galilController.toWeakRef());
                 galilCNConnectionWatcher->setupTimers(s.getGalilCNCheckConnectionIntervalMs());
 
-                galilCNConnectionWatchers.insert(currentThreadName, galilCNConnectionWatcher);
+                connectionWatchers.insert(key, galilCNConnectionWatcher);
                 this->getErrorManager().data()->subscribeObject(*galilCNConnectionWatcher.data());
 
                 galilCNConnectionWatcher->startWatcher();
@@ -343,13 +347,15 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
 
         auto&& galilController = galilCNControllers.value(currentThreadName);
 
-        if (!galilCNConnectionWatchers.contains(currentThreadName)) {
+        DeviceConnectionWatcherKey key(currentThreadName, DeviceKey::GALIL_CN);
+        if (!connectionWatchers.contains(key)) {
             if (existsEventLoop()) {
-                QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher());
+                int id = connectionWatchers.size() + 1;
+                QSharedPointer<DeviceConnectionWatcher> galilCNConnectionWatcher(new DeviceConnectionWatcher(id));
                 galilCNConnectionWatcher->setDevice(galilController.toWeakRef());
                 galilCNConnectionWatcher->setupTimers(s.getGalilCNCheckConnectionIntervalMs());
 
-                galilCNConnectionWatchers.insert(currentThreadName, galilCNConnectionWatcher);
+                connectionWatchers.insert(key, galilCNConnectionWatcher);
                 this->getErrorManager().data()->subscribeObject(*galilCNConnectionWatcher.data());
 
                 galilCNConnectionWatcher->startWatcher();
@@ -375,13 +381,15 @@ QSharedPointer<IOManager> DeviceFactory::instanceIOManager() {
 
         auto&& galilController = galilPLCControllers.value(currentThreadName);
 
-        if (!galilPLCConnectionWatchers.contains(currentThreadName)) {
+        DeviceConnectionWatcherKey key(currentThreadName, DeviceKey::GALIL_PLC);
+        if (!connectionWatchers.contains(key)) {
             if (existsEventLoop()) {
-                QSharedPointer<DeviceConnectionWatcher> galilPLCConnectionWatcher(new DeviceConnectionWatcher());
+                int id = connectionWatchers.size() + 1;
+                QSharedPointer<DeviceConnectionWatcher> galilPLCConnectionWatcher(new DeviceConnectionWatcher(id));
                 galilPLCConnectionWatcher->setDevice(galilController.toWeakRef());
                 galilPLCConnectionWatcher->setupTimers(s.getGalilPLCCheckConnectionIntervalMs());
 
-                galilPLCConnectionWatchers.insert(currentThreadName, galilPLCConnectionWatcher);
+                connectionWatchers.insert(key, galilPLCConnectionWatcher);
                 this->getErrorManager().data()->subscribeObject(*galilPLCConnectionWatcher.data());
 
                 galilPLCConnectionWatcher->startWatcher();
@@ -429,17 +437,19 @@ void DeviceFactory::detachManagers() {
 
     if (s.getMachineCNType() == DeviceKey::GALIL_CN) {
         galilCNControllers.remove(currentThreadName);
-        if (galilCNConnectionWatchers.contains(currentThreadName)) {
-            galilCNConnectionWatchers.value(currentThreadName)->stopWatcher();
-            galilCNConnectionWatchers.remove(currentThreadName);
+        DeviceConnectionWatcherKey key(currentThreadName, DeviceKey::GALIL_CN);
+        if (connectionWatchers.contains(key)) {
+            connectionWatchers.value(key)->stopWatcher();
+            connectionWatchers.remove(key);
         }
 
     }
     if (s.getMachinePLCType() == DeviceKey::GALIL_PLC) {
         galilPLCControllers.remove(currentThreadName);
-        if (galilPLCConnectionWatchers.contains(currentThreadName)) {
-            galilPLCConnectionWatchers.value(currentThreadName)->stopWatcher();
-            galilPLCConnectionWatchers.remove(currentThreadName);
+        DeviceConnectionWatcherKey key(currentThreadName, DeviceKey::GALIL_PLC);
+        if (connectionWatchers.contains(key)) {
+            connectionWatchers.value(key)->stopWatcher();
+            connectionWatchers.remove(key);
         }
     }
 
@@ -449,11 +459,3 @@ void DeviceFactory::detachManagers() {
     traceExit;
 
 }
-
-//MachineStatusDispatcher::Ptr DeviceFactory::getMachineStatusDispatcher() const {
-//
-//    traceEnter;
-//    traceExit;
-//    return this->machineStatusDispatcher.data();
-//
-//}

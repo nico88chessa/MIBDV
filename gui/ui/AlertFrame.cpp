@@ -140,13 +140,13 @@ void AlertItemModel::updateErrors(const QList<Error> refreshList) {
                 return false;
 
             // se il tipo di codice e' uguale, confronto il device
-            if (l.getDeviceKey() < r.getDeviceKey())
+            if (static_cast<int>(l.getDeviceKey()) < static_cast<int>(r.getDeviceKey()))
                 return true;
-            if (l.getDeviceKey() < r.getDeviceKey())
+            if (static_cast<int>(l.getDeviceKey()) > static_cast<int>(r.getDeviceKey()))
                 return false;
 
             // se il device e' uguale, confronto il codice dell'errore
-            return l.getErrorKey() < r.getErrorKey();
+            return l.getErrorId() < r.getErrorId();
         });
     }
 
@@ -163,16 +163,6 @@ void AlertItemModel::clear() {
 QList<Error> AlertItemModel::getErrors() const {
     return errors;
 }
-
-void AlertItemModel::sort(int column, Qt::SortOrder order) {
-    std::sort(errors.begin(), errors.end(), [&](const Error& l, const Error& r) -> bool {
-        bool res = l.getErrorType() >= r.getErrorType() &&
-                l.getDeviceKey() <= r.getDeviceKey() &&
-                l.getErrorKey() <= r.getErrorKey();
-        return res;
-    });
-}
-
 
 
 

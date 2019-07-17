@@ -43,13 +43,6 @@ public:
     void updateErrors(const QList<PN::Error> refreshList);
     QList<PN::Error> getErrors() const;
 
-signals:
-//    void modelUpdated();
-
-
-    // QAbstractItemModel interface
-public:
-    void sort(int column, Qt::SortOrder order);
 };
 
 

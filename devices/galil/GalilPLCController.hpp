@@ -53,9 +53,6 @@ public:
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
     virtual QString decodeError(const int& errorCode);
     int getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue = nullptr); // 10 min valore default
-    virtual DeviceKey getDeviceKey() const override {
-        return deviceKey;
-    }
 
 private:
     inline bool getConnectionStatus() const { return connectionStatus; }

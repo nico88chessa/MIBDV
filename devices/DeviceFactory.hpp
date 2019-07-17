@@ -22,9 +22,6 @@ class DeviceConnectionWatcher;
 class MachineStatusDispatcher;
 class MachineStatusNotifier;
 
-/* TODO NIC 28/05/2019 - iniziare a gestire l'error manager
- * qui andrebbe agganciata la logica dell'error manager a vari inspector
- */
 
 class DeviceFactory {
 public:
@@ -32,6 +29,25 @@ public:
     using ConstPtr = const DeviceFactory*;
 
     using ThreadName = QString;
+
+    // utilizzo una classe interna
+    class DeviceConnectionWatcherKey {
+    private:
+        QString threadName;
+        DeviceKey deviceId;
+
+    public:
+        DeviceConnectionWatcherKey(const QString& threadName, DeviceKey id) :
+            threadName(threadName), deviceId(id) { }
+        DeviceKey getDeviceId() const { return deviceId; }
+        void setDeviceId(const DeviceKey& value) { deviceId = value; }
+        QString getThreadName() const { return threadName; }
+        void setThreadName(const QString& value) { threadName = value; }
+
+        // TODO NIC 17/07/2019 - da verificare funzionamento
+        friend inline bool operator<(const DeviceConnectionWatcherKey& l, const DeviceConnectionWatcherKey& r);
+
+    };
 
 private:
     DeviceFactory();
@@ -60,8 +76,8 @@ private:
     QMap<ThreadName, QSharedPointer<GalilCNController>> galilCNControllers;
     QMap<ThreadName, QSharedPointer<GalilPLCController>> galilPLCControllers;
 
-    QMap<ThreadName, QSharedPointer<DeviceConnectionWatcher>> galilCNConnectionWatchers;
-    QMap<ThreadName, QSharedPointer<DeviceConnectionWatcher>> galilPLCConnectionWatchers;
+    // lista di connection watchers
+    QMap<DeviceConnectionWatcherKey, QSharedPointer<DeviceConnectionWatcher>> connectionWatchers;
 
     // wrapper che mascherano l'implementazione dei controller
     QMap<ThreadName, QSharedPointer<MotionManager>> motionManagers;
@@ -97,8 +113,14 @@ public:
     // qui rimuove i managers / controller dal thread corrente
     void detachManagers();
 
-//    MachineStatusDispatcher* getMachineStatusDispatcher() const;
 };
+
+bool operator<(const DeviceFactory::DeviceConnectionWatcherKey& l, const DeviceFactory::DeviceConnectionWatcherKey& r) {
+    if (l.threadName < r.threadName)
+        return true;
+    return static_cast<int>(l.deviceId) < static_cast<int>(r.deviceId);
+//    return static_cast<int>(l.deviceId) < static_cast<int>(r.deviceId) && (l.threadName < r.threadName);
+}
 
 }
 

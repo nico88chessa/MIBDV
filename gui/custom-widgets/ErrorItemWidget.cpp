@@ -22,6 +22,13 @@ void ErrorItemWidget::setError(const Error& error) {
     this->setErrorDescription(error.getErrorDescription());
     this->setErrorType(error.getErrorType());
 
+    switch (error.getErrorType()) {
+    case ErrorType::INFO : this->setProperty(IS_INFO_PROPERTY_NAME, true); break;
+    case ErrorType::WARNING : this->setProperty(IS_WARNING_PROPERTY_NAME, true); break;
+    case ErrorType::ERROR : this->setProperty(IS_ERROR_PROPERTY_NAME, true); break;
+    case ErrorType::FATAL : this->setProperty(IS_FATAL_PROPERTY_NAME, true); break;
+    }
+
 }
 
 int ErrorItemWidget::getIconWidth() const { return iconWidth; }

@@ -4,25 +4,36 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-static const ErrorID GALIL_CN_MA_AXIS_X_MOTOR_OFF = PROGRAM_ERR_START_CODE + 1;
-static const ErrorID GALIL_CN_MA_AXIS_X_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 2;
-static const ErrorID GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 3;
-static const ErrorID GALIL_CN_MA_AXIS_Y_MOTOR_OFF = PROGRAM_ERR_START_CODE + 4;
-static const ErrorID GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 5;
-static const ErrorID GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 6;
-static const ErrorID GALIL_CN_MA_AXIS_Z_MOTOR_OFF = PROGRAM_ERR_START_CODE + 7;
-static const ErrorID GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 8;
-static const ErrorID GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 9;
+
+static constexpr ErrorID GALIL_CN_MA_AXIS_X_MOTOR_OFF = PROGRAM_ERR_START_CODE + 1;
+static constexpr ErrorID GALIL_CN_MA_AXIS_X_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 2;
+static constexpr ErrorID GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 3;
+static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_X = PROGRAM_ERR_START_CODE + (0x01 << 8); // 65792
+
+static constexpr ErrorID GALIL_CN_MA_AXIS_Y_MOTOR_OFF = PROGRAM_ERR_START_CODE + 21;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 21;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 23;
+static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_Y = PROGRAM_ERR_START_CODE + (0x01 << 9); // 66048
+
+static constexpr ErrorID GALIL_CN_MA_AXIS_Z_MOTOR_OFF = PROGRAM_ERR_START_CODE + 41;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 42;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 43;
+static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_Z = PROGRAM_ERR_START_CODE + (0x01 << 10); // 66560
 
 static constexpr char GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X motor is off");
 static constexpr char GALIL_CN_MA_AXIS_X_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X forward limit");
 static constexpr char GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X backward limit");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_X_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X Stop code error");
+
 static constexpr char GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y motor is off");
 static constexpr char GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y forward limit");
 static constexpr char GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y backward limit");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y Stop code errort");
+
 static constexpr char GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z motor is off");
 static constexpr char GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z forward limit");
 static constexpr char GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z backward limit");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Z_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z Stop code error");
 
 
 GalilCNMotionAnalizer::GalilCNMotionAnalizer(QObject* parent) :
@@ -152,12 +163,27 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
             emit axisXHomeInProgressStopSignal();
     }
 
+    // check stop code asse x
+    int stopCodeAxisX = newStatus.getAxisAStopCode();
+    MotionStopCode motionStopCodeAxisX = GalilControllerUtils::evaluateStopCode(stopCodeAxisX);
+    QString decodeStopCodeAxisX = GalilControllerUtils::getStopCodeDescription(stopCodeAxisX);
+    QString stopCodeAxisXDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_X_DESCR)).arg(decodeStopCodeAxisX);
+    int stopCodeAxisXErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_X + stopCodeAxisX;
+    if (motionStopCodeAxisX == MotionStopCode::MOTION_STOP_ON_ERROR)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::ERROR));
+    else
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::INFO));
+
     // check coppia asse y
     bool isMotorYOff = newStatus.getAxisBMotorOff();
     if (isMotorYOff) {
         if (isMotorYOff != oldStatus.getAxisBMotorOff())
             emit axisYMotorOffSignal();
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::ERROR));
+
+        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::WARNING));
+        else
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::ERROR));
     }
 
     // check motion asse y
@@ -204,6 +230,17 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         else
             emit axisYHomeInProgressStopSignal();
     }
+
+    // check stop code asse y
+    int stopCodeAxisY = newStatus.getAxisBStopCode();
+    MotionStopCode motionStopCodeAxisY = GalilControllerUtils::evaluateStopCode(stopCodeAxisY);
+    QString decodeStopCodeAxisY = GalilControllerUtils::getStopCodeDescription(stopCodeAxisY);
+    QString stopCodeAxisYDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR)).arg(decodeStopCodeAxisY);
+    int stopCodeAxisYErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_Y + stopCodeAxisY;
+    if (motionStopCodeAxisY == MotionStopCode::MOTION_STOP_ON_ERROR)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::ERROR));
+    else
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::INFO));
 
     // check coppia asse z
     bool isMotorZOff = newStatus.getAxisCMotorOff();
@@ -261,6 +298,17 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         else
             emit axisZHomeInProgressStopSignal();
     }
+
+    // check stop code asse z
+    int stopCodeAxisZ = newStatus.getAxisCStopCode();
+    MotionStopCode motionStopCodeAxisZ = GalilControllerUtils::evaluateStopCode(stopCodeAxisZ);
+    QString decodeStopCodeAxisZ = GalilControllerUtils::getStopCodeDescription(stopCodeAxisZ);
+    QString stopCodeAxisZDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_Z_DESCR)).arg(decodeStopCodeAxisZ);
+    int stopCodeAxisZErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_Z + stopCodeAxisZ;
+    if (motionStopCodeAxisZ == MotionStopCode::MOTION_STOP_ON_ERROR)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::ERROR));
+    else
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::INFO));
 
     this->errorSignaler->notifyErrors();
 

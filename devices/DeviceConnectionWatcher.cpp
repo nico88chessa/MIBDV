@@ -10,13 +10,9 @@ static const ErrorID DEVICE_CONNECTION_WATCHER_DISCONNECTED = PROGRAM_ERR_START_
 
 static constexpr char DEVICE_CONNECTION_WATCHER_DISCONNECTED_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Connection watcher: device is not connected.");
 
-// FIXME Non va bene, se aggiungo/rimuovo dei watcher, dovrei tenere traccia delle rimozioni per evitare i casi in cui
-// associo per sbaglio a due diverse istanze lo stesso id
-static int currentInstance = 0;
-
-DeviceConnectionWatcher::DeviceConnectionWatcher(QObject* parent) :
+DeviceConnectionWatcher::DeviceConnectionWatcher(int watcherId, QObject* parent) :
     QObject(parent), device(nullptr),
-    connectionCheckTimer(this), isConnected(false), instanceId(++currentInstance) {
+    connectionCheckTimer(this), isConnected(false), instanceId(watcherId) {
 
     // TODO NIC 30/05/2019 - capire in futuro se abilitarlo o meno
     // if (QThread::currentThread()->eventDispatcher()==nullptr)
@@ -94,7 +90,7 @@ void DeviceConnectionWatcher::checkConnection() {
         errorSignaler->clearErrors();
         errorSignaler->addError(Error(DeviceKey::DEVICE_CONNECTION_WATCHER,
                                       DEVICE_CONNECTION_WATCHER_DISCONNECTED,
-                                      QString("%1 Device: %2").arg(DEVICE_CONNECTION_WATCHER_DISCONNECTED_DESCR).arg(Utils::getStringFromDeviceKey(device.data()->getDeviceKey())),
+                                      QString("%1 Device: %2").arg(DEVICE_CONNECTION_WATCHER_DISCONNECTED_DESCR).arg(Utils::getStringFromDeviceKey(deviceKey)),
                                       ErrorType::FATAL,
                                       this->instanceId));
         errorSignaler->notifyErrors();

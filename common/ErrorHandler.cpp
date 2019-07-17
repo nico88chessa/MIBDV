@@ -63,7 +63,7 @@ void ErrorSignaler::notifyErrors() {
                 errors2remove.append(err);
         }
 
-    // notifico gli errori sono se quelli nuovi sono diversi da quelli gia' segnalati
+    // notifico gli errori solo se quelli nuovi sono diversi da quelli gia' segnalati
     if (errors2remove.isEmpty() && (oldErrors == errors))
         return;
 

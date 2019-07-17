@@ -33,6 +33,7 @@ class DigitalOutputValue;
 class AnalogInputValue;
 class IOSignaler;
 class MotionAnalizer;
+class DeviceConnectionWatcher;
 
 enum class IOType;
 
@@ -141,6 +142,24 @@ struct deviceKeyTraits<DeviceKey::MOTION_ANALIZER> {
     static constexpr bool value = true;
     using type = MotionAnalizer;
 };
+
+template <>
+struct deviceKeyTraits<DeviceKey::DEVICE_CONNECTION_WATCHER> {
+    static constexpr bool value = true;
+    using type = DeviceConnectionWatcher;
+};
+
+template <typename T>
+constexpr DeviceKey getDeviceKeyFromTemplate() {
+    return std::is_same_v<T, GalilCNController> ? DeviceKey::GALIL_CN :
+           std::is_same_v<T, GalilCNInspector> ? DeviceKey::GALIL_CN_INSPECTOR :
+           std::is_same_v<T, GalilPLCController> ? DeviceKey::GALIL_PLC :
+           std::is_same_v<T, GalilPLCInspector> ? DeviceKey::GALIL_PLC_INSPECTOR :
+           std::is_same_v<T, IOSignaler> ? DeviceKey::IO_SIGNALER :
+           std::is_same_v<T, MotionAnalizer> ? DeviceKey::MOTION_ANALIZER :
+           std::is_same_v<T, DeviceConnectionWatcher> ? DeviceKey::DEVICE_CONNECTION_WATCHER :
+           DeviceKey::NONE;
+}
 
 }
 
