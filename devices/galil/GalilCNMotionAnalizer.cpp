@@ -20,6 +20,8 @@ static constexpr ErrorID GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT = PROGRAM_ERR_START_CO
 static constexpr ErrorID GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 43;
 static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_Z = PROGRAM_ERR_START_CODE + (0x01 << 10); // 66560
 
+static constexpr ErrorID GALIL_CN_AXIS_NEED_RESET = PROGRAM_ERR_START_CODE + 60;
+
 static constexpr char GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X motor is off");
 static constexpr char GALIL_CN_MA_AXIS_X_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X forward limit");
 static constexpr char GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X backward limit");
@@ -34,6 +36,8 @@ static constexpr char GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("
 static constexpr char GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z forward limit");
 static constexpr char GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z backward limit");
 static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Z_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z Stop code error");
+
+static constexpr char GALIL_CN_AXIS_NEED_RESET_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Need to reset axes");
 
 
 GalilCNMotionAnalizer::GalilCNMotionAnalizer(QObject* parent) :
@@ -309,6 +313,11 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::ERROR));
     else
         this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::INFO));
+
+    // controllo se e' necessario resettare gli assi
+    bool needReset = newStatus.getNeedReset();
+    if (needReset)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_AXIS_NEED_RESET, GALIL_CN_AXIS_NEED_RESET_DESCR, ErrorType::WARNING));
 
     this->errorSignaler->notifyErrors();
 

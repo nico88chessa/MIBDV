@@ -41,6 +41,7 @@ private:
     bool traceOn;
     bool echoOn;
     unsigned char errorCode;
+    bool needReset;
 
     // digital IO
     bool digitalInputs[GALIL_CN_DIGITAL_INPUTS];
@@ -283,6 +284,8 @@ public:
         axisCVelocity = rec.axis_c_velocity;
         axisCTorque = rec.axis_c_torque;
         axisCAnalogIn = rec.axis_c_analog_in;
+
+        needReset = false;
     }
 
     bool getProgramRunning() const { return programRunning; }
@@ -295,6 +298,8 @@ public:
     void setEchoOn(bool value) { echoOn = value; }
     unsigned char getErrorCode() const { return errorCode; }
     void setErrorCode(unsigned char value) { errorCode = value; }
+    bool getNeedReset() const { return needReset; }
+    void setNeedReset(bool value) { needReset = value; }
 
     bool getAxisALatchOccured() const { return axisALatchOccured; }
     void setAxisALatchOccured(bool value) { axisALatchOccured = value; }
@@ -494,9 +499,6 @@ public:
             throw DigitalOutputOutOfBoundException();
         return digitalOutputs[i-1];
     }
-
-
-
 
 };
 

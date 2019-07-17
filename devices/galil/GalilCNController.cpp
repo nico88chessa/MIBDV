@@ -1,11 +1,16 @@
 #include "GalilCNController.hpp"
 
+#include <QStringList>
+
 #include <gclib.h>
 #include <gclibo.h>
 #include <Logger.hpp>
 #include <devices/galil/GalilControllerUtils.hpp>
 
+
 using namespace PROGRAM_NAMESPACE;
+
+static constexpr char NEED_RESET_VARIABLE[] = "needRes";
 
 GalilCNController::GalilCNController() :
     handler(new GCon), isInitialized(false), connectionStatus(false),
@@ -863,6 +868,14 @@ GalilCNStatusBean GalilCNController::getStatus() {
     if (this->isError(result))
         throw NoStatusException();
 
+    vType variables;
+    result = this->getVariables(variables);
+    if (this->isError(result))
+        throw NoStatusException();
+
+    bool needReset = variables.value(NEED_RESET_VARIABLE, 1.0) > 0 ? true : false;
+    record.setNeedReset(needReset);
+
     return record;
 
 }
@@ -870,6 +883,30 @@ GalilCNStatusBean GalilCNController::getStatus() {
 QString GalilCNController::decodeError(const int& errorCode) {
 
     return GalilControllerUtils::getErrorDescription(errorCode);
+
+}
+
+int GalilCNController::notifyResetOk() {
+
+    traceEnter;
+
+    if (!getConnectionStatus()) {
+        traceErr() << "Galil CN: il controller non e' connesso";
+        return G_CUSTOM_CN_NOT_CONNECTED;
+    }
+
+    QString command = QString("%1 = 0").arg(NEED_RESET_VARIABLE);
+    traceDebug() << "Invio comando:" << command;
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmd(handle(), command.toStdString().data());
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    traceExit;
+    return result;
+
+    traceExit;
 
 }
 
@@ -975,6 +1012,43 @@ int GalilCNController::tellSwitches(Axis a, int& value) {
 #endif
 
     writeErrorIfExists(result);
+
+    traceExit;
+
+    return result;
+
+}
+
+int GalilCNController::getVariables(vType& variables) {
+
+    traceEnter;
+
+    if (!getConnectionStatus()) {
+        traceErr() << "Galil CN: il controller non e' connesso";
+        return G_CUSTOM_CN_NOT_CONNECTED;
+    }
+
+    QString command = "LV";
+    traceDebug() << "Invio comando:" << command;
+    char response[G_HUGE_BUFFER];
+#ifdef FLAG_CN_PRESENT
+    GReturn result = GCmdT(handle(), command.toStdString().data(), response, G_HUGE_BUFFER, nullptr);
+#else
+    GReturn result = G_NO_ERROR;
+#endif
+
+    writeErrorIfExists(result);
+
+    if (result == G_NO_ERROR) {
+        QStringList variablesString;
+        variablesString = QString(response).split("\r\n");
+        for (const QString& v: variablesString) {
+            QStringList sl = v.split("=");
+            QString key = sl.at(0);
+            double value = sl.at(1).toDouble();
+            variables.insert(key, value);
+        }
+    }
 
     traceExit;
 

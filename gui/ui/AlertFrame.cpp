@@ -184,7 +184,7 @@ void AlertItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
         auto&& styleOption = QStyleOptionViewItem(option);
 
         ErrorItemWidget widget;
-        if (styleOption.state & QStyle::State_HasFocus)
+        if (styleOption.state & QStyle::State_Selected)
             widget.setProperty(ErrorItemWidget::FOCUS_PROPERTY_NAME, true);
 
         widget.resize(option.rect.width(), option.rect.height());
@@ -261,6 +261,7 @@ void AlertFrame::setupUi() {
 
     traceEnter;
     ui->setupUi(this);
+    ui->lvAlerts->setSelectionMode(QListView::NoSelection);
     traceExit;
 
 }

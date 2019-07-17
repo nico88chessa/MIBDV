@@ -589,9 +589,19 @@ void MotionFrameLogic::homeAxes() {
 
     qPtr->isHomingAxes = false;
 
-    DialogAlert diag;
-    diag.setupLabels("Info", tr("Homing completato con successo"));
-    diag.exec();
+    res = motionManager->notifyResetOk();
+    if (motionManager->isErr(res)) {
+
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore segnalazione home OK al device - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
+        DialogAlert diag;
+        diag.setupLabels("Error", descrErr);
+        diag.exec();
+        return;
+
+    }
 
     traceExit;
 
@@ -779,6 +789,8 @@ void MotionFrame::updateUI() {
 
     traceEnter;
 
+    bool needResetAxis = motionBean.getNeedResetAxis();
+
     ui->dsbAxisXCurrentPosition->setValue(static_cast<double>(motionBean.getAxisXPosition()));
     ui->dsbAxisYCurrentPosition->setValue(static_cast<double>(motionBean.getAxisYPosition()));
     ui->dsbAxisZCurrentPosition->setValue(static_cast<double>(motionBean.getAxisZPosition()));
@@ -798,9 +810,13 @@ void MotionFrame::updateUI() {
     ui->cbAxisZMoving->setChecked(motionBean.getAxisZMoveInProgress());
     ui->cbAxisZReverseLimit->setChecked(motionBean.getAxisZReverseLimit());
 
-    ui->pbMoveX->setEnabled(!motionBean.getAxisXMoveInProgress() && !isHomingAxes);
-    ui->pbMoveY->setEnabled(!motionBean.getAxisYMoveInProgress() && !isHomingAxes);
-    ui->pbMoveZ->setEnabled(!motionBean.getAxisZMoveInProgress() && !isHomingAxes);
+    ui->pbMoveX->setEnabled(!needResetAxis && !motionBean.getAxisXMoveInProgress() && !isHomingAxes);
+    ui->pbMoveY->setEnabled(!needResetAxis && !motionBean.getAxisYMoveInProgress() && !isHomingAxes);
+    ui->pbMoveZ->setEnabled(!needResetAxis && !motionBean.getAxisZMoveInProgress() && !isHomingAxes);
+
+    ui->pbStopX->setEnabled(!needResetAxis && motionBean.getAxisXMoveInProgress() && !isHomingAxes);
+    ui->pbStopY->setEnabled(!needResetAxis && motionBean.getAxisYMoveInProgress() && !isHomingAxes);
+    ui->pbStopZ->setEnabled(!needResetAxis && motionBean.getAxisZMoveInProgress() && !isHomingAxes);
 
     ui->pbResetAxes->setEnabled(
                 !motionBean.getAxisXMoveInProgress() &&
