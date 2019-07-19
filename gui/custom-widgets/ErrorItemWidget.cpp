@@ -21,6 +21,7 @@ void ErrorItemWidget::setError(const Error& error) {
     this->setErrorId(error.getErrorId());
     this->setErrorDescription(error.getErrorDescription());
     this->setErrorType(error.getErrorType());
+    this->setErrorIdHumanReadable(Utils::makeErrorHumanReadable(error.getErrorId()));
 
     switch (error.getErrorType()) {
     case ErrorType::INFO : this->setProperty(IS_INFO_PROPERTY_NAME, true); break;
@@ -115,6 +116,10 @@ int ErrorItemWidget::getErrorDescriptionMaxRowCount() const { return errorDescri
 
 void ErrorItemWidget::setErrorDescriptionMaxRowCount(int value) { errorDescriptionMaxRowCount = value; }
 
+int ErrorItemWidget::getErrorIdHumanReadable() const { return errorIdHumanReadable; }
+
+void ErrorItemWidget::setErrorIdHumanReadable(int value) { errorIdHumanReadable = value; }
+
 
 /*QSize ErrorItemWidget::sizeHint() const {
     // TODO NIC 05/07/2019 - sarebbe interessante leggerlo da stylesheet .qss
@@ -177,7 +182,8 @@ void ErrorItemWidget::paintEvent(QPaintEvent* event) {
 
     // qui scrivo il testo
     p.drawText(deviceKeyLeft, yText, deviceKeyStr);
-    p.drawText(errorIdLeft, yText, QString::number(errorId));
+//    p.drawText(errorIdLeft, yText, QString::number(errorId));
+    p.drawText(errorIdLeft, yText, QString::number(errorIdHumanReadable));
 
     // qui la descirione
     font.setPixelSize(errorDescriptionFontSize);

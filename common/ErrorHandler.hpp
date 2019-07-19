@@ -84,8 +84,15 @@ public:
         traceEnter;
 
         static_assert (hasErrorSignaler<T>::value, "subscribeObject: oggetto non valido");
+
+        /* NOTE NIC 18/07/2019 - AutoConnection
+         * non servirebbe autoConnection come parametro perche' e' di default,
+         * tuttavia lo metto per questione di chiarezza; la cosa importante e'
+         * che lo slot associato al signal DEVE ESSERE ESEGUITO all'interno del thread in cui l'oggetto
+         * dello slot vive (altrimenti ci possono essere problemi di concorrenza)
+         */
         connect(object.getErrorSignaler(), &ErrorSignaler::signalErrorListUpdate,
-                this, &ErrorManager::errorListHandler, Qt::QueuedConnection);
+                this, &ErrorManager::errorListHandler, Qt::AutoConnection);
 
         traceExit;
 

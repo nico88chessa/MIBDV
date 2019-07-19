@@ -3,6 +3,7 @@
 
 #include "DigitalInput.hpp"
 
+
 namespace PROGRAM_NAMESPACE {
 
 class DigitalInputValue : public DigitalInput {
@@ -36,5 +37,7 @@ public:
 };
 
 }
+
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalInputValue)
 
 #endif // DIGITALINPUTVALUE_HPP

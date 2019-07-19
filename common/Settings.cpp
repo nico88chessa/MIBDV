@@ -100,23 +100,23 @@ void Settings::loadValuesFromFile() {
     // per gli input obbligatori, controllo che siano presenti
     // FIXME non usare getIoDescription perche' usato per la UI
 //    if (!digitalInputs.contains(IOType::POWER))
-//        this->digitalInputs[IOType::POWER] = DigitalInput(Utils::getIODescription(IOType::POWER), -1, false, DeviceKey::GALIL_CN, false, IOType::POWER);
+//        this->digitalInputs[IOType::POWER] = DigitalInput(Utils::getIODescription(IOType::POWER), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::GALIL_CN, false, IOType::POWER);
 //    if (!digitalInputs.contains(IOType::CYCLE))
-//        this->digitalInputs[IOType::CYCLE] = DigitalInput(Utils::getIODescription(IOType::CYCLE), -1, false, DeviceKey::GALIL_CN, false, IOType::CYCLE);
+//        this->digitalInputs[IOType::CYCLE] = DigitalInput(Utils::getIODescription(IOType::CYCLE), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::GALIL_CN, false, IOType::CYCLE);
 //    if (!digitalInputs.contains(IOType::EMERGENCY_MUSHROOM))
-//        this->digitalInputs[IOType::EMERGENCY_MUSHROOM] = DigitalInput(Utils::getIODescription(IOType::EMERGENCY_MUSHROOM), -1, false, DeviceKey::NONE, false, IOType::EMERGENCY_MUSHROOM);
+//        this->digitalInputs[IOType::EMERGENCY_MUSHROOM] = DigitalInput(Utils::getIODescription(IOType::EMERGENCY_MUSHROOM), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::EMERGENCY_MUSHROOM);
 //    if (!digitalInputs.contains(IOType::DOOR))
-//        this->digitalInputs[IOType::DOOR] = DigitalInput(Utils::getIODescription(IOType::DOOR), -1, false, DeviceKey::NONE, false, IOType::DOOR);
+//        this->digitalInputs[IOType::DOOR] = DigitalInput(Utils::getIODescription(IOType::DOOR), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::DOOR);
 //    if (!digitalInputs.contains(IOType::BYPASS_SECURITY))
-//        this->digitalInputs[IOType::BYPASS_SECURITY] = DigitalInput(Utils::getIODescription(IOType::BYPASS_SECURITY), -1, false, DeviceKey::NONE, false, IOType::BYPASS_SECURITY);
+//        this->digitalInputs[IOType::BYPASS_SECURITY] = DigitalInput(Utils::getIODescription(IOType::BYPASS_SECURITY), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::BYPASS_SECURITY);
 //    if (!digitalInputs.contains(IOType::WATER))
-//        this->digitalInputs[IOType::WATER] = DigitalInput(Utils::getIODescription(IOType::WATER), -1, false, DeviceKey::NONE, false, IOType::WATER);
+//        this->digitalInputs[IOType::WATER] = DigitalInput(Utils::getIODescription(IOType::WATER), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::WATER);
 //    if (!digitalInputs.contains(IOType::MARK_IN_PROGRESS))
-//        this->digitalInputs[IOType::MARK_IN_PROGRESS] = DigitalInput(Utils::getIODescription(IOType::MARK_IN_PROGRESS), -1, false, DeviceKey::NONE, false, IOType::MARK_IN_PROGRESS);
+//        this->digitalInputs[IOType::MARK_IN_PROGRESS] = DigitalInput(Utils::getIODescription(IOType::MARK_IN_PROGRESS), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::MARK_IN_PROGRESS);
 //    if (!digitalInputs.contains(IOType::SCANNER_READY))
-//        this->digitalInputs[IOType::SCANNER_READY] = DigitalInput(Utils::getIODescription(IOType::SCANNER_READY), -1, false, DeviceKey::NONE, false, IOType::SCANNER_READY);
+//        this->digitalInputs[IOType::SCANNER_READY] = DigitalInput(Utils::getIODescription(IOType::SCANNER_READY), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::SCANNER_READY);
 //    if (!digitalInputs.contains(IOType::SCANNER_ERROR))
-//        this->digitalInputs[IOType::SCANNER_ERROR] = DigitalInput(Utils::getIODescription(IOType::SCANNER_ERROR), -1, false, DeviceKey::NONE, false, IOType::SCANNER_ERROR);
+//        this->digitalInputs[IOType::SCANNER_ERROR] = DigitalInput(Utils::getIODescription(IOType::SCANNER_ERROR), DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::SCANNER_ERROR);
 
     // lettura output digitali
     size = settings.beginReadArray(ARRAY_DIGITAL_OUTPUT);
@@ -137,35 +137,35 @@ void Settings::loadValuesFromFile() {
 
     // controllo che siano presenti tutti gli output
 //    if (!digitalOutputs.contains(IOType::LASER_POWER))
-//        this->digitalOutputs[IOType::LASER_POWER] = DigitalOutput(Utils::getIODescription(IOType::LASER_POWER), -1, false, DeviceKey::NONE, false, IOType::LASER_POWER);
+//        this->digitalOutputs[IOType::LASER_POWER] = DigitalOutput(Utils::getIODescription(IOType::LASER_POWER), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::LASER_POWER);
 //    if (!digitalOutputs.contains(IOType::COMPRESSED_AIR_1))
-//        this->digitalOutputs[IOType::COMPRESSED_AIR_1] = DigitalOutput(Utils::getIODescription(IOType::COMPRESSED_AIR_1), -1, false, DeviceKey::NONE, false, IOType::COMPRESSED_AIR_1);
+//        this->digitalOutputs[IOType::COMPRESSED_AIR_1] = DigitalOutput(Utils::getIODescription(IOType::COMPRESSED_AIR_1), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::COMPRESSED_AIR_1);
 //    if (!digitalOutputs.contains(IOType::COMPRESSED_AIR_2))
-//        this->digitalOutputs[IOType::COMPRESSED_AIR_2] = DigitalOutput(Utils::getIODescription(IOType::COMPRESSED_AIR_2), -1, false, DeviceKey::NONE, false, IOType::COMPRESSED_AIR_2);
+//        this->digitalOutputs[IOType::COMPRESSED_AIR_2] = DigitalOutput(Utils::getIODescription(IOType::COMPRESSED_AIR_2), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::COMPRESSED_AIR_2);
 //    if (!digitalOutputs.contains(IOType::BRUSH_1))
-//        this->digitalOutputs[IOType::BRUSH_1] = DigitalOutput(Utils::getIODescription(IOType::BRUSH_1), -1, false, DeviceKey::NONE, false, IOType::BRUSH_1);
+//        this->digitalOutputs[IOType::BRUSH_1] = DigitalOutput(Utils::getIODescription(IOType::BRUSH_1), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::BRUSH_1);
 //    if (!digitalOutputs.contains(IOType::BRUSH_2))
-//        this->digitalOutputs[IOType::BRUSH_2] = DigitalOutput(Utils::getIODescription(IOType::BRUSH_2), -1, false, DeviceKey::NONE, false, IOType::BRUSH_2);
+//        this->digitalOutputs[IOType::BRUSH_2] = DigitalOutput(Utils::getIODescription(IOType::BRUSH_2), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::BRUSH_2);
 //    if (!digitalOutputs.contains(IOType::SUCTION))
-//        this->digitalOutputs[IOType::SUCTION] = DigitalOutput(Utils::getIODescription(IOType::SUCTION), -1, false, DeviceKey::NONE, false, IOType::SUCTION);
+//        this->digitalOutputs[IOType::SUCTION] = DigitalOutput(Utils::getIODescription(IOType::SUCTION), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::SUCTION);
 //    if (!digitalOutputs.contains(IOType::ENABLE_AIR_FOR_FLUID))
-//        this->digitalOutputs[IOType::ENABLE_AIR_FOR_FLUID] = DigitalOutput(Utils::getIODescription(IOType::ENABLE_AIR_FOR_FLUID), -1, false, DeviceKey::NONE, false, IOType::ENABLE_AIR_FOR_FLUID);
+//        this->digitalOutputs[IOType::ENABLE_AIR_FOR_FLUID] = DigitalOutput(Utils::getIODescription(IOType::ENABLE_AIR_FOR_FLUID), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::ENABLE_AIR_FOR_FLUID);
 //    if (!digitalOutputs.contains(IOType::ENABLE_FLUID))
-//        this->digitalOutputs[IOType::ENABLE_FLUID] = DigitalOutput(Utils::getIODescription(IOType::ENABLE_FLUID), -1, false, DeviceKey::NONE, false, IOType::ENABLE_FLUID);
+//        this->digitalOutputs[IOType::ENABLE_FLUID] = DigitalOutput(Utils::getIODescription(IOType::ENABLE_FLUID), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::ENABLE_FLUID);
 //    if (!digitalOutputs.contains(IOType::POWER_SCAN))
-//        this->digitalOutputs[IOType::POWER_SCAN] = DigitalOutput(Utils::getIODescription(IOType::POWER_SCAN), -1, false, DeviceKey::NONE, false, IOType::POWER_SCAN);
+//        this->digitalOutputs[IOType::POWER_SCAN] = DigitalOutput(Utils::getIODescription(IOType::POWER_SCAN), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::POWER_SCAN);
 //    if (!digitalOutputs.contains(IOType::START_SCAN))
-//        this->digitalOutputs[IOType::START_SCAN] = DigitalOutput(Utils::getIODescription(IOType::START_SCAN), -1, false, DeviceKey::NONE, false, IOType::START_SCAN);
+//        this->digitalOutputs[IOType::START_SCAN] = DigitalOutput(Utils::getIODescription(IOType::START_SCAN), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::START_SCAN);
 //    if (!digitalOutputs.contains(IOType::STOP_SCAN))
-//        this->digitalOutputs[IOType::STOP_SCAN] = DigitalOutput(Utils::getIODescription(IOType::STOP_SCAN), -1, false, DeviceKey::NONE, false, IOType::STOP_SCAN);
+//        this->digitalOutputs[IOType::STOP_SCAN] = DigitalOutput(Utils::getIODescription(IOType::STOP_SCAN), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::STOP_SCAN);
 //    if (!digitalOutputs.contains(IOType::RED_LIGHT))
-//        this->digitalOutputs[IOType::RED_LIGHT] = DigitalOutput(Utils::getIODescription(IOType::RED_LIGHT), -1, false, DeviceKey::NONE, false, IOType::RED_LIGHT);
+//        this->digitalOutputs[IOType::RED_LIGHT] = DigitalOutput(Utils::getIODescription(IOType::RED_LIGHT), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::RED_LIGHT);
 //    if (!digitalOutputs.contains(IOType::GREEN_LIGHT))
-//        this->digitalOutputs[IOType::GREEN_LIGHT] = DigitalOutput(Utils::getIODescription(IOType::GREEN_LIGHT), -1, false, DeviceKey::NONE, false, IOType::GREEN_LIGHT);
+//        this->digitalOutputs[IOType::GREEN_LIGHT] = DigitalOutput(Utils::getIODescription(IOType::GREEN_LIGHT), DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::GREEN_LIGHT);
 
     // lettura input analogici
     size = settings.beginReadArray(Settings::ARRAY_ANALOG_INPUT);
-    for (int i=0; i<size; ++i) {
+    for (int i=size-1; i>=0; --i) {
         settings.setArrayIndex(i);
         auto name = settings.value(ANALOG_INPUT_NAME).value<QString>();
         auto channel = settings.value(ANALOG_INPUT_CHANNEL).value<int>();
@@ -178,7 +178,7 @@ void Settings::loadValuesFromFile() {
         auto upperLimit = settings.value(ANALOG_INPUT_UPPER_LIMIT).value<analogReal>();
         auto hysteresys = settings.value(ANALOG_INPUT_HYSTERESIS).value<analogReal>();
         AnalogInput aInput(name, channel, device, isAlarm, gain, offset, unit, lowerLimit, upperLimit, hysteresys);
-        this->analogInputs.insertMulti(IOType::GENERIC_ANALOG_INPUT, aInput);
+        this->analogInputs.insertMulti(analogInputs.constEnd(), IOType::GENERIC_ANALOG_INPUT, aInput);
     }
     settings.endArray();
 
@@ -493,7 +493,7 @@ bool Settings::validateSettings() const {
         bool temp = validateDigitalInput(i);
         if (!temp)
             isValid = false;
-        if (i.getChannel() == -1)
+        if (i.getChannel() == DIGITAL_INPUT_CHANNEL_NONE)
             continue;
         if (i.getDevice() == DeviceKey::GALIL_CN)
             digitalInputCN.insertMulti(i.getChannel(), i.getElementType());
@@ -505,7 +505,7 @@ bool Settings::validateSettings() const {
         bool temp = validateDigitalOutput(o);
         if (!temp)
             isValid = false;
-        if (o.getChannel() == -1)
+        if (o.getChannel() == DIGITAL_OUTPUT_CHANNEL_NONE)
             continue;
         if (o.getDevice() == DeviceKey::GALIL_CN)
             digitalOutputCN.insertMulti(o.getChannel(), o.getElementType());
@@ -517,7 +517,7 @@ bool Settings::validateSettings() const {
         bool temp = validateAnalogInput(a);
         if (!temp)
             isValid = false;
-        if (a.getChannel() == -1)
+        if (a.getChannel() == ANALOG_INPUT_CHANNEL_NONE)
             continue;
         analogInputPLC.insertMulti(a.getChannel(), a.getElementType());
     }

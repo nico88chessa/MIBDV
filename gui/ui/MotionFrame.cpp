@@ -673,14 +673,14 @@ void MotionFrame::setupSignalsAndSlots() {
 
     connect(dPtr->motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& motionBean) {
         QMetaObject::invokeMethod(this, "updateMotionBean", Qt::QueuedConnection,
-                                  Q_ARG(const mibdv::MotionBean&, motionBean));
+                                  Q_ARG(const MotionBean&, motionBean));
     });
 
     connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
         Q_UNUSED(b);
         Q_UNUSED(c);
         QMetaObject::invokeMethod(this, "updateDigitalInputStatus", Qt::QueuedConnection,
-                                  Q_ARG(const mibdv::DigitalInputStatus&, a));
+                                  Q_ARG(const DigitalInputStatus&, a));
 
     });
 

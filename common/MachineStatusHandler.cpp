@@ -62,7 +62,8 @@ bool MachineStatusDispatcher::addNotifier(const QSharedPointer<MachineStatusNoti
         return false;
     notifier = newNotifier.toWeakRef();
 
-    connect(notifier.data(), &MachineStatusNotifier::machineStatusNotifierSignal, this, &MachineStatusDispatcher::setCurrentStatus);
+    connect(notifier.data(), &MachineStatusNotifier::machineStatusNotifierSignal,
+            this, &MachineStatusDispatcher::setCurrentStatus, Qt::AutoConnection);
     connect(notifier.data(), &MachineStatusNotifier::destroyed, [&]() {
         this->notifier.clear();
     });
@@ -72,7 +73,14 @@ bool MachineStatusDispatcher::addNotifier(const QSharedPointer<MachineStatusNoti
 
 void MachineStatusDispatcher::addReceiver(const MachineStatusReceiver& newReceiver) {
 
-    connect(this, &MachineStatusDispatcher::machineStatusSignal, &newReceiver, &MachineStatusReceiver::setCurrentStatus);
+    /* NOTE NIC 18/07/2019 - AutoConnection
+     * non servirebbe autoConnection come parametro perche' e' di default,
+     * tuttavia lo metto per questione di chiarezze; la cosa importante e'
+     * che lo slot associato al signal deve essere eseguito all'interno del thread in cui l'oggetto
+     * dello slot vive (altrimenti ci possono essere problemi di concorrenza)
+     */
+    connect(this, &MachineStatusDispatcher::machineStatusSignal,
+            &newReceiver, &MachineStatusReceiver::setCurrentStatus, Qt::AutoConnection);
 
 }
 

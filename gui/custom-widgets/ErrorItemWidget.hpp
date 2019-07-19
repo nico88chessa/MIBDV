@@ -53,6 +53,8 @@ private:
     PN::ErrorType errorType;
     QString infoIcon, warningIcon, errorIcon, fatalIcon;
 
+    int errorIdHumanReadable;
+
     int iconWidth;
     int iconHeight;
     int iconLeft, iconTop;
@@ -130,6 +132,9 @@ public:
 
     int getErrorDescriptionMaxRowCount() const;
     void setErrorDescriptionMaxRowCount(int value);
+
+    int getErrorIdHumanReadable() const;
+    void setErrorIdHumanReadable(int value);
 
 protected:
     void paintEvent(QPaintEvent* event);

@@ -3,9 +3,6 @@
 #include "ui_IOFrame.h"
 
 #include <Settings.hpp>
-#include <DigitalInputValue.hpp>
-#include <DigitalOutputValue.hpp>
-#include <AnalogInputValue.hpp>
 #include <gui/custom-widgets/MDSwitchLine.hpp>
 #include <gui/custom-widgets/MDDoubleSpinBox.hpp>
 #include <gui/ui/DialogAlert.hpp>
@@ -147,7 +144,10 @@ void IOFrame::setupUi() {
 
     // uscite digitali
     int startDORow = 0;
-    for (auto&& digitalOutput : digitalOutputs) {
+    QList<DigitalOutput> sortedOutputs = digitalOutputs.values();
+    std::sort(sortedOutputs.begin(), sortedOutputs.end());
+
+    for (auto&& digitalOutput : sortedOutputs) {
 
         MDSwitchLine* switchLine = new MDSwitchLine(tabDigitalIO);
         switchLine->setObjectName(digitalOutput.getName());
@@ -200,9 +200,9 @@ void IOFrame::setupSignalsAndSlots() {
 
     connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
         QMetaObject::invokeMethod(this, "updateDigitalIOStatus", Qt::QueuedConnection,
-                                  Q_ARG(const mibdv::DigitalInputStatus&, a),
-                                  Q_ARG(const mibdv::DigitalOutputStatus&, b),
-                                  Q_ARG(const mibdv::AnalogInputStatus&, c));
+                                  Q_ARG(const DigitalInputStatus&, a),
+                                  Q_ARG(const DigitalOutputStatus&, b),
+                                  Q_ARG(const AnalogInputStatus&, c));
     });
 
     auto&& digitalIOSA = ui->saDigitalIOContents;

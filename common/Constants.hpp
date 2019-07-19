@@ -8,12 +8,21 @@ namespace PROGRAM_NAMESPACE {
 
 constexpr double EPSILON = 2.0;
 
-constexpr int DIGITAL_INPUT_CHANNEL_NONE = -1;
-constexpr int DIGITAL_OUTPUT_CHANNEL_NONE = -1;
-constexpr int ANALOG_INPUT_CHANNEL_NONE = -1;
-constexpr int ANALOG_OUTPUT_CHANNEL_NONE = -1;
+/* NOTE NIC 18/07/2019 - ingresso non presente
+ * uso -100 per indicare un ingresso non presente,
+ * mentre uso -1 per indicare un ingresso virtuale; un ingresso virtuale significa che
+ * si vuole gestire un segnale I/O ma non associato ad alcun ingresso fisico (per esempio una variabile del CN/PLC)
+ * non posso usare 0 come ingresso virtuale perche' alcuni device iniziano
+ * a contare gli ingressi da 0
+ */
 
-constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16; // 65536
+constexpr int DIGITAL_INPUT_CHANNEL_VIRTUAL = -1;
+constexpr int DIGITAL_INPUT_CHANNEL_NONE = -100;
+constexpr int DIGITAL_OUTPUT_CHANNEL_NONE = -100;
+constexpr int ANALOG_INPUT_CHANNEL_NONE = -100;
+constexpr int ANALOG_OUTPUT_CHANNEL_NONE = -100;
+
+constexpr ErrorID PROGRAM_ERR_START_CODE = 0x01 << 16; // 65536
 
 namespace settings {
 

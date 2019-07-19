@@ -190,6 +190,9 @@ void DeviceFactory::initIOSignaler() {
          */
         QObject::connect(ioSignalerThread, &QThread::finished, ioSignalerThread, &QThread::deleteLater);
 
+        this->errorManager->subscribeObject(*ioSignaler.data());
+        this->machineStatusDispatcher->addReceiverT(*ioSignaler.data());
+
         ioSignaler.data()->moveToThread(ioSignalerThread);
         ioSignaler->thread()->start();
 

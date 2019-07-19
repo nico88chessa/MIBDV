@@ -346,7 +346,7 @@ MDSwitchLine:!enabled {
  */
 
 MDListWidget::item {
-    icon: url(:/mibdv/prova);
+    /*icon: url(:/mibdv/prova);*/
 }
 
 MDListWidget::item:hover {

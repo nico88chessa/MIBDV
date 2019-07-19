@@ -10,7 +10,8 @@
 
 using namespace PROGRAM_NAMESPACE;
 
-static constexpr char NEED_RESET_VARIABLE[] = "needRes";
+static constexpr char NEED_RESET_VARIABLE[] = "needRes"; // vale 1 se bisogna fare il reset
+static constexpr char MUSHROOM_VARIABLE[] = "abort";  // vale 0 se abort/mushroom e' attivo
 
 GalilCNController::GalilCNController() :
     handler(new GCon), isInitialized(false), connectionStatus(false),
@@ -874,7 +875,10 @@ GalilCNStatusBean GalilCNController::getStatus() {
         throw NoStatusException();
 
     bool needReset = variables.value(NEED_RESET_VARIABLE, 1.0) > 0 ? true : false;
+    bool isMushroomPressed = variables.value(MUSHROOM_VARIABLE, 0.0) < 1 ? true : false;
+
     record.setNeedReset(needReset);
+    record.setIsEmergencyMushroomPressed(isMushroomPressed);
 
     return record;
 

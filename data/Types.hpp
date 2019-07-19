@@ -1,11 +1,11 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
-
 // type traits
 #include <QMetaType>
 #include <QMap>
 #include <configure.h>
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -35,17 +35,8 @@ class IOSignaler;
 class MotionAnalizer;
 class DeviceConnectionWatcher;
 
-enum class IOType;
-
-using DigitalInputSet = QMap<IOType, DigitalInput>;
-using DigitalOutputSet = QMap<IOType, DigitalOutput>;
-using AnalogInputSet = QMap<IOType, AnalogInput>;
-
-using DigitalInputStatus = QMap<IOType, DigitalInputValue>;
-using DigitalOutputStatus = QMap<IOType, DigitalOutputValue>;
-using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
-
 using ErrorID = int;
+
 
 enum class ErrorType : int {
     INFO = 0,
@@ -70,24 +61,29 @@ enum class IOType : int {
     POWER = 0,                              // digital input
     CYCLE,                                  // digital input
     EMERGENCY_MUSHROOM,                     // digital input
-    DOOR,                                   // digital input
-    BYPASS_SECURITY,                        // digital input
-    WATER,                                  // digital input
+    DOOR_OPEN,                              // digital input
+    MAINTENANCE,                            // digital input
+    WATER_ALARM,                            // digital input
     MARK_IN_PROGRESS,                       // digital input
     SCANNER_READY,                          // digital input
     SCANNER_ERROR,                          // digital input
+    DISTANCE_SENSOR_FAULT,                  // digital input
+    DEPRESSURE_SENSOR_FAULT,                // digital input
+    PRESSURE_1_SENSOR_FAULT,                // digital input
+    PRESSURE_2_SENSOR_FAULT,                // digital input
     GENERIC_INPUT,                          // generic digital input
     LASER_POWER,                            // digital output
     COMPRESSED_AIR_1,                       // digital output
     COMPRESSED_AIR_2,                       // digital output
+    SUCTION,                                // digital output
     BRUSH_1,                                // digital output
     BRUSH_2,                                // digital output
-    SUCTION,                                // digital output
     ENABLE_AIR_FOR_FLUID,                   // digital output
     ENABLE_FLUID,                           // digital output
     POWER_SCAN,                             // digital output
     START_SCAN,                             // digital output
     STOP_SCAN,                              // digital output
+    YELLOW_LIGHT,                           // digital output
     RED_LIGHT,                              // digital output
     GREEN_LIGHT,                            // digital output
     GENERIC_ANALOG_INPUT,                   // generic analog input
@@ -106,6 +102,15 @@ enum class MachineStatus : int {
     IDLE,
     PRINTING
 };
+
+
+using DigitalInputSet = QMap<IOType, DigitalInput>;
+using DigitalOutputSet = QMap<IOType, DigitalOutput>;
+using AnalogInputSet = QMap<IOType, AnalogInput>;
+
+using DigitalInputStatus = QMap<IOType, DigitalInputValue>;
+using DigitalOutputStatus = QMap<IOType, DigitalOutputValue>;
+using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
 
 template <DeviceKey>
 struct deviceKeyTraits {
@@ -163,6 +168,10 @@ constexpr DeviceKey getDeviceKeyFromTemplate() {
 
 }
 
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::ErrorType)
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::IOType)
 Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::MotionStopCode)
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::MachineStatus)
 
 #endif // TYPES_HPP

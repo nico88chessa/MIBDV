@@ -36,8 +36,9 @@ public:
         numTileX = qCeil((float) width / tileSize);
         numTileY = qCeil((float) height / tileSize);
 
-        // NOTE NIC 07/02/2019
-        // Questo serve per gestire i casi in cui i punti sono sul bordo della griglia
+        /* NOTE NIC 07/02/2019 - punti bordo griglia
+         * Questo serve per gestire i casi in cui i punti sono sul bordo della griglia
+         */
         if (width % tileSize == 0) {
             traceDebug() << "Tile multiplo esatto lungo l'asse X; aggiungo un tile in X";
             numTileX++;

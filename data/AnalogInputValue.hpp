@@ -50,4 +50,6 @@ public:
 
 }
 
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::AnalogInputValue)
+
 #endif // ANALOGINPUTVALUE_HPP
