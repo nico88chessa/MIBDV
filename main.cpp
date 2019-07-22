@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include <QMetaType>
+#include <QThread>
 
 #include <Logger.hpp>
 #include <gui/ui/MainWindow.hpp>

@@ -123,6 +123,7 @@ constexpr char DIGITAL_INPUT_CHANNEL[] = "Channel";
 constexpr char DIGITAL_INPUT_INVERT_LOGIC[] = "InvertLogic";
 constexpr char DIGITAL_INPUT_DEVICE[] = "Device";
 constexpr char DIGITAL_INPUT_IS_ALARM[] = "IsAlarm";
+constexpr char DIGITAL_INPUT_IS_ALARM_INVERTED[] = "IsAlarmInverted";
 
 constexpr char DIGITAL_OUTPUT_TYPE[] = "Type";
 constexpr char DIGITAL_OUTPUT_NAME[] = "Name";

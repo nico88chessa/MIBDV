@@ -155,7 +155,18 @@ void IOSignaler::analizeIO() {
 
     for (auto&& dIn: digitalInputStatus.values()) {
 
-        if (dIn.getIsAlarm() && dIn.getValue()) {
+        if (!dIn.getIsAlarm())
+            continue;
+
+        /* NOTE NIC 22/07/2019
+         * se alarmInverted = false -> allarme e' attivo con logica alta
+         * se alarmInverted = true -> allarme e' attivo con logica bassa
+         * la logica dipende dal parametro invertLogic;
+         * quindi l'allarme e' attivo quando input e inverted sono uno negato dell'altro
+         */
+        bool showAlarm = dIn.getValue() == !dIn.getIsAlarmInverted();
+
+        if (showAlarm) {
             ErrorID errorId;
             QString errorDescr;
             bool isAlwaysAlarm = false;

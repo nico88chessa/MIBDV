@@ -92,7 +92,8 @@ void Settings::loadValuesFromFile() {
             name = Utils::getIODescription(type);
         auto invertLogic = settings.value(DIGITAL_INPUT_INVERT_LOGIC).value<bool>();
         auto isAlarm = settings.value(DIGITAL_INPUT_IS_ALARM).value<bool>();
-        DigitalInput input(name, channel, invertLogic, device, isAlarm, type);
+        auto isAlarmInverted = settings.value(DIGITAL_INPUT_IS_ALARM_INVERTED).value<bool>();
+        DigitalInput input(name, channel, invertLogic, device, isAlarm, isAlarmInverted, type);
         this->digitalInputs.insertMulti(static_cast<IOType>(type), input);
     }
     settings.endArray();
@@ -319,6 +320,7 @@ void Settings::writeValuesToFile() {
         settings.setValue(DIGITAL_INPUT_INVERT_LOGIC, input.getInvertLogic());
         settings.setValue(DIGITAL_INPUT_DEVICE, Utils::getStringFromDeviceKey(input.getDevice()));
         settings.setValue(DIGITAL_INPUT_IS_ALARM, input.getIsAlarm());
+        settings.setValue(DIGITAL_INPUT_IS_ALARM_INVERTED, input.getIsAlarmInverted());
     }
     settings.endArray();
 

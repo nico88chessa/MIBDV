@@ -25,11 +25,12 @@ public:
             dOut.getInvertLogic(),
             dOut.getDevice(),
             dOut.getIsAlarm(),
+            dOut.getIsAlarmInverted(),
             dOut.getElementType()) { }
 
     DigitalInputValue(QString name, int channel, bool invertLogic,
-                 DeviceKey device, bool isAlarm, IOType elementType) :
-        DigitalInput(name, channel, invertLogic, device, isAlarm, elementType), value(false) { }
+                 DeviceKey device, bool isAlarm, bool isAlarmInverted, IOType elementType) :
+        DigitalInput(name, channel, invertLogic, device, isAlarm, isAlarmInverted, elementType), value(false) { }
 
     bool getValue() const { return value; }
     void setValue(bool value) { this->value = value; }
