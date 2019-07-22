@@ -9,6 +9,12 @@
 #include <DeviceFactory.hpp>
 
 
+static constexpr int MAINWINDOW_ITEM_ALERT_POSITION = 0;
+static constexpr char MAINWINDOW_FATAL_ICON_PATH[] = ":/icons/black-theme/fatal";
+static constexpr char MAINWINDOW_ERROR_ICON_PATH[] = ":/icons/black-theme/error";
+static constexpr char MAINWINDOW_WARNING_ICON_PATH[] = ":/icons/black-theme/warning";
+static constexpr char MAINWINDOW_STATUS_OK_ICON_PATH[] = ":/icons/black-theme/status_ok";
+
 using namespace PROGRAM_NAMESPACE;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -75,6 +81,22 @@ void MainWindow::setupSignalsAndSlots() const {
         else if (QString(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageFileExplorer);
 
+    });
+
+    // top panel
+    QWeakPointer<ErrorManager> errorManager = DeviceFactoryInstance.getErrorManager();
+    connect(errorManager.data(), &ErrorManager::notifyMaxErrorType, this, [&](const ErrorType& errType) {
+        switch (errType) {
+        case ErrorType::INFO: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_STATUS_OK_ICON_PATH)); break;
+        case ErrorType::WARNING: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_WARNING_ICON_PATH)); break;
+        case ErrorType::ERROR: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_ERROR_ICON_PATH)); break;
+        case ErrorType::FATAL: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_FATAL_ICON_PATH)); break;
+        }
+    }, Qt::AutoConnection);
+
+    connect(ui->pbErrorState, &QPushButton::clicked, [&]() {
+        ui->listItem->setCurrentRow(MAINWINDOW_ITEM_ALERT_POSITION);
+        ui->stackedWidget->setCurrentWidget(ui->pageAlert);
     });
 
     traceExit;

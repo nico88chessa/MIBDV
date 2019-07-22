@@ -96,17 +96,24 @@ void ErrorManager::errorListHandler(QList<Error> newErrors, QList<Error> errorsT
     QList<Error> warnings;
     QList<Error> info;
 
+    // rimuovo gli errori non piu' presenti
     for (auto&& err2Remove: errorsToRemove) {
         int index = machineErrors.indexOf(err2Remove);
         if (index > -1)
             machineErrors.removeAt(index);
     }
 
-    for (auto&& error: newErrors) {
+    // aggiungo quelli nuovi
+    for (auto&& error: newErrors)
         if (!machineErrors.contains(error))
             machineErrors.append(error);
 
+    // aggiorno la lista degli errori
+    for (auto&& error: machineErrors) {
         switch (error.getErrorType()) {
+        case ErrorType::INFO:
+            info.append(error);
+            break;
         case ErrorType::WARNING:
             warnings.append(error);
             break;
@@ -119,11 +126,29 @@ void ErrorManager::errorListHandler(QList<Error> newErrors, QList<Error> errorsT
         }
     }
 
+    // notifico
     emit errorListUpdated(this->machineErrors);
 
-    if (!fatals.isEmpty()) emit hasFatals(fatals);
-    if (!errors.isEmpty()) emit hasErrors(errors);
-    if (!warnings.isEmpty()) emit hasWarnings(warnings);
+    ErrorType maxErrorType = ErrorType::INFO;
+
+    if (!fatals.isEmpty()) {
+        emit hasFatals(fatals);
+        maxErrorType = ErrorType::FATAL;
+    }
+
+    if (!errors.isEmpty()) {
+        emit hasErrors(errors);
+        if (maxErrorType < ErrorType::ERROR)
+            maxErrorType = ErrorType::ERROR;
+    }
+
+    if (!warnings.isEmpty()) {
+        emit hasWarnings(warnings);
+        if (maxErrorType < ErrorType::WARNING)
+            maxErrorType = ErrorType::WARNING;
+    }
+
+    emit notifyMaxErrorType(maxErrorType);
 
     traceExit;
 

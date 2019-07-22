@@ -73,7 +73,7 @@ private:
 public:
     explicit ErrorManager(QObject* parent = nullptr);
 
-public slots:
+private slots:
     void errorListHandler(QList<Error> newErrors, QList<Error> errorsToRemove);
 
 public:
@@ -99,6 +99,7 @@ public:
     }
 
 signals:
+    void notifyMaxErrorType(const ErrorType& errType);
     void errorListUpdated(const QList<Error> errorList);
     void hasFatals(const QList<Error> fatals);
     void hasErrors(const QList<Error> errors);

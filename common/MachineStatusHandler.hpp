@@ -15,7 +15,7 @@ namespace PROGRAM_NAMESPACE {
 
 #define DECL_MACHINE_STATUS_RECEIVER(TYPE) \
     QScopedPointer<PROGRAM_NAMESPACE::MachineStatusReceiver> machineStatusR; \
-    friend void PROGRAM_NAMESPACE::MachineStatusDispatcher::addReceiverT<TYPE>(const TYPE&); \
+    friend void PROGRAM_NAMESPACE::MachineStatusDispatcher::addReceiverT<TYPE>(TYPE&); \
     template <typename> friend class PROGRAM_NAMESPACE::hasMachineStatusReceiver;
 
 
@@ -69,6 +69,8 @@ public:
     explicit MachineStatusNotifier(QObject* parent = Q_NULLPTR);
     int getId() const;
 
+
+public slots:
     MachineStatus getCurrentStatus() const;
     void setCurrentStatus(const MachineStatus& value);
 
@@ -100,7 +102,7 @@ private:
 
     /* NOTE NIC 10/07/2019 - variabile sato macchina
      * questo mi serve per mantenere lo stato della macchina quando non c'e' alcun
-     * notifier; inizializzo la macchina a IDLE
+     * notifier; inizializzo la macchina a STATUS_NAN
      */
     MachineStatus currentStatus;
 
@@ -108,12 +110,12 @@ public:
     explicit MachineStatusDispatcher(QObject* parent = Q_NULLPTR);
 
     bool addNotifier(const QSharedPointer<MachineStatusNotifier>& newNotifier);
-    void addReceiver(const MachineStatusReceiver& newReceiver);
+    void addReceiver(MachineStatusReceiver& newReceiver);
 
     bool canAddNotifier() const;
 
     template <typename T>
-    void addReceiverT(const T& newReceiver) {
+    void addReceiverT(T& newReceiver) {
 
         traceEnter;
         static_assert (hasMachineStatusReceiver<T>::value, "Il tipo dell'oggetto non ha un MachineStatusReceiver");

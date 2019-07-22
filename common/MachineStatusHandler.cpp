@@ -11,7 +11,7 @@ int MachineStatusNotifier::notifierId = 0;
  */
 
 MachineStatusReceiver::MachineStatusReceiver(QObject* parent) :
-    QObject(parent), id(++receiverId) { }
+    QObject(parent), id(++receiverId), currentStatus(MachineStatus::STATUS_NAN) { }
 
 int MachineStatusReceiver::getId() const { return id; }
 
@@ -29,7 +29,8 @@ void MachineStatusReceiver::setCurrentStatus(const MachineStatus& value) {
  * M A C H I N E S T A T U S N O T I F I E R
  */
 
-MachineStatusNotifier::MachineStatusNotifier(QObject* parent) : QObject(parent), id(++notifierId) { }
+MachineStatusNotifier::MachineStatusNotifier(QObject* parent) : QObject(parent),
+    id(++notifierId), currentStatus(MachineStatus::STATUS_NAN) { }
 
 int MachineStatusNotifier::getId() const { return id; }
 
@@ -62,6 +63,8 @@ bool MachineStatusDispatcher::addNotifier(const QSharedPointer<MachineStatusNoti
         return false;
     notifier = newNotifier.toWeakRef();
 
+    QMetaObject::invokeMethod(notifier.data(), "setCurrentStatus", Qt::AutoConnection, Q_ARG(MachineStatus, this->currentStatus));
+
     connect(notifier.data(), &MachineStatusNotifier::machineStatusNotifierSignal,
             this, &MachineStatusDispatcher::setCurrentStatus, Qt::AutoConnection);
     connect(notifier.data(), &MachineStatusNotifier::destroyed, [&]() {
@@ -71,7 +74,7 @@ bool MachineStatusDispatcher::addNotifier(const QSharedPointer<MachineStatusNoti
 
 }
 
-void MachineStatusDispatcher::addReceiver(const MachineStatusReceiver& newReceiver) {
+void MachineStatusDispatcher::addReceiver(MachineStatusReceiver& newReceiver) {
 
     /* NOTE NIC 18/07/2019 - AutoConnection
      * non servirebbe autoConnection come parametro perche' e' di default,
@@ -79,6 +82,8 @@ void MachineStatusDispatcher::addReceiver(const MachineStatusReceiver& newReceiv
      * che lo slot associato al signal deve essere eseguito all'interno del thread in cui l'oggetto
      * dello slot vive (altrimenti ci possono essere problemi di concorrenza)
      */
+    QMetaObject::invokeMethod(&newReceiver, "setCurrentStatus", Qt::AutoConnection, Q_ARG(MachineStatus, this->currentStatus));
+
     connect(this, &MachineStatusDispatcher::machineStatusSignal,
             &newReceiver, &MachineStatusReceiver::setCurrentStatus, Qt::AutoConnection);
 

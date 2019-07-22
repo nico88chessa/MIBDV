@@ -394,7 +394,6 @@ QSharedPointer<MachineStatusNotifier> DeviceFactory::instanceMachineStatusNotifi
         return QSharedPointer<MachineStatusNotifier>();
     }
     QSharedPointer<MachineStatusNotifier> msn(new MachineStatusNotifier(parent));
-    msn->setCurrentStatus(this->machineStatusDispatcher->getCurrentStatus());
     machineStatusDispatcher->addNotifier(msn);
     traceExit;
     return msn;
