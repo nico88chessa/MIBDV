@@ -3,6 +3,7 @@
 
 #include "DigitalOutput.hpp"
 
+
 namespace PROGRAM_NAMESPACE {
 
 class DigitalOutputValue : public DigitalOutput {
@@ -36,5 +37,7 @@ public:
 };
 
 }
+
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalOutputValue)
 
 #endif // DIGITALOUTPUTVALUE_HPP

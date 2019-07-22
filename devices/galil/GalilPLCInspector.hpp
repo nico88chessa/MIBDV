@@ -4,6 +4,8 @@
 #include "ConnectedDeviceInspector.hpp"
 #include "GalilPLCController.hpp"
 
+#include <ErrorHandler.hpp>
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -16,6 +18,7 @@ public:
 
 private:
     GalilPLCStatusBean lastStatus;
+    DECL_ERROR_SIGNALER_FRIENDS(GalilPLCInspector)
 
     inline GalilPLCController::Ptr getGalilPLCDevicePtr() {
         return static_cast<GalilPLCController::Ptr>(device.data());

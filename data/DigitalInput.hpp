@@ -6,6 +6,7 @@
 #include <configure.h>
 #include <Constants.hpp>
 
+
 namespace PROGRAM_NAMESPACE {
 
 class DigitalInput {
@@ -19,22 +20,24 @@ private:
     bool invertLogic;
     DeviceKey device;
     bool isAlarm;
+    bool isAlarmInverted;
     IOType elementType;
 
 public:
     DigitalInput() :
-        DigitalInput("", -1, false, DeviceKey::NONE, false, IOType::NOT_VALID) { }
+        DigitalInput("", DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, false, IOType::NOT_VALID) { }
 
     DigitalInput(QString name, int channel, bool invertLogic,
-                 DeviceKey device, bool isAlarm, IOType elementType) :
+                 DeviceKey device, bool isAlarm, bool isAlarmInverted, IOType elementType) :
         name(name), channel(channel), invertLogic(invertLogic),
-        device(device), isAlarm(isAlarm), elementType(elementType) { }
+        device(device), isAlarm(isAlarm), isAlarmInverted(isAlarmInverted), elementType(elementType) { }
 
     inline QString getName() const { return name; }
     inline int getChannel() const { return channel; }
     inline bool getInvertLogic() const { return invertLogic; }
     inline DeviceKey getDevice() const { return device; }
     inline bool getIsAlarm() const { return isAlarm; }
+    inline bool getIsAlarmInverted() const { return isAlarmInverted; }
     inline IOType getElementType() const { return elementType; }
 
     friend inline bool operator==(const DigitalInput& l, const DigitalInput& r);
@@ -52,5 +55,7 @@ bool operator<(const DigitalInput& l, const DigitalInput& r) {
 }
 
 }
+
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalInput)
 
 #endif // DIGITALINPUT_HPP

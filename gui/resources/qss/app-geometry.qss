@@ -6,7 +6,6 @@
     background-color: #f5f5f5;
 }
 
-
 #top {
     background-color: #9be7ff;
     min-height: 64px;
@@ -62,6 +61,7 @@ QCheckBox::indicator::unchecked[isDigitalIO = true] {
 QCheckBox::indicator::checked[isDigitalIO = true] {
     image: url(:/icons/black-theme/lens);
 }
+
 
 
 /*
@@ -156,6 +156,7 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
 }
 
 
+
 /*
  * I O   F R A M E
  */
@@ -180,6 +181,7 @@ QTabWidget {
 /*.IOFrame #saDigitalIO QWidget {
     min-height: 40px;
 }*/
+
 
 
 /*
@@ -239,6 +241,23 @@ MDFileExplorerWidget {
     background-color: purple;
     color: white;
 }
+
+
+
+/*
+ * A L E R T   F R A M E
+ */
+
+.AlertFrame #lvAlerts {
+    border: none;
+    background-color: transparent;
+}
+
+/*
+.AlertFrame #lvAlerts::item:hover {
+}
+*/
+
 
 
 /*

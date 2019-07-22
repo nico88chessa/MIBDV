@@ -3,7 +3,7 @@
 using namespace PROGRAM_NAMESPACE;
 
 AnalogInput::AnalogInput() :
-    AnalogInput("", -1, DeviceKey::NONE,
+    AnalogInput("", ANALOG_INPUT_CHANNEL_NONE, DeviceKey::NONE,
                   false, 1.0, 0,
                   "", std::numeric_limits<analogReal>::min(),
                   std::numeric_limits<analogReal>::max(), 1.0) { }

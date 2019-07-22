@@ -1,4 +1,5 @@
 /*************************
+ tilde ~
  color scheme
  primary:           #2e7d32 - rgb(46,125,50)
  primary-dark:      #005005 - rgb(0,80,5)
@@ -6,6 +7,14 @@
  secondary:         #757575 - rgb(117,117,117)
  secondary-dark:    #494949 - rgb(73,73,73)
  secondary-light:   #a4a4a4 - rgb(164,164,164)
+ info-color:       #B00020 - rgb(176,0,32)        da sistemare
+ info-text-color:  #FFFFFF - rgb(255,255,255)     da sistemare
+ warning-color:       #B00020 - rgb(176,0,32)     da sistemare
+ warning-text-color:  #FFFFFF - rgb(255,255,255)  da sistemare
+ error-color:       #B00020 - rgb(176,0,32)       da sistemare
+ error-text-color:  #FFFFFF - rgb(255,255,255)    da sistemare
+ fatal-color:       #B00020 - rgb(176,0,32)       da sistemare
+ fatal-text-color:  #FFFFFF - rgb(255,255,255)    da sistemare
  *************************/
 
 QMainWindow {
@@ -23,10 +32,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDLineEdit
-/******************/
+/*
+ *  M D L I N E E D I T
+ */
 
 .MDLineEdit {
     qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
@@ -51,10 +59,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDSpinBox
-/******************/
+/*
+ *  M D S P I N B O X
+ */
 
 .MDSpinBox {
     qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
@@ -79,10 +86,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDDoubleSpinBox
-/******************/
+/*
+ *  M D D O U B L E S P I N B O X
+ */
 
 .MDDoubleSpinBox {
     qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
@@ -107,10 +113,9 @@ QWidget:!enabled {
 
 
 
-
-/******************/
-/* MDComboBox
-/******************/
+/*
+ *  M D C O M B O B O X
+ */
 
 .MDComboBox {
     border-bottom-color: rgba(0, 0, 0, 42%);
@@ -175,7 +180,6 @@ QWidget:!enabled {
 
 
 
-
 /*
  * Q S L I D E R
  */
@@ -213,6 +217,7 @@ QSlider::add-page:vertical {
 }
 
 
+
 /*
  * Q C O M B O B O X
  */
@@ -236,11 +241,9 @@ QSlider::add-page:vertical {
 
 
 
-
 /*
  * Q P U S H B U T T O N
  */
-
 
 .QPushButton {
     qproperty-focusPolicy: NoFocus;
@@ -256,7 +259,6 @@ QSlider::add-page:vertical {
 .QPushButton::disabled {
     background-color: rgba(128, 128, 128, 0.5);
 }
-
 
 
 
@@ -278,10 +280,9 @@ QSlider::add-page:vertical {
 
 
 
-
-/******************/
-/* QCheckBox
-/******************/
+/*
+ * Q C H E C K B O X
+ */
 
 QCheckBox {
     /*color: green;*/
@@ -297,10 +298,9 @@ QCheckBox::indicator::checked {
 
 
 
-
-/******************/
-/* MDSwitchLine
-/******************/
+/*
+ * M D S W I T C H L I N E
+ */
 
 MDSwitchLine {
 /*    border: 1px solid red;*/
@@ -345,13 +345,12 @@ MDSwitchLine:!enabled {
 
 
 
-
-/******************/
-/* MDListWidget
-/******************/
+/*
+ * M D L I S T W I D G E T
+ */
 
 MDListWidget::item {
-    icon: url(:/mibdv/prova);
+    /*icon: url(:/mibdv/prova);*/
 }
 
 MDListWidget::item:hover {
@@ -364,10 +363,9 @@ MDListWidget::item:selected {
 
 
 
-
-/***********************/
-/* QTabWidget - QTabBar
-/***********************/
+/*
+ * Q T A B W I D G E T   -   Q T A B B A R
+ */
 
 QTabBar {
     background-color: transparent;
@@ -404,12 +402,17 @@ QTabBar::tab:!selected {
 
 
 /*
+ * Q T R E E V I E W
+ */
+
+ /*
 QTreeView::branch {
     background: red;
     padding: 0px;
     margin: 0px:
 }
 */
+
 
 
 /*
@@ -425,6 +428,7 @@ QTreeView::branch {
     color: black;
     border-color: blue;
 }
+
 
 
 /*
@@ -466,7 +470,10 @@ QTreeView::branch {
     qproperty-icon: url(:/icons/black-theme/rename);
 }
 
- * MDTwoLineItem (compact)
+
+
+/*
+ * M D T W O L I N E I T E M   ( C O M P A C T )
  */
 
 .MDTwoLineItem {
@@ -474,4 +481,48 @@ QTreeView::branch {
     background-clip: border;
     color: black;
     qproperty-secondaryLabelColor: gray;
+}
+
+
+
+/*
+ * E R R O R   I T E M   W I D G E T
+ */
+
+.ErrorItemWidget {
+    border-color: white;
+    background-color: transparent;
+    qproperty-infoIcon: url(:/icons/black-theme/info);
+    qproperty-warningIcon: url(:/icons/black-theme/warning);
+    qproperty-errorIcon: url(:/icons/black-theme/error);
+    qproperty-fatalIcon: url(:/icons/black-theme/critical);
+}
+
+.ErrorItemWidget[focusCustom="true"],
+.ErrorItemWidget[focusCustom="true"][isInfo~="true"],
+.ErrorItemWidget[focusCustom="true"][isWarning~="true"],
+.ErrorItemWidget[focusCustom="true"][isError~="true"],
+.ErrorItemWidget[focusCustom="true"][isFatal~="true"]{
+    color: green;
+    background-color: yellow;
+}
+
+.ErrorItemWidget[isInfo="true"] {
+    color: white;
+    background-color: rgba(92,184,92);
+}
+
+.ErrorItemWidget[isWarning="true"] {
+    color: black;
+    background-color: rgba(226,164,31);
+}
+
+.ErrorItemWidget[isError="true"] {
+    color: white;
+    background-color: rgba(176,0,32);
+}
+
+.ErrorItemWidget[isFatal="true"] {
+    color: rgba(255,255,255);
+    background-color: rgba(66,66,66);
 }

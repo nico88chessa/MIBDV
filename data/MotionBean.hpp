@@ -48,6 +48,8 @@ private:
     real axisZPosition;
     MotionStopCode axisZStopCode;
 
+    bool needResetAxis;
+
 public:
 
     MotionBean() {
@@ -138,6 +140,8 @@ private:
             axisZPosition = galilCNStatusBean.getAxisCReferencePosition() / static_cast<real>(axisZStepPerMm);
         axisZStopCode = GalilControllerUtils::evaluateStopCode(galilCNStatusBean.getAxisCStopCode());
 
+        needResetAxis = galilCNStatusBean.getNeedReset();
+
     }
 
 public:
@@ -187,8 +191,10 @@ public:
     MotionStopCode getAxisXStopCode() const { return axisXStopCode; }
     void setAxisXStopCode(const MotionStopCode& value) { axisXStopCode = value; }
 
-};
+    bool getNeedResetAxis() const { return needResetAxis; }
+    void setNeedResetAxis(bool value) { needResetAxis = value; }
 
+};
 
 }
 

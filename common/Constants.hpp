@@ -8,12 +8,21 @@ namespace PROGRAM_NAMESPACE {
 
 constexpr double EPSILON = 2.0;
 
-constexpr int DIGITAL_INPUT_CHANNEL_NONE = -1;
-constexpr int DIGITAL_OUTPUT_CHANNEL_NONE = -1;
-constexpr int ANALOG_INPUT_CHANNEL_NONE = -1;
-constexpr int ANALOG_OUTPUT_CHANNEL_NONE = -1;
+/* NOTE NIC 18/07/2019 - ingresso non presente
+ * uso -100 per indicare un ingresso non presente,
+ * mentre uso -1 per indicare un ingresso virtuale; un ingresso virtuale significa che
+ * si vuole gestire un segnale I/O ma non associato ad alcun ingresso fisico (per esempio una variabile del CN/PLC)
+ * non posso usare 0 come ingresso virtuale perche' alcuni device iniziano
+ * a contare gli ingressi da 0
+ */
 
-constexpr int PROGRAM_ERR_START_CODE = 0x01 << 16; // 65536
+constexpr int DIGITAL_INPUT_CHANNEL_VIRTUAL = -1;
+constexpr int DIGITAL_INPUT_CHANNEL_NONE = -100;
+constexpr int DIGITAL_OUTPUT_CHANNEL_NONE = -100;
+constexpr int ANALOG_INPUT_CHANNEL_NONE = -100;
+constexpr int ANALOG_OUTPUT_CHANNEL_NONE = -100;
+
+constexpr ErrorID PROGRAM_ERR_START_CODE = 0x01 << 16; // 65536
 
 namespace settings {
 
@@ -31,6 +40,7 @@ constexpr char AXIS_X_OPERATIVE_DEC_MMS2[] = "AxisX/OperativeDecMms2";
 constexpr char AXIS_X_HOMING_SPEED_MMS[] = "AxisX/HomingSpeedMms";
 constexpr char AXIS_X_HOMING_ACC_MMS2[] = "AxisX/HomingAccMms2";
 constexpr char AXIS_X_HOMING_DEC_MMS2[] = "AxisX/HomingDecMms2";
+constexpr char AXIS_X_CHECK_LIMITS[] = "AxisX/CheckLimits";
 
 constexpr int AXIS_X_STEP_PER_MM_DFLT = 16385;
 constexpr int AXIS_X_MIN_POS_MM_DFLT = 0;
@@ -45,6 +55,7 @@ constexpr real AXIS_X_OPERATIVE_DEC_MMS2_DFLT = 10;
 constexpr real AXIS_X_HOMING_SPEED_MMS_DFLT = AXIS_X_MANUAL_SPEED_MMS_DFLT;
 constexpr real AXIS_X_HOMING_ACC_MMS2_DFLT = AXIS_X_MANUAL_ACC_MMS2_DFLT;
 constexpr real AXIS_X_HOMING_DEC_MMS2_DFLT = AXIS_X_MANUAL_DEC_MMS2_DFLT;
+constexpr bool AXIS_X_CHECK_LIMITS_DFLT = true;
 
 constexpr char AXIS_Y_STEP_PER_MM[] = "AxisY/StepPerMm";
 constexpr char AXIS_Y_MIN_POS_MM[] = "AxisY/MinPosMm";
@@ -59,6 +70,7 @@ constexpr char AXIS_Y_OPERATIVE_DEC_MMS2[] = "AxisY/OperativeDecMms2";
 constexpr char AXIS_Y_HOMING_SPEED_MMS[] = "AxisY/HomingSpeedMms";
 constexpr char AXIS_Y_HOMING_ACC_MMS2[] = "AxisY/HomingAccMms2";
 constexpr char AXIS_Y_HOMING_DEC_MMS2[] = "AxisY/HomingDecMms2";
+constexpr char AXIS_Y_CHECK_LIMITS[] = "AxisY/CheckLimits";
 
 constexpr int AXIS_Y_STEP_PER_MM_DFLT = 1000;
 constexpr int AXIS_Y_MIN_POS_MM_DFLT = 0;
@@ -73,6 +85,7 @@ constexpr real AXIS_Y_OPERATIVE_DEC_MMS2_DFLT = 10;
 constexpr real AXIS_Y_HOMING_SPEED_MMS_DFLT = AXIS_Y_MANUAL_SPEED_MMS_DFLT;
 constexpr real AXIS_Y_HOMING_ACC_MMS2_DFLT = AXIS_Y_MANUAL_ACC_MMS2_DFLT;
 constexpr real AXIS_Y_HOMING_DEC_MMS2_DFLT = AXIS_Y_MANUAL_DEC_MMS2_DFLT;
+constexpr bool AXIS_Y_CHECK_LIMITS_DFLT = true;
 
 constexpr char AXIS_Z_STEP_PER_MM[] = "AxisZ/StepPerMm";
 constexpr char AXIS_Z_MIN_POS_MM[] = "AxisZ/MinPosMm";
@@ -87,6 +100,7 @@ constexpr char AXIS_Z_OPERATIVE_DEC_MMS2[] = "AxisZ/OperativeDecMms2";
 constexpr char AXIS_Z_HOMING_SPEED_MMS[] = "AxisZ/HomingSpeedMms";
 constexpr char AXIS_Z_HOMING_ACC_MMS2[] = "AxisZ/HomingAccMms2";
 constexpr char AXIS_Z_HOMING_DEC_MMS2[] = "AxisZ/HomingDecMms2";
+constexpr char AXIS_Z_CHECK_LIMITS[] = "AxisZ/CheckLimits";
 
 constexpr int AXIS_Z_STEP_PER_MM_DFLT = 200;
 constexpr int AXIS_Z_MIN_POS_MM_DFLT = 0;
@@ -101,6 +115,7 @@ constexpr real AXIS_Z_OPERATIVE_DEC_MMS2_DFLT = 10;
 constexpr real AXIS_Z_HOMING_SPEED_MMS_DFLT = AXIS_Z_MANUAL_SPEED_MMS_DFLT;
 constexpr real AXIS_Z_HOMING_ACC_MMS2_DFLT = AXIS_Z_MANUAL_ACC_MMS2_DFLT;
 constexpr real AXIS_Z_HOMING_DEC_MMS2_DFLT = AXIS_Z_MANUAL_DEC_MMS2_DFLT;
+constexpr bool AXIS_Z_CHECK_LIMITS_DFLT = true;
 
 constexpr char DIGITAL_INPUT_TYPE[] = "Type";
 constexpr char DIGITAL_INPUT_NAME[] = "Name";
@@ -108,6 +123,7 @@ constexpr char DIGITAL_INPUT_CHANNEL[] = "Channel";
 constexpr char DIGITAL_INPUT_INVERT_LOGIC[] = "InvertLogic";
 constexpr char DIGITAL_INPUT_DEVICE[] = "Device";
 constexpr char DIGITAL_INPUT_IS_ALARM[] = "IsAlarm";
+constexpr char DIGITAL_INPUT_IS_ALARM_INVERTED[] = "IsAlarmInverted";
 
 constexpr char DIGITAL_OUTPUT_TYPE[] = "Type";
 constexpr char DIGITAL_OUTPUT_NAME[] = "Name";

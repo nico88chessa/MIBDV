@@ -5,7 +5,7 @@ using namespace PROGRAM_NAMESPACE;
 AbstractConnectedDeviceInspector::AbstractConnectedDeviceInspector(QObject* parent) :
     AbstractDeviceInspector(parent) {
 
-    connect(this, &AbstractConnectedDeviceInspector::disconnectedSignal, this, &AbstractConnectedDeviceInspector::restartProcess);
+    connect(this, &AbstractConnectedDeviceInspector::disconnectedSignal, this, &AbstractDeviceInspector::restartProcess);
 
 }
 
@@ -14,6 +14,7 @@ bool AbstractConnectedDeviceInspector::beforeProcess() {
     traceEnter;
     if (!connectDevice()) {
         QTimer::singleShot(restartTimeMs, this, &AbstractConnectedDeviceInspector::startProcess);
+        emit failedToConnectSignal();
         return false;
     } else
         emit connectedSignal();

@@ -21,8 +21,8 @@
 #include <laser-ipg-temporary/utility/IpgYLPNLaserConfiguration.hpp>
 #include <Logger.hpp>
 #include <DeviceFactory.hpp>
+#include <MotionAnalizer.hpp>
 #include <IOSignaler.hpp>
-#include <MotionSignaler.hpp>
 #include <Types.hpp>
 #include <json/FilterJsonParser.hpp>
 #include <core/image-processor/RowTileProcessor.hpp>
@@ -222,7 +222,7 @@ bool Worker::process() {
     // inizio processo di stampa vero e proprio
 
     updateStatusAsync("Start process");
-    QWeakPointer<MotionSignaler> motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    QWeakPointer<IMotionAnalizer> motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
     QWeakPointer<IOSignaler> ioSignaler = DeviceFactoryInstance.getIOSignaler();
 
     // EventLoop e timer per gestione eventi
@@ -300,7 +300,7 @@ bool Worker::process() {
                 if (countDownTick == MAX_COUNTDOWN_TICKS)
                     localEventLoop.quit();
         });
-        QMetaObject::Connection c2 = connect(motionSignaler.data(), &MotionSignaler::motionBeanSignal, [&](const MotionBean& mb) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
             if (localEventLoop.isRunning()) {
                 if (!mb.getAxisXMotorOff() && !mb.getAxisYMotorOff() && !mb.getAxisZMotorOff()) {
                     canContinue = true;
@@ -679,7 +679,7 @@ bool Worker::process() {
 
             res = MOTION_MANAGER_NO_ERR;
 
-            QMetaObject::Connection c1 = connect(motionSignaler.data(), &MotionSignaler::motionBeanSignal, [&](const MotionBean& mb) {
+            QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
                 if (localEventLoop.isRunning() && !localTimer.isActive()) {
                     if (!mb.getAxisXMoveInProgress()) {
                         if (mb.getAxisXStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
@@ -694,7 +694,7 @@ bool Worker::process() {
                     QObject::disconnect(c1);
                 }
             });
-            QMetaObject::Connection c2 = connect(motionSignaler.data(), static_cast<void (MotionSignaler::*)(MotionStopCode)>(&MotionSignaler::axisXMotionStopSignal), [&](MotionStopCode sc) {
+            QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
                 if (localEventLoop.isRunning()) {
                     if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                         res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -821,7 +821,7 @@ bool Worker::process() {
 
                     res = MOTION_MANAGER_NO_ERR;
 
-                    QMetaObject::Connection c1 = connect(motionSignaler.data(), &MotionSignaler::motionBeanSignal, [&](const MotionBean& mb) {
+                    QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
                         if (localEventLoop.isRunning() && !localTimer.isActive()) {
                             if (!mb.getAxisYMoveInProgress()) {
                                 if (mb.getAxisYStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
@@ -836,7 +836,7 @@ bool Worker::process() {
                             QObject::disconnect(c1);
                         }
                     });
-                    QMetaObject::Connection c2 = connect(motionSignaler.data(), static_cast<void (MotionSignaler::*)(MotionStopCode)>(&MotionSignaler::axisYMotionStopSignal), [&](MotionStopCode sc) {
+                    QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
                         if (localEventLoop.isRunning()) {
                             if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                                 res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;

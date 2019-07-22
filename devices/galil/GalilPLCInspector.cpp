@@ -2,7 +2,14 @@
 
 #include <Settings.hpp>
 
+
 using namespace PROGRAM_NAMESPACE;
+
+static const ErrorID GALIL_PLC_INSPECTOR_FAILED_TO_CONNECT = PROGRAM_ERR_START_CODE + 1;
+static const ErrorID GALIL_PLC_INSPECTOR_DISCONNECTED = PROGRAM_ERR_START_CODE + 2;
+
+static constexpr char GALIL_PLC_INSPECTOR_FAILED_TO_CONNECT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Impossible to connect to device in Galil PLC Inspector");
+static constexpr char GALIL_PLC_INSPECTOR_DISCONNECTED_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Galil PLC Inspector device disconnected");
 
 GalilPLCInspector::GalilPLCInspector(QObject* parent) :
     ConnectedDeviceInspector(parent) {
@@ -18,6 +25,25 @@ GalilPLCInspector::GalilPLCInspector(QObject* parent) :
 
     this->setRefreshValue(s.getGalilPLCStatusRefreshIntervalMs());
     this->setRestartTime(s.getGalilPLCReconnectionIntervalMs());
+
+    initializeErrorSignaler(errorSignaler, this);
+
+    connect(this, &AbstractConnectedDeviceInspector::failedToConnectSignal, [&]() {
+        errorSignaler->clearErrors();
+        errorSignaler->addError(Error(DeviceKey::GALIL_PLC_INSPECTOR, GALIL_PLC_INSPECTOR_FAILED_TO_CONNECT, GALIL_PLC_INSPECTOR_FAILED_TO_CONNECT_DESCR, ErrorType::FATAL));
+        errorSignaler->notifyErrors();
+    });
+
+    connect(this, &AbstractConnectedDeviceInspector::disconnectedSignal, [&]() {
+        errorSignaler->clearErrors();
+        errorSignaler->addError(Error(DeviceKey::GALIL_PLC_INSPECTOR, GALIL_PLC_INSPECTOR_DISCONNECTED, GALIL_PLC_INSPECTOR_DISCONNECTED_DESCR, ErrorType::FATAL));
+        errorSignaler->notifyErrors();
+    });
+
+    connect(this, &AbstractConnectedDeviceInspector::connectedSignal, [&]() {
+        errorSignaler->clearErrors();
+        errorSignaler->notifyErrors();
+    });
 
 }
 

@@ -238,7 +238,7 @@ protected:
 
     }
 
-    bool homeXImpl(spdCNType speed, accCNType acc, accCNType dec) override {
+    virtual bool homeXImpl(spdCNType speed, accCNType acc, accCNType dec) override {
 
         traceEnter;
         bool isOk = homeImpl(Axis::X, speed, acc, dec);
@@ -247,7 +247,7 @@ protected:
 
     }
 
-    bool homeYImpl(spdCNType speed, accCNType acc, accCNType dec) override {
+    virtual bool homeYImpl(spdCNType speed, accCNType acc, accCNType dec) override {
 
         traceEnter;
         bool isOk = homeImpl(Axis::Y, speed, acc, dec);
@@ -256,12 +256,28 @@ protected:
 
     }
 
-    bool homeZImpl(spdCNType speed, accCNType acc, accCNType dec) override {
+    virtual bool homeZImpl(spdCNType speed, accCNType acc, accCNType dec) override {
 
         traceEnter;
         bool isOk = homeImpl(Axis::Z, speed, acc, dec);
         traceExit;
         return isOk;
+
+    }
+
+    virtual bool notifyResetOkImpl() override {
+
+        traceEnter;
+        E err = cn->notifyResetOk();
+
+        if (cn->isError(err)) {
+            traceErr() << "Errore nella segnalazione reset ok al CN. Err: " << err;
+            traceErr() << "Descrizione errore: " << cn->decodeError(err);
+            return false;
+        }
+
+        traceExit;
+        return true;
 
     }
 

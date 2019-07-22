@@ -42,6 +42,7 @@ public:
     virtual E moveToPosition(Axis a, posCNType pos, spdCNType speed, accCNType acc, accCNType dec) = 0;
     virtual E setPosition(Axis a, posCNType pos) = 0;
     virtual bool isError(E errorCode) = 0;
+    virtual E notifyResetOk() = 0;
     virtual QString decodeError(const E& errorCode) = 0;
 
 };

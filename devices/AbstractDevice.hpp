@@ -7,6 +7,8 @@
 
 namespace PROGRAM_NAMESPACE {
 
+enum class DeviceKey;
+
 class NoStatusException : public std::exception {
     const char* what() const noexcept {
         return "No status exception: status is not available from device";

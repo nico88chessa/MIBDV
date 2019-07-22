@@ -31,6 +31,7 @@ static constexpr MotionErr MOTION_MANAGER_STOP_COMMAND_Z_ERR = PROGRAM_ERR_START
 static constexpr MotionErr MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 18;
 static constexpr MotionErr MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 19;
 static constexpr MotionErr MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY = PROGRAM_ERR_START_CODE + 20;
+static constexpr MotionErr MOTION_MANAGER_RESET_NOTIFY_KO = PROGRAM_ERR_START_CODE + 21;
 
 
 class MotionManager : public QObject {
@@ -62,6 +63,8 @@ public:
     MotionErr stopZ();
     MotionErr homeZ();
 
+    MotionErr notifyResetOk();
+
 protected:
     virtual bool moveXImpl(posType posMm, spdCNType speed, accCNType acc, accCNType dec) = 0;
     virtual bool moveYImpl(posType posMm, spdCNType speed, accCNType acc, accCNType dec) = 0;
@@ -79,35 +82,7 @@ protected:
     virtual bool homeYImpl(spdCNType speed, accCNType acc, accCNType dec) = 0;
     virtual bool homeZImpl(spdCNType speed, accCNType acc, accCNType dec) = 0;
 
-signals:
-    //void powerOffSignal();
-    //void powerOnSignal();
-    //void cycleOffSignal();
-    //void cycleOnSignal();
-
-    void axisXMotorOffSignal();
-    void axisXMotionStopSignal(MotionStopCode stopCode);
-    void axisXForwardLimitSignal();
-    void axisXBackwardLimitSignal();
-    void axisXHomeInProgressStartSignal();
-    void axisXHomeInProgressStopSignal();
-    void axisXHomingComplete();
-
-    void axisYMotorOffSignal();
-    void axisYMotionStopSignal(MotionStopCode stopCode);
-    void axisYForwardLimitSignal();
-    void axisYBackwardLimitSignal();
-    void axisYHomeInProgressStartSignal();
-    void axisYHomeInProgressStopSignal();
-    void axisYHomingComplete();
-
-    void axisZMotorOffSignal();
-    void axisZMotionStopSignal(MotionStopCode stopCode);
-    void axisZForwardLimitSignal();
-    void axisZBackwardLimitSignal();
-    void axisZHomeInProgressStartSignal();
-    void axisZHomeInProgressStopSignal();
-    void axisZHomingComplete();
+    virtual bool notifyResetOkImpl() = 0;
 
 public:
 
@@ -131,9 +106,10 @@ public:
             case MOTION_MANAGER_STOP_COMMAND_X_ERR: errDescr = tr("Errore nel comando di stop per l'asse X"); break;
             case MOTION_MANAGER_STOP_COMMAND_Y_ERR: errDescr = tr("Errore nel comando di stop per l'asse Y"); break;
             case MOTION_MANAGER_STOP_COMMAND_Z_ERR: errDescr = tr("Errore nel comando di stop per l'asse Z"); break;
-            case MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY: errDescr = tr("Homing asse X completato correttamente"); break;;
-            case MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY: errDescr = tr("Homing asse Y completato correttamente"); break;;
-            case MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY: errDescr = tr("Homing asse Z completato correttamente"); break;;
+            case MOTION_MANAGER_HOME_X_COMPLETED_CORRECTLY: errDescr = tr("Homing asse X completato correttamente"); break;
+            case MOTION_MANAGER_HOME_Y_COMPLETED_CORRECTLY: errDescr = tr("Homing asse Y completato correttamente"); break;
+            case MOTION_MANAGER_HOME_Z_COMPLETED_CORRECTLY: errDescr = tr("Homing asse Z completato correttamente"); break;
+            case MOTION_MANAGER_RESET_NOTIFY_KO: errDescr = tr("Failed to notify reset ok to device"); break;
             default: ;
         }
         return errDescr;

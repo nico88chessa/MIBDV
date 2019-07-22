@@ -41,6 +41,8 @@ private:
     bool traceOn;
     bool echoOn;
     unsigned char errorCode;
+    bool needReset;
+    bool isEmergencyMushroomPressed;
 
     // digital IO
     bool digitalInputs[GALIL_CN_DIGITAL_INPUTS];
@@ -160,7 +162,7 @@ public:
     explicit GalilCNStatusBean() { }
 
     /**
-     * NOTE NIC 31/10/2018: questa e' una copy-initialization;
+     * NOTE NIC 31/10/2018 - questa e' una copy-initialization;
      * tuttavia nel compilatore gcc viene ottmizzata come una direct-initialization
      * metto explicit per forzare l'uso del tipo GalilCNStatusBean;
      * vedere \ref GalilCNController::getRecord
@@ -283,6 +285,9 @@ public:
         axisCVelocity = rec.axis_c_velocity;
         axisCTorque = rec.axis_c_torque;
         axisCAnalogIn = rec.axis_c_analog_in;
+
+        needReset = false;
+        isEmergencyMushroomPressed = false;
     }
 
     bool getProgramRunning() const { return programRunning; }
@@ -295,6 +300,10 @@ public:
     void setEchoOn(bool value) { echoOn = value; }
     unsigned char getErrorCode() const { return errorCode; }
     void setErrorCode(unsigned char value) { errorCode = value; }
+    bool getNeedReset() const { return needReset; }
+    void setNeedReset(bool value) { needReset = value; }
+    bool getIsEmergencyMushroomPressed() const { return isEmergencyMushroomPressed; }
+    void setIsEmergencyMushroomPressed(bool value) { isEmergencyMushroomPressed = value; }
 
     bool getAxisALatchOccured() const { return axisALatchOccured; }
     void setAxisALatchOccured(bool value) { axisALatchOccured = value; }
@@ -495,11 +504,7 @@ public:
         return digitalOutputs[i-1];
     }
 
-
-
-
 };
-
 
 }
 

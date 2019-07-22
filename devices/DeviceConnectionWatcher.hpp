@@ -9,6 +9,7 @@
 #include <Types.hpp>
 
 #include <AbstractDevice.hpp>
+#include <ErrorHandler.hpp>
 
 namespace PROGRAM_NAMESPACE {
 
@@ -29,20 +30,29 @@ protected:
     QWeakPointer<IAbstractDevice> device;
     QTimer connectionCheckTimer;
     bool isConnected;
+    DeviceKey deviceKey;
+
+private:
+    int instanceId;
+    DECL_ERROR_SIGNALER_FRIENDS(DeviceConnectionWatcher)
 
 public:
-    explicit DeviceConnectionWatcher(QObject* parent = nullptr);
+    explicit DeviceConnectionWatcher(int watcherId, QObject* parent = nullptr);
     ~DeviceConnectionWatcher();
 
     template <typename T>
     void setDevice(const QWeakPointer<T>& dev) {
 
         static_assert(isDevice<T>::value, "Tipo device non valido");
+        static_assert(getDeviceKeyFromTemplate<T>() != DeviceKey::NONE, "Il device non e' valido");
+        deviceKey = getDeviceKeyFromTemplate<T>();
         device = dev;
 
     }
 
     void setupTimers(int checkTimerMs);
+
+    inline DeviceKey getDeviceKey() const { return deviceKey; }
 
 protected:
     void reconnectDevice();

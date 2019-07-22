@@ -20,6 +20,11 @@
         <file alias="panorama_fish_eye">icons/black-theme/baseline_panorama_fish_eye_black_24dp.png</file>
         <file alias="delete_forever">icons/black-theme/baseline_delete_forever_black_48dp.png</file>
         <file alias="rename">icons/black-theme/rename_icon-icons_24d.png</file>
+        <file alias="error">icons/black-theme/baseline_error_black_24dp.png</file>
+        <file alias="info">icons/black-theme/baseline_info_black_24dp.png</file>
+        <file alias="warning">icons/black-theme/baseline_warning_black_24dp.png</file>
+        <file alias="fatal">icons/black-theme/baseline_sentiment_very_dissatisfied_black_24dp.png</file>
+        <file alias="status_ok">icons/black-theme/baseline_sentiment_very_satisfied_black_24dp.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>

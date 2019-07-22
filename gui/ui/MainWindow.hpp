@@ -6,6 +6,8 @@
 
 #include "UnmovableWindow.hpp"
 
+//#include <MachineStatusHandler.hpp>
+
 
 namespace Ui {
 class MainWindow;
@@ -35,7 +37,8 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private:
+//private:
+//    QSharedPointer<PROGRAM_NAMESPACE::MachineStatusNotifier> msn;
 
 private slots:
     void setupStyleSheets() const;

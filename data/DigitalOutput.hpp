@@ -6,6 +6,7 @@
 #include <configure.h>
 #include <Constants.hpp>
 
+
 namespace PROGRAM_NAMESPACE {
 
 class DigitalOutput {
@@ -23,7 +24,7 @@ private:
 
 public:
     DigitalOutput() :
-        DigitalOutput("", -1, false, DeviceKey::NONE, false, IOType::NOT_VALID) { }
+        DigitalOutput("", DIGITAL_OUTPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, IOType::NOT_VALID) { }
 
     DigitalOutput(QString name, int channel, bool invertLogic,
                   DeviceKey device, bool isAlarm, IOType elementType) :
@@ -52,5 +53,7 @@ bool operator<(const DigitalOutput& l, const DigitalOutput& r) {
 }
 
 }
+
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalOutput)
 
 #endif // DIGITALOUTPUT_HPP

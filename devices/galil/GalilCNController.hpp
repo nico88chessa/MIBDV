@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QScopedPointer>
+#include <QMap>
 
 #include <configure.h>
 #include <data/GalilCNStatusBean.hpp>
@@ -28,6 +29,8 @@ public:
     static constexpr DeviceKey deviceKey = DeviceKey::GALIL_CN;
 
 private:
+    using vType = QMap<QString, double>;
+
     QScopedPointer<GCon> handler;
     bool isInitialized;
     bool connectionStatus;
@@ -103,6 +106,7 @@ public:
     virtual GalilCNStatusBean getStatus();
     virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
     virtual QString decodeError(const int& errorCode);
+    virtual int notifyResetOk();
     int getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue = nullptr); // 10 min valore default
 
 private:
@@ -114,6 +118,7 @@ private:
     inline void writeErrorIfExists(int errorCode);
     int getInputs(int bank, int& bankStatus);
     int tellSwitches(Axis a, int& value);
+    int getVariables(vType& variables = vType());
 
 };
 

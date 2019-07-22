@@ -2,8 +2,8 @@ SET(ITEMS
     Logger
     Settings
     Constants
-    ErrorSignaler
-    ErrorManager
+    ErrorHandler
+    MachineStatusHandler
     Utils
     ComputationUtils
     MathUtils

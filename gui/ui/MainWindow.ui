@@ -71,6 +71,24 @@
          <property name="currentIndex">
           <number>2</number>
          </property>
+         <widget class="QWidget" name="pageAlert">
+          <widget class="AlertFrame" name="frameAlert">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>824</width>
+             <height>704</height>
+            </rect>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+          </widget>
+         </widget>
          <widget class="QWidget" name="pageMotion">
           <widget class="MotionFrame" name="frameMotion">
            <property name="geometry">
@@ -218,6 +236,19 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="pbErrorState">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pb">
          <property name="text">
           <string/>
@@ -275,6 +306,12 @@
    <class>FileExplorerFrame</class>
    <extends>QFrame</extends>
    <header>gui/ui/FileExplorerFrame.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AlertFrame</class>
+   <extends>QFrame</extends>
+   <header>gui/ui/AlertFrame.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

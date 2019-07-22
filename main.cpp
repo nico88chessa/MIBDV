@@ -1,27 +1,24 @@
 #include <QApplication>
 #include <QFontDatabase>
-
+#include <QMetaType>
 #include <QThread>
 
-#include <Settings.hpp>
 #include <Logger.hpp>
 #include <gui/ui/MainWindow.hpp>
 
 #include <MotionBean.hpp>
 #include <GalilCNStatusBean.hpp>
 #include <GalilPLCStatusBean.hpp>
+#include <DigitalInput.hpp>
+#include <DigitalOutput.hpp>
+#include <AnalogInput.hpp>
 #include <DigitalInputValue.hpp>
-#include <IOSignaler.hpp>
+#include <DigitalOutputValue.hpp>
+#include <AnalogInputValue.hpp>
+
+#include <Error.hpp>
 #include <Types.hpp>
 
-#include <Grid.hpp>
-#include <PointSet.hpp>
-#include <StackedTile.hpp>
-#include <ComputationUtils.hpp>
-
-#include <third-party/ipg-marking-library-wrapper/include/Scanner.h>
-
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DeviceKey)
 
 void loadCustomFont() {
 
@@ -49,89 +46,122 @@ void loadCustomFont() {
 
 void registerMetatypes() {
 
-    // NOTE NIC 18/03/2019 - qui vanno registrati i tipi custom che devono essere gestiti
-    // dalle connessioni Signal / Slot
-    // Non e' necessario registrare i tipi se utilizzati solo come QVariant
+    /* NOTE NIC 18/03/2019 - registrazione tipi custom
+     * qui vanno registrati i tipi custom che devono essere gestiti
+     * dalle connessioni Signal / Slot (soprattutto nel caso di QueueConnection);
+     * non e' necessario registrare i tipi se utilizzati solo come QVariant
+     * ricordarsi di registrare il tipi sia con namespace sia senza
+     * altrimenti le chiamate fatte usando QMetaObject::invokeMethod(...) non funzionano
+     */
 
     using namespace PROGRAM_NAMESPACE;
 
     traceEnter;
-
     qRegisterMetaType<PROGRAM_NAMESPACE::GalilCNStatusBean>("GalilCNStatusBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::GalilCNStatusBean>("mibdv::GalilCNStatusBean");
     qRegisterMetaType<PROGRAM_NAMESPACE::GalilPLCStatusBean>("GalilPLCStatusBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::GalilPLCStatusBean>("mibdv::GalilPLCStatusBean");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionBean>("MotionBean");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MotionBean>("mibdv::MotionBean");
     qRegisterMetaType<PROGRAM_NAMESPACE::DeviceKey>("DeviceKey");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DeviceKey>("mibdv::DeviceKey");
+    qRegisterMetaType<PROGRAM_NAMESPACE::IOType>("IOType");
+    qRegisterMetaType<PROGRAM_NAMESPACE::IOType>("mibdv::IOType");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInput>("DigitalInput");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInput>("mibdv::DigitalInput");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutput>("DigitalOutput");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutput>("mibdv::DigitalOutput");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInput>("AnalogInput");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInput>("mibdv::AnalogInput");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputValue>("DigitalInputValue");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputValue>("mibdv::DigitalInputValue");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputValue>("DigitalOutputValue");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputValue>("mibdv::DigitalOutputValue");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputValue>("AnalogInputValue");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputValue>("mibdv::AnalogInputValue");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputStatus>("DigitalInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputStatus>("mibdv::DigitalInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("DigitalOutputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("mibdv::DigitalOutputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("AnalogInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("mibdv::AnalogInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("MotionStopCode");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("mibdv::MotionStopCode");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MachineStatus>("MachineStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::MachineStatus>("mibdv::MachineStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::Error>("Error");
+    qRegisterMetaType<PROGRAM_NAMESPACE::Error>("mibdv::Error");
+    qRegisterMetaType<PROGRAM_NAMESPACE::ErrorType>("ErrorType");
+    qRegisterMetaType<PROGRAM_NAMESPACE::ErrorType>("mibdv::ErrorType");
+    qRegisterMetaType<QList<PROGRAM_NAMESPACE::Error>>("QList<Error>");
+    qRegisterMetaType<QList<PROGRAM_NAMESPACE::Error>>("mibdv::QList<Error>");
 
     traceExit;
 
 }
 
-int mainTestFori(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
-
-    using namespace PROGRAM_NAMESPACE;
-    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
-
-    QFile file("C:\\Users\\nicola\\Desktop\\a4-norotate.csv");
-//    QFile file("C:\\Users\\nicola\\Desktop\\test.csv");
-//    QFile file("C:\\Users\\nicola\\Desktop\\50x50.csv");
-//    QFile file("C:\\Users\\nicola\\Desktop\\5x5.csv");
-
-    if (!file.open(QIODevice::ReadOnly))
-        exit(-1);
-
-    QString firstLine(file.readLine());
-    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
-    file.readLine();
-    file.readLine();
-
-    mibdv::PointSetI set(pointsNumber);
-    bool okX;
-    bool okY;
-    int count = 0;
-    int fixedSize = 10;
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        QList<QByteArray> lineSplit = line.split(';');
-        if (lineSplit.size()>2) {
-            int x = lineSplit.at(0).toInt(&okX);
-            int y = lineSplit.at(1).toInt(&okY);
-            if (!(okX && okY))
-                exit(-1);
-            set.addPoint(x, y);
-
-        }
-//        if (++count > fixedSize)
-//            break;
-    }
-
-    PointI m = set.getMin();
-    PointI M = set.getMax();
-    int w = M.getX() - m.getX();
-    int h = M.getY() - m.getY();
-    GridI test(m, w, h, 10000);
-
-    for (auto&& p: set.getVector())
-        test.addPoint(p);
-
-    const QVector<TileI>& row = test.getRow(0);
-
-    QVector<StackedTileI> stacks;
-    for (auto&& item: row)
-        stacks.append(StackedTileI(ComputationUtils::shuffleTile(item), 500));
-
-    QList<TileI> rowTiles;
-    for (auto&& st: stacks)
-        rowTiles.append(st.getTiles());
-
-    auto sl = ComputationUtils::shuffleList(rowTiles);
-
-    traceExit;
-
-}
+//int mainTestFori(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
+//
+//    using namespace PROGRAM_NAMESPACE;
+//    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+//
+//    QFile file("C:\\Users\\nicola\\Desktop\\a4-norotate.csv");
+////    QFile file("C:\\Users\\nicola\\Desktop\\test.csv");
+////    QFile file("C:\\Users\\nicola\\Desktop\\50x50.csv");
+////    QFile file("C:\\Users\\nicola\\Desktop\\5x5.csv");
+//
+//    if (!file.open(QIODevice::ReadOnly))
+//        exit(-1);
+//
+//    QString firstLine(file.readLine());
+//    int pointsNumber = firstLine.split(':', QString::SkipEmptyParts).at(1).toInt();
+//    file.readLine();
+//    file.readLine();
+//
+//    mibdv::PointSetI set(pointsNumber);
+//    bool okX;
+//    bool okY;
+//    int count = 0;
+//    int fixedSize = 10;
+//    while (!file.atEnd()) {
+//        QByteArray line = file.readLine();
+//        QList<QByteArray> lineSplit = line.split(';');
+//        if (lineSplit.size()>2) {
+//            int x = lineSplit.at(0).toInt(&okX);
+//            int y = lineSplit.at(1).toInt(&okY);
+//            if (!(okX && okY))
+//                exit(-1);
+//            set.addPoint(x, y);
+//
+//        }
+////        if (++count > fixedSize)
+////            break;
+//    }
+//
+//    PointI m = set.getMin();
+//    PointI M = set.getMax();
+//    int w = M.getX() - m.getX();
+//    int h = M.getY() - m.getY();
+//    GridI test(m, w, h, 10000);
+//
+//    for (auto&& p: set.getVector())
+//        test.addPoint(p);
+//
+//    const QVector<TileI>& row = test.getRow(0);
+//
+//    QVector<StackedTileI> stacks;
+//    for (auto&& item: row)
+//        stacks.append(StackedTileI(ComputationUtils::shuffleTile(item), 500));
+//
+//    QList<TileI> rowTiles;
+//    for (auto&& st: stacks)
+//        rowTiles.append(st.getTiles());
+//
+//    auto sl = ComputationUtils::shuffleList(rowTiles);
+//
+//    traceExit;
+//
+//}
 
 static constexpr char* MAIN_THREAD_NAME = "Main";
 
@@ -141,18 +171,31 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     //using namespace ipg_marking_library_wrapper;
     traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
 
-//    using testStatus = isDevice<GalilCNController>::statusType;
-//    testStatus prova;
-//
-//    bool v1 = isConnectedDeviceInspector<ConnectedDeviceInspector<GalilCNController>>::value;
-//    bool v2 = isCN<ConnectedDeviceInspector<GalilPLCController>::type>::value;
-//    bool v3 = isConnectedDeviceInspector<int>::value;
-////    bool v4 = isConnectedDeviceInspector<ConnectedDeviceInspector<int>>::value;
-    //bool isMotionInspectorTC = isCNInspector<ConnectedDeviceInspector<GalilCNController>>();
-    //bool isMotionInspectorTCK = isCNInspector<ConnectedDeviceInspector<GalilPLCController>>();
-//    bool isMotionInspectorTP = isPLCInspector<ConnectedDeviceInspector<GalilPLCController>>();
-//    bool isMotionInspectorTPK = isPLCInspector<ConnectedDeviceInspector<GalilCNController>>();
-    //bool isMotionInspectorT2 = isCNInspector<int>();
+    /*
+    bool test2 = hasMachineStatusReceiver<Prova>::value;
+    bool test3 = hasMachineStatusReceiver<int>::value;
+    */
+
+    /*
+    bool test4 = hasMachineStatusReceiver<GalilCNMotionAnalizer>::value;
+    bool test = hasErrorSignaler<int>::value;
+    test = hasErrorSignaler<GalilCNMotionAnalizer>::value;
+    */
+
+    /*
+    using testStatus = isDevice<GalilCNController>::statusType;
+    testStatus prova;
+
+    bool v1 = isConnectedDeviceInspector<ConnectedDeviceInspector<GalilCNController>>::value;
+    bool v2 = isCN<ConnectedDeviceInspector<GalilPLCController>::type>::value;
+    bool v3 = isConnectedDeviceInspector<int>::value;
+    bool v4 = isConnectedDeviceInspector<ConnectedDeviceInspector<int>>::value;
+    bool isMotionInspectorTC = isCNInspector<ConnectedDeviceInspector<GalilCNController>>();
+    bool isMotionInspectorTCK = isCNInspector<ConnectedDeviceInspector<GalilPLCController>>();
+    bool isMotionInspectorTP = isPLCInspector<ConnectedDeviceInspector<GalilPLCController>>();
+    bool isMotionInspectorTPK = isPLCInspector<ConnectedDeviceInspector<GalilCNController>>();
+    bool isMotionInspectorT2 = isCNInspector<int>();
+    */
 
     QApplication app(argc, argv);
     QApplication::instance()->thread()->setObjectName(MAIN_THREAD_NAME);
@@ -170,93 +213,3 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
     return app.exec();
 
 }
-
-
-//int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
-
-//    using namespace PROGRAM_NAMESPACE;
-
-//    GalilControllerUtils::decodeError(G_CUSTOM_CN_DIGITAL_INPUT_OUT_OF_RANGE);
-
-//    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
-//    traceEnter;
-
-
-//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppConfigLocation);
-//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
-//    traceInfo() << QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation);
-
-//    traceExit;
-
-//    GalilCNController test;
-//    traceDebug() << isDevice<AbstractDevice<GDataRecord2103> >::value;
-//    traceDebug() << isDevice<GalilCNController>::value;
-//    traceDebug() << isDevice<GalilPLCController>::value;
-
-//    GalilCNInspector inspector;
-//    ErrorManager errorManager;
-//    errorManager.subscribeObject(inspector);
-
-//    test.connect("169.254.12.10");
-//    test.setupController(16, 16, 8);
-
-//    static_assert(isDevice<decltype (test)>::value, "non sono un  device");
-//    using status = isDevice<decltype (test)>::statusType;
-//    status a;
-//    a = test.getStatus();
-
-//    traceDebug() << "isCN:" << isCN<int>::value;
-//    traceDebug() << "isCN:" << isCN<GalilCNController>::value;
-//    traceDebug() << "isCN:" << isCN<GalilPLCController>::value;
-
-//    traceDebug() << "isPLC:" << isPLC<int>::value;
-//    traceDebug() << "isPLC:" << isPLC<GalilCNController>::value;
-//    traceDebug() << "isPLC:" << isPLC<GalilPLCController>::value;
-
-//    int st;
-//    double v;
-//    for (int i=0; i<16; ++i) {
-//        test.getDigitalInput(i+1, st);
-//        traceDebug() << i+1 << ":" << st;
-//    }
-//    for (int i=0; i<16; ++i) {
-//        test.getDigitalOutput(i+1, st);
-//        traceDebug() << i+1 << ":" << st;
-//    }
-//    for (int i=0; i<8; ++i) {
-//        test.getAnalogInput(i+1, v);
-//        traceDebug() << i+1 << ":" << v;
-//    }
-
-//    bool b;
-//    test.getPosition(GalilCNController::Axis::X, st); traceInfo() << st;
-//    test.isAxisInMotion(GalilCNController::Axis::X, b); traceInfo() << b;
-//    test.isAxisPositionError(GalilCNController::Axis::X, b); traceInfo() << b;
-//    test.isMotorOff(GalilCNController::Axis::X, b); traceInfo() << b;
-//    test.isForwardLimit(GalilCNController::Axis::X, b); traceInfo() << b;
-//    test.isBackwardLimit(GalilCNController::Axis::X, b); traceInfo() << b;
-//    test.isHomeAxis(GalilCNController::Axis::X, b); traceInfo() << b;
-//    test.checkAbort(b); traceInfo() << b;
-//    test.setDigitalOutput(5, true);
-//    test.setSpeeds(GalilCNController::Axis::X, 10);
-//    test.setAccelerations(GalilCNController::Axis::X, 2048, 3072);
-//    test.setMoveParameters(GalilCNController::Axis::X, 10, 2048, 3072);
-//    test.stopAxis(GalilCNController::Axis::X);
-//    test.homingX(1024, 2048, 3072);
-//    test.homingY(1024, 2048, 3072);
-//    test.homingZ(1024, 2048, 3072);
-//    test.homingW(1024, 2048, 3072);
-//    test.home(GalilCNController::Axis::X, 1024, 2048, 3072);
-//    test.setPosition(GalilCNController::Axis::X, 0);
-//    test.moveToPosition(GalilCNController::Axis::X, 10000, 1024, 2048, 3072);
-//    test.startMoveAxis(GalilCNController::Axis::X);
-
-//    Settings::instance();
-
-//    traceExit;
-
-//    return 0;
-
-//}
-

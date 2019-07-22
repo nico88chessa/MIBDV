@@ -8,6 +8,7 @@
 #include <MotionManager.hpp>
 #include <MotionBean.hpp>
 
+
 class MotionFrameLogic;
 
 namespace Ui {

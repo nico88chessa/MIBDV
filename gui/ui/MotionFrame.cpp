@@ -5,7 +5,6 @@
 #include "DialogAlert.hpp"
 
 #include <DeviceFactory.hpp>
-#include <MotionSignaler.hpp>
 #include <IOSignaler.hpp>
 
 #include <Logger.hpp>
@@ -24,7 +23,7 @@ MotionFrameLogic::~MotionFrameLogic() { }
 void MotionFrameLogic::initialize() {
     traceEnter;
 
-    this->motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    this->motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
     this->ioSignaler = DeviceFactoryInstance.getIOSignaler();
     this->motionManager = DeviceFactoryInstance.instanceMotionManager();
     this->ioManager = DeviceFactoryInstance.instanceIOManager();
@@ -100,7 +99,7 @@ void MotionFrameLogic::moveX() {
                 }
             }
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -175,7 +174,7 @@ void MotionFrameLogic::moveY() {
             }
             t.stop();
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
@@ -251,7 +250,7 @@ void MotionFrameLogic::moveZ() {
             }
             t.stop();
         });
-        QMetaObject::Connection c2 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
@@ -385,7 +384,7 @@ void MotionFrameLogic::homeAxes() {
         t.setInterval(TIMER_CHECK_MOTION_MS);
         res = MOTION_MANAGER_NO_ERR;
 
-        QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::axisZHomingComplete, [&]{
+        QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::axisZHomingComplete, [&]{
             if (loop.isRunning()) {
                 res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
                 loop.quit();
@@ -404,7 +403,7 @@ void MotionFrameLogic::homeAxes() {
                 }
             }
         });
-        QMetaObject::Connection c3 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisZMotionStopSignal), [&](MotionStopCode sc) {
+        QMetaObject::Connection c3 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal), [&](MotionStopCode sc) {
             if (loop.isRunning()) {
                 if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
                     res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
@@ -480,7 +479,7 @@ void MotionFrameLogic::homeAxes() {
     bool isAxisYMoving = true;
 
 
-    QMetaObject::Connection c1 = connect(motionManager.data(), &MotionManager::axisXHomingComplete, [&]{
+    QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::axisXHomingComplete, [&]{
         if (loop.isRunning()) {
             isAxisXMoving = false;
             resX = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
@@ -488,7 +487,7 @@ void MotionFrameLogic::homeAxes() {
                 loop.quit();
         }
     });
-    QMetaObject::Connection c2 = connect(motionManager.data(), &MotionManager::axisYHomingComplete, [&]{
+    QMetaObject::Connection c2 = connect(motionAnalizer.data(), &IMotionAnalizer::axisYHomingComplete, [&]{
         if (loop.isRunning()) {
             isAxisYMoving = false;
             resY = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
@@ -526,7 +525,7 @@ void MotionFrameLogic::homeAxes() {
             }
         }
     });
-    QMetaObject::Connection c5 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisXMotionStopSignal), [&](MotionStopCode sc) {
+    QMetaObject::Connection c5 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
         if (loop.isRunning()) {
             isAxisXMoving = false;
             if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
@@ -537,7 +536,7 @@ void MotionFrameLogic::homeAxes() {
                 loop.quit();
         }
     });
-    QMetaObject::Connection c6 = connect(motionManager.data(), static_cast<void (MotionManager::*)(MotionStopCode)>(&MotionManager::axisYMotionStopSignal), [&](MotionStopCode sc) {
+    QMetaObject::Connection c6 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
         if (loop.isRunning()) {
             isAxisYMoving = false;
             if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
@@ -590,9 +589,19 @@ void MotionFrameLogic::homeAxes() {
 
     qPtr->isHomingAxes = false;
 
-    DialogAlert diag;
-    diag.setupLabels("Info", tr("Homing completato con successo"));
-    diag.exec();
+    res = motionManager->notifyResetOk();
+    if (motionManager->isErr(res)) {
+
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore segnalazione home OK al device - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+
+        DialogAlert diag;
+        diag.setupLabels("Error", descrErr);
+        diag.exec();
+        return;
+
+    }
 
     traceExit;
 
@@ -676,19 +685,19 @@ void MotionFrame::setupSignalsAndSlots() {
 
     traceEnter;
 
-    auto&& motionSignaler = DeviceFactoryInstance.getMotionSignaler();
+    auto&& motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
     auto&& ioSignaler = DeviceFactoryInstance.getIOSignaler();
 
-    connect(dPtr->motionSignaler.data(), &MotionSignaler::motionBeanSignal, [&](const MotionBean& motionBean) {
+    connect(dPtr->motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& motionBean) {
         QMetaObject::invokeMethod(this, "updateMotionBean", Qt::QueuedConnection,
-                                  Q_ARG(const mibdv::MotionBean&, motionBean));
+                                  Q_ARG(const MotionBean&, motionBean));
     });
 
     connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
         Q_UNUSED(b);
         Q_UNUSED(c);
         QMetaObject::invokeMethod(this, "updateDigitalInputStatus", Qt::QueuedConnection,
-                                  Q_ARG(const mibdv::DigitalInputStatus&, a));
+                                  Q_ARG(const DigitalInputStatus&, a));
 
     });
 
@@ -758,6 +767,17 @@ void MotionFrame::setupUi() {
     ui->pbStopY->setEnabled(true);
     ui->pbStopZ->setEnabled(true);
 
+    bool checkLimitsAxisX = s.getAxisXCheckLimits();
+    bool checkLimitsAxisY = s.getAxisYCheckLimits();
+    bool checkLimitsAxisZ = s.getAxisZCheckLimits();
+
+    ui->cbAxisXForwardLimit->setVisible(checkLimitsAxisX);
+    ui->cbAxisXReverseLimit->setVisible(checkLimitsAxisX);
+    ui->cbAxisYForwardLimit->setVisible(checkLimitsAxisY);
+    ui->cbAxisYReverseLimit->setVisible(checkLimitsAxisY);
+    ui->cbAxisZForwardLimit->setVisible(checkLimitsAxisZ);
+    ui->cbAxisZReverseLimit->setVisible(checkLimitsAxisZ);
+
     traceExit;
 
 }
@@ -800,6 +820,8 @@ void MotionFrame::updateUI() {
 
     traceEnter;
 
+    bool needResetAxis = motionBean.getNeedResetAxis();
+
     ui->dsbAxisXCurrentPosition->setValue(static_cast<double>(motionBean.getAxisXPosition()));
     ui->dsbAxisYCurrentPosition->setValue(static_cast<double>(motionBean.getAxisYPosition()));
     ui->dsbAxisZCurrentPosition->setValue(static_cast<double>(motionBean.getAxisZPosition()));
@@ -819,9 +841,13 @@ void MotionFrame::updateUI() {
     ui->cbAxisZMoving->setChecked(motionBean.getAxisZMoveInProgress());
     ui->cbAxisZReverseLimit->setChecked(motionBean.getAxisZReverseLimit());
 
-    ui->pbMoveX->setEnabled(!motionBean.getAxisXMoveInProgress() && !isHomingAxes);
-    ui->pbMoveY->setEnabled(!motionBean.getAxisYMoveInProgress() && !isHomingAxes);
-    ui->pbMoveZ->setEnabled(!motionBean.getAxisZMoveInProgress() && !isHomingAxes);
+    ui->pbMoveX->setEnabled(!needResetAxis && !motionBean.getAxisXMoveInProgress() && !isHomingAxes);
+    ui->pbMoveY->setEnabled(!needResetAxis && !motionBean.getAxisYMoveInProgress() && !isHomingAxes);
+    ui->pbMoveZ->setEnabled(!needResetAxis && !motionBean.getAxisZMoveInProgress() && !isHomingAxes);
+
+    ui->pbStopX->setEnabled(!needResetAxis && motionBean.getAxisXMoveInProgress() && !isHomingAxes);
+    ui->pbStopY->setEnabled(!needResetAxis && motionBean.getAxisYMoveInProgress() && !isHomingAxes);
+    ui->pbStopZ->setEnabled(!needResetAxis && motionBean.getAxisZMoveInProgress() && !isHomingAxes);
 
     ui->pbResetAxes->setEnabled(
                 !motionBean.getAxisXMoveInProgress() &&

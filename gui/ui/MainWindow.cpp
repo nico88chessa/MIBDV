@@ -9,6 +9,12 @@
 #include <DeviceFactory.hpp>
 
 
+static constexpr int MAINWINDOW_ITEM_ALERT_POSITION = 0;
+static constexpr char MAINWINDOW_FATAL_ICON_PATH[] = ":/icons/black-theme/fatal";
+static constexpr char MAINWINDOW_ERROR_ICON_PATH[] = ":/icons/black-theme/error";
+static constexpr char MAINWINDOW_WARNING_ICON_PATH[] = ":/icons/black-theme/warning";
+static constexpr char MAINWINDOW_STATUS_OK_ICON_PATH[] = ":/icons/black-theme/status_ok";
+
 using namespace PROGRAM_NAMESPACE;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -16,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     traceEnter;
 
+//    msn = DeviceFactoryInstance.instanceMachineStatusNotifier();
     this->setupUi();
     this->setupStyleSheets();
 
@@ -59,14 +66,15 @@ void MainWindow::setupSignalsAndSlots() const {
     connect(ui->pbRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
 
     // left panel
-
-    auto listItem = ui->listItem;
+    auto&& listItem = ui->listItem;
     connect(listItem, &MDListWidget::itemClicked, [&, listItem](QListWidgetItem* item) {
         auto itemWidget = static_cast<MDCustomItem::Ptr>(listItem->itemWidget(item));
         if (itemWidget == nullptr)
             return;
         QString text = itemWidget->text();
-        if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
+        if (QString(MAINWINDOW_MDCUSTOMITEM_ALERT).compare(text) == 0)
+            ui->stackedWidget->setCurrentWidget(ui->pageAlert);
+        else if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageMotion);
         else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
             ui->stackedWidget->setCurrentWidget(ui->pageIO);
@@ -77,6 +85,21 @@ void MainWindow::setupSignalsAndSlots() const {
 
     });
 
+    // top panel
+    QWeakPointer<ErrorManager> errorManager = DeviceFactoryInstance.getErrorManager();
+    connect(errorManager.data(), &ErrorManager::notifyMaxErrorType, this, [&](const ErrorType& errType) {
+        switch (errType) {
+        case ErrorType::INFO: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_STATUS_OK_ICON_PATH)); break;
+        case ErrorType::WARNING: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_WARNING_ICON_PATH)); break;
+        case ErrorType::ERROR: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_ERROR_ICON_PATH)); break;
+        case ErrorType::FATAL: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_FATAL_ICON_PATH)); break;
+        }
+    }, Qt::AutoConnection);
+
+    connect(ui->pbErrorState, &QPushButton::clicked, [&]() {
+        ui->listItem->setCurrentRow(MAINWINDOW_ITEM_ALERT_POSITION);
+        ui->stackedWidget->setCurrentWidget(ui->pageAlert);
+    });
     // content panel
 
     int widgetsCount = ui->stackedWidget->count();
@@ -255,6 +278,11 @@ void MainWindow::setupStyleSheets() const {
     QString content = mdGeomStr + geomStr + themeStr;
 
     app->setStyleSheet(content);
+
+//    if (msn->getCurrentStatus() == MachineStatus::IDLE)
+//        msn->setCurrentStatus(MachineStatus::PRINTING);
+//    else
+//        msn->setCurrentStatus(MachineStatus::IDLE);
 
     traceExit;
 

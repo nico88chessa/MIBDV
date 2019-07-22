@@ -55,6 +55,7 @@ public:
     real getAxisXHomingSpeedMms() const { return axisXHomingSpeedMms; }
     real getAxisXHomingAccMms2() const { return axisXHomingAccMms2; }
     real getAxisXHomingDecMms2() const { return axisXHomingDecMms2; }
+    bool getAxisXCheckLimits() const { return axisXCheckLimits; }
 
     int getAxisYStepPerMm() const { return axisYStepPerMm; }
     int getAxisYMinPosMm() const { return axisYMinPosMm; }
@@ -69,6 +70,7 @@ public:
     real getAxisYHomingSpeedMms() const { return axisYHomingSpeedMms; }
     real getAxisYHomingAccMms2() const { return axisYHomingAccMms2; }
     real getAxisYHomingDecMms2() const { return axisYHomingDecMms2; }
+    bool getAxisYCheckLimits() const { return axisYCheckLimits; }
 
     int getAxisZStepPerMm() const { return axisZStepPerMm; }
     int getAxisZMinPosMm() const { return axisZMinPosMm; }
@@ -83,6 +85,7 @@ public:
     real getAxisZHomingSpeedMms() const { return axisZHomingSpeedMms; }
     real getAxisZHomingAccMms2() const { return axisZHomingAccMms2; }
     real getAxisZHomingDecMms2() const { return axisZHomingDecMms2; }
+    bool getAxisZCheckLimits() const { return axisZCheckLimits; }
 
     const DigitalInputSet& getDigitalInputs() const { return digitalInputs; }
     const DigitalOutputSet& getDigitalOutputs() const { return digitalOutputs; }
@@ -135,6 +138,7 @@ private:
     real axisXHomingSpeedMms;
     real axisXHomingAccMms2;
     real axisXHomingDecMms2;
+    bool axisXCheckLimits;
 
     // ASSE Y
     int axisYStepPerMm;
@@ -150,6 +154,7 @@ private:
     real axisYHomingSpeedMms;
     real axisYHomingAccMms2;
     real axisYHomingDecMms2;
+    bool axisYCheckLimits;
 
     // ASSE Z
     int axisZStepPerMm;
@@ -165,6 +170,7 @@ private:
     real axisZHomingSpeedMms;
     real axisZHomingAccMms2;
     real axisZHomingDecMms2;
+    bool axisZCheckLimits;
 
     // IO
     DigitalInputSet digitalInputs;

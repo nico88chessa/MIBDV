@@ -6,7 +6,7 @@
 #include <QSharedPointer>
 
 #include <configure.h>
-#include <ErrorManager.hpp>
+#include <ErrorHandler.hpp>
 
 
 namespace PROGRAM_NAMESPACE {
@@ -14,16 +14,14 @@ namespace PROGRAM_NAMESPACE {
 class GalilPLCController;
 class GalilCNController;
 class AbstractConnectedDeviceInspector;
-class MotionSignaler;
+class IMotionAnalizer;
 class IOSignaler;
 class MotionManager;
 class IOManager;
-class InspectorStatusNotifier;
 class DeviceConnectionWatcher;
+class MachineStatusDispatcher;
+class MachineStatusNotifier;
 
-/* TODO NIC 28/05/2019 - iniziare a gestire l'error manager
- * qui andrebbe agganciata la logica dell'error manager a vari inspector
- */
 
 class DeviceFactory {
 public:
@@ -32,6 +30,25 @@ public:
 
     using ThreadName = QString;
 
+    // utilizzo una classe interna
+    class DeviceConnectionWatcherKey {
+    private:
+        QString threadName;
+        DeviceKey deviceId;
+
+    public:
+        DeviceConnectionWatcherKey(const QString& threadName, DeviceKey id) :
+            threadName(threadName), deviceId(id) { }
+        DeviceKey getDeviceId() const { return deviceId; }
+        void setDeviceId(const DeviceKey& value) { deviceId = value; }
+        QString getThreadName() const { return threadName; }
+        void setThreadName(const QString& value) { threadName = value; }
+
+        // TODO NIC 17/07/2019 - da verificare funzionamento
+        friend inline bool operator<(const DeviceConnectionWatcherKey& l, const DeviceConnectionWatcherKey& r);
+
+    };
+
 private:
     DeviceFactory();
     ~DeviceFactory();
@@ -39,13 +56,13 @@ private:
     // errorManager
     QSharedPointer<ErrorManager> errorManager;
 
-    // questo serve per controllare se gli inspector dei dispositivi funzionano
-    QScopedPointer<InspectorStatusNotifier> inspectorStatusNotifier;
+    // machine state dispatcher
+    QScopedPointer<MachineStatusDispatcher> machineStatusDispatcher;
 
     // oggetti per la gestione degli inspector
     QSharedPointer<AbstractConnectedDeviceInspector> galilPLCInspector;
     QSharedPointer<AbstractConnectedDeviceInspector> galilCNInspector;
-    QSharedPointer<MotionSignaler> motionSignaler;
+    QSharedPointer<IMotionAnalizer> motionAnalizer;
     QSharedPointer<IOSignaler> ioSignaler;
 
 
@@ -59,15 +76,15 @@ private:
     QMap<ThreadName, QSharedPointer<GalilCNController>> galilCNControllers;
     QMap<ThreadName, QSharedPointer<GalilPLCController>> galilPLCControllers;
 
-    QMap<ThreadName, QSharedPointer<DeviceConnectionWatcher>> galilCNConnectionWatchers;
-    QMap<ThreadName, QSharedPointer<DeviceConnectionWatcher>> galilPLCConnectionWatchers;
+    // lista di connection watchers
+    QMap<DeviceConnectionWatcherKey, QSharedPointer<DeviceConnectionWatcher>> connectionWatchers;
 
     // wrapper che mascherano l'implementazione dei controller
     QMap<ThreadName, QSharedPointer<MotionManager>> motionManagers;
     QMap<ThreadName, QSharedPointer<IOManager>> ioManagers;
 
 private:
-    void initMotionSignaler();
+    void initMotionAnalizer();
     void initIOSignaler();
 
     /**
@@ -83,9 +100,7 @@ public:
 
     static DeviceFactory& instance();
 
-    InspectorStatusNotifier* getInspectorStatusNotifier() const;
-
-    QWeakPointer<MotionSignaler> getMotionSignaler();
+    QWeakPointer<IMotionAnalizer> getMotionAnalizer();
     QWeakPointer<IOSignaler> getIOSignaler();
 
     QSharedPointer<MotionManager> instanceMotionManager();
@@ -93,10 +108,19 @@ public:
 
     QWeakPointer<ErrorManager> getErrorManager();
 
+    QSharedPointer<MachineStatusNotifier> instanceMachineStatusNotifier(QObject* parent = Q_NULLPTR) const;
+
     // qui rimuove i managers / controller dal thread corrente
     void detachManagers();
 
 };
+
+bool operator<(const DeviceFactory::DeviceConnectionWatcherKey& l, const DeviceFactory::DeviceConnectionWatcherKey& r) {
+    if (l.threadName < r.threadName)
+        return true;
+    return static_cast<int>(l.deviceId) < static_cast<int>(r.deviceId);
+//    return static_cast<int>(l.deviceId) < static_cast<int>(r.deviceId) && (l.threadName < r.threadName);
+}
 
 }
 

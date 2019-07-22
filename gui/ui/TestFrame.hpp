@@ -89,10 +89,6 @@ private:
     static constexpr int TEST_FRAME_LASER_TAB_INDEX = 2;
 
 
-    // questo parametro serve per far si che lo stato della testa vada a BUSY;
-    // infatti se faccio un close() poco dopo aver fatto un open(), il close viene ignorato
-    static constexpr int TEST_FRAME_SCANNER_WAIT_TIME_AFTER_CONNECTION_MS = 2000;
-
     Ui::TestFrame *ui;
     QButtonGroup* pointShapeGroup;
     TestFrameLogic* dPtr;

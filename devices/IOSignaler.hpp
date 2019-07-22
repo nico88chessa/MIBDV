@@ -14,6 +14,9 @@
 #include <DigitalOutputValue.hpp>
 #include <AnalogInputValue.hpp>
 
+#include <ErrorHandler.hpp>
+#include <MachineStatusHandler.hpp>
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -33,9 +36,11 @@ private:
     AnalogInputStatus analogInputStatus;
 
 private:
-    DigitalInputStatus digitalInputLastValues;
+    DigitalInputStatus digitalInputLastValues; // usati solamente per i signals
     bool isFirst;
     QList<QMetaObject::Connection> connections;
+    DECL_ERROR_SIGNALER_FRIENDS(IOSignaler)
+    DECL_MACHINE_STATUS_RECEIVER(IOSignaler)
 
     QTimer refreshTimer;
     bool needSignaler;
@@ -57,20 +62,25 @@ public:
 
         static_assert(isCN<typeT>::value || isPLC<typeT>::value, "Il device deve essere un CN o un PLC");
 
-        if (std::is_same<GalilCNController, typeT>::value) {
-            auto&& c = connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
-                if (this != nullptr)
-                    QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilCNStatusBean, qvariant_cast<GalilCNStatusBean>(status)));
-            });
-            connections.push_back(c);
+        //if (std::is_same<GalilCNController, typeT>::value) {
+        //    auto&& c = connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
+        //        if (this != nullptr)
+        //            QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilCNStatusBean, qvariant_cast<GalilCNStatusBean>(status)));
+        //    });
+        //    connections.push_back(c);
+        //
+        //} else if (std::is_same<GalilPLCController, typeT>::value) {
+        //    auto&& c = connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
+        //        if (this != nullptr)
+        //            QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilPLCStatusBean, qvariant_cast<GalilPLCStatusBean>(status)));
+        //    });
+        //    connections.push_back(c);
+        //}
 
-        } else if (std::is_same<GalilPLCController, typeT>::value) {
-            auto&& c = connect(inspector.data(), &I::statusSignal, [&](const QVariant& status) {
-                if (this != nullptr)
-                    QMetaObject::invokeMethod(this, "updateStatus", Qt::QueuedConnection, Q_ARG(GalilPLCStatusBean, qvariant_cast<GalilPLCStatusBean>(status)));
-            });
-            connections.push_back(c);
-        }
+        auto&& c = connect(inspector.data(), &I::statusSignal, this, [&](const QVariant& status) {
+            this->updateStatus(qvariant_cast<statusT>(status));
+        }, Qt::QueuedConnection);
+        connections.push_back(c);
 
         traceExit;
 
@@ -83,6 +93,8 @@ public:
 
 private:
     void analizeIO();
+
+    ErrorID buildGenericErrorId(const DigitalInputValue& dIn) const;
 
 private slots:
     void process();
@@ -114,9 +126,5 @@ signals:
 };
 
 }
-
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalInputStatus)
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::DigitalOutputStatus)
-Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::AnalogInputStatus)
 
 #endif // IOSIGNALER_HPP

@@ -153,6 +153,8 @@ protected:
 
         if (!initialize()) {
             this->setProcessErrorCode(PROCESSOR_THREAD_INITIALIZE_ERROR);
+            emit processFinished();
+            this->setIsRunning(false);
             return;
         }
 

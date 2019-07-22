@@ -63,4 +63,6 @@ bool operator<(const AnalogInput& l, const AnalogInput& r) {
 
 }
 
+Q_DECLARE_METATYPE(PROGRAM_NAMESPACE::AnalogInput)
+
 #endif // ANALOGINPUT_HPP

@@ -307,3 +307,14 @@ MotionErr MotionManager::homeZ() {
         return MOTION_MANAGER_NO_ERR;
 
 }
+
+MotionErr MotionManager::notifyResetOk() {
+
+    traceEnter;
+    traceExit;
+    if (!this->notifyResetOkImpl())
+        return MOTION_MANAGER_RESET_NOTIFY_KO;
+    else
+        return MOTION_MANAGER_NO_ERR;
+
+}

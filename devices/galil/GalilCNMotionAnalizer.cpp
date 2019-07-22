@@ -1,7 +1,43 @@
 #include "GalilCNMotionAnalizer.hpp"
-#include <devices/MotionSignaler.hpp>
+#include <QtCore>
+
 
 using namespace PROGRAM_NAMESPACE;
+
+
+static constexpr ErrorID GALIL_CN_MA_AXIS_X_MOTOR_OFF = PROGRAM_ERR_START_CODE + 1;
+static constexpr ErrorID GALIL_CN_MA_AXIS_X_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 2;
+static constexpr ErrorID GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 3;
+static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_X = PROGRAM_ERR_START_CODE + (0x01 << 8); // 65792 (256)
+
+static constexpr ErrorID GALIL_CN_MA_AXIS_Y_MOTOR_OFF = PROGRAM_ERR_START_CODE + 21;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 21;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 23;
+static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_Y = PROGRAM_ERR_START_CODE + (0x01 << 9); // 66048 (512)
+
+static constexpr ErrorID GALIL_CN_MA_AXIS_Z_MOTOR_OFF = PROGRAM_ERR_START_CODE + 41;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT = PROGRAM_ERR_START_CODE + 42;
+static constexpr ErrorID GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT = PROGRAM_ERR_START_CODE + 43;
+static constexpr ErrorID GALIL_CN_MOTION_STOP_CODE_START_MASK_Z = PROGRAM_ERR_START_CODE + (0x01 << 10); // 66560 (1024)
+
+static constexpr ErrorID GALIL_CN_AXIS_NEED_RESET = PROGRAM_ERR_START_CODE + 60;
+
+static constexpr char GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X motor is off");
+static constexpr char GALIL_CN_MA_AXIS_X_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X forward limit");
+static constexpr char GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X backward limit");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_X_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis X Stop code error");
+
+static constexpr char GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y motor is off");
+static constexpr char GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y forward limit");
+static constexpr char GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y backward limit");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Y Stop code error");
+
+static constexpr char GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z motor is off");
+static constexpr char GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z forward limit");
+static constexpr char GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z backward limit");
+static constexpr char GALIL_CN_MOTION_STOP_CODE_START_MASK_Z_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Axis Z Stop code error");
+
+static constexpr char GALIL_CN_AXIS_NEED_RESET_DESCR[] = QT_TRANSLATE_NOOP("mibdv", "Need to reset axes");
 
 
 GalilCNMotionAnalizer::GalilCNMotionAnalizer(QObject* parent) :
@@ -23,11 +59,19 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         return;
     }
 
+    this->errorSignaler->clearErrors();
+
     // check coppia asse x
     bool isMotorXOff = newStatus.getAxisAMotorOff();
-    if (isMotorXOff)
+    if (isMotorXOff) {
         if (isMotorXOff != oldStatus.getAxisAMotorOff())
-            emit signaler->axisXMotorOffSignal();
+            emit axisXMotorOffSignal();
+
+        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR), ErrorType::WARNING));
+        else
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR), ErrorType::ERROR));
+    }
 
     // check motion asse x
     bool isMovingAxisX = newStatus.getAxisAMoveInProgress();
@@ -40,31 +84,31 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
 
                 if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX) {
 
-                    Logger::instance().debug() << "Galil axis X FI ok";
-                    emit signaler->axisXHomingComplete();
+                    traceDebug() << "Galil axis X FI ok";
+                    emit axisXHomingComplete();
                     isFECheck = 0;
 
                 } else if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_FINDING_EDGE) {
 
-                    Logger::instance().debug() << "Galil axis X FE ok";
+                    traceDebug() << "Galil axis X FE ok";
 
                     if (isFECheck < CUSTOM_HOME_AXIS_X_FE_COUNT) {
 
-                        Logger::instance().debug() << "count: " << isFECheck;
+                        traceDebug() << "count: " << isFECheck;
                         lastStatus.setAxisAMoveInProgress(true); // obbligo a ricontrollare se l'asse e' davvero fermo al giro dopo
                         ++isFECheck;
 
                     } else {
 
-                        Logger::instance().debug() << "Galil axis X still in FE";
+                        traceDebug() << "Galil axis X still in FE";
                         isFECheck = 0;
                         MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
                         if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
-                            Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
-                            Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                            traceErr() << "Galil axis X stop code error:" << galilStopCode;
+                            traceErr() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
                         }
 
-                        emit signaler->axisXMotionStopSignal(stopCode);
+                        emit axisXMotionStopSignal(stopCode);
                     }
 
                 } else {
@@ -73,57 +117,82 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
 
                     MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
                     if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
-                        Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
-                        Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                        traceErr() << "Galil axis X stop code error:" << galilStopCode;
+                        traceErr() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
                     }
 
-                    emit signaler->axisXMotionStopSignal(stopCode);
+                    emit axisXMotionStopSignal(stopCode);
                 }
 
             } else {
 
                 if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
-                    emit signaler->axisXHomingComplete();
+                    emit axisXHomingComplete();
 
                 MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
                 if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
-                    Logger::instance().error() << "Galil axis X stop code error:" << galilStopCode;
-                    Logger::instance().error() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                    traceErr() << "Galil axis X stop code error:" << galilStopCode;
+                    traceErr() << "Galil axis X stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
                 }
-                emit signaler->axisXMotionStopSignal(stopCode);
+                emit axisXMotionStopSignal(stopCode);
 
             }
 
         }
     }
 
-    // check forward limit asse x
-    bool isForwardLimitAxisX = newStatus.getAxisAForwardLimit();
-    if (isForwardLimitAxisX)
-        if (isForwardLimitAxisX != oldStatus.getAxisAForwardLimit())
-            emit signaler->axisXForwardLimitSignal();
+    // check limiti asse x se abilitato
+    if (getCheckLimitsAxisX()) {
 
-    // check backward limit asse x
-    bool isBackwardLimitAxisX = newStatus.getAxisAReverseLimit();
-    if (isBackwardLimitAxisX)
-        if (isBackwardLimitAxisX != oldStatus.getAxisAReverseLimit())
-            emit signaler->axisXBackwardLimitSignal();
+        // check forward limit asse x
+        bool isForwardLimitAxisX = newStatus.getAxisAForwardLimit();
+        if (isForwardLimitAxisX) {
+            if (isForwardLimitAxisX != oldStatus.getAxisAForwardLimit())
+                emit axisXForwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_X_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+        // check backward limit asse x
+        bool isBackwardLimitAxisX = newStatus.getAxisAReverseLimit();
+        if (isBackwardLimitAxisX) {
+            if (isBackwardLimitAxisX != oldStatus.getAxisAReverseLimit())
+                emit axisXBackwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_X_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+    }
 
     // check homing in progress asse x
     bool isHomingXInProgress = newStatus.getAxisAHmInProgress();
     bool lastStatusHomeXInProgress = oldStatus.getAxisAHmInProgress();
     if (isHomingXInProgress != lastStatusHomeXInProgress) {
         if (isHomingXInProgress)
-            emit signaler->axisXHomeInProgressStartSignal();
+            emit axisXHomeInProgressStartSignal();
         else
-            emit signaler->axisXHomeInProgressStopSignal();
+            emit axisXHomeInProgressStopSignal();
     }
+
+    // check stop code asse x
+    int stopCodeAxisX = newStatus.getAxisAStopCode();
+    MotionStopCode motionStopCodeAxisX = GalilControllerUtils::evaluateStopCode(stopCodeAxisX);
+    QString decodeStopCodeAxisX = GalilControllerUtils::getStopCodeDescription(stopCodeAxisX);
+    QString stopCodeAxisXDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_X_DESCR)).arg(decodeStopCodeAxisX);
+    int stopCodeAxisXErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_X + stopCodeAxisX;
+    if (motionStopCodeAxisX == MotionStopCode::MOTION_STOP_ON_ERROR)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::ERROR));
+    else
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::INFO));
 
     // check coppia asse y
     bool isMotorYOff = newStatus.getAxisBMotorOff();
     if (isMotorYOff) {
         if (isMotorYOff != oldStatus.getAxisBMotorOff())
-            emit signaler->axisYMotorOffSignal();
+            emit axisYMotorOffSignal();
+
+        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::WARNING));
+        else
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::ERROR));
     }
 
     // check motion asse y
@@ -134,44 +203,70 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
             int galilStopCode = newStatus.getAxisBStopCode();
 
             if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
-                emit signaler->axisYHomingComplete();
+                emit axisYHomingComplete();
 
             MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
             if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
-                Logger::instance().error() << "Galil axis Y stop code error:" << galilStopCode;
-                Logger::instance().error() << "Galil axis Y stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                traceErr() << "Galil axis Y stop code error:" << galilStopCode;
+                traceErr() << "Galil axis Y stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
             }
-            emit signaler->axisYMotionStopSignal(stopCode);
+            emit axisYMotionStopSignal(stopCode);
         }
     }
 
-    // check forward limit asse y
-    bool isForwardLimitAxisY = newStatus.getAxisBForwardLimit();
-    if (isForwardLimitAxisY)
-        if (isForwardLimitAxisY != oldStatus.getAxisBForwardLimit())
-            emit signaler->axisYForwardLimitSignal();
 
-    // check backward limit asse y
-    bool isBackwardLimitAxisY = newStatus.getAxisBReverseLimit();
-    if (isBackwardLimitAxisY)
-        if (isBackwardLimitAxisY != oldStatus.getAxisBReverseLimit())
-            emit signaler->axisYBackwardLimitSignal();
+    // check limiti asse y se abilitato
+    if (getCheckLimitsAxisY()) {
+
+        // check forward limit asse y
+        bool isForwardLimitAxisY = newStatus.getAxisBForwardLimit();
+        if (isForwardLimitAxisY) {
+            if (isForwardLimitAxisY != oldStatus.getAxisBForwardLimit())
+                emit axisYForwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Y_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+        // check backward limit asse y
+        bool isBackwardLimitAxisY = newStatus.getAxisBReverseLimit();
+        if (isBackwardLimitAxisY) {
+            if (isBackwardLimitAxisY != oldStatus.getAxisBReverseLimit())
+                emit axisYBackwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Y_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+    }
 
     // check homing in progress asse y
     bool isHomingYInProgress = newStatus.getAxisBHmInProgress();
     bool lastStatusHomeYInProgress = oldStatus.getAxisBHmInProgress();
     if (isHomingYInProgress != lastStatusHomeYInProgress) {
         if (isHomingYInProgress)
-            emit signaler->axisYHomeInProgressStartSignal();
+            emit axisYHomeInProgressStartSignal();
         else
-            emit signaler->axisYHomeInProgressStopSignal();
+            emit axisYHomeInProgressStopSignal();
     }
+
+    // check stop code asse y
+    int stopCodeAxisY = newStatus.getAxisBStopCode();
+    MotionStopCode motionStopCodeAxisY = GalilControllerUtils::evaluateStopCode(stopCodeAxisY);
+    QString decodeStopCodeAxisY = GalilControllerUtils::getStopCodeDescription(stopCodeAxisY);
+    QString stopCodeAxisYDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR)).arg(decodeStopCodeAxisY);
+    int stopCodeAxisYErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_Y + stopCodeAxisY;
+    if (motionStopCodeAxisY == MotionStopCode::MOTION_STOP_ON_ERROR)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::ERROR));
+    else
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::INFO));
 
     // check coppia asse z
     bool isMotorZOff = newStatus.getAxisCMotorOff();
     if (isMotorZOff) {
         if (isMotorZOff != oldStatus.getAxisCMotorOff())
-            emit signaler->axisZMotorOffSignal();
+            emit axisZMotorOffSignal();
+
+        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR), ErrorType::WARNING));
+        else
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR), ErrorType::ERROR));
     }
 
     // check motion asse z
@@ -182,38 +277,65 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
             int galilStopCode = newStatus.getAxisCStopCode();
 
             if (galilStopCode == GALIL_CN_STOP_CODE_STOPPED_AFTER_HOMING_FIND_INDEX)
-                emit signaler->axisZHomingComplete();
+                emit axisZHomingComplete();
 
             MotionStopCode stopCode = GalilControllerUtils::evaluateStopCode(galilStopCode);
             if (stopCode != MotionStopCode::MOTION_STOP_CORRECTLY) {
-                Logger::instance().error() << "Galil axis Z stop code error:" << galilStopCode;
-                Logger::instance().error() << "Galil axis Z stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
+                traceErr() << "Galil axis Z stop code error:" << galilStopCode;
+                traceErr() << "Galil axis Z stop description:" << GalilControllerUtils::getStopCodeDescription(galilStopCode);
             }
-            emit signaler->axisZMotionStopSignal(stopCode);
+            emit axisZMotionStopSignal(stopCode);
         }
     }
 
-    // check forward limit asse z
-    bool isForwardLimitAxisZ = newStatus.getAxisCForwardLimit();
-    if (isForwardLimitAxisZ)
-        if (isForwardLimitAxisZ != oldStatus.getAxisCForwardLimit())
-            emit signaler->axisZForwardLimitSignal();
+    // check limiti asse z se abilitato
+    if (getCheckLimitsAxisX()) {
 
-    // check backward limit asse z
-    bool isBackwardLimitAxisZ = newStatus.getAxisCReverseLimit();
-    if (isBackwardLimitAxisZ)
-        if (isBackwardLimitAxisZ != oldStatus.getAxisCReverseLimit())
-            emit signaler->axisZBackwardLimitSignal();
+        // check forward limit asse z
+        bool isForwardLimitAxisZ = newStatus.getAxisCForwardLimit();
+        if (isForwardLimitAxisZ) {
+            if (isForwardLimitAxisZ != oldStatus.getAxisCForwardLimit())
+                emit axisZForwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Z_FORWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+        // check backward limit asse z
+        bool isBackwardLimitAxisZ = newStatus.getAxisCReverseLimit();
+        if (isBackwardLimitAxisZ) {
+            if (isBackwardLimitAxisZ != oldStatus.getAxisCReverseLimit())
+                emit axisZBackwardLimitSignal();
+            this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT, tr(GALIL_CN_MA_AXIS_Z_BACKWARD_LIMIT_DESCR), ErrorType::ERROR));
+        }
+
+    }
 
     // check homing in progress asse z
     bool isHomingZInProgress = newStatus.getAxisCHmInProgress();
     bool lastStatusHomeZInProgress = oldStatus.getAxisCHmInProgress();
     if (isHomingZInProgress != lastStatusHomeZInProgress) {
         if (isHomingZInProgress)
-            emit signaler->axisZHomeInProgressStartSignal();
+            emit axisZHomeInProgressStartSignal();
         else
-            emit signaler->axisZHomeInProgressStopSignal();
+            emit axisZHomeInProgressStopSignal();
     }
+
+    // check stop code asse z
+    int stopCodeAxisZ = newStatus.getAxisCStopCode();
+    MotionStopCode motionStopCodeAxisZ = GalilControllerUtils::evaluateStopCode(stopCodeAxisZ);
+    QString decodeStopCodeAxisZ = GalilControllerUtils::getStopCodeDescription(stopCodeAxisZ);
+    QString stopCodeAxisZDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_Z_DESCR)).arg(decodeStopCodeAxisZ);
+    int stopCodeAxisZErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_Z + stopCodeAxisZ;
+    if (motionStopCodeAxisZ == MotionStopCode::MOTION_STOP_ON_ERROR)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::ERROR));
+    else
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::INFO));
+
+    // controllo se e' necessario resettare gli assi
+    bool needReset = newStatus.getNeedReset();
+    if (needReset)
+        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_AXIS_NEED_RESET, GALIL_CN_AXIS_NEED_RESET_DESCR, ErrorType::WARNING));
+
+    this->errorSignaler->notifyErrors();
 
     traceExit;
 
