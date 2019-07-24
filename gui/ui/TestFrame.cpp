@@ -4,6 +4,8 @@
 #include <QVector>
 #include <QMouseEvent>
 #include <QElapsedTimer>
+#include <QFileDialog>
+#include <QDir>
 
 #include <vector>
 #include <iostream>
@@ -40,10 +42,10 @@ static constexpr const char* ROWTILE_PROCESSOR_THREAD_NAME = "ROW_TILE_PROCESSOR
 
 Worker::Worker(QObject* parent) : QObject(parent), printConfiguration(),
     hasToStop(false), commandsExecuted(PrintCommandExecuted::IDLE) {
-    this->setupSignalsAndSlot();
+    this->setupSignalsAndSlots();
 }
 
-void Worker::setupSignalsAndSlot() {
+void Worker::setupSignalsAndSlots() {
 
     traceEnter;
     connect(this, &Worker::stopRequest, [&]() {
@@ -1767,6 +1769,245 @@ void TestFrame::showPopup(const QString& err, const QString& descr) {
 
 }
 
+void TestFrame::updatePrintConfiguration() {
+
+    traceEnter;
+    PrintConfiguration& pc = this->currentConfiguration;
+
+    // percorso file
+    pc.setFilePath(ui->leFilePath->text());
+
+    // setup movimentazione
+    pc.setTileSizeMm(ui->sbTileSize->value());
+    pc.setAngleMRad(ui->dsbAngleMrad->value());
+    pc.setOffsetXmm(ui->dsbOffsetX->value());
+    pc.setOffsetYmm(ui->dsbOffsetY->value());
+    pc.setTileScaleXPercent(ui->dsbScaleX->value());
+    pc.setTileScaleYPercent(ui->dsbScaleY->value());
+    pc.setWaitTimeMs(ui->sbTileTime->value());
+    pc.setWaitTimeAfterYMovementMs(ui->sbWaitTimeYMovement->value());
+    pc.setLaserFrequency(ui->sbLaserFrequency->value());
+
+    // scelta algoritmo
+    pc.setIsRandomAlgorithm(ui->cbRandomChoice->isChecked());
+    pc.setIsNeighborhoodAlgorithm(ui->cbNHChoice->isChecked());
+
+    // configurazione random
+    pc.setRandomPointsPerTile(ui->sbRPointsPerTile->value());
+    pc.setRandomIsShuffleRowTiles(ui->cbRShuffleRowTiles->isChecked());
+
+    // configurazione neighborhood
+    pc.setNeighborhoodMinDistanceUm(ui->sbNHMinDistance->value());
+    pc.setNeighborhoodIsShuffleStackedTiles(ui->cbNHShuffleStackedTiles->isChecked());
+    pc.setNeighborhoodIsShuffleRowTiles(ui->cbNHShuffleRowTiles->isChecked());
+
+    // scelta del punto di stampa
+    pc.setPointShape(static_cast<PointShapeEnum>(pointShapeGroup->checkedId()));
+
+    // point
+    pc.setNumberOfPulses(ui->sbPointPulses->value());
+
+    // circle points
+    pc.setCirclePointsRadiusUm(ui->sbCirclePointsRadius->value());
+    pc.setCirclePointsNumberOfSides(ui->sbCirclePointsNumberSides->value());
+    pc.setCirclePointsNumberOfPulses(ui->sbCirclePointsPulses->value());
+
+    // circle vector
+    pc.setCircleVectorRadiusUm(ui->sbCircleVectorRadius->value());
+    pc.setCircleVectorNumberOfRevolutions(ui->sbCircleVectorNumberRevolutions->value());
+    pc.setCircleVectorNumberOfSides(ui->sbCircleVectorNumberSides->value());
+    pc.setCircleVectorPitch(ui->sbCircleVectorPointsPitch->value());
+
+    QStringList stringList;
+
+    stringList << "Tile size mm: " << QString::number(pc.getTileSizeMm()) << "\r\n";
+    stringList << "Angle mrad: " << QString::number(pc.getAngleMRad()) << "\r\n";
+    stringList << "Offset x mm: " << QString::number(pc.getOffsetXmm()) << "\r\n";
+    stringList << "Offset y mm: " << QString::number(pc.getOffsetYmm()) << "\r\n";
+    stringList << "Tile scale x percent: " << QString::number(pc.getTileScaleXPercent()) << "\r\n";
+    stringList << "Tile scale y percent: " << QString::number(pc.getTileScaleYPercent()) << "\r\n";
+    stringList << "Wait time ms: " << QString::number(pc.getWaitTimeMs()) << "\r\n";
+    stringList << "Wait time after y movement ms: " << QString::number(pc.getWaitTimeAfterYMovementMs()) << "\r\n";
+    stringList << "Laser frequency: " << QString::number(pc.getLaserFrequency()) << "\r\n";
+
+    // SCELTA ALGORITMO
+    stringList << "Is random algorithm: " << QString::number(pc.getIsRandomAlgorithm()) << "\r\n";
+    stringList << "Is neighborhood algorithm: " << QString::number(pc.getIsNeighborhoodAlgorithm()) << "\r\n";
+
+    // CONFIGURAZIONE RANDOM
+    stringList << "Random points per tile: " << QString::number(pc.getRandomPointsPerTile()) << "\r\n";
+    stringList << "Random is shuffle row tiles: " << QString::number(pc.getRandomIsShuffleRowTiles()) << "\r\n";
+
+    // CONFIGURAZIONE NEIGHBORHOOD
+    stringList << "Neighborhood min distance um: " << QString::number(pc.getNeighborhoodMinDistanceUm()) << "\r\n";
+    stringList << "Neighborhood is shuffle stacked tiles: " << QString::number(pc.getNeighborhoodIsShuffleStackedTiles()) << "\r\n";
+    stringList << "Neighborhood is shuffle row tiles: " << QString::number(pc.getNeighborhoodIsShuffleRowTiles()) << "\r\n";
+
+    // SCELTA DEL PUNTO DI STAMPA
+    stringList << "Point shape: " << getStringFromPointShapeEnum(pc.getPointShape()) << "\r\n";
+
+    // POINT
+    stringList << "Number of pulses: " << QString::number(pc.getNumberOfPulses()) << "\r\n";
+
+    // CIRCLE POINTS
+    stringList << "Circle points radius um: " << QString::number(pc.getCirclePointsRadiusUm()) << "\r\n";
+    stringList << "Circle points number of sides: " << QString::number(pc.getCirclePointsNumberOfSides()) << "\r\n";
+    stringList << "Circle points number of pulses: " << QString::number(pc.getCirclePointsNumberOfPulses()) << "\r\n";
+
+    // CIRCLE VECTOR
+    stringList << "Circle vector radius um: " << QString::number(pc.getCircleVectorRadiusUm()) << "\r\n";
+    stringList << "Circle vector number of revolutions: " << QString::number(pc.getCircleVectorNumberOfRevolutions()) << "\r\n";
+    stringList << "Circle vector number of sides: " << QString::number(pc.getCircleVectorNumberOfSides()) << "\r\n";
+    stringList << "Circle vector pitch: " << QString::number(pc.getCircleVectorPitch()) << "\r\n";
+
+    ui->lConfigurationDetail->setText(stringList.join(""));
+
+    traceExit;
+
+}
+
+void TestFrame::restorePrintConfiguration() {
+
+    traceEnter;
+
+    ui->sbTileSize->setValue(currentConfiguration.getTileSizeMm());
+    ui->dsbAngleMrad->setValue(currentConfiguration.getAngleMRad());
+    ui->dsbOffsetX->setValue(currentConfiguration.getOffsetXmm());
+    ui->dsbOffsetY->setValue(currentConfiguration.getOffsetYmm());
+    ui->dsbScaleX->setValue(currentConfiguration.getTileScaleXPercent());
+    ui->dsbScaleY->setValue(currentConfiguration.getTileScaleYPercent());
+    ui->sbTileTime->setValue(currentConfiguration.getWaitTimeMs());
+    ui->sbWaitTimeYMovement->setValue(currentConfiguration.getWaitTimeAfterYMovementMs());
+    ui->sbLaserFrequency->setValue(currentConfiguration.getLaserFrequency());
+
+    ui->cbRandomChoice->setChecked(currentConfiguration.getIsRandomAlgorithm());
+    ui->cbNHChoice->setChecked(currentConfiguration.getIsNeighborhoodAlgorithm());
+
+    ui->sbRPointsPerTile->setValue(currentConfiguration.getRandomPointsPerTile());
+    ui->cbRShuffleRowTiles->setChecked(currentConfiguration.getRandomIsShuffleRowTiles());
+
+    ui->sbNHMinDistance->setValue(currentConfiguration.getNeighborhoodMinDistanceUm());
+    ui->cbNHShuffleStackedTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleStackedTiles());
+    ui->cbNHShuffleRowTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleRowTiles());
+
+    switch (currentConfiguration.getPointShape()) {
+    case PointShapeEnum::POINT:
+        ui->rbPoint->setChecked(true);
+        ui->swPointShapeDetails->setCurrentIndex(0); break;
+        break;
+    case PointShapeEnum::CIRCLE_POINTS:
+        ui->rbCirclePoints->setChecked(true);
+        ui->swPointShapeDetails->setCurrentIndex(1); break;
+        break;
+    case PointShapeEnum::CIRCLE_VECTOR:
+        ui->rbCircleVector->setChecked(true);
+        ui->swPointShapeDetails->setCurrentIndex(2); break;
+        break;
+    }
+
+    ui->sbPointPulses->setValue(currentConfiguration.getNumberOfPulses());
+
+    ui->sbCirclePointsRadius->setValue(currentConfiguration.getCirclePointsRadiusUm());
+    ui->sbCirclePointsNumberSides->setValue(currentConfiguration.getCirclePointsNumberOfSides());
+    ui->sbCirclePointsPulses->setValue(currentConfiguration.getCirclePointsNumberOfPulses());
+
+    ui->sbCircleVectorRadius->setValue(currentConfiguration.getCircleVectorRadiusUm());
+    ui->sbCircleVectorNumberRevolutions->setValue(currentConfiguration.getCircleVectorNumberOfRevolutions());
+    ui->sbCircleVectorNumberSides->setValue(currentConfiguration.getCircleVectorNumberOfSides());
+    ui->sbCircleVectorPointsPitch->setValue(currentConfiguration.getCircleVectorPitch());
+
+    traceExit;
+
+}
+
+void TestFrame::saveConfiguration() {
+
+    traceEnter;
+
+    Settings& s = Settings::instance();
+
+    QFileDialog fd;
+    fd.setDirectory(QDir(s.getMarkingConfigurationPath()));
+    fd.setNameFilters(QStringList("configuration (*.json)"));
+    fd.setAcceptMode(QFileDialog::AcceptSave);
+    fd.setViewMode(QFileDialog::Detail);
+    if (fd.exec() == QDialog::Accepted) {
+        QString filePath = fd.selectedFiles().at(0);
+
+        QFile file(filePath);
+
+        if (!file.open(QIODevice::ReadWrite)) {
+            traceWarn() << "Impossibile aprire il file in scrittura";
+            DialogAlert diag(this);
+            diag.setupLabels("Errore apertura file", QString("Errore nell'apertura del file %1").arg(filePath));
+            diag.exec();
+            return;
+        }
+
+        QScopedPointer<IAbstractJsonParser> parser(new ConfigurationJsonParser());
+        QByteArray res;
+        if (parser->encodeJson(&this->currentConfiguration, res) != JSON_PARSER_NO_ERROR) {
+            traceWarn() << "Errore nel parser del file";
+            DialogAlert diag;
+            diag.setupLabels("Errore parsing file", QString("Il file di configurazione non ' valido").arg(filePath));
+            diag.exec();
+            return;
+        }
+
+        file.write(res);
+    }
+
+    traceExit;
+
+}
+
+void TestFrame::loadConfiguration() {
+
+    traceEnter;
+
+    Settings& s = Settings::instance();
+
+    QFileDialog fd;
+    fd.setDirectory(QDir(s.getMarkingConfigurationPath()));
+    fd.setNameFilters(QStringList("configuration (*.json)"));
+    fd.setAcceptMode(QFileDialog::AcceptOpen);
+    fd.setViewMode(QFileDialog::Detail);
+
+    if (fd.exec() == QDialog::Accepted) {
+        QString filePath = fd.selectedFiles().at(0);
+
+        QFile file(filePath);
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            traceWarn() << "Impossibile aprire il file in lettura";
+            DialogAlert diag(this);
+            diag.setupLabels("Errore apertura file", QString("Errore nell'apertura del file %1").arg(filePath));
+            diag.exec();
+            return;
+        }
+
+        QByteArray saveData = file.readAll();
+
+        QScopedPointer<IAbstractJsonParser> parser(new ConfigurationJsonParser());
+        PrintConfiguration pc;
+        if (parser->decodeJson(saveData, &pc) != JSON_PARSER_NO_ERROR) {
+            traceWarn() << "Errore nel parser del file";
+            DialogAlert diag;
+            diag.setupLabels("Errore parsing file", QString("Il file di configurazione non ' valido").arg(filePath));
+            diag.exec();
+            return;
+        }
+
+        this->currentConfiguration = pc;
+
+        restorePrintConfiguration();
+        updatePrintConfiguration();
+    }
+
+    traceExit;
+
+}
+
 void TestFrame::setupUi() {
 
     traceEnter;
@@ -1969,43 +2210,13 @@ void TestFrame::setupSignalsAndSlots() {
 
     connect(dPtr, &TestFrameLogic::laserIpgYLPNinitializedSignal, this, &TestFrame::laserIpgYLPNConfigurationReady);
 
-//    connect(ui->tabWidget, &QTabWidget::currentChanged, [&](int index) {
+    connect(ui->tabWidget, &QTabWidget::currentChanged, [&](int index) {
+        if (index == TEST_FRAME_SAVE_LOAD_TAB_INDEX)
+            this->updatePrintConfiguration();
+    });
 
-//        if (this->laserParametersChanged) {
-//            int currentIndex = ui->tabWidget->currentIndex();
-//            if ((currentIndex == 1) && (index != 1)) {
-
-
-//                DialogAlert diag;
-//                diag.setupLabels("Warning", "Se non si impostano i parametri del laser, verranno ripristinati gli ultimi salvati. Continuare?");
-
-//                if (diag.exec() == QDialog::Accepted) {
-
-//                    IpgYLPNLaserConfiguration& laserConfiguration = IpgYLPNLaserConfiguration::instance();
-//                    int laserPower = qRound(laserConfiguration.getCurrentPower());
-//                    this->ui->hsLaserPower->setValue(laserPower);
-//                    ui->sbLaserPower->setValue(laserPower);
-
-//                    int currentModeIndex = laserConfiguration.getCurrentModeIndex();
-//                    int currentFrequency = laserConfiguration.getCurrentFrequency();
-//                    ui->sbLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
-//                    ui->sbLaserFrequency->setValue(currentFrequency);
-
-//                    ui->hsLaserFrequency->setRange(laserConfiguration.getMode(currentModeIndex).minFrequency, laserConfiguration.getMode(currentModeIndex).maxFrequency);
-//                    ui->hsLaserFrequency->setValue(currentFrequency);
-
-//                    laserParametersChanged = false;
-//                    this->updateTabUiLaserChanged(false);
-
-//                } else {
-
-//                    ui->tabWidget->setCurrentIndex(1);
-
-//                }
-//            }
-//        }
-
-//    });
+    connect(ui->pbSave, &QPushButton::clicked, this, &TestFrame::saveConfiguration);
+    connect(ui->pbLoad, &QPushButton::clicked, this, &TestFrame::loadConfiguration);
 
     traceExit;
 
@@ -2075,6 +2286,7 @@ bool TestFrame::eventFilter(QObject* object, QEvent* event) {
                     }
 
                 }
+
             }
 
         }
@@ -2082,5 +2294,243 @@ bool TestFrame::eventFilter(QObject* object, QEvent* event) {
     }
 
     return QFrame::eventFilter(object, event);
+
+}
+
+JsonParserError ConfigurationJsonParser::encodeJson(PrintConfiguration::ConstPtr obj, QByteArray& output) {
+
+    QJsonDocument doc;
+    QJsonObject jsonObj;
+
+    jsonObj[CONFIGURATION_JSON_TILE_SIZE_MM_KEY] = obj->getTileSizeMm();
+    jsonObj[CONFIGURATION_JSON_ANGLE_MRAD_KEY] = obj->getAngleMRad();
+    jsonObj[CONFIGURATION_JSON_OFFSET_X_MM_KEY] = obj->getOffsetXmm();
+    jsonObj[CONFIGURATION_JSON_OFFSET_Y_MM_KEY] = obj->getOffsetYmm();
+    jsonObj[CONFIGURATION_JSON_TILE_SCALE_X_PERCENT_KEY] = obj->getTileScaleXPercent();
+    jsonObj[CONFIGURATION_JSON_TILE_SCALE_Y_PERCENT_KEY] = obj->getTileScaleYPercent();
+    jsonObj[CONFIGURATION_JSON_WAIT_TIME_MS_KEY] = obj->getWaitTimeMs();
+    jsonObj[CONFIGURATION_JSON_WAIT_TIME_AFTER_Y_MOVEMENT_MS_KEY] = obj->getWaitTimeAfterYMovementMs();
+    jsonObj[CONFIGURATION_JSON_LASER_FREQUENCY_KEY] = obj->getLaserFrequency();
+    jsonObj[CONFIGURATION_JSON_IS_RANDOM_ALGORITHM_KEY] = obj->getIsRandomAlgorithm();
+    jsonObj[CONFIGURATION_JSON_IS_NEIGHBORHOOD_ALGORITHM_KEY] = obj->getIsNeighborhoodAlgorithm();
+    jsonObj[CONFIGURATION_JSON_RANDOM_POINTS_PER_TILE_KEY] = obj->getRandomPointsPerTile();
+    jsonObj[CONFIGURATION_JSON_RANDOM_IS_SHUFFLE_ROW_TILES_KEY] = obj->getRandomIsShuffleRowTiles();
+    jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_MIN_DISTANCE_UM_KEY] = obj->getNeighborhoodMinDistanceUm();
+    jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_STACKED_TILES_KEY] = obj->getNeighborhoodIsShuffleStackedTiles();
+    jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_ROW_TILES_KEY] = obj->getNeighborhoodIsShuffleRowTiles();
+    jsonObj[CONFIGURATION_JSON_POINT_SHAPE_KEY] = getStringFromPointShapeEnum(obj->getPointShape());
+    jsonObj[CONFIGURATION_JSON_NUMBER_OF_PULSES_KEY] = obj->getNumberOfPulses();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_POINTS_RADIUS_UM_KEY] = obj->getCirclePointsRadiusUm();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_POINTS_NUMBER_OF_SIDES_KEY] = obj->getCirclePointsNumberOfSides();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_POINTS_NUMBER_OF_PULSES_KEY] = obj->getCirclePointsNumberOfPulses();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_VECTOR_RADIUS_UM_KEY] = obj->getCircleVectorRadiusUm();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_VECTOR_NUMBER_OF_REVOLUTIONS_KEY] = obj->getCircleVectorNumberOfRevolutions();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_VECTOR_NUMBER_OF_SIDES_KEY] = obj->getCircleVectorNumberOfSides();
+    jsonObj[CONFIGURATION_JSON_CIRCLE_VECTOR_PITCH_KEY] = obj->getCircleVectorPitch();
+
+    doc.setObject(jsonObj);
+
+    output = doc.toJson();
+
+    return JSON_PARSER_NO_ERROR;
+
+}
+
+JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, PrintConfiguration::Ptr obj) {
+
+    traceEnter;
+    QJsonDocument doc = QJsonDocument::fromJson(input);
+    if (doc.isNull()) {
+        traceErr() << "Errore nella chiamata fromJson";
+        return JSON_PARSER_ERROR_DOCUMENT_PARSER;
+    }
+
+    QJsonObject jsonObj = doc.object();
+
+    QJsonValue tileSizeMm = jsonObj.value(CONFIGURATION_JSON_TILE_SIZE_MM_KEY);
+    if (tileSizeMm.isUndefined()) {
+        traceErr() << "Chiave tileSizeMm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue angleMRad = jsonObj.value(CONFIGURATION_JSON_ANGLE_MRAD_KEY);
+    if (angleMRad.isUndefined()) {
+        traceErr() << "Chiave angleMRad non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue offsetXmm = jsonObj.value(CONFIGURATION_JSON_OFFSET_X_MM_KEY);
+    if (offsetXmm.isUndefined()) {
+        traceErr() << "Chiave offsetXmm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue offsetYmm = jsonObj.value(CONFIGURATION_JSON_OFFSET_Y_MM_KEY);
+    if (offsetYmm.isUndefined()) {
+        traceErr() << "Chiave offsetYmm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue tileScaleXPercent = jsonObj.value(CONFIGURATION_JSON_TILE_SCALE_X_PERCENT_KEY);
+    if (tileScaleXPercent.isUndefined()) {
+        traceErr() << "Chiave tileScaleXPercent non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue tileScaleYPercent = jsonObj.value(CONFIGURATION_JSON_TILE_SCALE_Y_PERCENT_KEY);
+    if (tileScaleYPercent.isUndefined()) {
+        traceErr() << "Chiave tileScaleYPercent non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue waitTimeMs = jsonObj.value(CONFIGURATION_JSON_WAIT_TIME_MS_KEY);
+    if (waitTimeMs.isUndefined()) {
+        traceErr() << "Chiave waitTimeMs non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue waitTimeAfterYMovementMs = jsonObj.value(CONFIGURATION_JSON_WAIT_TIME_AFTER_Y_MOVEMENT_MS_KEY);
+    if (waitTimeAfterYMovementMs.isUndefined()) {
+        traceErr() << "Chiave waitTimeAfterYMovementMs non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue laserFrequency = jsonObj.value(CONFIGURATION_JSON_LASER_FREQUENCY_KEY);
+    if (laserFrequency.isUndefined()) {
+        traceErr() << "Chiave laserFrequency non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue isRandomAlgorithm = jsonObj.value(CONFIGURATION_JSON_IS_RANDOM_ALGORITHM_KEY);
+    if (isRandomAlgorithm.isUndefined()) {
+        traceErr() << "Chiave isRandomAlgorithm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue isNeighborhoodAlgorithm = jsonObj.value(CONFIGURATION_JSON_IS_NEIGHBORHOOD_ALGORITHM_KEY);
+    if (isNeighborhoodAlgorithm.isUndefined()) {
+        traceErr() << "Chiave isNeighborhoodAlgorithm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue randomPointsPerTile = jsonObj.value(CONFIGURATION_JSON_RANDOM_POINTS_PER_TILE_KEY);
+    if (randomPointsPerTile.isUndefined()) {
+        traceErr() << "Chiave randomPointsPerTile non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue randomIsShuffleRowTiles = jsonObj.value(CONFIGURATION_JSON_RANDOM_IS_SHUFFLE_ROW_TILES_KEY);
+    if (randomIsShuffleRowTiles.isUndefined()) {
+        traceErr() << "Chiave randomIsShuffleRowTiles non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue neighborhoodMinDistanceUm = jsonObj.value(CONFIGURATION_JSON_NEIGHBORHOOD_MIN_DISTANCE_UM_KEY);
+    if (neighborhoodMinDistanceUm.isUndefined()) {
+        traceErr() << "Chiave neighborhoodMinDistanceUm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue neighborhoodIsShuffleStackedTiles = jsonObj.value(CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_STACKED_TILES_KEY);
+    if (neighborhoodIsShuffleStackedTiles.isUndefined()) {
+        traceErr() << "Chiave neighborhoodIsShuffleStackedTiles non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue neighborhoodIsShuffleRowTiles = jsonObj.value(CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_ROW_TILES_KEY);
+    if (neighborhoodIsShuffleRowTiles.isUndefined()) {
+        traceErr() << "Chiave neighborhoodIsShuffleRowTiles non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue pointShape = jsonObj.value(CONFIGURATION_JSON_POINT_SHAPE_KEY);
+    if (pointShape.isUndefined()) {
+        traceErr() << "Chiave pointShape non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue numberOfPulses = jsonObj.value(CONFIGURATION_JSON_NUMBER_OF_PULSES_KEY);
+    if (numberOfPulses.isUndefined()) {
+        traceErr() << "Chiave numberOfPulses non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circlePointsRadiusUm = jsonObj.value(CONFIGURATION_JSON_CIRCLE_POINTS_RADIUS_UM_KEY);
+    if (circlePointsRadiusUm.isUndefined()) {
+        traceErr() << "Chiave circlePointsRadiusUm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circlePointsNumberOfSides = jsonObj.value(CONFIGURATION_JSON_CIRCLE_POINTS_NUMBER_OF_SIDES_KEY);
+    if (circlePointsNumberOfSides.isUndefined()) {
+        traceErr() << "Chiave circlePointsNumberOfSides non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circlePointsNumberOfPulses = jsonObj.value(CONFIGURATION_JSON_CIRCLE_POINTS_NUMBER_OF_PULSES_KEY);
+    if (circlePointsNumberOfPulses.isUndefined()) {
+        traceErr() << "Chiave circlePointsNumberOfPulses non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circleVectorRadiusUm = jsonObj.value(CONFIGURATION_JSON_CIRCLE_VECTOR_RADIUS_UM_KEY);
+    if (circleVectorRadiusUm.isUndefined()) {
+        traceErr() << "Chiave circleVectorRadiusUm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circleVectorNumberOfRevolutions = jsonObj.value(CONFIGURATION_JSON_CIRCLE_VECTOR_NUMBER_OF_REVOLUTIONS_KEY);
+    if (circleVectorNumberOfRevolutions.isUndefined()) {
+        traceErr() << "Chiave circleVectorNumberOfRevolutions non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circleVectorNumberOfSides = jsonObj.value(CONFIGURATION_JSON_CIRCLE_VECTOR_NUMBER_OF_SIDES_KEY);
+    if (circleVectorNumberOfSides.isUndefined()) {
+        traceErr() << "Chiave circleVectorNumberOfSides non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue circleVectorPitch = jsonObj.value(CONFIGURATION_JSON_CIRCLE_VECTOR_PITCH_KEY);
+    if (circleVectorPitch.isUndefined()) {
+        traceErr() << "Chiave circleVectorPitch non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    obj->setTileSizeMm(tileSizeMm.toInt());
+    obj->setAngleMRad(angleMRad.toDouble());
+    obj->setOffsetXmm(offsetXmm.toDouble());
+    obj->setOffsetYmm(offsetYmm.toDouble());
+    obj->setTileScaleXPercent(tileScaleXPercent.toDouble());
+    obj->setTileScaleYPercent(tileScaleYPercent.toDouble());
+    obj->setWaitTimeMs(waitTimeMs.toInt());
+    obj->setWaitTimeAfterYMovementMs(waitTimeAfterYMovementMs.toInt());
+    obj->setLaserFrequency(laserFrequency.toInt());
+
+    obj->setIsRandomAlgorithm(isRandomAlgorithm.toBool());
+    obj->setIsNeighborhoodAlgorithm(isNeighborhoodAlgorithm.toBool());
+
+    obj->setRandomPointsPerTile(randomPointsPerTile.toInt());
+    obj->setRandomIsShuffleRowTiles(randomIsShuffleRowTiles.toBool());
+
+    obj->setNeighborhoodMinDistanceUm(neighborhoodMinDistanceUm.toInt());
+    obj->setNeighborhoodIsShuffleStackedTiles(neighborhoodIsShuffleStackedTiles.toBool());
+    obj->setNeighborhoodIsShuffleRowTiles(neighborhoodIsShuffleRowTiles.toBool());
+
+    obj->setPointShape(getPointShapeEnumFromString(pointShape.toString()));
+
+    obj->setNumberOfPulses(numberOfPulses.toInt());
+
+    obj->setCirclePointsRadiusUm(circlePointsRadiusUm.toInt());
+    obj->setCirclePointsNumberOfSides(circlePointsNumberOfSides.toInt());
+    obj->setCirclePointsNumberOfPulses(circlePointsNumberOfPulses.toInt());
+
+    obj->setCircleVectorRadiusUm(circleVectorRadiusUm.toInt());
+    obj->setCircleVectorNumberOfRevolutions(circleVectorNumberOfRevolutions.toInt());
+    obj->setCircleVectorNumberOfSides(circleVectorNumberOfSides.toInt());
+    obj->setCircleVectorPitch(circleVectorPitch.toInt());
+
+    traceExit;
+    return JSON_PARSER_NO_ERROR;
 
 }

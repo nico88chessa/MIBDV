@@ -13,7 +13,7 @@
     border: none;
     padding: 0px 24px;
     background-clip: padding;
-    border-bottom: 4px solid qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255,0,0,255), stop:0.7 rgba(255,0,0,50));
+    /*border-bottom: 4px solid qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255,0,0,255), stop:0.7 rgba(255,0,0,50));*/
 }
 
 #top > QPushButton {
@@ -28,6 +28,22 @@
     min-height: 24px;
     max-height: 24px;
     font-size: 16px;
+}
+
+#top #pbErrorState[ErrorType="FATAL"] {
+    qproperty-icon: url(":/icons/black-theme/fatal");
+}
+
+#top #pbErrorState[ErrorType="ERROR"] {
+    qproperty-icon: url(":/icons/black-theme/error");
+}
+
+#top #pbErrorState[ErrorType="WARNING"] {
+    qproperty-icon: url(":/icons/black-theme/warning");
+}
+
+#top #pbErrorState[ErrorType="INFO"] {
+    qproperty-icon: url(":/icons/black-theme/status_ok");
 }
 
 #lTitle {
@@ -289,4 +305,38 @@ MDFileExplorerWidget {
     padding: 20px 0px 8px;
     qproperty-labelX: 14;
     qproperty-labelY: 15;
+}
+
+.TestFrame #pbSave,
+.TestFrame #pbLoad {
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    border-radius: 28px;
+    padding: 0px;
+    qproperty-iconSize: 28px;
+}
+
+.TestFrame #pbSave,
+.TestFrame #pbLoad {
+    background-color: rgba(10, 10, 10, 20%);
+}
+
+.TestFrame #pbSave:pressed,
+.TestFrame #pbLoad:pressed {
+    background-color: rgba(10, 100, 100, 80%);
+}
+
+.TestFrame #pbSave {
+
+    qproperty-icon: url(:/icons/black-theme/save);
+}
+
+.TestFrame #pbLoad {
+    qproperty-icon: url(:/icons/black-theme/load);
+}
+
+.TestFrame #lConfigurationDetail {
+    font-size: 13px;
 }

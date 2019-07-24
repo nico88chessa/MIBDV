@@ -25,6 +25,8 @@
         <file alias="warning">icons/black-theme/baseline_warning_black_24dp.png</file>
         <file alias="fatal">icons/black-theme/baseline_sentiment_very_dissatisfied_black_24dp.png</file>
         <file alias="status_ok">icons/black-theme/baseline_sentiment_very_satisfied_black_24dp.png</file>
+        <file alias="save">icons/black-theme/baseline_save_black_24dp.png</file>
+        <file alias="load">icons/black-theme/baseline_unarchive_black_24dp.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Roboto-Black">fonts/Roboto-Black.ttf</file>

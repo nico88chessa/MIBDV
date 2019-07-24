@@ -27,116 +27,6 @@ enum class PrintCommandExecuted : int {
     PRINT_LOOP
 };
 
-class PrintConfiguration {
-private:
-    // percorso file
-    QString filePath;
-
-    // setup movimentazione
-    int tileSizeMm;
-    double angleMRad;
-    double offsetXmm;
-    double offsetYmm;
-    float tileScaleXPercent;
-    float tileScaleYPercent;
-    int waitTimeMs;
-    int waitTimeAfterYMovementMs;
-    int laserFrequency;
-
-    // scelta algoritmo
-    bool isRandomAlgorithm;
-    bool isNeighborhoodAlgorithm;
-
-    // configurazione random
-    int randomPointsPerTile;
-    bool randomIsShuffleRowTiles;
-
-    // configurazione neighborhood
-    int neighborhoodMinDistanceUm;
-    bool neighborhoodIsShuffleStackedTiles;
-    bool neighborhoodIsShuffleRowTiles;
-
-    // scelta del punto di stampa
-    PointShapeEnum pointShape;
-
-    // point
-    int numberOfPulses;
-
-    // circle points
-    int circlePointsRadiusUm;
-    int circlePointsNumberOfSides;
-    int circlePointsNumberOfPulses;
-
-    // circle vector
-    int circleVectorRadiusUm;
-    int circleVectorNumberOfRevolutions;
-    int circleVectorNumberOfSides;
-    int circleVectorPitch;
-
-public:
-    QString getFilePath() const { return filePath; }
-    void setFilePath(const QString& value) { filePath = value; }
-
-    int getTileSizeMm() const { return tileSizeMm; }
-    void setTileSizeMm(int value) { tileSizeMm = value; }
-    double getAngleMRad() const { return angleMRad; }
-    void setAngleMRad(double value) { angleMRad = value; }
-    double getOffsetXmm() const { return offsetXmm; }
-    void setOffsetXmm(double value) { offsetXmm = value; }
-    double getOffsetYmm() const { return offsetYmm; }
-    void setOffsetYmm(double value) { offsetYmm = value; }
-    float getTileScaleXPercent() const { return tileScaleXPercent; }
-    void setTileScaleXPercent(float value) { tileScaleXPercent = value; }
-    float getTileScaleYPercent() const { return tileScaleYPercent; }
-    void setTileScaleYPercent(float value) { tileScaleYPercent = value; }
-    int getWaitTimeMs() const { return waitTimeMs; }
-    void setWaitTimeMs(int value) { waitTimeMs = value; }
-    int getWaitTimeAfterYMovementMs() const { return waitTimeAfterYMovementMs; }
-    void setWaitTimeAfterYMovementMs(int value) { waitTimeAfterYMovementMs = value; }
-    int getLaserFrequency() const { return laserFrequency; }
-    void setLaserFrequency(int value) { laserFrequency = value; }
-
-    bool getIsRandomAlgorithm() const { return isRandomAlgorithm; }
-    void setIsRandomAlgorithm(bool value) { isRandomAlgorithm = value; }
-    bool getIsNeighborhoodAlgorithm() const { return isNeighborhoodAlgorithm; }
-    void setIsNeighborhoodAlgorithm(bool value) { isNeighborhoodAlgorithm = value; }
-
-    int getRandomPointsPerTile() const { return randomPointsPerTile; }
-    void setRandomPointsPerTile(int value) { randomPointsPerTile = value; }
-    bool getRandomIsShuffleRowTiles() const { return randomIsShuffleRowTiles; }
-    void setRandomIsShuffleRowTiles(bool value) { randomIsShuffleRowTiles = value; }
-
-    int getNeighborhoodMinDistanceUm() const { return neighborhoodMinDistanceUm; }
-    void setNeighborhoodMinDistanceUm(int value) { neighborhoodMinDistanceUm = value; }
-    bool getNeighborhoodIsShuffleStackedTiles() const { return neighborhoodIsShuffleStackedTiles; }
-    void setNeighborhoodIsShuffleStackedTiles(bool value) { neighborhoodIsShuffleStackedTiles = value; }
-    bool getNeighborhoodIsShuffleRowTiles() const { return neighborhoodIsShuffleRowTiles; }
-    void setNeighborhoodIsShuffleRowTiles(bool value) { neighborhoodIsShuffleRowTiles = value; }
-
-    PointShapeEnum getPointShape() const { return pointShape; }
-    void setPointShape(const PointShapeEnum& value) { pointShape = value; }
-
-    int getNumberOfPulses() const { return numberOfPulses; }
-    void setNumberOfPulses(int value) { numberOfPulses = value; }
-
-    int getCirclePointsRadiusUm() const { return circlePointsRadiusUm; }
-    void setCirclePointsRadiusUm(int value) { circlePointsRadiusUm = value; }
-    int getCirclePointsNumberOfSides() const { return circlePointsNumberOfSides; }
-    void setCirclePointsNumberOfSides(int value) { circlePointsNumberOfSides = value; }
-    int getCirclePointsNumberOfPulses() const { return circlePointsNumberOfPulses; }
-    void setCirclePointsNumberOfPulses(int value) { circlePointsNumberOfPulses = value; }
-
-    int getCircleVectorRadiusUm() const { return circleVectorRadiusUm; }
-    void setCircleVectorRadiusUm(int value) { circleVectorRadiusUm = value; }
-    int getCircleVectorNumberOfRevolutions() const { return circleVectorNumberOfRevolutions; }
-    void setCircleVectorNumberOfRevolutions(int value) { circleVectorNumberOfRevolutions = value; }
-    int getCircleVectorNumberOfSides() const { return circleVectorNumberOfSides; }
-    void setCircleVectorNumberOfSides(int value) { circleVectorNumberOfSides = value; }
-    int getCircleVectorPitch() const { return circleVectorPitch; }
-    void setCircleVectorPitch(int value) { circleVectorPitch = value; }
-
-};
-
 class Worker : public QObject {
     Q_OBJECT
 
@@ -172,7 +62,7 @@ public:
     void setPrintConfiguration(const PrintConfiguration& value) { printConfiguration = value; }
 
 private:
-    void setupSignalsAndSlot();
+    void setupSignalsAndSlots();
     inline void updateLastCommandExecute(PrintCommandExecuted c) { this->commandsExecuted = c; }
 
 public slots:

@@ -2,6 +2,8 @@
 #include "ui_MainWindow.h"
 #include <QMetaObject>
 
+//#include <QGraphicsDropShadowEffect>
+
 #include <QFile>
 #include <Logger.hpp>
 #include <gui/resources/lang/lang.hpp>
@@ -10,10 +12,19 @@
 
 
 static constexpr int MAINWINDOW_ITEM_ALERT_POSITION = 0;
-static constexpr char MAINWINDOW_FATAL_ICON_PATH[] = ":/icons/black-theme/fatal";
-static constexpr char MAINWINDOW_ERROR_ICON_PATH[] = ":/icons/black-theme/error";
-static constexpr char MAINWINDOW_WARNING_ICON_PATH[] = ":/icons/black-theme/warning";
-static constexpr char MAINWINDOW_STATUS_OK_ICON_PATH[] = ":/icons/black-theme/status_ok";
+
+static constexpr char MAINWINDOW_MDCUSTOMITEM_ALERT_OBJECT_NAME[] = "alertItem";
+static constexpr char MAINWINDOW_MDCUSTOMITEM_IO_OBJECT_NAME[] = "ioItem";
+static constexpr char MAINWINDOW_MDCUSTOMITEM_MOTION_OBJECT_NAME[] = "motionItem";
+static constexpr char MAINWINDOW_MDCUSTOMITEM_FORI_OBJECT_NAME[] = "foriItem";
+static constexpr char MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER_OBJECT_NAME[] = "fileExplorerItem";
+
+static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY[] = "ErrorType";
+static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_FATAL[] = "FATAL";
+static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_ERROR[] = "ERROR";
+static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_WARNING[] = "WARNING";
+static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_INFO[] = "INFO";
+
 
 using namespace PROGRAM_NAMESPACE;
 
@@ -49,6 +60,12 @@ void MainWindow::setupUi() {
     traceEnter;
 
     ui->setupUi(this);
+
+//    QGraphicsDropShadowEffect* dse = new QGraphicsDropShadowEffect(ui->top);
+//    dse->setBlurRadius(20);
+//    dse->setEnabled(true);
+//    dse->setOffset(0, 0);
+//    ui->top->setGraphicsEffect(dse);
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
@@ -89,11 +106,13 @@ void MainWindow::setupSignalsAndSlots() const {
     QWeakPointer<ErrorManager> errorManager = DeviceFactoryInstance.getErrorManager();
     connect(errorManager.data(), &ErrorManager::notifyMaxErrorType, this, [&](const ErrorType& errType) {
         switch (errType) {
-        case ErrorType::INFO: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_STATUS_OK_ICON_PATH)); break;
-        case ErrorType::WARNING: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_WARNING_ICON_PATH)); break;
-        case ErrorType::ERROR: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_ERROR_ICON_PATH)); break;
-        case ErrorType::FATAL: ui->pbErrorState->setIcon(QIcon(MAINWINDOW_FATAL_ICON_PATH)); break;
+        case ErrorType::INFO: ui->pbErrorState->setProperty(MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY, MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_INFO); break;
+        case ErrorType::WARNING: ui->pbErrorState->setProperty(MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY, MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_WARNING); break;
+        case ErrorType::ERROR: ui->pbErrorState->setProperty(MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY, MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_ERROR); break;
+        case ErrorType::FATAL: ui->pbErrorState->setProperty(MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY, MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_FATAL); break;
         }
+        ui->pbErrorState->style()->unpolish(ui->pbErrorState);
+        ui->pbErrorState->style()->polish(ui->pbErrorState);
     }, Qt::AutoConnection);
 
     connect(ui->pbErrorState, &QPushButton::clicked, [&]() {
@@ -130,9 +149,18 @@ void MainWindow::setupUiPanels() {
 
     traceEnter;
 
+    setupUiTopPanel();
     setupUiLeftPanel();
     setupUiContentPanel();
 
+    traceExit;
+
+}
+
+void MainWindow::setupUiTopPanel() {
+
+    traceEnter;
+    // nothing to do
     traceExit;
 
 }
@@ -141,11 +169,26 @@ void MainWindow::setupUiLeftPanel() {
 
     traceEnter;
 
-    MDCustomItem::Ptr alert = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_ALERT, ":/icons/black-theme/add_alert");
-    MDCustomItem::Ptr io = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_IO, ":/icons/black-theme/input");
-    MDCustomItem::Ptr motion = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_MOTION, ":icons/black-theme/pan_tool");
-    MDCustomItem::Ptr fori = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_TEST_FORI, ":icons/black-theme/pan_tool");
-    MDCustomItem::Ptr fileExplorer = new MDCustomItem(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER, ":/icons/black-theme/add_alert");
+    MDCustomItem::Ptr alert = new MDCustomItem;
+    alert->setObjectName(MAINWINDOW_MDCUSTOMITEM_ALERT_OBJECT_NAME);
+    alert->setText(MAINWINDOW_MDCUSTOMITEM_ALERT);
+
+    MDCustomItem::Ptr io = new MDCustomItem;
+    io->setObjectName(MAINWINDOW_MDCUSTOMITEM_IO_OBJECT_NAME);
+    io->setText(MAINWINDOW_MDCUSTOMITEM_IO);
+
+    MDCustomItem::Ptr motion = new MDCustomItem;
+    motion->setObjectName(MAINWINDOW_MDCUSTOMITEM_MOTION_OBJECT_NAME);
+    motion->setText(MAINWINDOW_MDCUSTOMITEM_MOTION);
+
+    MDCustomItem::Ptr fori = new MDCustomItem;
+    fori->setObjectName(MAINWINDOW_MDCUSTOMITEM_FORI_OBJECT_NAME);
+    fori->setText(MAINWINDOW_MDCUSTOMITEM_TEST_FORI);
+
+    MDCustomItem::Ptr fileExplorer = new MDCustomItem;
+    fileExplorer->setObjectName(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER_OBJECT_NAME);
+    fileExplorer->setText(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER);
+
 
     QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
     QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);

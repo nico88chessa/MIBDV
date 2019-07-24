@@ -26,12 +26,13 @@ MDListWidget::MDListWidget(QWidget* parent) : QListWidget(parent) {
 
 
 MDCustomItem::MDCustomItem(QWidget* parent) :
-    QLabel(parent) {
+    MDCustomItem("", "", parent) { }
 
-}
+MDCustomItem::MDCustomItem(const QString& text, QWidget* parent) :
+    MDCustomItem(text, "", parent) { }
 
-MDCustomItem::MDCustomItem(const QString& text, const QString& iconPath) :
-    QLabel(text), iconPath(iconPath) { }
+MDCustomItem::MDCustomItem(const QString& text, const QString& iconPath, QWidget* parent) :
+    QLabel(text, parent), iconPath(iconPath) { }
 
 QString MDCustomItem::getIconPath() const { return iconPath; }
 

@@ -122,6 +122,7 @@ public:
     quint16 getIpgYLPNLaserPort() const { return ipgYLPNLaserPort; }
     void setIpgYLPNLaserPort(const quint16& value) { ipgYLPNLaserPort = value; }
     QString getUiSpoolPath() const { return uiSpoolPath; }
+    QString getMarkingConfigurationPath() const { return markingConfigurationPath; }
 
 private:
     // ASSE X
@@ -184,6 +185,7 @@ private:
 
     // UI
     QString uiSpoolPath;
+    QString markingConfigurationPath;
 
     // GALIL CN PARAMETERS
     int galilCNConnectionTimeoutMs;
