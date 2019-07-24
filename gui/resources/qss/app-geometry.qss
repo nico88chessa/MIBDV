@@ -30,6 +30,22 @@
     font-size: 16px;
 }
 
+#top #pbErrorState[ErrorType="FATAL"] {
+    qproperty-icon: url(":/icons/black-theme/fatal");
+}
+
+#top #pbErrorState[ErrorType="ERROR"] {
+    qproperty-icon: url(":/icons/black-theme/error");
+}
+
+#top #pbErrorState[ErrorType="WARNING"] {
+    qproperty-icon: url(":/icons/black-theme/warning");
+}
+
+#top #pbErrorState[ErrorType="INFO"] {
+    qproperty-icon: url(":/icons/black-theme/status_ok");
+}
+
 #lTitle {
     padding: 0px 0px 0px 0px;
     padding-bottom: 14px;
@@ -196,6 +212,11 @@ QTabWidget {
 
 .FileExplorerFrame #content {
     border: none;
+}
+
+.FileExplorerFrame #bottom {
+    min-height: 48px;
+    max-height: 48px;
 }
 
 .FileExplorerFrame #lvExplorer {

@@ -19,6 +19,7 @@ static constexpr char LOG_PATH[] = "@LOG_PATH@";
 static constexpr char STYLESHEET_PATH[] = "@STYLESHEET_PATH@/";
 
 static constexpr char SPOOL_PATH_DFLT[] = "@SPOOL_PATH_DFLT@";
+static constexpr char MARKING_CONFIGURATION_PATH_DFLT[] = "@MARKING_CONFIGURATION_PATH_DFLT@";
 
 static constexpr int MAX_NUM_LOG_FILES = 5;
 

@@ -3,6 +3,7 @@
 
 #include <Logger.hpp>
 
+
 using namespace PROGRAM_NAMESPACE;
 
 DialogAlert::DialogAlert(QWidget *parent) :
@@ -25,7 +26,7 @@ void DialogAlert::setupUi() {
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
-
+    this->setWindowModality(Qt::ApplicationModal);
     this->setModal(true);
 
 }

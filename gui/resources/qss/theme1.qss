@@ -357,6 +357,26 @@ MDListWidget::item:selected {
     background-color: green;
 }
 
+.MDListWidget MDCustomItem[objectName="alertItem"] {
+    qproperty-iconPath: url(:/icons/black-theme/add_alert);
+}
+
+.MDListWidget MDCustomItem[objectName="ioItem"] {
+    qproperty-iconPath: url(:/icons/black-theme/input);
+}
+
+.MDListWidget MDCustomItem[objectName="motionItem"] {
+    qproperty-iconPath: url(:/icons/black-theme/pan_tool);
+}
+
+.MDListWidget MDCustomItem[objectName="foriItem"] {
+    qproperty-iconPath: url(:/icons/black-theme/pan_tool);
+}
+
+.MDListWidget MDCustomItem[objectName="fileExplorerItem"] {
+    qproperty-iconPath: url(:/icons/black-theme/add_alert);
+}
+
 
 
 /*
@@ -491,7 +511,7 @@ QTreeView::branch {
     qproperty-infoIcon: url(:/icons/black-theme/info);
     qproperty-warningIcon: url(:/icons/black-theme/warning);
     qproperty-errorIcon: url(:/icons/black-theme/error);
-    qproperty-fatalIcon: url(:/icons/black-theme/critical);
+    qproperty-fatalIcon: url(:/icons/black-theme/fatal);
 }
 
 .ErrorItemWidget[focusCustom="true"],
@@ -521,4 +541,14 @@ QTreeView::branch {
 .ErrorItemWidget[isFatal="true"] {
     color: rgba(255,255,255);
     background-color: rgba(66,66,66);
+}
+
+
+
+/*
+ * D I A L O G   A L E R T
+ */
+
+DialogAlert {
+    background-color: white;
 }

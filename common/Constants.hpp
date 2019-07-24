@@ -153,8 +153,10 @@ constexpr int MACHINE_IO_REFRESH_INTERVAL_MS_DFLT = 1000;
 
 constexpr char UI_PREFIX[] = "Ui";
 constexpr char UI_SPOOL_PATH[] = "Ui/SpoolPath";
+constexpr char UI_MARKING_CONFIGURATION_PATH[] = "Ui/MarkingConfigurationPath";
 
 constexpr const char* UI_SPOOL_PATH_DFLT = PROGRAM_NAMESPACE::SPOOL_PATH_DFLT;
+constexpr const char* UI_MARKING_CONFIGURATION_PATH_DFLT = PROGRAM_NAMESPACE::MARKING_CONFIGURATION_PATH_DFLT;
 
 constexpr char GALIL_CN_PREFIX[] = "GalilCN";
 constexpr char GALIL_CN_CONNECTION_TIMEOUT_MS[] = "GalilCN/ConnectionTimeoutMs";

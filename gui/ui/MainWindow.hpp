@@ -27,6 +27,7 @@ private:
     void setupUi();
     void setupSignalsAndSlots() const;
     void setupUiPanels();
+    void setupUiTopPanel();
     void setupUiLeftPanel();
     void setupUiContentPanel();
 

@@ -217,6 +217,7 @@ void Settings::loadValuesFromFile() {
     }
 
     uiSpoolPath = settings.value(UI_SPOOL_PATH, UI_SPOOL_PATH_DFLT).value<QString>();
+    markingConfigurationPath = settings.value(UI_MARKING_CONFIGURATION_PATH, UI_MARKING_CONFIGURATION_PATH_DFLT).value<QString>();
 
     traceDebug() << "axisXStepPerMm:" << axisXStepPerMm;
     traceDebug() << "axisXMinPosMm:" << axisXMinPosMm;
@@ -395,6 +396,7 @@ void Settings::writeValuesToFile() {
         settings.remove(GALIL_PLC_PREFIX);
 
     settings.setValue(UI_SPOOL_PATH, uiSpoolPath);
+    settings.setValue(UI_MARKING_CONFIGURATION_PATH, markingConfigurationPath);
 
     settings.sync();
 
