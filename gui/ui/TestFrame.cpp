@@ -25,6 +25,7 @@
 #include <DeviceFactory.hpp>
 #include <MotionAnalizer.hpp>
 #include <IOSignaler.hpp>
+#include <ErrorHandler.hpp>
 #include <Types.hpp>
 #include <json/FilterJsonParser.hpp>
 #include <core/image-processor/RowTileProcessor.hpp>
@@ -41,7 +42,7 @@ static constexpr const char* ROWTILE_PROCESSOR_THREAD_NAME = "ROW_TILE_PROCESSOR
  */
 
 Worker::Worker(QObject* parent) : QObject(parent), printConfiguration(),
-    hasToStop(false), commandsExecuted(PrintCommandExecuted::IDLE) {
+    hasToStop(false), hasErrors(false), commandsExecuted(PrintCommandExecuted::IDLE) {
     this->setupSignalsAndSlots();
 }
 
@@ -54,11 +55,40 @@ void Worker::setupSignalsAndSlots() {
         if (!fileProcessorThread.isNull())
             fileProcessorThread->stop();
     });
+
+    connect(this, &Worker::hasFatalsSignal, [&](QList<Error> errors) {
+        traceErr() << "Rilevato errori";
+        for (auto&& e: errors) {
+            if (!errorList.contains(e))
+                errorList.append(e);
+            traceErr() << "Device:" << Utils::getStringFromDeviceKey(e.getDeviceKey());
+            traceErr() << "Error id:" << e.getErrorId();
+            traceErr() << "Error type:" << static_cast<int>(e.getErrorType());
+            traceErr() << "Error Description:" << e.getErrorDescription();
+        }
+        hasErrors = true;
+        emit errorsSignal();
+    });
+
+    connect(this, &Worker::hasErrorsSignal, [&](QList<Error> errors) {
+        traceErr() << "Rilevato errori";
+        for (auto&& e: errors) {
+            if (!errorList.contains(e))
+                errorList.append(e);
+            traceErr() << "Device:" << Utils::getStringFromDeviceKey(e.getDeviceKey());
+            traceErr() << "Error id:" << e.getErrorId();
+            traceErr() << "Error type:" << static_cast<int>(e.getErrorType());
+            traceErr() << "Error Description:" << e.getErrorDescription();
+        }
+        hasErrors = true;
+        emit errorsSignal();
+    });
+
     traceExit;
 
 }
 
-void Worker::startJob() {
+void Worker::startProcess() {
 
     QString format = "dd/MM/yyyy - HH:mm:ss";
     QString startTime = QDateTime::currentDateTime().toString(format);
@@ -70,17 +100,34 @@ void Worker::startJob() {
     if (canProcess)
         exitCorrectly = this->process();
 
+    machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
     this->afterProcess();
 
     if (canProcess) {
-        if (!exitCorrectly)
-            showDialogAsync("Warning", "Processo fermato" \
-                            "\nInizio: " + startTime + \
-                            "\nFine: " + QDateTime::currentDateTime().toString(format));
-        else
-            showDialogAsync("Info", "Foratura completata correttamente" \
-                            "\nInizio: " + startTime + \
-                            "\nFine: " + QDateTime::currentDateTime().toString(format));
+
+        if (hasErrors) {
+
+            QString errors;
+            for (auto&& e: errorList)
+                errors += Utils::getStringFromDeviceKey(e.getDeviceKey()) + " - " \
+                       + QString::number(e.getErrorId()) + " - " \
+                       + QString::number(static_cast<int>(e.getErrorType())) + " - " \
+                       + e.getErrorDescription() + "\n";
+            errors += "\n\nInizio: " + startTime + \
+                    "\nFine: " + QDateTime::currentDateTime().toString(format);
+            showDialogAsync("Errori rilevati", errors);
+
+        } else {
+
+            if (!exitCorrectly)
+                showDialogAsync("Warning", "Processo fermato" \
+                                "\nInizio: " + startTime + \
+                                "\nFine: " + QDateTime::currentDateTime().toString(format));
+            else
+                showDialogAsync("Info", "Foratura completata correttamente" \
+                                "\nInizio: " + startTime + \
+                                "\nFine: " + QDateTime::currentDateTime().toString(format));
+        }
     }
 
     traceExit;
@@ -95,6 +142,7 @@ bool Worker::beforeProcess() {
     updateStatusAsync("Device initializiation...");
     ioManager = DeviceFactoryInstance.instanceIOManager();
     motionManager = DeviceFactoryInstance.instanceMotionManager();
+    machineStatusNotifier = DeviceFactoryInstance.instanceMachineStatusNotifier();
 
     if (!ioManager->isConnected())
         if (!ioManager->connect()) {
@@ -109,6 +157,11 @@ bool Worker::beforeProcess() {
             updateStatusAsync("Device initializiation... KO");
             return false;
         }
+
+    if (machineStatusNotifier.isNull()) {
+        traceErr() << "Impossibile istanziare l'oggetto MachineStatusNotifier";
+        return false;
+    }
 
     updateStatusAsync("Device initializiation... OK");
 
@@ -241,9 +294,12 @@ bool Worker::process() {
     // controllo che la macchina sia in Start
     {
         updateStatusAsync("Wait for Start...");
-        canContinue = false;
-        countDownTick = 0;
 
+        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+            hasErrors = true;
+            if (localEventLoop.isRunning())
+                localEventLoop.quit();
+        });
         QMetaObject::Connection cs = connect(ioSignaler.data(), &IOSignaler::statusSignal, [&](auto dIn, auto dOut, auto aIn) {
             if (localEventLoop.isRunning()) {
                 Q_UNUSED(dOut);
@@ -274,6 +330,7 @@ bool Worker::process() {
         countDownTimer.start();
         localEventLoop.exec();
         countDownTimer.stop();
+        QObject::disconnect(ce);
         QObject::disconnect(cs);
         QObject::disconnect(c1);
         QObject::disconnect(c2);
@@ -281,6 +338,9 @@ bool Worker::process() {
 
         if (hasToStop)
             return true;
+
+        if (hasErrors)
+            return false;
 
         if (!canContinue) {
             traceErr() << "Premere Start per avviare il processo";
@@ -296,6 +356,11 @@ bool Worker::process() {
         canContinue = false;
         countDownTick = 0;
 
+        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+            hasErrors = true;
+            if (localEventLoop.isRunning())
+                localEventLoop.quit();
+        });
         QMetaObject::Connection c1 = connect(&countDownTimer, &QTimer::timeout, [&]() {
             updateStatusAsync(QString("Wait for motors on... %1").arg(MAX_COUNTDOWN_TICKS - (++countDownTick)));
             if (localEventLoop.isRunning())
@@ -319,12 +384,16 @@ bool Worker::process() {
         countDownTimer.start();
         localEventLoop.exec();
         countDownTimer.stop();
+        QObject::disconnect(ce);
         QObject::disconnect(c1);
         QObject::disconnect(c2);
         QObject::disconnect(c3);
 
         if (hasToStop)
             return true;
+
+        if (hasErrors)
+            return false;
 
         if (!canContinue) {
             traceErr() << "Gli assi non sono tutti in coppia";
@@ -340,6 +409,11 @@ bool Worker::process() {
         canContinue = false;
         countDownTick = 0;
 
+        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+            hasErrors = true;
+            if (localEventLoop.isRunning())
+                localEventLoop.quit();
+        });
         QMetaObject::Connection cc = connect(ioSignaler.data(), &IOSignaler::statusSignal, [&](auto dIn, auto dOut, auto aIn) {
             if (localEventLoop.isRunning()) {
                 Q_UNUSED(dOut);
@@ -370,6 +444,7 @@ bool Worker::process() {
         countDownTimer.start();
         localEventLoop.exec();
         countDownTimer.stop();
+        QObject::disconnect(ce);
         QObject::disconnect(cc);
         QObject::disconnect(c1);
         QObject::disconnect(c2);
@@ -378,6 +453,9 @@ bool Worker::process() {
         if (hasToStop)
             return true;
 
+        if (hasErrors)
+            return false;
+
         if (!canContinue) {
             traceErr() << "Abilitare il cycle per continuare la stampa";
             showDialogAsync("Error", "Abilitare il cycle per continuare la stampa");
@@ -385,6 +463,7 @@ bool Worker::process() {
         }
     }
 
+    machineStatusNotifier->setCurrentStatus(MachineStatus::PRINTING);
     updateLastCommandExecute(PrintCommandExecuted::CYCLE);
 
 
@@ -406,6 +485,9 @@ bool Worker::process() {
     if (hasToStop)
         return true;
 
+    if (hasErrors)
+        return false;
+
     // lancio il thread di esecuzione dei punti
     updateStatusAsync("Starting file process thread...");
     fileProcessorThread.reset(
@@ -418,6 +500,11 @@ bool Worker::process() {
     // aspetto che il thread sia avviato
     {
         canContinue = false;
+        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+            hasErrors = true;
+            if (localEventLoop.isRunning())
+                localEventLoop.quit();
+        });
         QMetaObject::Connection c1 = connect(&localTimer, &QTimer::timeout, [&]() {
             localEventLoop.quit();
         });
@@ -434,8 +521,12 @@ bool Worker::process() {
         localTimer.start();
         localEventLoop.exec();
         localTimer.stop();
+        QObject::disconnect(ce);
         QObject::disconnect(c1);
         QObject::disconnect(c2);
+
+        if (hasErrors)
+            return false;
 
         if (!canContinue) {
             traceErr() << "Il thread di processo dei dati non si e' avviato";
@@ -625,6 +716,9 @@ bool Worker::process() {
     if (hasToStop)
         return true;
 
+    if (hasErrors)
+        return false;
+
     printMeasureTimer.start();
 
     updateLastCommandExecute(PrintCommandExecuted::PRINT_LOOP);
@@ -681,6 +775,11 @@ bool Worker::process() {
 
             res = MOTION_MANAGER_NO_ERR;
 
+            QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+                hasErrors = true;
+                if (localEventLoop.isRunning())
+                    localEventLoop.quit();
+            });
             QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
                 if (localEventLoop.isRunning() && !localTimer.isActive()) {
                     if (!mb.getAxisXMoveInProgress()) {
@@ -717,9 +816,13 @@ bool Worker::process() {
             localTimer.start();
             localEventLoop.exec();
             localTimer.stop();
+            QObject::disconnect(ce);
             QObject::disconnect(c1);
             QObject::disconnect(c2);
             QObject::disconnect(c3);
+
+            if (hasErrors)
+                return false;
 
             if (this->motionManager->isErr(res)) {
                 continueLoop = false;
@@ -823,6 +926,11 @@ bool Worker::process() {
 
                     res = MOTION_MANAGER_NO_ERR;
 
+                    QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+                        hasErrors = true;
+                        if (localEventLoop.isRunning())
+                            localEventLoop.quit();
+                    });
                     QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
                         if (localEventLoop.isRunning() && !localTimer.isActive()) {
                             if (!mb.getAxisYMoveInProgress()) {
@@ -859,9 +967,13 @@ bool Worker::process() {
                     localTimer.start();
                     localEventLoop.exec();
                     localTimer.stop();
+                    QObject::disconnect(ce);
                     QObject::disconnect(c1);
                     QObject::disconnect(c2);
                     QObject::disconnect(c3);
+
+                    if (hasErrors)
+                        return false;
 
                     if (this->motionManager->isErr(res)) {
                         continueLoop = false;
@@ -1009,6 +1121,11 @@ bool Worker::process() {
              * a interrompere l'eventLoop
              */
             bool isMarkInProgress = true;
+            QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
+                hasErrors = true;
+                if (localEventLoop.isRunning())
+                    localEventLoop.quit();
+            });
             QMetaObject::Connection c1 = connect(ioSignaler.data(), &IOSignaler::markInProgressOffSignal, [&]() {
                 isMarkInProgress = false;
                 if (localEventLoop.isRunning() && !waitTimeTimer.isActive())
@@ -1040,6 +1157,7 @@ bool Worker::process() {
             qint64 tileTimeMeasureMs = tileMeasureTimer.elapsed();
             updateTileTimeAsync(tileTimeMeasureMs);
 
+            QObject::disconnect(ce);
             QObject::disconnect(c1);
             QObject::disconnect(c2);
             QObject::disconnect(c3);
@@ -1058,6 +1176,9 @@ bool Worker::process() {
             qApp->processEvents();
             if (hasToStop)
                 continueLoop = false;
+
+            if (hasErrors)
+                return false;
 
         }
 
@@ -1446,7 +1567,7 @@ TestFrameLogic::TestFrameLogic() :
 
 TestFrameLogic::~TestFrameLogic() { }
 
-void TestFrameLogic::startProcess() {
+void TestFrameLogic::startWork() {
 
     traceEnter;
 
@@ -1454,60 +1575,22 @@ void TestFrameLogic::startProcess() {
     qPtr->ui->pbStartProcess->setEnabled(false);
     qPtr->ui->pbStopProcess->setEnabled(true);
 
-    PrintConfiguration printConfiguration;
+    qPtr->updatePrintConfiguration();
 
-    // percorso file
-    printConfiguration.setFilePath(qPtr->ui->leFilePath->text());
+    PrintConfiguration printConfiguration = qPtr->currentConfiguration;
 
-    // setup movimentazione
-    printConfiguration.setTileSizeMm(qPtr->ui->sbTileSize->value());
-    printConfiguration.setAngleMRad(qPtr->ui->dsbAngleMrad->value());
-    printConfiguration.setOffsetXmm(qPtr->ui->dsbOffsetX->value());
-    printConfiguration.setOffsetYmm(qPtr->ui->dsbOffsetY->value());
-    printConfiguration.setTileScaleXPercent(qPtr->ui->dsbScaleX->value());
-    printConfiguration.setTileScaleYPercent(qPtr->ui->dsbScaleY->value());
-    printConfiguration.setWaitTimeMs(qPtr->ui->sbTileTime->value());
-    printConfiguration.setWaitTimeAfterYMovementMs(qPtr->ui->sbWaitTimeYMovement->value());
-    printConfiguration.setLaserFrequency(qPtr->ui->sbLaserFrequency->value());
-
-    // scelta algoritmo
-    printConfiguration.setIsRandomAlgorithm(qPtr->ui->cbRandomChoice->isChecked());
-    printConfiguration.setIsNeighborhoodAlgorithm(qPtr->ui->cbNHChoice->isChecked());
-
-    // configurazione random
-    printConfiguration.setRandomPointsPerTile(qPtr->ui->sbRPointsPerTile->value());
-    printConfiguration.setRandomIsShuffleRowTiles(qPtr->ui->cbRShuffleRowTiles->isChecked());
-
-    // configurazione neighborhood
-    printConfiguration.setNeighborhoodMinDistanceUm(qPtr->ui->sbNHMinDistance->value());
-    printConfiguration.setNeighborhoodIsShuffleStackedTiles(qPtr->ui->cbNHShuffleStackedTiles->isChecked());
-    printConfiguration.setNeighborhoodIsShuffleRowTiles(qPtr->ui->cbNHShuffleRowTiles->isChecked());
-
-    // scelta del punto di stampa
-    printConfiguration.setPointShape(static_cast<PointShapeEnum>(qPtr->pointShapeGroup->checkedId()));
-
-    // point
-    printConfiguration.setNumberOfPulses(qPtr->ui->sbPointPulses->value());
-
-    // circle points
-    printConfiguration.setCirclePointsRadiusUm(qPtr->ui->sbCirclePointsRadius->value());
-    printConfiguration.setCirclePointsNumberOfSides(qPtr->ui->sbCirclePointsNumberSides->value());
-    printConfiguration.setCirclePointsNumberOfPulses(qPtr->ui->sbCirclePointsPulses->value());
-
-    // circle vector
-    printConfiguration.setCircleVectorRadiusUm(qPtr->ui->sbCircleVectorRadius->value());
-    printConfiguration.setCircleVectorNumberOfRevolutions(qPtr->ui->sbCircleVectorNumberRevolutions->value());
-    printConfiguration.setCircleVectorNumberOfSides(qPtr->ui->sbCircleVectorNumberSides->value());
-    printConfiguration.setCircleVectorPitch(qPtr->ui->sbCircleVectorPointsPitch->value());
+    QWeakPointer<ErrorManager> errorManager = DeviceFactoryInstance.getErrorManager();
 
     workerThread = new NamedThread(WORKER_THREAD_NAME);
     Worker::Ptr worker = new Worker();
     worker->setPrintConfiguration(printConfiguration);
     worker->tfl = this;
 
-    connect(workerThread, &QThread::started, worker, &Worker::startJob);
+    connect(workerThread, &QThread::started, worker, &Worker::startProcess);
     connect(worker, &Worker::finished, workerThread, &QThread::quit);
     connect(worker, &Worker::finished, worker, &Worker::deleteLater);
+    connect(errorManager.data(), &ErrorManager::hasErrors, worker, &Worker::hasErrorsSignal);
+    connect(errorManager.data(), &ErrorManager::hasFatals, worker, &Worker::hasFatalsSignal);
     connect(this, &TestFrameLogic::stopRequest, worker, &Worker::stopRequest);
     connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
     connect(workerThread, &QThread::destroyed, [&]() {
@@ -1522,7 +1605,7 @@ void TestFrameLogic::startProcess() {
 
 }
 
-void TestFrameLogic::stopProcess() {
+void TestFrameLogic::stopWork() {
     traceEnter;
     emit stopRequest();
     traceExit;
@@ -1681,7 +1764,7 @@ void TestFrameLogic::initIpgYLPNLaser() {
 TestFrame::TestFrame(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::TestFrame), dPtr(new TestFrameLogic()),
-    laserParametersChanged(false) {
+    laserParametersChanged(false), needResetAxes(true), hasErrors(false) {
 
     traceEnter;
 
@@ -2008,6 +2091,15 @@ void TestFrame::loadConfiguration() {
 
 }
 
+void TestFrame::updateUi() {
+
+    traceEnter;
+    bool isStartEnabled = !hasErrors && !needResetAxes;
+    this->ui->pbStartProcess->setEnabled(isStartEnabled);
+    traceExit;
+
+}
+
 void TestFrame::setupUi() {
 
     traceEnter;
@@ -2124,8 +2216,22 @@ void TestFrame::setupUi() {
 void TestFrame::setupSignalsAndSlots() {
 
     traceEnter;
-    connect(ui->pbStartProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::startProcess);
-    connect(ui->pbStopProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::stopProcess);
+
+    auto&& errorManager = DeviceFactoryInstance.getErrorManager();
+    auto&& motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
+
+    connect(errorManager.data(), &ErrorManager::notifyMaxErrorType, [&](ErrorType type) {
+        hasErrors = type == ErrorType::ERROR || type == ErrorType::FATAL;
+        this->updateUi();
+    });
+
+    connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](MotionBean mb) {
+        this->needResetAxes = mb.getNeedResetAxis();
+        this->updateUi();
+    });
+
+    connect(ui->pbStartProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::startWork);
+    connect(ui->pbStopProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::stopWork);
 
     // signals/slots della tab laser
     connect(ui->sbLaserPower, static_cast<void (MDSpinBox::*)(int)>(&MDSpinBox::valueChanged), [&](int value) {
@@ -2197,6 +2303,9 @@ void TestFrame::setupSignalsAndSlots() {
 
     connect(ui->pbGuideLaser, &QPushButton::clicked, dPtr, &TestFrameLogic::changeGuideLaserState);
 
+    connect(dPtr, &TestFrameLogic::laserIpgYLPNinitializedSignal, this, &TestFrame::laserIpgYLPNConfigurationReady);
+
+    // signals/slots della tab points
     connect(pointShapeGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), [&](int id) {
 
         switch (id) {
@@ -2207,8 +2316,6 @@ void TestFrame::setupSignalsAndSlots() {
         }
 
     });
-
-    connect(dPtr, &TestFrameLogic::laserIpgYLPNinitializedSignal, this, &TestFrame::laserIpgYLPNConfigurationReady);
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, [&](int index) {
         if (index == TEST_FRAME_SAVE_LOAD_TAB_INDEX)

@@ -290,6 +290,8 @@ private:
     PROGRAM_NAMESPACE::MotionBean motionBean;
     PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
     bool laserParametersChanged;
+    bool needResetAxes;
+    bool hasErrors;
     PrintConfiguration currentConfiguration;
 
 public:
@@ -308,6 +310,8 @@ private slots:
     void restorePrintConfiguration();
     void saveConfiguration();
     void loadConfiguration();
+
+    void updateUi();
 
 private:
     void setupUi();

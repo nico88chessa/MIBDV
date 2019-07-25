@@ -169,28 +169,84 @@ void IOSignaler::analizeIO() {
         if (showAlarm) {
             ErrorID errorId;
             QString errorDescr;
-            bool isAlwaysAlarm = false;
+            bool isAlarm = false;
             switch (dIn.getElementType()) {
-            case IOType::POWER: errorId = IO_SIGNALER_POWER; errorDescr = IO_SIGNALER_POWER_DESCR; break;
-            case IOType::CYCLE: errorId = IO_SIGNALER_CYCLE; errorDescr = IO_SIGNALER_CYCLE_DESCR; break;
-            case IOType::EMERGENCY_MUSHROOM: errorId = IO_SIGNALER_EMERGENCY_MUSHROOM; errorDescr = IO_SIGNALER_EMERGENCY_MUSHROOM_DESCR; isAlwaysAlarm = true; break;
-            case IOType::DOOR_OPEN: errorId = IO_SIGNALER_DOOR_OPEN; errorDescr = IO_SIGNALER_DOOR_OPEN_DESCR; break;
-            case IOType::MAINTENANCE: errorId = IO_SIGNALER_MAINTENANCE; errorDescr = IO_SIGNALER_MAINTENANCE_DESCR; break;
-            case IOType::WATER_ALARM: errorId = IO_SIGNALER_WATER_ALARM; errorDescr = IO_SIGNALER_WATER_ALARM_DESCR; isAlwaysAlarm = true; break;
-            case IOType::MARK_IN_PROGRESS: errorId = IO_SIGNALER_MARK_IN_PROGRESS; errorDescr = IO_SIGNALER_MARK_IN_PROGRESS_DESCR; break;
-            case IOType::SCANNER_READY: errorId = IO_SIGNALER_SCANNER_READY; errorDescr = IO_SIGNALER_SCANNER_READY_DESCR; break;
-            case IOType::SCANNER_ERROR: errorId = IO_SIGNALER_SCANNER_ERROR; errorDescr = IO_SIGNALER_SCANNER_ERROR_DESCR; isAlwaysAlarm = true; break;
-            case IOType::DISTANCE_SENSOR_FAULT: errorId = IO_SIGNALER_DISTANCE_SENSOR_FAULT; errorDescr = IO_SIGNALER_DISTANCE_SENSOR_FAULT_DESCR; isAlwaysAlarm = true; break;
-            case IOType::DEPRESSURE_SENSOR_FAULT: errorId = IO_SIGNALER_DEPRESSURE_SENSOR_FAULT; errorDescr = IO_SIGNALER_DEPRESSURE_SENSOR_FAULT_DESCR; isAlwaysAlarm = true; break;
-            case IOType::PRESSURE_1_SENSOR_FAULT: errorId = IO_SIGNALER_PRESSURE_1_SENSOR_FAULT; errorDescr = IO_SIGNALER_PRESSURE_1_SENSOR_FAULT_DESCR; isAlwaysAlarm = true; break;
-            case IOType::PRESSURE_2_SENSOR_FAULT: errorId = IO_SIGNALER_PRESSURE_2_SENSOR_FAULT; errorDescr = IO_SIGNALER_PRESSURE_2_SENSOR_FAULT_DESCR; isAlwaysAlarm = true; break;
-            case IOType::GENERIC_INPUT: errorId = buildGenericErrorId(dIn); errorDescr = QString("%1%2").arg(IO_SIGNALER_GENERIC_INPUT_DESCR).arg(dIn.getName()); isAlwaysAlarm = true; break;
+            case IOType::POWER:
+                errorId = IO_SIGNALER_POWER;
+                errorDescr = IO_SIGNALER_POWER_DESCR;
+                isAlarm = machineStatus == MachineStatus::PRINTING;
+                break;
+            case IOType::CYCLE:
+                errorId = IO_SIGNALER_CYCLE;
+                errorDescr = IO_SIGNALER_CYCLE_DESCR;
+                isAlarm = machineStatus == MachineStatus::PRINTING;
+                break;
+            case IOType::EMERGENCY_MUSHROOM:
+                errorId = IO_SIGNALER_EMERGENCY_MUSHROOM;
+                errorDescr = IO_SIGNALER_EMERGENCY_MUSHROOM_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::DOOR_OPEN:
+                errorId = IO_SIGNALER_DOOR_OPEN;
+                errorDescr = IO_SIGNALER_DOOR_OPEN_DESCR;
+                isAlarm = !digitalInputStatus.value(IOType::MAINTENANCE).getValue();
+                break;
+            case IOType::MAINTENANCE:
+                errorId = IO_SIGNALER_MAINTENANCE;
+                errorDescr = IO_SIGNALER_MAINTENANCE_DESCR;
+                isAlarm = false;
+                break;
+            case IOType::WATER_ALARM:
+                errorId = IO_SIGNALER_WATER_ALARM;
+                errorDescr = IO_SIGNALER_WATER_ALARM_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::MARK_IN_PROGRESS:
+                errorId = IO_SIGNALER_MARK_IN_PROGRESS;
+                errorDescr = IO_SIGNALER_MARK_IN_PROGRESS_DESCR;
+                isAlarm = false;
+                break;
+            case IOType::SCANNER_READY:
+                errorId = IO_SIGNALER_SCANNER_READY;
+                errorDescr = IO_SIGNALER_SCANNER_READY_DESCR;
+                isAlarm = false;
+                break;
+            case IOType::SCANNER_ERROR:
+                errorId = IO_SIGNALER_SCANNER_ERROR;
+                errorDescr = IO_SIGNALER_SCANNER_ERROR_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::DISTANCE_SENSOR_FAULT:
+                errorId = IO_SIGNALER_DISTANCE_SENSOR_FAULT;
+                errorDescr = IO_SIGNALER_DISTANCE_SENSOR_FAULT_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::DEPRESSURE_SENSOR_FAULT:
+                errorId = IO_SIGNALER_DEPRESSURE_SENSOR_FAULT;
+                errorDescr = IO_SIGNALER_DEPRESSURE_SENSOR_FAULT_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::PRESSURE_1_SENSOR_FAULT:
+                errorId = IO_SIGNALER_PRESSURE_1_SENSOR_FAULT;
+                errorDescr = IO_SIGNALER_PRESSURE_1_SENSOR_FAULT_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::PRESSURE_2_SENSOR_FAULT:
+                errorId = IO_SIGNALER_PRESSURE_2_SENSOR_FAULT;
+                errorDescr = IO_SIGNALER_PRESSURE_2_SENSOR_FAULT_DESCR;
+                isAlarm = true;
+                break;
+            case IOType::GENERIC_INPUT:
+                errorId = buildGenericErrorId(dIn);
+                errorDescr = QString("%1%2").arg(IO_SIGNALER_GENERIC_INPUT_DESCR).arg(dIn.getName());
+                isAlarm = true;
+                break;
             }
 
-            if (machineStatus == MachineStatus::PRINTING || isAlwaysAlarm)
-                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, ErrorType::ERROR));
-            else
-                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, ErrorType::WARNING));
+//            if (machineStatus == MachineStatus::PRINTING || isAlwaysAlarm)
+            errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, isAlarm ? ErrorType::ERROR : ErrorType::WARNING));
+//            else
+//                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, ErrorType::WARNING));
         }
 
     }

@@ -7,6 +7,8 @@
 #include <MotionManager.hpp>
 #include <IOManager.hpp>
 #include <MotionManager.hpp>
+#include <MachineStatusHandler.hpp>
+#include <Error.hpp>
 #include <core/image-processor/AbstractProcessor.hpp>
 #include <laser-ipg-temporary/communication/ipg_sync_interface.hpp>
 #include <third-party/ipg-marking-library-wrapper/include/Scanner.h>
@@ -15,6 +17,7 @@
 class TestFrame;
 
 enum class PointShapeEnum;
+class PrintConfiguration;
 
 enum class PrintCommandExecuted : int {
     IDLE,
@@ -49,10 +52,15 @@ private:
     TestFrameLogic* tfl;
     QSharedPointer<PROGRAM_NAMESPACE::IOManager> ioManager;
     QSharedPointer<PROGRAM_NAMESPACE::MotionManager> motionManager;
+    QSharedPointer<PROGRAM_NAMESPACE::MachineStatusNotifier> machineStatusNotifier;
     QScopedPointer<PROGRAM_NAMESPACE::ProcessorThread> fileProcessorThread;
     QScopedPointer<ipg_marking_library_wrapper::Scanner> scanner;
     PrintConfiguration printConfiguration;
+
     bool hasToStop;
+    bool hasErrors;
+    QList<PROGRAM_NAMESPACE::Error> errorList;
+
     PrintCommandExecuted commandsExecuted;
 
 public:
@@ -66,7 +74,7 @@ private:
     inline void updateLastCommandExecute(PrintCommandExecuted c) { this->commandsExecuted = c; }
 
 public slots:
-    void startJob();
+    void startProcess();
 
 private:
     bool beforeProcess();
@@ -85,6 +93,15 @@ private:
 signals:
     void finished();
     void stopRequest();
+
+    /* NOTE NIC 25/07/2019 - gestione segnali errori
+     * sono obbligato ad usare altri segnali perche' nel processo di stampa, non e' detto che sia
+     * sempre in attesa di eventi esterni (quando chiamo processEvents()); allora, per evitare una perdita di un errore,
+     * imposto la variabile di istanza hasErrors attraverso uno slot fatto ad-hoc (vedere metodo setupSignalsAndSlots)
+     */
+    void hasErrorsSignal(QList<PROGRAM_NAMESPACE::Error> errors);
+    void hasFatalsSignal(QList<PROGRAM_NAMESPACE::Error> fatals);
+    void errorsSignal(); // uso private alla classe Worker
 
 };
 
@@ -110,8 +127,8 @@ public:
     ~TestFrameLogic();
 
 private slots:
-    void startProcess();
-    void stopProcess();
+    void startWork();
+    void stopWork();
 
     void changeGuideLaserState();
     void updateStatus(const QString& status);
