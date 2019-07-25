@@ -243,10 +243,10 @@ void IOSignaler::analizeIO() {
                 break;
             }
 
-//            if (machineStatus == MachineStatus::PRINTING || isAlwaysAlarm)
-            errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, isAlarm ? ErrorType::ERROR : ErrorType::WARNING));
-//            else
-//                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, ErrorType::WARNING));
+            if (dIn.getElementType() == IOType::EMERGENCY_MUSHROOM)
+                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, ErrorType::FATAL));
+            else
+                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, isAlarm ? ErrorType::ERROR : ErrorType::WARNING));
         }
 
     }
