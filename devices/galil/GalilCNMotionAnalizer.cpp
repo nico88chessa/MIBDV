@@ -178,10 +178,10 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
     QString decodeStopCodeAxisX = GalilControllerUtils::getStopCodeDescription(stopCodeAxisX);
     QString stopCodeAxisXDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_X_DESCR)).arg(decodeStopCodeAxisX);
     int stopCodeAxisXErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_X + stopCodeAxisX;
-    if (motionStopCodeAxisX == MotionStopCode::MOTION_STOP_ON_ERROR)
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::ERROR));
-    else
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::INFO));
+    //if (motionStopCodeAxisX == MotionStopCode::MOTION_STOP_ON_ERROR)
+    //    this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::ERROR));
+    //else
+    this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisXErrorCodeToShow, stopCodeAxisXDescr, ErrorType::INFO));
 
     // check coppia asse y
     bool isMotorYOff = newStatus.getAxisBMotorOff();
@@ -252,10 +252,10 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
     QString decodeStopCodeAxisY = GalilControllerUtils::getStopCodeDescription(stopCodeAxisY);
     QString stopCodeAxisYDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_Y_DESCR)).arg(decodeStopCodeAxisY);
     int stopCodeAxisYErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_Y + stopCodeAxisY;
-    if (motionStopCodeAxisY == MotionStopCode::MOTION_STOP_ON_ERROR)
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::ERROR));
-    else
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::INFO));
+    //if (motionStopCodeAxisY == MotionStopCode::MOTION_STOP_ON_ERROR)
+    //    this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::ERROR));
+    //else
+    this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisYErrorCodeToShow, stopCodeAxisYDescr, ErrorType::INFO));
 
     // check coppia asse z
     bool isMotorZOff = newStatus.getAxisCMotorOff();
@@ -325,10 +325,10 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
     QString decodeStopCodeAxisZ = GalilControllerUtils::getStopCodeDescription(stopCodeAxisZ);
     QString stopCodeAxisZDescr = QString("%1 - %2").arg(tr(GALIL_CN_MOTION_STOP_CODE_START_MASK_Z_DESCR)).arg(decodeStopCodeAxisZ);
     int stopCodeAxisZErrorCodeToShow = GALIL_CN_MOTION_STOP_CODE_START_MASK_Z + stopCodeAxisZ;
-    if (motionStopCodeAxisZ == MotionStopCode::MOTION_STOP_ON_ERROR)
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::ERROR));
-    else
-        this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::INFO));
+    //if (motionStopCodeAxisZ == MotionStopCode::MOTION_STOP_ON_ERROR)
+    //    this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::ERROR));
+    //else
+    this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, stopCodeAxisZErrorCodeToShow, stopCodeAxisZDescr, ErrorType::INFO));
 
     // controllo se e' necessario resettare gli assi
     bool needReset = newStatus.getNeedReset();
