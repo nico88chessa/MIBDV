@@ -18,6 +18,7 @@ class TestFrame;
 
 enum class PointShapeEnum;
 class PrintConfiguration;
+class MachineStatusReceiver;
 
 enum class PrintCommandExecuted : int {
     IDLE,
@@ -118,12 +119,13 @@ public:
 private:
     TestFrame* qPtr;
     NamedThread* workerThread;
+    QScopedPointer<PROGRAM_NAMESPACE::MachineStatusReceiver> machineStatusReceiver;
 
     bool isProcessStopped;
     bool isLaserInitialized;
 
 public:
-    TestFrameLogic();
+    explicit TestFrameLogic(QObject* parent = Q_NULLPTR);
     ~TestFrameLogic();
 
 private slots:

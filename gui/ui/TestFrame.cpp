@@ -26,6 +26,7 @@
 #include <MotionAnalizer.hpp>
 #include <IOSignaler.hpp>
 #include <ErrorHandler.hpp>
+#include <MachineStatusHandler.hpp>
 #include <Types.hpp>
 #include <json/FilterJsonParser.hpp>
 #include <core/image-processor/RowTileProcessor.hpp>
@@ -254,10 +255,13 @@ bool Worker::process() {
     int neighborhoodMinDistanceUm = printConfiguration.getNeighborhoodMinDistanceUm();
     bool neighborhoodIsShuffleStackedTiles = printConfiguration.getNeighborhoodIsShuffleStackedTiles();
     bool neighborhoodIsShuffleRowTiles = printConfiguration.getNeighborhoodIsShuffleRowTiles();
+    bool neighborhoodIsTopBottomOrder = printConfiguration.getNeighborhoodIsTopBottomOrder();
+
     if (isNeighborhoodAlgorithm) {
         traceInfo() << "NeighborhoodMinDistanceUm: " << neighborhoodMinDistanceUm;
         traceInfo() << "NeighborhoodIsShuffleStackedTiles: " << neighborhoodIsShuffleStackedTiles;
         traceInfo() << "NeighborhoodIsShuffleRowTiles: " << neighborhoodIsShuffleRowTiles;
+        traceInfo() << "NeighborhoodIsTopBottomOrder: " << neighborhoodIsTopBottomOrder;
     }
 
     // leggo l'header del file
@@ -690,6 +694,7 @@ bool Worker::process() {
         showDialogAsync("Error", "Eccezione in fase di connessione con testa scansione");
         return false;
     }
+
     /* NOTE NIC 24/06/2019 - sleep connessione testa
      * questo tempo lo metto perche' se mi connetto e sconnetto troppo velocemente dalla testa
      * di scansione, per qualche motivo (librerie IPG probabilmente) la connessione resta appesa
@@ -729,7 +734,7 @@ bool Worker::process() {
 
     while (continueLoop && fileProcessorThread->hasNext()) {
 
-        GridI::Row row;
+        GridRowI row;
         qApp->processEvents();
         updateStatusAsync("Creating row data...");
         bool isNextValid = fileProcessorThread->getNext(&row);
@@ -738,6 +743,11 @@ bool Worker::process() {
             traceErr() << "Il thread processor non ha generato una riga valida";
             exitCorrectly = false;
             continue;
+        }
+
+        if (neighborhoodIsTopBottomOrder) {
+            traceInfo() << "Stampa in modalita' NH in modalita' top to bottom";
+            row = ComputationUtils::fromTopToBottom(row);
         }
         updateStatusAsync("Creating row data... OK");
 
@@ -1554,14 +1564,17 @@ bool Worker::getPulseEnergy(float& energyJoule) {
  *  T E S T   F R A M E   L O G I C
  */
 
-TestFrameLogic::TestFrameLogic() :
+TestFrameLogic::TestFrameLogic(QObject* parent) :
+    QObject(parent),
+    workerThread(nullptr),
     isProcessStopped(false),
-    isLaserInitialized(false),
-    workerThread(nullptr) {
+    isLaserInitialized(false) {
 
 #ifdef FLAG_IPG_YLPN_LASER_PRESENT
     QTimer::singleShot(1000, this, &TestFrameLogic::initIpgYLPNLaser);
 #endif
+    machineStatusReceiver.reset(new PROGRAM_NAMESPACE::MachineStatusReceiver(this));
+    DeviceFactoryInstance.subscribeMachineStatusReceiver(*machineStatusReceiver.data());
 
 }
 
@@ -1764,7 +1777,7 @@ void TestFrameLogic::initIpgYLPNLaser() {
 TestFrame::TestFrame(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::TestFrame), dPtr(new TestFrameLogic()),
-    laserParametersChanged(false), needResetAxes(true), hasErrors(false) {
+    laserParametersChanged(false), hasErrors(false), machineStatus(MachineStatus::STATUS_NAN) {
 
     traceEnter;
 
@@ -1789,14 +1802,25 @@ void TestFrame::updateMotionBean(const MotionBean& b) {
 
     traceEnter;
     this->motionBean = b;
+    this->updateUi();
     traceExit;
 
 }
 
-void TestFrame::updateDigitalInputStatus(const DigitalInputStatus& i) {
+void TestFrame::updateHasErrors(bool hasErrors) {
 
     traceEnter;
-    this->digitalInputStatus = i;
+    this->hasErrors = hasErrors;
+    this->updateUi();
+    traceExit;
+
+}
+
+void TestFrame::updateMachineStatus(const MachineStatus& s) {
+
+    traceEnter;
+    this->machineStatus = s;
+    this->updateUi();
     traceExit;
 
 }
@@ -1883,6 +1907,7 @@ void TestFrame::updatePrintConfiguration() {
     pc.setNeighborhoodMinDistanceUm(ui->sbNHMinDistance->value());
     pc.setNeighborhoodIsShuffleStackedTiles(ui->cbNHShuffleStackedTiles->isChecked());
     pc.setNeighborhoodIsShuffleRowTiles(ui->cbNHShuffleRowTiles->isChecked());
+    pc.setNeighborhoodIsTopBottomOrder(ui->cbNHTopBottomOrder->isChecked());
 
     // scelta del punto di stampa
     pc.setPointShape(static_cast<PointShapeEnum>(pointShapeGroup->checkedId()));
@@ -1925,6 +1950,7 @@ void TestFrame::updatePrintConfiguration() {
     stringList << "Neighborhood min distance um: " << QString::number(pc.getNeighborhoodMinDistanceUm()) << "\r\n";
     stringList << "Neighborhood is shuffle stacked tiles: " << QString::number(pc.getNeighborhoodIsShuffleStackedTiles()) << "\r\n";
     stringList << "Neighborhood is shuffle row tiles: " << QString::number(pc.getNeighborhoodIsShuffleRowTiles()) << "\r\n";
+    stringList << "Neighborhood is top bottom order: " << QString::number(pc.getNeighborhoodIsTopBottomOrder()) << "\r\n";
 
     // SCELTA DEL PUNTO DI STAMPA
     stringList << "Point shape: " << getStringFromPointShapeEnum(pc.getPointShape()) << "\r\n";
@@ -1972,6 +1998,7 @@ void TestFrame::restorePrintConfiguration() {
     ui->sbNHMinDistance->setValue(currentConfiguration.getNeighborhoodMinDistanceUm());
     ui->cbNHShuffleStackedTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleStackedTiles());
     ui->cbNHShuffleRowTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleRowTiles());
+    ui->cbNHTopBottomOrder->setChecked(currentConfiguration.getNeighborhoodIsTopBottomOrder());
 
     switch (currentConfiguration.getPointShape()) {
     case PointShapeEnum::POINT:
@@ -2094,8 +2121,10 @@ void TestFrame::loadConfiguration() {
 void TestFrame::updateUi() {
 
     traceEnter;
-    bool isStartEnabled = !hasErrors && !needResetAxes;
+    bool isStartEnabled = !hasErrors && !motionBean.getNeedResetAxis() && dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::IDLE;
+    bool isStopEnabled = !hasErrors && !motionBean.getNeedResetAxis() && dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::PRINTING;
     this->ui->pbStartProcess->setEnabled(isStartEnabled);
+    this->ui->pbStopProcess->setEnabled(isStopEnabled);
     traceExit;
 
 }
@@ -2221,14 +2250,12 @@ void TestFrame::setupSignalsAndSlots() {
     auto&& motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
 
     connect(errorManager.data(), &ErrorManager::notifyMaxErrorType, [&](ErrorType type) {
-        hasErrors = type == ErrorType::ERROR || type == ErrorType::FATAL;
-        this->updateUi();
+        this->updateHasErrors(type == ErrorType::ERROR || type == ErrorType::FATAL);
     });
 
-    connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](MotionBean mb) {
-        this->needResetAxes = mb.getNeedResetAxis();
-        this->updateUi();
-    });
+    connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, this, &TestFrame::updateMotionBean);
+
+    connect(dPtr->machineStatusReceiver.data(), &PROGRAM_NAMESPACE::MachineStatusReceiver::statusChanged, this, &TestFrame::updateMachineStatus);
 
     connect(ui->pbStartProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::startWork);
     connect(ui->pbStopProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::stopWork);
@@ -2425,6 +2452,7 @@ JsonParserError ConfigurationJsonParser::encodeJson(PrintConfiguration::ConstPtr
     jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_MIN_DISTANCE_UM_KEY] = obj->getNeighborhoodMinDistanceUm();
     jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_STACKED_TILES_KEY] = obj->getNeighborhoodIsShuffleStackedTiles();
     jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_ROW_TILES_KEY] = obj->getNeighborhoodIsShuffleRowTiles();
+    jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_TOP_BOTTOM_ORDER_KEY] = obj->getNeighborhoodIsTopBottomOrder();
     jsonObj[CONFIGURATION_JSON_POINT_SHAPE_KEY] = getStringFromPointShapeEnum(obj->getPointShape());
     jsonObj[CONFIGURATION_JSON_NUMBER_OF_PULSES_KEY] = obj->getNumberOfPulses();
     jsonObj[CONFIGURATION_JSON_CIRCLE_POINTS_RADIUS_UM_KEY] = obj->getCirclePointsRadiusUm();
@@ -2550,6 +2578,12 @@ JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, Pri
         return JSON_PARSER_ERROR_KEY_NOT_FOUND;
     }
 
+    QJsonValue neighborhoodIsTopBottomOrder = jsonObj.value(CONFIGURATION_JSON_NEIGHBORHOOD_IS_TOP_BOTTOM_ORDER_KEY);
+    if (neighborhoodIsTopBottomOrder.isUndefined()) {
+        traceErr() << "Chiave neighborhoodIsTopBottomOrder non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
     QJsonValue pointShape = jsonObj.value(CONFIGURATION_JSON_POINT_SHAPE_KEY);
     if (pointShape.isUndefined()) {
         traceErr() << "Chiave pointShape non presente nel file json";
@@ -2623,6 +2657,7 @@ JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, Pri
     obj->setNeighborhoodMinDistanceUm(neighborhoodMinDistanceUm.toInt());
     obj->setNeighborhoodIsShuffleStackedTiles(neighborhoodIsShuffleStackedTiles.toBool());
     obj->setNeighborhoodIsShuffleRowTiles(neighborhoodIsShuffleRowTiles.toBool());
+    obj->setNeighborhoodIsTopBottomOrder(neighborhoodIsTopBottomOrder.toBool());
 
     obj->setPointShape(getPointShapeEnumFromString(pointShape.toString()));
 

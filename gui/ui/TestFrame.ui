@@ -32,7 +32,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabPrint">
       <attribute name="title">
@@ -340,7 +340,7 @@
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0">
+         <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0">
           <property name="leftMargin">
            <number>5</number>
           </property>
@@ -359,7 +359,31 @@
           <property name="verticalSpacing">
            <number>0</number>
           </property>
-          <item row="5" column="1">
+          <item row="4" column="2">
+           <widget class="QCheckBox" name="cbNHTopBottomOrder">
+            <property name="text">
+             <string>Tob bottom order</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" colspan="2">
+           <widget class="QCheckBox" name="cbNHShuffleStackedTiles">
+            <property name="text">
+             <string>Shuffle layer tiles</string>
+            </property>
+            <property name="label" stdset="0">
+             <string>Shuffle tile</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QCheckBox" name="cbNHShuffleRowTiles">
+            <property name="text">
+             <string>Shuffle all row tiles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -372,7 +396,7 @@
             </property>
            </spacer>
           </item>
-          <item row="2" column="1">
+          <item row="2" column="1" colspan="2">
            <widget class="MDSpinBox" name="sbNHMinDistance">
             <property name="minimumSize">
              <size>
@@ -391,24 +415,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QCheckBox" name="cbNHShuffleStackedTiles">
-            <property name="text">
-             <string>Shuffle layer tiles</string>
-            </property>
-            <property name="label" stdset="0">
-             <string>Shuffle tile</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QCheckBox" name="cbNHShuffleRowTiles">
-            <property name="text">
-             <string>Shuffle all row tiles</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
+          <item row="0" column="1" colspan="2">
            <widget class="QCheckBox" name="cbNHChoice">
             <property name="text">
              <string>Neighborhood</string>

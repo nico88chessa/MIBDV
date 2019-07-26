@@ -400,6 +400,12 @@ QSharedPointer<MachineStatusNotifier> DeviceFactory::instanceMachineStatusNotifi
 
 }
 
+void DeviceFactory::subscribeMachineStatusReceiver(MachineStatusReceiver& receiver) {
+    traceEnter;
+    this->machineStatusDispatcher->addReceiver(receiver);
+    traceExit;
+}
+
 void DeviceFactory::detachManagers() {
 
     traceEnter;

@@ -14,6 +14,7 @@
 #include <PointSet.hpp>
 #include <Tile.hpp>
 #include <StackedTile.hpp>
+#include <Grid.hpp>
 
 
 namespace PROGRAM_NAMESPACE {
@@ -107,6 +108,19 @@ public:
         Tile<T> temp(other.getBoundingBox());
         temp.addPointSet(ComputationUtils::shufflePointSet(other.getPointSet()));
         return temp;
+    }
+
+    template <typename T>
+    static GridRow<T> fromTopToBottom(const QVector<Tile<T>>& row) {
+        GridRow<T> tilesInRow = row;
+        std::sort(tilesInRow.begin(), tilesInRow.end(), [](const Tile<T>& l, const Tile<T>& r) -> bool {
+            auto&& lMin = l.getBoundingBox().getMin();
+            auto&& rMin = r.getBoundingBox().getMin();
+            if (lMin.getX() < rMin.getX())
+                return true;
+            return lMin.getY() > rMin.getY();
+        });
+        return tilesInRow;
     }
 
 };

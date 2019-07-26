@@ -82,6 +82,7 @@ private:
     int neighborhoodMinDistanceUm;
     bool neighborhoodIsShuffleStackedTiles;
     bool neighborhoodIsShuffleRowTiles;
+    bool neighborhoodIsTopBottomOrder;
 
     // scelta del punto di stampa
     PointShapeEnum pointShape;
@@ -139,6 +140,8 @@ public:
     void setNeighborhoodIsShuffleStackedTiles(bool value) { neighborhoodIsShuffleStackedTiles = value; }
     bool getNeighborhoodIsShuffleRowTiles() const { return neighborhoodIsShuffleRowTiles; }
     void setNeighborhoodIsShuffleRowTiles(bool value) { neighborhoodIsShuffleRowTiles = value; }
+    bool getNeighborhoodIsTopBottomOrder() const { return neighborhoodIsTopBottomOrder; }
+    void setNeighborhoodIsTopBottomOrder(bool value) { neighborhoodIsTopBottomOrder = value; }
 
     PointShapeEnum getPointShape() const { return pointShape; }
     void setPointShape(const PointShapeEnum& value) { pointShape = value; }
@@ -191,6 +194,7 @@ private:
     static constexpr char* CONFIGURATION_JSON_NEIGHBORHOOD_MIN_DISTANCE_UM_KEY = "neighborhoodMinDistanceUm";
     static constexpr char* CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_STACKED_TILES_KEY = "neighborhoodIsShuffleStackedTiles";
     static constexpr char* CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_ROW_TILES_KEY = "neighborhoodIsShuffleRowTiles";
+    static constexpr char* CONFIGURATION_JSON_NEIGHBORHOOD_IS_TOP_BOTTOM_ORDER_KEY = "neighborhoodIsTopBottomOrder";
 
     static constexpr char* CONFIGURATION_JSON_POINT_SHAPE_KEY = "pointShape";
 
@@ -238,8 +242,8 @@ private:
     static constexpr int TEST_FRAME_TILE_SIZE_MAX = 200;
     static constexpr int TEST_FRAME_MIN_FREQUENCY = 0;
     static constexpr int TEST_FRAME_MAX_FREQUENCY = 3000;
-    static constexpr int TEST_FRAME_WAIT_TIME_MS_MIN = 50;
-    static constexpr int TEST_FRAME_WAIT_TIME_MS_MAX = 10000;
+    static constexpr int TEST_FRAME_WAIT_TIME_MS_MIN = 60;
+    static constexpr int TEST_FRAME_WAIT_TIME_MS_MAX = 5000;
     static constexpr int TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MIN = 1000;
     static constexpr int TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MAX = 10000;
     static constexpr int TEST_FRAME_OFFSET_X_MIN = 0;
@@ -288,10 +292,9 @@ private:
     QButtonGroup* pointShapeGroup;
     TestFrameLogic* dPtr;
     PROGRAM_NAMESPACE::MotionBean motionBean;
-    PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
     bool laserParametersChanged;
-    bool needResetAxes;
     bool hasErrors;
+    PROGRAM_NAMESPACE::MachineStatus machineStatus;
     PrintConfiguration currentConfiguration;
 
 public:
@@ -300,7 +303,8 @@ public:
 
 public slots:
     void updateMotionBean(const PROGRAM_NAMESPACE::MotionBean& b);
-    void updateDigitalInputStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& i);
+    void updateHasErrors(bool hasErrors);
+    void updateMachineStatus(const PROGRAM_NAMESPACE::MachineStatus& s);
     void setFilePath(const QString& filePath);
     void laserIpgYLPNConfigurationReady();
     void showPopup(const QString& err, const QString& descr);

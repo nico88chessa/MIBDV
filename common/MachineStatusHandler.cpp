@@ -21,6 +21,7 @@ MachineStatus MachineStatusReceiver::getCurrentStatus() const {
 
 void MachineStatusReceiver::setCurrentStatus(const MachineStatus& value) {
     currentStatus = value;
+    emit statusChanged(currentStatus);
 }
 
 
