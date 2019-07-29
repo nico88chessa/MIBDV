@@ -102,12 +102,18 @@
             <property name="text">
              <string/>
             </property>
+            <property name="type" stdset="0">
+             <string>floating</string>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pbStopY">
             <property name="text">
              <string/>
+            </property>
+            <property name="type" stdset="0">
+             <string>floating</string>
             </property>
            </widget>
           </item>
@@ -240,12 +246,18 @@
             <property name="text">
              <string/>
             </property>
+            <property name="type" stdset="0">
+             <string>floating</string>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pbStopZ">
             <property name="text">
              <string/>
+            </property>
+            <property name="type" stdset="0">
+             <string>floating</string>
             </property>
            </widget>
           </item>
@@ -425,12 +437,18 @@
             <property name="text">
              <string/>
             </property>
+            <property name="type" stdset="0">
+             <string>floating</string>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pbStopX">
             <property name="text">
              <string/>
+            </property>
+            <property name="type" stdset="0">
+             <string>floating</string>
             </property>
            </widget>
           </item>

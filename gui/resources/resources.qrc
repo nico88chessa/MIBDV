@@ -131,9 +131,6 @@
         <file alias="settings">icons/0d47a1/baseline_settings_black_24dp_primary.png</file>
         <file alias="settings_dark">icons/0d47a1/baseline_settings_black_24dp_primary_dark.png</file>
         <file alias="settings_light">icons/0d47a1/baseline_settings_black_24dp_primary_light.png</file>
-        <file alias="stop">icons/0d47a1/baseline_stop_black_24dp_primary.png</file>
-        <file alias="stop_dark">icons/0d47a1/baseline_stop_black_24dp_primary_dark.png</file>
-        <file alias="stop_light">icons/0d47a1/baseline_stop_black_24dp_primary_light.png</file>
         <file alias="toggle_off">icons/0d47a1/baseline_toggle_off_black_24dp_primary.png</file>
         <file alias="toggle_off_dark">icons/0d47a1/baseline_toggle_off_black_24dp_primary_dark.png</file>
         <file alias="toggle_off_light">icons/0d47a1/baseline_toggle_off_black_24dp_primary_light.png</file>

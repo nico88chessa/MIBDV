@@ -85,6 +85,9 @@
            <height>24</height>
           </size>
          </property>
+         <property name="type" stdset="0">
+          <string>topbar</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -102,12 +105,18 @@
            <height>24</height>
           </size>
          </property>
+         <property name="type" stdset="0">
+          <string>topbar</string>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pbRefreshStyle">
          <property name="text">
           <string>RS</string>
+         </property>
+         <property name="type" stdset="0">
+          <string>topbar</string>
          </property>
         </widget>
        </item>
