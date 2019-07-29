@@ -668,9 +668,6 @@ void MotionFrame::setupSignalsAndSlots() {
 
     traceEnter;
 
-    auto&& motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
-    auto&& ioSignaler = DeviceFactoryInstance.getIOSignaler();
-
     connect(dPtr->motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& motionBean) {
         QMetaObject::invokeMethod(this, "updateMotionBean", Qt::QueuedConnection,
                                   Q_ARG(const MotionBean&, motionBean));

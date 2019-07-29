@@ -44,6 +44,9 @@ public slots:
     MachineStatus getCurrentStatus() const;
     void setCurrentStatus(const MachineStatus& value);
 
+signals:
+    void statusChanged(const MachineStatus& status);
+
 };
 
 

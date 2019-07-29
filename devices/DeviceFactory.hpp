@@ -21,6 +21,7 @@ class IOManager;
 class DeviceConnectionWatcher;
 class MachineStatusDispatcher;
 class MachineStatusNotifier;
+class MachineStatusReceiver;
 
 
 class DeviceFactory {
@@ -109,6 +110,7 @@ public:
     QWeakPointer<ErrorManager> getErrorManager();
 
     QSharedPointer<MachineStatusNotifier> instanceMachineStatusNotifier(QObject* parent = Q_NULLPTR) const;
+    void subscribeMachineStatusReceiver(MachineStatusReceiver& receiver);
 
     // qui rimuove i managers / controller dal thread corrente
     void detachManagers();

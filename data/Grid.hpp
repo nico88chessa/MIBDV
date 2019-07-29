@@ -12,15 +12,16 @@
 namespace PROGRAM_NAMESPACE {
 
 template <typename T>
+using GridRow = QVector<Tile<T>>;
+
+template <typename T>
 class Grid {
 public:
     using Ptr = Grid<T>*;
     using ConstPtr = const Grid<T>*;
 
-    using Row = QVector<Tile<T>>;
-
 private:
-    QVector<Row> vet;
+    QVector<GridRow<T>> vet;
     PointI start;
 
     int numTileX;
@@ -95,11 +96,11 @@ public:
         return getTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
     }
 
-    const Row& getRow(int row) const {
+    const GridRow<T>& getRow(int row) const {
         return vet.at(row);
     }
 
-    Row& getRow(int row) {
+    GridRow<T>& getRow(int row) {
         return vet[row];
     }
 
@@ -122,6 +123,11 @@ using GridI = Grid<int>;
 using GridUI = Grid<unsigned int>;
 using GridF = Grid<float>;
 using GridD = Grid<double>;
+
+using GridRowI = GridRow<int>;
+using GridRowUI = GridRow<unsigned int>;
+using GridRowF = GridRow<float>;
+using GridRowD = GridRow<double>;
 
 }
 

@@ -14,19 +14,17 @@ namespace PROGRAM_NAMESPACE {
 
 static constexpr ProcessErrorCode ROWTILEPROCESSOR_JSON_CHUNK_ERROR_CODE = PROCESSOR_THREAD_END_CODE + 1;
 
-class RowTileProcessor : public AbstractProcessor<GridI::Row> {
+class RowTileProcessor : public AbstractProcessor<GridRowI> {
 public:
     using Ptr = RowTileProcessor*;
     using ConstPtr = const RowTileProcessor*;
-
-    using GridIRow = GridI::Row;
 
 private:
     using FilterStripe = FilterStream::Stripe;
 
 private:
     static constexpr int STACK_SIZE = 2;
-    QVector<GridIRow> doubleBuffer;
+    QVector<GridRowI> doubleBuffer;
     FilterStream filterStream;
     QScopedPointer<IAbstractJsonStreamDecoder> jsonDecoder;
     QScopedPointer<GridI> grid;
@@ -212,7 +210,7 @@ protected:
         return doubleBuffer.size() < STACK_SIZE;
     }
 
-    virtual void getNextImpl(GridIRow& data) override {
+    virtual void getNextImpl(GridRowI& data) override {
         data = doubleBuffer.first();
         doubleBuffer.removeFirst();
     }
