@@ -2,32 +2,14 @@
  * D E T A I L S
  */
 
-#content {
-    background-color: #f5f5f5;
-}
-
 #top {
-    background-color: #9be7ff;
     min-height: 64px;
     max-height: 64px;
     border: none;
     padding: 0px 24px;
     background-clip: padding;
-    border-bottom: 4px solid qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255,0,0,255), stop:0.7 rgba(255,0,0,50));
-}
-
-#top > QPushButton {
-    color: black;
-    background-color: yellow;
-    background-clip: content;
-    padding: 0px 0px 20px 16px;
-    border: none;
-    margin: 0px 0px 0px 0px;
-    min-width: 24px;
-    max-width: 24px;
-    min-height: 24px;
-    max-height: 24px;
-    font-size: 16px;
+    border-bottom-style: solid;
+    border-bottom-width: 0px;
 }
 
 #lTitle {
@@ -35,31 +17,18 @@
     padding-bottom: 14px;
     font-weight: 400;
     font-size: 20px;
-    background-color: transparent;
     background-clip: border;
 }
 
 #left {
-    background-color: #64b5f6;
     max-width: 200px;
     border: none;
-    border-right: 2px solid gray;
-}
-
-#left #listItem {
-    background-color: transparent;
+    border-right-width: 1px;
+    border-right-style: solid;
 }
 
 QCheckBox[isDigitalIO = true] {
     qproperty-focusPolicy: NoFocus;
-}
-
-QCheckBox::indicator::unchecked[isDigitalIO = true] {
-    image: url(:/icons/black-theme/panorama_fish_eye);
-}
-
-QCheckBox::indicator::checked[isDigitalIO = true] {
-    image: url(:/icons/black-theme/lens);
 }
 
 
@@ -68,89 +37,8 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
  * M O T I O N   F R A M E
  */
 
-#stackedWidget {
-    background-color: lightgreen;
-}
-
-#tabMotion {
-    background-color: pink;
-}
-
-#tabMotion .QPushButton {
-    padding: 16px 16px;
-    margin: 10px 10px;
-    border-width: 2px;
-    border-style: solid;
-    border-color: green;
-    border-radius: 28px;
-    min-width:  24px;
-    max-width:  24px;
-    min-height: 24px;
-    max-height: 24px;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: transparent;
-}
-
 .QLabel[type=subheader] {
     font-size: 14px;
-}
-
-#tabMotion #pbMoveX,
-#tabMotion #pbMoveY,
-#tabMotion #pbMoveZ {
-    background-image: url(:/icons/black-theme/play_circle_filled);
-    background-repeat: none;
-    background-position: center center;
-}
-
-#tabMotion #pbMoveX:!enabled,
-#tabMotion #pbMoveY:!enabled,
-#tabMotion #pbMoveZ:!enabled {
-    background-image: url(:/icons/disabled/play_circle_filled);
-    background-repeat: none;
-    background-position: center center;
-}
-
-#tabMotion #pbStopX,
-#tabMotion #pbStopY,
-#tabMotion #pbStopZ {
-    background-image: url(:/icons/black-theme/pause_circle_filled);
-    background-repeat: none;
-    background-position: center center;
-}
-
-#tabMotion #pbStopX:!enabled,
-#tabMotion #pbStopY:!enabled,
-#tabMotion #pbStopZ:!enabled {
-    background-image: url(:/icons/disabled/pause_circle_filled);
-    background-repeat: none;
-    background-position: center center;
-}
-
-#tabMotion #pbStopAxes,
-#tabMotion #pbResetAxes {
-    padding: 0px 36px;
-    margin: 6px 8px;
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 2px;
-    min-width: 64px;
-    min-height: 32px;
-    max-height: 32px;
-    font-size: 14px;
-    font-weight: 600;
-    background-image: none;
-    qproperty-focusPolicy: NoFocus;
-    border-color: transparent;
-    color: white;
-    background-color: green;
-}
-
-#tabMotion #pbStopAxes:!enabled,
-#tabMotion #pbResetAxes:!enabled {
-    background-color: rgba(255, 255, 255, 12%);
-    color: rgba(255 255 255 30%);
 }
 
 
@@ -162,23 +50,6 @@ QCheckBox::indicator::checked[isDigitalIO = true] {
 .IOFrame {
     qproperty-rowMinHeight: 48;
 }
-
-.IOFrame QFrame {
-    background-color: transparent;
-}
-
-QTabWidget {
-    background-color: transparent;
-}
-
-#saDigitalIOContents,
-#saAnalogIOContents {
-    background-color: transparent;
-}
-
-/*.IOFrame #saDigitalIO QWidget {
-    min-height: 40px;
-}*/
 
 
 
@@ -204,7 +75,13 @@ QTabWidget {
     border-right-width: 2px;
     border-right-style: solid;
     font-size: 16px;
-    font-family: Roboto;
+}
+
+.FileExplorerFrame #top #pbDelete,
+.FileExplorerFrame #top #pbRename {
+    padding: 12px 0px 12px 16px;
+    qproperty-text: "";
+    qproperty-iconSize: 24px;
 }
 
 MDFileExplorerWidget {
@@ -226,15 +103,6 @@ MDFileExplorerWidget {
     border: none;
 }
 
-.FileExplorerFrame MDFileExplorerWidget::item:hover {
-    background-color: green;
-}
-
-.FileExplorerFrame MDFileExplorerWidget::item:selected {
-    background-color: purple;
-    color: white;
-}
-
 
 
 /*
@@ -243,10 +111,4 @@ MDFileExplorerWidget {
 
 .AlertFrame #lvAlerts {
     border: none;
-    background-color: transparent;
 }
-
-/*
-.AlertFrame #lvAlerts::item:hover {
-}
-*/

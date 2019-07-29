@@ -235,19 +235,23 @@ void MainWindow::setupStyleSheets() const {
     QApplication* app = static_cast<QApplication*>(QApplication::instance());
     app->setStyleSheet(styleSheet());
 
-    QFile mdGeomStyle(QString(STYLESHEET_PATH)+"geometry.qss");
-    mdGeomStyle.open(QFile::ReadOnly);
-    QByteArray mdGeomStr = mdGeomStyle.readAll();
+    QFile widgetGeometry(QString(STYLESHEET_PATH)+"widget-geometry.qss");
+    widgetGeometry.open(QFile::ReadOnly);
+    QByteArray widgetGeometryStr = widgetGeometry.readAll();
 
-    QFile appGeom(QString(STYLESHEET_PATH)+"app-geometry.qss");
-    appGeom.open(QFile::ReadOnly);
-    QByteArray geomStr = appGeom.readAll();
+    QFile appGeometry(QString(STYLESHEET_PATH)+"app-geometry.qss");
+    appGeometry.open(QFile::ReadOnly);
+    QByteArray appGeometryStr = appGeometry.readAll();
 
-    QFile theme(QString(STYLESHEET_PATH)+"theme1.qss");
-    theme.open(QFile::ReadOnly);
-    QByteArray themeStr = theme.readAll();
+    QFile widgetTheme1(QString(STYLESHEET_PATH)+"widget-theme1.qss");
+    widgetTheme1.open(QFile::ReadOnly);
+    QByteArray widgetTheme1Str = widgetTheme1.readAll();
 
-    QString content = mdGeomStr + geomStr + themeStr;
+    QFile appTheme1(QString(STYLESHEET_PATH)+"app-theme1.qss");
+    appTheme1.open(QFile::ReadOnly);
+    QByteArray appTheme1Str = appTheme1.readAll();
+
+    QString content = widgetGeometryStr + appGeometryStr + widgetTheme1Str + appTheme1Str;
 
     app->setStyleSheet(content);
 

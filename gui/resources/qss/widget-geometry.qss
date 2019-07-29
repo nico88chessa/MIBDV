@@ -1,4 +1,15 @@
 /*
+ * G L O B A L
+ */
+
+QWidget {
+    font-family: Roboto;
+    font-weight: 400;
+}
+
+
+
+/*
  * M D L I N E E D I T
  */
 
@@ -27,7 +38,7 @@
 }
 
 .MDLineEdit:disabled {
-    padding: 36px 0px 7px;
+    padding: 36px 0px 8px;
     border-bottom-width: 1px;
     border-bottom-style: dotted;
 }
@@ -63,7 +74,7 @@
 }
 
 .MDSpinBox:disabled {
-    padding: 36px 0px 7px;
+    padding: 36px 0px 8px;
     border-bottom-width: 1px;
     border-bottom-style: dotted;
 }
@@ -78,7 +89,7 @@
     font-size: 16px;
     padding: 36px 0px 8px;
     max-height: 54px;
-    min-height: 18px;
+    min-height: 16px;
     margin: 0px 12px 8px;
     qproperty-labelX: 14;
     qproperty-labelY: 28;
@@ -99,7 +110,7 @@
 }
 
 .MDDoubleSpinBox:disabled {
-    padding: 36px 0px 7px;
+    padding: 36px 0px 8px;
     border-bottom-width: 1px;
     border-bottom-style: dotted;
 }
@@ -293,12 +304,53 @@ QPushButton {
     margin: 6px 8px;
     border-width: 1px;
     border-style: solid;
-    border-radius: 2px;
+    border-radius: 4px;
+    max-width: 200px;
     min-width: 64px;
     min-height: 32px;
     max-height: 32px;
     font-size: 14px;
     font-weight: 600;
+    background-image: none;
+    qproperty-focusPolicy: NoFocus;
+}
+
+
+
+/*
+ * Q P U S H B U T T O N - F L O A T I N G
+ */
+
+QPushButton[type="floating"] {
+    padding: 16px 16px;
+    margin: 10px 10px;
+    border-width: 0px;
+    border-radius: 28px;
+    min-width:  24px;
+    max-width:  24px;
+    min-height: 24px;
+    max-height: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    qproperty-iconSize: 24px;
+}
+
+
+
+/*
+ * Q P U S H B U T T O N - T O P B A R
+ */
+
+QPushButton[type="topbar"] {
+    background-clip: content;
+    padding: 0px 0px 20px 16px;
+    border: none;
+    margin: 0px 0px 0px 0px;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    font-size: 16px;
 }
 
 
@@ -363,12 +415,7 @@ QRadioButton::indicator {
     qproperty-layoutDirection: RightToLeft;
 }
 
-.MDSwitchLine:hover {
-/*    background-color: blue;*/
-}
-
 .MDSwitchLine::indicator {
-/*    border: 1px solid red;*/
     padding: 0px;
     width: 48px;
     height: 48px;
@@ -383,6 +430,8 @@ QRadioButton::indicator {
 .MDListWidget {
     qproperty-focusPolicy: NoFocus;
     font-size: 16px;
+    padding: 8px 0px;
+    border: none;
 }
 
 .MDListWidget::item:hover {
@@ -414,7 +463,6 @@ QRadioButton::indicator {
 QTabBar {
 /*    qproperty-drawBase: true;*/
     border: none;
-    background-color: transparent;
 }
 
 QTabWidget {
@@ -432,17 +480,17 @@ QTabWidget::tab-bar {
 QTabBar::tab {
     font-size: 14px;
     font-weight: 500;
-    background-color: transparent;
     background-origin: margin;
-    min-width: 160px;
+    min-width: 90px;
     min-height: 48px;
-    padding: 0px 12px;
+    padding: 0px 16px;
     border: none;
     border-radius: 0px;
-/*    color: darkgray;*/
 }
 
-QTabBar::tab:selected, QTabBar::tab:hover {
+QTabBar::tab:hover {
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
 }
 
 QTabBar::tab:selected {
@@ -464,21 +512,9 @@ QScrollBar {
     width: 20px;
 }
 
-
 QScrollBar:vertical {
-    border: 2px solid transparent;
-}
-
-QScrollBar::handle:vertical {
-    background: green;
-}
-
-QScrollBar::sub-page:vertical {
-    background-color: lightGray;
-}
-
-QScrollBar::add-page:vertical {
-    background-color: lightGray;
+    border-width: 2px;
+    border-style: solit;
 }
 
 QScrollBar::add-line:vertical {
