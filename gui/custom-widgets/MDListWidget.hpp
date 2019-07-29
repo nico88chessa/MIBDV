@@ -42,7 +42,8 @@ public:
 
 public:
     explicit MDCustomItem(QWidget* parent = nullptr);
-    explicit MDCustomItem(const QString& text, const QString& iconPath);
+    explicit MDCustomItem(const QString& text, QWidget* parent = nullptr);
+    explicit MDCustomItem(const QString& text, const QString& iconPath, QWidget* parent = nullptr);
 
     QString getIconPath() const;
     void setIconPath(const QString& value);
