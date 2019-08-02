@@ -5,6 +5,11 @@
 
 class NamedThread : public QThread {
     Q_OBJECT
+
+public:
+    using Ptr = NamedThread*;
+    using ConstPtr = const NamedThread*;
+
 public:
     explicit NamedThread(const QString& threadName, QObject *parent = Q_NULLPTR) :
         QThread(parent) {

@@ -54,19 +54,6 @@
        <property name="spacing">
         <number>0</number>
        </property>
-       <item row="0" column="0" colspan="2">
-        <widget class="MDLineEdit" name="leFilePath">
-         <property name="minimumSize">
-          <size>
-           <width>200</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="label" stdset="0">
-          <string>Path File</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QWidget" name="wRandom" native="true">
          <property name="minimumSize">
@@ -100,14 +87,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="cbRShuffleRowTiles">
             <property name="text">
-             <string>Shuffle all row tiles</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="cbRandomChoice">
-            <property name="text">
-             <string>Random</string>
+             <string>Shuffle row tiles</string>
             </property>
            </widget>
           </item>
@@ -138,39 +118,19 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
           </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="rbRandomChoice">
+            <property name="text">
+             <string>Random</string>
+            </property>
+           </widget>
+          </item>
          </layout>
-        </widget>
-       </item>
-       <item row="7" column="0" colspan="2">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>239</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="6" column="1">
-        <widget class="QPushButton" name="pbStopProcess">
-         <property name="text">
-          <string>Stop</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QPushButton" name="pbStartProcess">
-         <property name="text">
-          <string>Start</string>
-         </property>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
@@ -203,8 +163,8 @@
           <property name="verticalSpacing">
            <number>0</number>
           </property>
-          <item row="0" column="0">
-           <widget class="MDSpinBox" name="sbTileSize">
+          <item row="1" column="0">
+           <widget class="MDDoubleSpinBox" name="dsbOffsetX">
             <property name="minimumSize">
              <size>
               <width>300</width>
@@ -218,7 +178,7 @@
              </size>
             </property>
             <property name="label" stdset="0">
-             <string>Tile size [mm]</string>
+             <string>Offset X [mm]</string>
             </property>
            </widget>
           </item>
@@ -241,8 +201,8 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="MDDoubleSpinBox" name="dsbOffsetX">
+          <item row="0" column="0">
+           <widget class="MDSpinBox" name="sbTileSize">
             <property name="minimumSize">
              <size>
               <width>300</width>
@@ -256,7 +216,14 @@
              </size>
             </property>
             <property name="label" stdset="0">
-             <string>Offset X [mm]</string>
+             <string>Tile size [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="MDDoubleSpinBox" name="dsbScaleY">
+            <property name="label" stdset="0">
+             <string>Scale Y [%]</string>
             </property>
            </widget>
           </item>
@@ -282,13 +249,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="MDSpinBox" name="sbWaitTimeYMovement">
-            <property name="label" stdset="0">
-             <string>Wait time after axis Y movement [ms]</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <widget class="MDDoubleSpinBox" name="dsbAngleMrad">
             <property name="decimals">
@@ -305,10 +265,10 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="MDDoubleSpinBox" name="dsbScaleY">
+          <item row="3" column="1">
+           <widget class="MDSpinBox" name="sbWaitTimeYMovement">
             <property name="label" stdset="0">
-             <string>Scale Y [%]</string>
+             <string>Wait time after axis Y movement [ms]</string>
             </property>
            </widget>
           </item>
@@ -327,100 +287,10 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QWidget" name="wNeighborhood" native="true">
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0">
-          <property name="leftMargin">
-           <number>5</number>
-          </property>
-          <property name="topMargin">
-           <number>5</number>
-          </property>
-          <property name="rightMargin">
-           <number>5</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <property name="horizontalSpacing">
-           <number>4</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>0</number>
-          </property>
-          <item row="4" column="2">
-           <widget class="QCheckBox" name="cbNHTopBottomOrder">
-            <property name="text">
-             <string>Tob bottom order</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1" colspan="2">
-           <widget class="QCheckBox" name="cbNHShuffleStackedTiles">
-            <property name="text">
-             <string>Shuffle layer tiles</string>
-            </property>
-            <property name="label" stdset="0">
-             <string>Shuffle tile</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QCheckBox" name="cbNHShuffleRowTiles">
-            <property name="text">
-             <string>Shuffle all row tiles</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="1" colspan="2">
-           <widget class="MDSpinBox" name="sbNHMinDistance">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
               <height>0</height>
              </size>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="label" stdset="0">
-             <string>Minimum distance [um]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QCheckBox" name="cbNHChoice">
-            <property name="text">
-             <string>Neighborhood</string>
-            </property>
-           </widget>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -459,17 +329,17 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="0" colspan="3">
+           <widget class="MDLineEdit" name="leStatus">
+            <property name="label" stdset="0">
+             <string>Status</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="2">
            <widget class="MDLineEdit" name="leEstimatedResidualTime">
             <property name="label" stdset="0">
              <string>Estimated Residual Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="MDLineEdit" name="leStackTimeMeasure">
-            <property name="label" stdset="0">
-             <string>Stack time measure  [ms]</string>
             </property>
            </widget>
           </item>
@@ -481,15 +351,173 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>40</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
           </item>
-          <item row="0" column="0" colspan="3">
-           <widget class="MDLineEdit" name="leStatus">
+          <item row="1" column="1">
+           <widget class="MDLineEdit" name="leStackTimeMeasure">
             <property name="label" stdset="0">
-             <string>Status</string>
+             <string>Stack time measure  [ms]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="3">
+           <layout class="QGridLayout" name="gridLayout_16">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="3">
+             <widget class="QPushButton" name="pbPauseProcess">
+              <property name="text">
+               <string>PAUSE</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QPushButton" name="pbStopProcess">
+              <property name="text">
+               <string>STOP</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="pbStartProcess">
+              <property name="text">
+               <string>START</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="pbResumeProcess">
+              <property name="text">
+               <string>RESUME</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="MDLineEdit" name="leFilePath">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="label" stdset="0">
+          <string>Path File</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QWidget" name="wNeighborhood" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>4</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="7" column="0">
+           <widget class="QRadioButton" name="rbNHReverseY">
+            <property name="text">
+             <string>Reverse Y</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QRadioButton" name="rbNHNormal">
+            <property name="text">
+             <string>Normal</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QRadioButton" name="rbNHShuffleRowTiles">
+            <property name="text">
+             <string>Shuffle row tiles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0" colspan="2">
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="4" column="1">
+           <widget class="QCheckBox" name="cbNHShuffleStackedTiles">
+            <property name="text">
+             <string>Shuffle stack tiles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="MDSpinBox" name="sbNHMinDistance">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="label" stdset="0">
+             <string>Minimum distance [um]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="rbNHChoice">
+            <property name="text">
+             <string>Neighborhood</string>
             </property>
            </widget>
           </item>
@@ -1009,15 +1037,9 @@
   <tabstop>dsbScaleY</tabstop>
   <tabstop>sbTileTime</tabstop>
   <tabstop>sbWaitTimeYMovement</tabstop>
-  <tabstop>cbRandomChoice</tabstop>
+  <tabstop>rbRandomChoice</tabstop>
   <tabstop>sbRPointsPerTile</tabstop>
   <tabstop>cbRShuffleRowTiles</tabstop>
-  <tabstop>cbNHChoice</tabstop>
-  <tabstop>sbNHMinDistance</tabstop>
-  <tabstop>cbNHShuffleStackedTiles</tabstop>
-  <tabstop>cbNHShuffleRowTiles</tabstop>
-  <tabstop>pbStartProcess</tabstop>
-  <tabstop>pbStopProcess</tabstop>
   <tabstop>sbPointPulses</tabstop>
   <tabstop>sbCirclePointsRadius</tabstop>
   <tabstop>sbCirclePointsNumberSides</tabstop>

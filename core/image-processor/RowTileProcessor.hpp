@@ -20,10 +20,10 @@ public:
     using ConstPtr = const RowTileProcessor*;
 
 private:
-    using FilterStripe = FilterStream::Stripe;
-
-private:
     static constexpr int STACK_SIZE = 2;
+
+protected:
+    using FilterStripe = FilterStream::Stripe;
     QVector<GridRowI> doubleBuffer;
     FilterStream filterStream;
     QScopedPointer<IAbstractJsonStreamDecoder> jsonDecoder;
@@ -31,7 +31,7 @@ private:
     const QString jsonPath;
     const int tileSizeUm;
     int elaboratedStripe;
-    int lastRowTileIndexInsert;
+    int nextRowToInsert;
 
 public:
     RowTileProcessor(const QString& threadName, const QString& filePath, int tileSizeUm, QObject* parent = Q_NULLPTR) :
@@ -39,7 +39,7 @@ public:
         doubleBuffer(), jsonPath(filePath), tileSizeUm(tileSizeUm) {
 
         elaboratedStripe = 0;
-        lastRowTileIndexInsert = -1;
+        nextRowToInsert = 0;
     }
 
 protected:
@@ -58,6 +58,12 @@ protected:
 
         if (!QFile::exists(jsonPath)) {
             traceErr() << "File non trovato: " << jsonPath;
+            traceExit;
+            return false;
+        }
+
+        if (tileSizeUm == 0) {
+            traceErr() << "Il TileSizeUm deve essere > 0";
             traceExit;
             return false;
         }
@@ -121,8 +127,8 @@ protected:
             }
 
             FilterStripe stripe = filterStream.getStripe(elaboratedStripe);
-            auto&& points = stripe.getPoints();
-            if (points.isEmpty()) {
+            auto&& pointsStripe = stripe.getPoints();
+            if (pointsStripe.isEmpty()) {
                 traceInfo() << "Nessun punto presente nello stripe: " << elaboratedStripe;
                 ++elaboratedStripe;
                 continue;
@@ -130,43 +136,35 @@ protected:
 
             ++elaboratedStripe;
 
-            PointI pointStart = points.first();
-            PointI pointEnd = points.last();
+            PointI pointStart = pointsStripe.first();
+            PointI pointEnd = pointsStripe.last();
             int xTilePointStart = this->grid->getTileIndexX(pointStart);
             int xTilePointEnd = this->grid->getTileIndexX(pointEnd);
 
-            for (auto&& p: stripe.getPoints())
+            for (auto&& p: pointsStripe)
                 this->grid->addPoint(p);
 
-            // qui controllo di aver valorizzato i RowTile tali per cui ho inserito tutti i punti;
-            // so di aver inserito tutti i punti se xTileStart < xTileEnd oppure
-            // xTileStart == XTileEnd, pero' non ho inserito i tile con indice minore di xTileEnd (== xTileStart)
-            if ( (xTilePointStart < xTilePointEnd) ||
-                 ((xTilePointStart == xTilePointEnd) && (lastRowTileIndexInsert < (xTilePointEnd - 1))) ) {
+            while (nextRowToInsert < xTilePointEnd && !isStopped) {
 
-                // inserisco tutti i tile con indice < xTilePointEnd
-                while ((lastRowTileIndexInsert < (xTilePointEnd - 1)) && !isStopped) {
+                locker.relock();
+                while (!isSpaceAvailable() && !stopRequest)
+                    this->spaceAvailableCondition.wait(locker.mutex());
 
-                    locker.relock();
-                    while (!isSpaceAvailable() && !stopRequest)
-                        this->spaceAvailableCondition.wait(locker.mutex());
+                while (this->pauseRequest && !stopRequest)
+                    pauseCondition.wait(locker.mutex());
 
-                    while (this->pauseRequest && !stopRequest)
-                        pauseCondition.wait(locker.mutex());
-
-                    if (stopRequest) {
-                        isStopped = true;
-                        locker.unlock();
-                        continue;
-                    }
-
-                    ++lastRowTileIndexInsert;
-                    this->doubleBuffer.append(grid->getRow(lastRowTileIndexInsert));
-                    traceInfo() << "Inserisco nel buffer il RowTile: " << lastRowTileIndexInsert;
-                    resultsReadyCondition.notify_all();
+                if (stopRequest) {
+                    isStopped = true;
                     locker.unlock();
-
+                    continue;
                 }
+
+                this->doubleBuffer.append(grid->getRow(nextRowToInsert));
+                traceInfo() << "Inserisco nel buffer il RowTile: " << nextRowToInsert;
+                nextRowToInsert++;
+                resultsReadyCondition.notify_all();
+                locker.unlock();
+
             }
 
             // qui controllo se sto verificando l'ultimo stripe; in questo caso, devo iterare il ciclo
@@ -174,7 +172,7 @@ protected:
             if (elaboratedStripe == filterStream.getStripesNumber()) {
 
                 int lastRowTileIndex = this->grid->getRows() - 1;
-                while ((lastRowTileIndexInsert < lastRowTileIndex) && !isStopped) {
+                while ((nextRowToInsert <= lastRowTileIndex) && !isStopped) {
 
                     locker.relock();
                     while (!isSpaceAvailable() && !stopRequest)
@@ -189,9 +187,9 @@ protected:
                         continue;
                     }
 
-                    ++lastRowTileIndexInsert;
-                    this->doubleBuffer.append(grid->getRow(lastRowTileIndexInsert));
-                    traceInfo() << "Inserisco nel buffer il RowTile: " << lastRowTileIndexInsert;
+                    this->doubleBuffer.append(grid->getRow(nextRowToInsert));
+                    traceInfo() << "Inserisco nel buffer il RowTile: " << nextRowToInsert;
+                    nextRowToInsert++;
                     resultsReadyCondition.notify_all();
                     locker.unlock();
 

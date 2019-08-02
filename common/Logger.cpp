@@ -97,27 +97,27 @@ Logger& Logger::instance() {
 }
 
 void Logger::enter(const char* functionName) const {
-    qDebug() << "ENTER" << functionName;
+    qDebug().noquote() << "ENTER" << functionName;
 }
 
 void Logger::exit(const char* functionName) const {
-    qDebug() << "EXIT" << functionName;
+    qDebug().noquote() << "EXIT" << functionName;
 }
 
 QDebug Logger::debug() const {
-    return qDebug();
+    return qDebug().noquote();
 }
 
 QDebug Logger::info() const {
-    return qInfo();
+    return qInfo().noquote();
 }
 
 QDebug Logger::warn() const {
-    return qWarning();
+    return qWarning().noquote();
 }
 
 QDebug Logger::error() const {
-    return qCritical();
+    return qCritical().noquote();
 }
 
 void Logger::fatal(const char *msg, ...) const {

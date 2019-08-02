@@ -6,13 +6,13 @@
 #include <QList>
 
 #include <configure.h>
-#include <Tile.hpp>
+#include <GridRow.hpp>
 
 
 namespace PROGRAM_NAMESPACE {
 
-template <typename T>
-using GridRow = QVector<Tile<T>>;
+//template <typename T>
+//using GridRow = QVector<GridTile<T>>; // GridRow contiene tutti i tile di una singola riga della griglia
 
 template <typename T>
 class Grid {
@@ -21,7 +21,7 @@ public:
     using ConstPtr = const Grid<T>*;
 
 private:
-    QVector<GridRow<T>> vet;
+    QVector<GridRow<T>> vet; // contiene tutte le righe della griglia
     PointI start;
 
     int numTileX;
@@ -49,25 +49,29 @@ public:
             numTileY++;
         }
 
-        traceDebug() << "Grid width: " << width;
-        traceDebug() << "Grid height" << height;
-        traceDebug() << "Grid numero Tile X: " << numTileX;
-        traceDebug() << "Grid numero Tile Y: " << numTileY;
+        traceInfo() << "Grid width: " << width;
+        traceInfo() << "Grid height" << height;
+        traceInfo() << "Grid numero Tile X: " << numTileX;
+        traceInfo() << "Grid numero Tile Y: " << numTileY;
 
         PointI m = start;
         for (int r=0; r<numTileX; ++r) {
 
-            QVector<Tile<T>> row;
+            GridRow<T> row;
             m.setX(start.getX() + tileSize*r);
+
+            row.setMaxCols(numTileY);
 
             for (int c=0; c<numTileY; ++c) {
                 m.setY(start.getY() + tileSize*c);
                 PointI M = m + PointI(tileSize, tileSize);
-                Tile<T> t(m, M);
+                GridTile<T> t(m, M);
                 traceDebug() << "Indice Tile X: " << r;
                 traceDebug() << "Indice Tile Y: " << c;
                 traceDebug() << "Tile: " << m << " x " << M;
-                row.append(t);
+                t.setRowIndex(r);
+                t.setColIndex(c);
+                row.addTile(t);
             }
 
             vet.append(row);
@@ -80,19 +84,21 @@ public:
     Grid(int x, int y, int width, int height, int tileSize) :
         Grid(PointI(x, y), width, height, tileSize) { }
 
-    const Tile<T>& getTile(int r, int c) const {
-        return vet.at(r).at(c);
+    PointI getStart() const { return start; }
+
+    const GridTile<T>& getTile(int r, int c) const {
+        return vet.at(r).getTileList().at(c);
     }
 
-    Tile<T>& getTile(int r, int c) {
-        return vet[r][c];
+    GridTile<T>& getTile(int r, int c) {
+        return vet[r].tileList[c];
     }
 
-    const Tile<T>& getTile(const Point<T>& p) const {
+    const GridTile<T>& getTile(const Point<T>& p) const {
         return getTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
     }
 
-    Tile<T>& getTile(const Point<T>& p) {
+    GridTile<T>& getTile(const Point<T>& p) {
         return getTile(qFloor((float) (p - start).getX()/tileSize), qFloor((float) (p - start).getY()/tileSize));
     }
 
@@ -113,6 +119,8 @@ public:
 
     int getCols() const { return numTileY; }
 
+    inline int getTileSize() const { return tileSize; }
+
     inline int getTileIndexX (const Point<T>& p) const { return qFloor((float) (p - start).getX()/tileSize); }
 
     inline int getTileIndexY (const Point<T>& p) const { return qFloor((float) (p - start).getY()/tileSize); }
@@ -123,11 +131,6 @@ using GridI = Grid<int>;
 using GridUI = Grid<unsigned int>;
 using GridF = Grid<float>;
 using GridD = Grid<double>;
-
-using GridRowI = GridRow<int>;
-using GridRowUI = GridRow<unsigned int>;
-using GridRowF = GridRow<float>;
-using GridRowD = GridRow<double>;
 
 }
 

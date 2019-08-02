@@ -286,8 +286,37 @@ MDFileExplorerWidget {
     background-color: pink;
 }
 
+.TestFrame .MDDoubleSpinBox,
 .TestFrame .MDSpinBox {
-    min-width: 70px;
+    padding: 34px 0px 8px;
+    max-height: 54px;
+    min-height: 18px;
+    margin: 0px 12px 10px;
+    qproperty-labelX: 14;
+    qproperty-labelY: 28;
+    qproperty-labelTextWidth: 12;
+    border: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+}
+
+.TestFrame .MDDoubleSpinBox:focus,
+.TestFrame .MDSpinBox:focus {
+    padding: 36px 0px 7px;
+    border-bottom-width: 2px;
+}
+
+.TestFrame .MDDoubleSpinBox:read-only,
+.TestFrame .MDSpinBox:read-only {
+    padding: 36px 0px 8px;
+    border-bottom-width: 1px;
+}
+
+.TestFrame .MDDoubleSpinBox:disabled,
+.TestFrame .MDSpinBox:disabled {
+    padding: 36px 0px 7px;
+    border-bottom-width: 1px;
+    border-bottom-style: dotted;
 }
 
 .TestFrame #frPoint {

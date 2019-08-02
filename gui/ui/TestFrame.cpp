@@ -30,6 +30,7 @@
 #include <Types.hpp>
 #include <json/FilterJsonParser.hpp>
 #include <core/image-processor/RowTileProcessor.hpp>
+#include <core/image-processor/ResumeRowTileProcessor.hpp>
 #include <core/json/FilterJsonStreamDecoder.hpp>
 
 
@@ -37,22 +38,30 @@ using namespace PROGRAM_NAMESPACE;
 
 static constexpr const char* WORKER_THREAD_NAME = "WORKER_THREAD";
 static constexpr const char* ROWTILE_PROCESSOR_THREAD_NAME = "ROW_TILE_PROCESSOR_THREAD";
+static constexpr const char* RESUME_ROWTILE_PROCESSOR_THREAD_NAME = "RESUME_TILE_PROCESSOR_THREAD";
 
 /*
  *  W O R K E R   T H R E A D
  */
 
 Worker::Worker(QObject* parent) : QObject(parent), printConfiguration(),
-    hasToStop(false), hasErrors(false), commandsExecuted(PrintCommandExecuted::IDLE) {
+    hasToStop(false), hasToPause(false), hasErrors(false), commandsExecuted(PrintCommandExecuted::IDLE) {
     this->setupSignalsAndSlots();
 }
 
 void Worker::setupSignalsAndSlots() {
 
     traceEnter;
-    connect(this, &Worker::stopRequest, [&]() {
+    connect(this, &Worker::stopRequestSignal, [&]() {
         traceInfo() << "Premuto pulsante di stop";
         this->hasToStop = true;
+        if (!fileProcessorThread.isNull())
+            fileProcessorThread->stop();
+    });
+
+    connect(this, &Worker::pauseRequestSignal, [&]() {
+        traceInfo() << "Premuto pulsante di pause";
+        this->hasToPause = true;
         if (!fileProcessorThread.isNull())
             fileProcessorThread->stop();
     });
@@ -68,7 +77,7 @@ void Worker::setupSignalsAndSlots() {
             traceErr() << "Error Description:" << e.getErrorDescription();
         }
         hasErrors = true;
-        emit errorsSignal();
+        emit stopProcessByErrorSignal();
     });
 
     connect(this, &Worker::hasErrorsSignal, [&](QList<Error> errors) {
@@ -82,7 +91,7 @@ void Worker::setupSignalsAndSlots() {
             traceErr() << "Error Description:" << e.getErrorDescription();
         }
         hasErrors = true;
-        emit errorsSignal();
+        emit stopProcessByErrorSignal();
     });
 
     traceExit;
@@ -97,17 +106,49 @@ void Worker::startProcess() {
     traceEnter;
     bool canProcess = this->beforeProcess();
 
-    bool exitCorrectly;
+    ExitCause exitCause = ExitCause::NOT_VALID;
     if (canProcess)
-        exitCorrectly = this->process();
+        exitCause = this->process();
 
-    machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
     this->afterProcess();
 
     if (canProcess) {
-
-        if (hasErrors) {
-
+        switch (exitCause) {
+        case ExitCause::NOT_VALID:
+        {
+            // NOTE NIC 02/08/2019 - da verificare
+            machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+        } break;
+        case ExitCause::PROCESS_COMPLETED_CORRECTLY:
+        {
+            machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+            showDialogAsync("Info", "Foratura completata correttamente" \
+                            "\nInizio: " + startTime + \
+                            "\nFine: " + QDateTime::currentDateTime().toString(format));
+        } break;
+        case ExitCause::EXIT_BY_TIMEOUT:
+        {
+            if (printStatus.isValid())
+                machineStatusNotifier->setCurrentStatus(MachineStatus::STOP_RESUMABLE);
+            else
+                machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+        } break;
+        case ExitCause::STOP_BY_USER:
+        {
+            machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+            showDialogAsync("Warning", "Processo fermato" \
+                            "\nInizio: " + startTime + \
+                            "\nFine: " + QDateTime::currentDateTime().toString(format));
+        } break;
+        case ExitCause::PAUSE_BY_USER:
+        {
+            machineStatusNotifier->setCurrentStatus(MachineStatus::PAUSE);
+            showDialogAsync("Warning", "Processo messo in pausa dall'utente" \
+                            "\nInizio: " + startTime + \
+                            "\nFine: " + QDateTime::currentDateTime().toString(format));
+        } break;
+        case ExitCause::ERROR_CATCHED:
+        {
             QString errors;
             for (auto&& e: errorList)
                 errors += Utils::getStringFromDeviceKey(e.getDeviceKey()) + " - " \
@@ -116,20 +157,23 @@ void Worker::startProcess() {
                        + e.getErrorDescription() + "\n";
             errors += "\n\nInizio: " + startTime + \
                     "\nFine: " + QDateTime::currentDateTime().toString(format);
-            showDialogAsync("Errori rilevati", errors);
-
-        } else {
-
-            if (!exitCorrectly)
-                showDialogAsync("Warning", "Processo fermato" \
-                                "\nInizio: " + startTime + \
-                                "\nFine: " + QDateTime::currentDateTime().toString(format));
+            if (printStatus.isValid())
+                machineStatusNotifier->setCurrentStatus(MachineStatus::STOP_RESUMABLE);
             else
-                showDialogAsync("Info", "Foratura completata correttamente" \
-                                "\nInizio: " + startTime + \
-                                "\nFine: " + QDateTime::currentDateTime().toString(format));
+                machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+            showDialogAsync("Errori rilevati", errors);
+        } break;
+        case ExitCause::INTERNAL_ERROR:
+        {
+            if (printStatus.isValid())
+                machineStatusNotifier->setCurrentStatus(MachineStatus::STOP_RESUMABLE);
+            else
+                machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+        } break;
         }
     }
+
+    emit finishedSignal();
 
     traceExit;
 
@@ -171,7 +215,7 @@ bool Worker::beforeProcess() {
 
 }
 
-bool Worker::process() {
+ExitCause Worker::process() {
 
     namespace imlw = ipg_marking_library_wrapper;
     using namespace PROGRAM_NAMESPACE;
@@ -233,13 +277,13 @@ bool Worker::process() {
     if (isRandomAlgorithm && isNeighborhoodAlgorithm) {
         traceErr() << "Scelti entrambi gli algoritmi";
         showDialogAsync("Error", "Controllare checkbox algoritmo tiling");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     if (!isRandomAlgorithm && !isNeighborhoodAlgorithm) {
         traceErr() << "Nessun algoritmo scelto";
         showDialogAsync("Error", "Non e' stato scelto alcun algoritmo di tiling");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     // parametri algoritmo random
@@ -255,13 +299,13 @@ bool Worker::process() {
     int neighborhoodMinDistanceUm = printConfiguration.getNeighborhoodMinDistanceUm();
     bool neighborhoodIsShuffleStackedTiles = printConfiguration.getNeighborhoodIsShuffleStackedTiles();
     bool neighborhoodIsShuffleRowTiles = printConfiguration.getNeighborhoodIsShuffleRowTiles();
-    bool neighborhoodIsTopBottomOrder = printConfiguration.getNeighborhoodIsTopBottomOrder();
+    bool neighborhoodIsReverseY = printConfiguration.getNeighborhoodIsReverseY();
 
     if (isNeighborhoodAlgorithm) {
         traceInfo() << "NeighborhoodMinDistanceUm: " << neighborhoodMinDistanceUm;
         traceInfo() << "NeighborhoodIsShuffleStackedTiles: " << neighborhoodIsShuffleStackedTiles;
         traceInfo() << "NeighborhoodIsShuffleRowTiles: " << neighborhoodIsShuffleRowTiles;
-        traceInfo() << "NeighborhoodIsTopBottomOrder: " << neighborhoodIsTopBottomOrder;
+        traceInfo() << "NeighborhoodIsReverseY: " << neighborhoodIsReverseY;
     }
 
     // leggo l'header del file
@@ -274,12 +318,11 @@ bool Worker::process() {
         QString descr = QString("Impossibile trovare il file %1").arg(filePath);
         traceErr() << descr;
         showDialogAsync("Error", descr);
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
 
     // inizio processo di stampa vero e proprio
-
     updateStatusAsync("Start process");
     QWeakPointer<IMotionAnalizer> motionAnalizer = DeviceFactoryInstance.getMotionAnalizer();
     QWeakPointer<IOSignaler> ioSignaler = DeviceFactoryInstance.getIOSignaler();
@@ -289,18 +332,24 @@ bool Worker::process() {
     QTimer localTimer;
     localTimer.setSingleShot(true);
     localTimer.setInterval(WAIT_THREAD_STARTED_TIME_MS);
-    QTimer countDownTimer;
-    countDownTimer.setInterval(COUNTDOWN_INTERVAL_MS);
-    int countDownTick = 0;
-    bool canContinue = false;
 
+    bool canContinue = false;
+    bool isStopByUser = false;
+    bool isPauseByUser = false;
+    bool errorCatched = false;
+    bool isResumePrint = printStatus.isValid();
 
     // controllo che la macchina sia in Start
     {
         updateStatusAsync("Wait for Start...");
+        canContinue = false;
 
-        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-            hasErrors = true;
+        QTimer countDownTimer;
+        countDownTimer.setInterval(COUNTDOWN_INTERVAL_MS);
+        int countDownTick = 0;
+
+        QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+            errorCatched = true;
             if (localEventLoop.isRunning())
                 localEventLoop.quit();
         });
@@ -325,8 +374,8 @@ bool Worker::process() {
             canContinue = true;
             localEventLoop.quit();
         });
-        QMetaObject::Connection c3 = connect(this, &Worker::stopRequest, [&]() {
-            hasToStop = true;
+        QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+            isStopByUser = true;
             traceInfo() << "Stop richiesto dall'utente";
             localEventLoop.quit();
         });
@@ -340,17 +389,18 @@ bool Worker::process() {
         QObject::disconnect(c2);
         QObject::disconnect(c3);
 
-        if (hasToStop)
-            return true;
-
-        if (hasErrors)
-            return false;
-
         if (!canContinue) {
+            if (errorCatched)
+                return ExitCause::ERROR_CATCHED;
+            if (isStopByUser)
+                return ExitCause::STOP_BY_USER;
+
             traceErr() << "Premere Start per avviare il processo";
             showDialogAsync("Error", "Premere Start per avviare il processo");
-            return false;
+
+            return ExitCause::EXIT_BY_TIMEOUT;
         }
+
     }
 
 
@@ -358,10 +408,13 @@ bool Worker::process() {
     {
         updateStatusAsync("Wait for motors on...");
         canContinue = false;
-        countDownTick = 0;
 
-        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-            hasErrors = true;
+        QTimer countDownTimer;
+        countDownTimer.setInterval(COUNTDOWN_INTERVAL_MS);
+        int countDownTick = 0;
+
+        QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+            errorCatched = true;
             if (localEventLoop.isRunning())
                 localEventLoop.quit();
         });
@@ -379,8 +432,8 @@ bool Worker::process() {
                 }
             }
         });
-        QMetaObject::Connection c3 = connect(this, &Worker::stopRequest, [&]() {
-            hasToStop = true;
+        QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+            isStopByUser = true;
             traceInfo() << "Stop richiesto dall'utente";
             localEventLoop.quit();
         });
@@ -393,16 +446,17 @@ bool Worker::process() {
         QObject::disconnect(c2);
         QObject::disconnect(c3);
 
-        if (hasToStop)
-            return true;
-
-        if (hasErrors)
-            return false;
-
         if (!canContinue) {
+
+            if (errorCatched)
+                return ExitCause::ERROR_CATCHED;
+            if (isStopByUser)
+                return ExitCause::STOP_BY_USER;
+
             traceErr() << "Gli assi non sono tutti in coppia";
             showDialogAsync("Error", "Gli assi non sono tutti in coppia");
-            return false;
+
+            return ExitCause::EXIT_BY_TIMEOUT;
         }
     }
 
@@ -411,10 +465,13 @@ bool Worker::process() {
     {
         updateStatusAsync("Wait for Cycle...");
         canContinue = false;
-        countDownTick = 0;
 
-        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-            hasErrors = true;
+        QTimer countDownTimer;
+        countDownTimer.setInterval(COUNTDOWN_INTERVAL_MS);
+        int countDownTick = 0;
+
+        QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+            errorCatched = true;
             if (localEventLoop.isRunning())
                 localEventLoop.quit();
         });
@@ -439,8 +496,8 @@ bool Worker::process() {
             canContinue = true;
             localEventLoop.quit();
         });
-        QMetaObject::Connection c3 = connect(this, &Worker::stopRequest, [&]() {
-            hasToStop = true;
+        QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+            isStopByUser = true;
             traceInfo() << "Stop richiesto dall'utente";
             localEventLoop.quit();
         });
@@ -454,16 +511,16 @@ bool Worker::process() {
         QObject::disconnect(c2);
         QObject::disconnect(c3);
 
-        if (hasToStop)
-            return true;
-
-        if (hasErrors)
-            return false;
-
         if (!canContinue) {
+            if (errorCatched)
+                return ExitCause::ERROR_CATCHED;
+            if (isStopByUser)
+                return ExitCause::STOP_BY_USER;
+
             traceErr() << "Abilitare il cycle per continuare la stampa";
             showDialogAsync("Error", "Abilitare il cycle per continuare la stampa");
-            return false;
+
+            return ExitCause::EXIT_BY_TIMEOUT;
         }
     }
 
@@ -479,47 +536,74 @@ bool Worker::process() {
         QString descr = QString("Errore nela decodifica dell'header del file json; codice errore: %1").arg(headerErr);
         traceErr() << descr;
         showDialogAsync("Error", descr);
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
     streamDecoder.reset();
 
 
     // faccio svuotare la coda degli eventi (mi serve per controllare se e' stato premuto il pulsante stop)
     qApp->processEvents();
-    if (hasToStop)
-        return true;
+    if (hasErrors) return ExitCause::ERROR_CATCHED;
+    if (hasToStop) return ExitCause::STOP_BY_USER;
 
-    if (hasErrors)
-        return false;
 
-    // lancio il thread di esecuzione dei punti
-    updateStatusAsync("Starting file process thread...");
-    fileProcessorThread.reset(
-                new RowTileProcessor(
-                    ROWTILE_PROCESSOR_THREAD_NAME,
-                    filePath,
-                    tileSizeUm));
+    if (!isResumePrint) {
+
+        // lancio il thread di esecuzione dei punti (da nuovo)
+        updateStatusAsync("Starting file process thread...");
+        fileProcessorThread.reset(
+                    new RowTileProcessor(
+                        ROWTILE_PROCESSOR_THREAD_NAME,
+                        filePath,
+                        tileSizeUm));
+
+    } else {
+
+        // lancio il thread di esecuzione dei punti (da stato salvato)
+        int rowIndex = printStatus.getRowIndex();
+        if (printStatus.getTileYToPrint().isEmpty())
+            rowIndex++;
+
+        updateStatusAsync("Starting file process thread for resume previous print...");
+        fileProcessorThread.reset(
+                    new ResumeRowTileProcessor(
+                        RESUME_ROWTILE_PROCESSOR_THREAD_NAME,
+                        filePath,
+                        tileSizeUm,
+                        rowIndex
+                        ));
+
+    }
 
 
     // aspetto che il thread sia avviato
     {
+        updateStatusAsync("Starting file process thread... OK");
         canContinue = false;
-        QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-            hasErrors = true;
+
+        QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+            errorCatched = true;
             if (localEventLoop.isRunning())
                 localEventLoop.quit();
         });
         QMetaObject::Connection c1 = connect(&localTimer, &QTimer::timeout, [&]() {
             localEventLoop.quit();
         });
-        QMetaObject::Connection c2 = connect(fileProcessorThread.data(), &ProcessorThread::processStarted, [&]() {
+        QMetaObject::Connection c2 = connect(fileProcessorThread.data(), &ProcessorThread::loopRunning, this, [&]() {
             canContinue = true;
+            localEventLoop.quit();
+        });
+        QMetaObject::Connection c3 = connect(fileProcessorThread.data(), &ProcessorThread::processFinished, this, [&]() {
+            canContinue = false;
+            localEventLoop.quit();
+        });
+        QMetaObject::Connection c4 = connect(this, &Worker::stopRequestSignal, [&]() {
+            isStopByUser = true;
+            traceInfo() << "Stop richiesto dall'utente";
             localEventLoop.quit();
         });
 
         fileProcessorThread->start();
-        updateStatusAsync("Starting file process thread... OK");
-
         updateLastCommandExecute(PrintCommandExecuted::PROCESSOR_THREAD_RUN);
 
         localTimer.start();
@@ -528,14 +612,19 @@ bool Worker::process() {
         QObject::disconnect(ce);
         QObject::disconnect(c1);
         QObject::disconnect(c2);
-
-        if (hasErrors)
-            return false;
+        QObject::disconnect(c3);
+        QObject::disconnect(c4);
 
         if (!canContinue) {
+            if (errorCatched)
+                return ExitCause::ERROR_CATCHED;
+            if (isStopByUser)
+                return ExitCause::STOP_BY_USER;
+
             traceErr() << "Il thread di processo dei dati non si e' avviato";
             showDialogAsync("Error", "Il thread di processo dei dati non si e' avviato");
-            return false;
+
+            return ExitCause::INTERNAL_ERROR;
         }
 
     }
@@ -546,7 +635,7 @@ bool Worker::process() {
     if (!ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_1)) {
         traceErr() << "Impossibile attivare l'aria compressa";
         showDialogAsync("Error", "Impossibile attivare l'aria compressa");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
 
@@ -555,7 +644,7 @@ bool Worker::process() {
     if (!ioManager->setDigitalOutput(IOType::COMPRESSED_AIR_2)) {
         traceErr() << "Impossibile attivare l'aria compressa 2";
         showDialogAsync("Error", "Impossibile attivare l'aria compressa 2");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
 
@@ -564,7 +653,7 @@ bool Worker::process() {
     if (!ioManager->setDigitalOutput(IOType::SUCTION)) {
         traceErr() << "Impossibile attivare l'aspirazione";
         showDialogAsync("Error", "Impossibile attivare l'aspirazione");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
 
@@ -573,7 +662,7 @@ bool Worker::process() {
     if (!ioManager->setDigitalOutput(IOType::LASER_POWER)) {
         traceErr() << "Impossibile attivare la potenza del laser";
         showDialogAsync("Error", "Impossibile attivare la potenza del laser");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
 
@@ -582,10 +671,11 @@ bool Worker::process() {
     if (!ioManager->setDigitalOutput(IOType::POWER_SCAN)) {
         traceErr() << "Impossibile abilitare il power scan";
         showDialogAsync("Error", "Impossibile abilitare il power scan");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     updateLastCommandExecute(PrintCommandExecuted::IO_ACTIVATED);
+
 
     // inizio configurazione testa scansione ipg
     updateStatusAsync("Initalizing laser...");
@@ -595,7 +685,7 @@ bool Worker::process() {
         traceErr() << "Impossibile accendere il laser";
         showDialogAsync("Error", "Impossibile accendere il laser." \
                                  "\nVedere il log per maggiori dettagli.");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     updateLastCommandExecute(PrintCommandExecuted::LASER_ON);
@@ -604,7 +694,7 @@ bool Worker::process() {
         traceErr() << "Impossibile interrogare l'energia dell'impulso del laser";
         showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser" \
                                  "\nVedere il log per maggiori dettagli.");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 #endif
     updateStatusAsync("Initalizing laser... OK");
@@ -614,7 +704,7 @@ bool Worker::process() {
     if (pointShape == PointShapeEnum::UNDEFINED) {
         traceErr() << "Non e' stato selezionato alcuna forma di punto";
         showDialogAsync("Error", "Non e' stato selezionato alcuna forma di punto");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     imlw::VectorList circleVectorsWRevolutions;
@@ -637,13 +727,13 @@ bool Worker::process() {
     if (scannerList.empty()) {
         traceErr() << "Impossibile trovare lo scanner";
         showDialogAsync("Error", "Impossibile trovare lo scanner");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     if (scannerList.at(0).getStatus() != imlw::ConnectionStatus::AVAILABLE) {
         traceErr() << "Lo scanner e' nello stato di busy";
         showDialogAsync("Error", "Lo scanner e' nello stato di busy");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     std::string err;
@@ -692,7 +782,7 @@ bool Worker::process() {
         traceErr() << "Eccezione in fase di connessione con testa scansione";
         traceErr() << "Descrizione eccezione: " << ex.what();
         showDialogAsync("Error", "Eccezione in fase di connessione con testa scansione");
-        return false;
+        return ExitCause::INTERNAL_ERROR;
     }
 
     /* NOTE NIC 24/06/2019 - sleep connessione testa
@@ -711,47 +801,47 @@ bool Worker::process() {
     QElapsedTimer tileMeasureTimer;
     QElapsedTimer stackedTileMeasureTimer;
     QElapsedTimer printMeasureTimer;
-    int tileCounter = 0;
+
     int totalNumberOfPoints = filter.getNumOfPoints();
     int numberOfPointsPrinted = 0;
     int numberOfPointsRemains = totalNumberOfPoints;
 
     // faccio svuotare la coda degli eventi (mi serve per controllare se e' stato premuto il pulsante stop)
     qApp->processEvents();
-    if (hasToStop)
-        return true;
-
-    if (hasErrors)
-        return false;
+    if (hasErrors) return ExitCause::ERROR_CATCHED;
+    if (hasToStop) return ExitCause::STOP_BY_USER;
 
     printMeasureTimer.start();
 
     updateLastCommandExecute(PrintCommandExecuted::PRINT_LOOP);
 
-    // ciclo su tutte le righe
-    bool continueLoop = true;
-    bool exitCorrectly = true;
+    ExitCause exitCause = ExitCause::NOT_VALID;
 
-    while (continueLoop && fileProcessorThread->hasNext()) {
+    // ciclo su tutte le righe RowTile
+    while (canContinue && fileProcessorThread->hasNext()) {
 
         GridRowI row;
         qApp->processEvents();
         updateStatusAsync("Creating row data...");
         bool isNextValid = fileProcessorThread->getNext(&row);
         if (!isNextValid) {
-            continueLoop = false;
             traceErr() << "Il thread processor non ha generato una riga valida";
-            exitCorrectly = false;
+            showDialogAsync("Error", "Il thread processor non ha generato una riga valida");
+            canContinue = false;
+            exitCause = ExitCause::INTERNAL_ERROR;
             continue;
         }
 
-        if (neighborhoodIsTopBottomOrder) {
-            traceInfo() << "Stampa in modalita' NH in modalita' top to bottom";
-            row = ComputationUtils::fromTopToBottom(row);
+        int rowIndex = row.getTileList().at(0).getRowIndex();
+        printStatus.setRowIndex(rowIndex);
+        if (printStatus.getTileYToPrint().isEmpty()) {
+            int maxCols = row.getMaxCols();
+            printStatus.reloadTileY(maxCols);
         }
+
         updateStatusAsync("Creating row data... OK");
 
-        int xUm = row.at(0).getBoundingBox().getMin().getX();
+        int xUm = row.getTileList().at(0).getBoundingBox().getMin().getX();
         int offsetXum = offsetXmm * 1000;
         int tileSizeUm = tileSizeMm * 1000 * 0.5;
 
@@ -769,6 +859,8 @@ bool Worker::process() {
 #ifdef FLAG_MOCK_MOTION_PRESENT
         moveXmm = 0;
 #endif
+
+        // inizio spostamento asse x
         int res = this->motionManager->moveX(moveXmm);
 
         if (motionManager->isErr(res)) {
@@ -776,30 +868,31 @@ bool Worker::process() {
             traceErr() << "Errore comando move asse X - codice:" << res;
             traceErr() << "Descrizione:" << descrErr;
             showDialogAsync("Error move asse X", QString("Descrizione errore: %1").arg(descrErr));
-            continueLoop = false;
-            exitCorrectly = false;
+            canContinue = false;
+            exitCause = ExitCause::INTERNAL_ERROR;
+            continue;
 
         } else {
 
             localTimer.setInterval(MOTION_CHECK_TIME_MS);
 
             res = MOTION_MANAGER_NO_ERR;
+            canContinue = false;
 
-            QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-                hasErrors = true;
+            QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+                errorCatched = true;
                 if (localEventLoop.isRunning())
                     localEventLoop.quit();
             });
             QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
                 if (localEventLoop.isRunning() && !localTimer.isActive()) {
                     if (!mb.getAxisXMoveInProgress()) {
-                        if (mb.getAxisXStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
+                        if (mb.getAxisXStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY) {
                             res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
-                        else {
+                            canContinue = true;
+                        } else
                             res = MOTION_MANAGER_MOTION_X_STOP_ERROR;
-                            continueLoop = false;
-                            showDialogAsync("Errore stop asse X", QString("L'asse X si e' fermato in modo anomalo"));
-                        }
+
                         localEventLoop.quit();
                     }
                     QObject::disconnect(c1);
@@ -807,18 +900,17 @@ bool Worker::process() {
             });
             QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
                 if (localEventLoop.isRunning()) {
-                    if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
+                    if (sc == MotionStopCode::MOTION_STOP_CORRECTLY) {
                         res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
-                    else {
+                        canContinue = false;
+                    } else
                         res = MOTION_MANAGER_MOTION_X_STOP_ERROR;
-                        continueLoop = false;
-                        showDialogAsync("Errore stop asse X", QString("L'asse X si e' fermato in modo anomalo"));
-                    }
+
                     localEventLoop.quit();
                 }
             });
-            QMetaObject::Connection c3 = connect(this, &Worker::stopRequest, [&]() {
-                continueLoop = false;
+            QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+                isStopByUser = true;
                 traceInfo() << "Stop richiesto dall'utente";
                 localEventLoop.quit();
             });
@@ -831,377 +923,459 @@ bool Worker::process() {
             QObject::disconnect(c2);
             QObject::disconnect(c3);
 
-            if (hasErrors)
-                return false;
-
-            if (this->motionManager->isErr(res)) {
-                continueLoop = false;
-                exitCorrectly = false;
+            if (!canContinue) {
+                if (errorCatched)
+                    exitCause = ExitCause::ERROR_CATCHED;
+                if (isStopByUser)
+                    exitCause = ExitCause::STOP_BY_USER;
+                else {
+                    traceErr() << "L'asse X si e' fermato in modo anomalo";
+                    showDialogAsync("Errore stop asse X", QString("L'asse X si e' fermato in modo anomalo"));
+                    exitCause = ExitCause::INTERNAL_ERROR;
+                }
             }
 
         }
 
-        if (!continueLoop)
+        if (!canContinue)
             continue;
 
-        // per ogni riga, dai tile creo gli stacked tile
-        updateStatusAsync("Creazione stacked tile");
-        QVector<StackedTileI> stackedTiles;
 
+        // se necessario, randomizzo l'ordine dei tile presenti in una RowTile
+        GridRowI rowTiles;
         if (isRandomAlgorithm) {
 
-            for (auto&& item: row)
-                stackedTiles.append(StackedTileI(ComputationUtils::shuffleTile(item), randomPointsPerTile));
+            traceInfo() << "Algoritmo random";
+            if (randomIsShuffleRowTiles) {
+                traceInfo() << "Disordino i GridTile della riga corrente";
+                rowTiles = ComputationUtils::shuffleRowTile(row);
+            } else
+                rowTiles = row;
 
         } else if (isNeighborhoodAlgorithm) {
 
-            for (auto&& item: row)
-                stackedTiles.append(StackedTileI(item, neighborhoodMinDistanceUm, neighborhoodMinDistanceUm));
+            traceInfo() << "Algoritmo neighborhood";
+
+            if (neighborhoodIsShuffleRowTiles) {
+                traceInfo() << "Disordino i GridTile della riga corrente";
+                rowTiles = ComputationUtils::shuffleRowTile(row);
+            } else if (neighborhoodIsReverseY) {
+                traceInfo() << "Ordino i GridTile in Y-Reverse";
+                rowTiles = ComputationUtils::reverseYOrder(row);
+            } else {
+                rowTiles = row;
+            }
 
         } else {
 
-            for (auto&& item: row)
-                stackedTiles.append(StackedTileI(item, randomPointsPerTile));
+            traceErr() << "Nessun algoritmo selezionato";
+            showDialogAsync("Algoritmo foratura", QString("Nessun algoritmo selezionato"));
+            exitCause = ExitCause::INTERNAL_ERROR;
 
         }
 
-        // una volta creati gli stacked tile, devo creare la lista di tutti i tile per mescolarli
-        QList<TileI> rowTiles;
-        for (const StackedTileI& stack: stackedTiles) {
 
-            if (isNeighborhoodAlgorithm && neighborhoodIsShuffleStackedTiles)
-                rowTiles.append(ComputationUtils::shuffleList(stack.getTiles()));
+        // qui inizio a ciclare su tutti i tile della RowTile
+        for (const GridTileI& tile: rowTiles.getTileList()) {
+
+            if (!canContinue)
+                break;
+
+            int colIndex = tile.getColIndex();
+            traceInfo() << QString("Verifico che il tile [%0, %1] non sia stato gia' stampato").arg(rowIndex).arg(colIndex);
+
+            if (tile.isEmpty()) {
+                traceInfo() << "Il tile non contiene punti, vado al successivo";
+                continue;
+            }
+
+            if (!printStatus.isTileYToPrint(colIndex)) {
+                traceInfo() << "Tile gia' stampato; vado al successivo tile";
+                continue;
+            }
+            traceInfo() << QString("Stampo tile con indice [%0, %1]").arg(rowIndex).arg(colIndex);
+
+            // per ogni riga, dai tile creo gli stacked tile
+            updateStatusAsync("Creazione stacked tile");
+            StackedTileI stackedTile;
+
+            if (isRandomAlgorithm)
+                stackedTile = StackedTileI(ComputationUtils::shuffleTile(tile), randomPointsPerTile);
+            else if (isNeighborhoodAlgorithm)
+                stackedTile = StackedTileI(tile, neighborhoodMinDistanceUm, neighborhoodMinDistanceUm);
             else
-                rowTiles.append(stack.getTiles());
-        }
+                stackedTile = StackedTileI(tile, randomPointsPerTile);
 
-        QList<TileI> sl;
-        // disordino i tiles di ogni singola riga
-        if (isRandomAlgorithm && randomIsShuffleRowTiles)
-            sl = ComputationUtils::shuffleList(rowTiles);
-        else if (isNeighborhoodAlgorithm && neighborhoodIsShuffleRowTiles)
-            sl = ComputationUtils::shuffleList(rowTiles);
-        else
-            sl = rowTiles;
+            // una volta creati gli stacked tile, devo creare la lista di tutti i tile per mescolarli
+            QList<TileI> tiles = stackedTile.getTiles();
 
-        float lastMoveYmm = 0;
+            // disordino i tiles di ogni singola riga (se necessario)
+            if (isNeighborhoodAlgorithm && neighborhoodIsShuffleStackedTiles)
+                tiles = ComputationUtils::shuffleList(tiles);
 
-        for (auto&& currentTile: sl) {
-
-            tileMeasureTimer.start();
-
-            // dalla lista, inizio a stampare ogni singolo tile
-            int yUm = currentTile.getBoundingBox().getMin().getY();
+            // inizio la logica per lo spostamento della testa lungo l'asse y
+            int yUm = tile.getBoundingBox().getMin().getY();
             int offsetYum = offsetYmm * 1000;
             int tileSizeUm = tileSizeMm * 1000 * 0.5;
 
             int moveYum = yUm + offsetYum + tileSizeUm;
             float moveYmm = (float) moveYum * 0.001;
 
-#ifdef FLAG_MOCK_MOTION_PRESENT
-            lastMoveYmm = moveYmm;
-#endif
+            traceInfo() << "Spostamento testa lungo l'asse Y per bounding box immagine: " << yUm << "um";
+            traceInfo() << "Offset lungo l'asse Y: " << offsetYum << "um";
+            traceInfo() << "Offset per dimensione tile Y (diviso per 2): " << tileSizeUm << "um";
+            traceInfo() << "Spostamento testa lungo l'asse Y totale: " << moveYum << "um";
+            traceInfo() << "Spostamento testa lungo l'asse Y totale: " << moveYmm << "mm";
 
-            if (lastMoveYmm != moveYmm) {
-
-                traceInfo() << "Spostamento testa lungo l'asse Y per bounding box immagine: " << yUm << "um";
-                traceInfo() << "Offset lungo l'asse Y: " << offsetYum << "um";
-                traceInfo() << "Offset per dimensione tile Y (diviso per 2): " << tileSizeUm << "um";
-                traceInfo() << "Spostamento testa lungo l'asse Y totale: " << moveYum << "um";
-                traceInfo() << "Spostamento testa lungo l'asse Y totale: " << moveYmm << "mm";
-
-                updateStatusAsync("Spostamento testa lungo l'asse Y");
-                stackedTileMeasureTimer.start();
+            updateStatusAsync("Spostamento testa lungo l'asse Y");
 
 #ifdef FLAG_MOCK_MOTION_PRESENT
-                moveYmm = 0;
+            moveYmm = 0;
 #endif
 
-                res = this->motionManager->moveY(moveYmm);
-                lastMoveYmm = moveYmm;
+            // inizio spostamento asse y
+            res = this->motionManager->moveY(moveYmm);
 
-                if (motionManager->isErr(res)) {
+            if (motionManager->isErr(res)) {
 
-                    QString descrErr = MotionManager::decodeError(res);
-                    traceErr() << "Errore comando move asse Y - codice:" << res;
-                    traceErr() << "Descrizione:" << descrErr;
-                    showDialogAsync("Error move asse Y", QString("Descrizione errore: %1").arg(descrErr));
-                    continueLoop = false;
-                    exitCorrectly = false;
-                    continue;
+                QString descrErr = MotionManager::decodeError(res);
+                traceErr() << "Errore comando move asse Y - codice:" << res;
+                traceErr() << "Descrizione:" << descrErr;
+                showDialogAsync("Error move asse Y", QString("Descrizione errore: %1").arg(descrErr));
+                canContinue = false;
+                exitCause = ExitCause::INTERNAL_ERROR;
+                continue;
 
-                } else {
+            } else {
 
-                    localTimer.setInterval(MOTION_CHECK_TIME_MS);
+                localTimer.setInterval(MOTION_CHECK_TIME_MS);
 
-                    res = MOTION_MANAGER_NO_ERR;
+                res = MOTION_MANAGER_NO_ERR;
+                canContinue = false;
 
-                    QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-                        hasErrors = true;
-                        if (localEventLoop.isRunning())
-                            localEventLoop.quit();
-                    });
-                    QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
-                        if (localEventLoop.isRunning() && !localTimer.isActive()) {
-                            if (!mb.getAxisYMoveInProgress()) {
-                                if (mb.getAxisYStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY)
-                                    res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
-                                else {
-                                    res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
-                                    continueLoop = false;
-                                    showDialogAsync("Errore stop asse Y", QString("L'asse Y si e' fermato in modo anomalo"));
-                                }
-                            }
-                            localEventLoop.quit();
-                            QObject::disconnect(c1);
-                        }
-                    });
-                    QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
-                        if (localEventLoop.isRunning()) {
-                            if (sc == MotionStopCode::MOTION_STOP_CORRECTLY)
-                                res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
-                            else {
-                                res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
-                                continueLoop = false;
-                                showDialogAsync("Errore stop asse Y", QString("L'asse Y si e' fermato in modo anomalo"));
-                            }
-                            localEventLoop.quit();
-                        }
-                    });
-                    QMetaObject::Connection c3 = connect(this, &Worker::stopRequest, [&]() {
-                        continueLoop = false;
-                        traceInfo() << "Stop richiesto dall'utente";
+                QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+                    errorCatched = true;
+                    if (localEventLoop.isRunning())
                         localEventLoop.quit();
-                    });
+                });
+                QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
+                    if (localEventLoop.isRunning() && !localTimer.isActive()) {
+                        if (!mb.getAxisYMoveInProgress()) {
+                            if (mb.getAxisYStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY) {
+                                res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                                canContinue = true;
+                            } else
+                                res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
 
-                    localTimer.start();
-                    localEventLoop.exec();
-                    localTimer.stop();
-                    QObject::disconnect(ce);
-                    QObject::disconnect(c1);
-                    QObject::disconnect(c2);
-                    QObject::disconnect(c3);
-
-                    if (hasErrors)
-                        return false;
-
-                    if (this->motionManager->isErr(res)) {
-                        continueLoop = false;
-                        exitCorrectly = false;
+                        }
+                        localEventLoop.quit();
+                        QObject::disconnect(c1);
                     }
+                });
+                QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
+                    if (localEventLoop.isRunning()) {
+                        if (sc == MotionStopCode::MOTION_STOP_CORRECTLY) {
+                            res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
+                            canContinue = false;
+                        } else
+                            res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
 
+                        localEventLoop.quit();
+                    }
+                });
+                QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+                    isStopByUser = false;
+                    traceInfo() << "Stop richiesto dall'utente";
+                    localEventLoop.quit();
+                });
+
+                localTimer.start();
+                localEventLoop.exec();
+                localTimer.stop();
+                QObject::disconnect(ce);
+                QObject::disconnect(c1);
+                QObject::disconnect(c2);
+                QObject::disconnect(c3);
+
+                if (!canContinue) {
+                    if (errorCatched)
+                        exitCause = ExitCause::ERROR_CATCHED;
+                    if (isStopByUser)
+                        exitCause = ExitCause::STOP_BY_USER;
+                    else {
+                        traceErr() << "L'asse Y si e' fermato in modo anomalo";
+                        showDialogAsync("Errore stop asse Y", QString("L'asse Y si e' fermato in modo anomalo"));
+                        exitCause = ExitCause::INTERNAL_ERROR;
+                    }
+                } else
                     this->thread()->msleep(waitTimeAfterYMovementMs);
-                }
             }
 
-            if (!continueLoop)
+            if (!canContinue)
                 break;
 
-            updateStatusAsync("Stampa tile");
+            /* una volta completato lo spostamento dell'asse y, inizio con
+             * iterare ciascun tile presente nello StackedTile
+             */
 
-#ifdef FLAG_SCANNER_HEAD_PRESENT
-            try {
-                scanner->laser(imlw::LaserAction::Enable);
-            } catch (imlw::LibraryException& ex) {
-                traceErr() << "Eccezione testa scansione al comando laser enable";
-                traceErr() << "Descrizione eccezione: " << ex.what();
-                showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
-                continueLoop = false;
-                exitCorrectly = false;
-            }
-#endif
-            if (!continueLoop)
-                break;
+            stackedTileMeasureTimer.start();
 
-            PointI offset = currentTile.getCenter();
-            offset.setX(-offset.getX());
-            offset.setY(-offset.getY());
-            PointSetI movePoints = ComputationUtils::movePointSet(currentTile.getPointSet(), offset);
-            movePoints = ComputationUtils::axisBase2HeadBase(movePoints);
-            const QVector<PointI>& vectorPoints = movePoints.getVector();
-            numberOfPointsPrinted += vectorPoints.size();
-            numberOfPointsRemains -= vectorPoints.size();
+            emit enablePauseSignal(true);
 
             QTimer waitTimeTimer;
             waitTimeTimer.setInterval(waitTimeMs);
             waitTimeTimer.setSingleShot(true);
 
-            if (pointShape == PointShapeEnum::POINT) {
+            int tileCounter = 0;
+            int stackTileSize = tiles.size();
 
-                std::list<imlw::Point> listOfPoints;
-                for (auto&& p: vectorPoints)
-                    listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
+            for (auto&& currentTile: tiles) {
 
-                imlw::PointList outputPoints(listOfPoints);
-                outputPoints.rotate(angleRad);
-                outputPoints.scale(tileScaleXUnit, tileScaleYUnit, 1);
+                if (!canContinue)
+                    break;
 
-                waitTimeTimer.start();
+                // dalla lista, inizio a stampare ogni singolo tile
+                tileMeasureTimer.start();
 
-#ifdef FLAG_SCANNER_HEAD_PRESENT
-                try {
-
-                    scanner->output(outputPoints);
-                    listOfPoints.clear();
-                    scanner->laser(imlw::LaserAction::Disable);
-
-                } catch (imlw::LibraryException& ex) {
-                    traceErr() << "Eccezione testa scansione al comando output punti";
-                    traceErr() << "Descrizione eccezione: " << ex.what();
-                    showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
-                    continueLoop = false;
-                    exitCorrectly = false;
-                }
-#endif
-
-            } else if (pointShape == PointShapeEnum::CIRCLE_POINTS) {
-
-                imlw::PointList circles;
-                for (auto&& p: vectorPoints) {
-
-                    imlw::PointList singleCirclePoints;
-                    singleCirclePoints.append(singleCirclePointList);
-                    singleCirclePoints.shift(p.getX(), p.getY(), 0);
-                    circles.append(singleCirclePoints);
-                }
-                circles.rotate(angleRad);
-                circles.scale(tileScaleXUnit, tileScaleYUnit, 1);
-
-                waitTimeTimer.start();
+                updateStatusAsync(QString("Stampa tile [%0, %1] - %2 di %3").arg(rowIndex).arg(colIndex).arg(tileCounter).arg(stackTileSize));
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
                 try {
-
-                    scanner->output(circles);
-                    scanner->laser(imlw::LaserAction::Disable);
-
+                    scanner->laser(imlw::LaserAction::Enable);
                 } catch (imlw::LibraryException& ex) {
-                    traceErr() << "Eccezione testa scansione al comando output vettori";
+                    traceErr() << "Eccezione testa scansione al comando laser enable";
                     traceErr() << "Descrizione eccezione: " << ex.what();
                     showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
-                    continueLoop = false;
-                    exitCorrectly = false;
+                    exitCause = ExitCause::INTERNAL_ERROR;
+                    canContinue = false;
                 }
 #endif
+                if (!canContinue)
+                    break;
 
-            } else if (pointShape == PointShapeEnum::CIRCLE_VECTOR) {
+                PointI offset = currentTile.getCenter();
+                offset.setX(-offset.getX());
+                offset.setY(-offset.getY());
+                PointSetI movePoints = ComputationUtils::movePointSet(currentTile.getPointSet(), offset);
+                movePoints = ComputationUtils::axisBase2HeadBase(movePoints);
+                const QVector<PointI>& vectorPoints = movePoints.getVector();
+                numberOfPointsPrinted += vectorPoints.size();
+                numberOfPointsRemains -= vectorPoints.size();
 
-                imlw::VectorList circlesVet;
-                for (auto&& p: vectorPoints) {
+                if (pointShape == PointShapeEnum::POINT) {
 
-                    imlw::VectorList singleCircle;
-                    singleCircle.append(circleVectorsWRevolutions);
-                    singleCircle.shift(p.getX(), p.getY(), 0);
-                    circlesVet.append(singleCircle);
-                }
-                circlesVet.rotate(angleRad);
-                circlesVet.scale(tileScaleXUnit, tileScaleYUnit, 1);
+                    std::list<imlw::Point> listOfPoints;
+                    for (auto&& p: vectorPoints)
+                        listOfPoints.push_back(imlw::Point(p.getX(), p.getY()));
 
-                waitTimeTimer.start();
+                    imlw::PointList outputPoints(listOfPoints);
+                    outputPoints.rotate(angleRad);
+                    outputPoints.scale(tileScaleXUnit, tileScaleYUnit, 1);
+
+                    waitTimeTimer.start();
 
 #ifdef FLAG_SCANNER_HEAD_PRESENT
-                try {
+                    try {
 
-                    scanner->output(circlesVet);
-                    scanner->laser(imlw::LaserAction::Disable);
+                        scanner->output(outputPoints);
+                        listOfPoints.clear();
+                        scanner->laser(imlw::LaserAction::Disable);
 
-                } catch (imlw::LibraryException& ex) {
-                    traceErr() << "Eccezione testa scansione al comando output vettori";
-                    traceErr() << "Descrizione eccezione: " << ex.what();
-                    showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
-                    continueLoop = false;
-                    exitCorrectly = false;
-                }
+                    } catch (imlw::LibraryException& ex) {
+                        traceErr() << "Eccezione testa scansione al comando output punti";
+                        traceErr() << "Descrizione eccezione: " << ex.what();
+                        showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
+                        exitCause = ExitCause::INTERNAL_ERROR;
+                        canContinue = false;
+                    }
 #endif
+
+                } else if (pointShape == PointShapeEnum::CIRCLE_POINTS) {
+
+                    imlw::PointList circles;
+                    for (auto&& p: vectorPoints) {
+
+                        imlw::PointList singleCirclePoints;
+                        singleCirclePoints.append(singleCirclePointList);
+                        singleCirclePoints.shift(p.getX(), p.getY(), 0);
+                        circles.append(singleCirclePoints);
+                    }
+                    circles.rotate(angleRad);
+                    circles.scale(tileScaleXUnit, tileScaleYUnit, 1);
+
+                    waitTimeTimer.start();
+
+#ifdef FLAG_SCANNER_HEAD_PRESENT
+                    try {
+
+                        scanner->output(circles);
+                        scanner->laser(imlw::LaserAction::Disable);
+
+                    } catch (imlw::LibraryException& ex) {
+                        traceErr() << "Eccezione testa scansione al comando output vettori";
+                        traceErr() << "Descrizione eccezione: " << ex.what();
+                        showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
+                        exitCause = ExitCause::INTERNAL_ERROR;
+                        canContinue = false;
+                    }
+#endif
+
+                } else if (pointShape == PointShapeEnum::CIRCLE_VECTOR) {
+
+                    imlw::VectorList circlesVet;
+                    for (auto&& p: vectorPoints) {
+
+                        imlw::VectorList singleCircle;
+                        singleCircle.append(circleVectorsWRevolutions);
+                        singleCircle.shift(p.getX(), p.getY(), 0);
+                        circlesVet.append(singleCircle);
+                    }
+                    circlesVet.rotate(angleRad);
+                    circlesVet.scale(tileScaleXUnit, tileScaleYUnit, 1);
+
+                    waitTimeTimer.start();
+
+#ifdef FLAG_SCANNER_HEAD_PRESENT
+                    try {
+
+                        scanner->output(circlesVet);
+                        scanner->laser(imlw::LaserAction::Disable);
+
+                    } catch (imlw::LibraryException& ex) {
+                        traceErr() << "Eccezione testa scansione al comando output vettori";
+                        traceErr() << "Descrizione eccezione: " << ex.what();
+                        showDialogAsync("Errore testa scanzione", QString("Descrizione eccezione: %1").arg(ex.what()));
+                        exitCause = ExitCause::INTERNAL_ERROR;
+                        canContinue = false;
+                    }
+#endif
+                }
+
+                if (!canContinue)
+                    break;
+
+                /*
+                 * NOTE NIC 31/07/2019 - il funzionamento teorico e' il seguente:
+                 * una volta inviato i punti alla testa, aspetto 2 eventi:
+                 * 1. tempo attesa tile non scada
+                 * 2. segnale che la testa ha finito di stampare
+                 * se il tempo di attesa tile e' scaduto ma la testa sta ancora stampando,
+                 * non faccio piu' partire un terzo timer (da quando gestisco a thread) in quanto
+                 * non ha senso far partire un terzo timer che si basa sul segnale del IOSignaler;
+                 * tanto vale basarsi sul signal del IOSignaler stesso e valutare lo stato della variabile
+                 * MARK_IN_PROGRESS;
+                 * quindi:
+                 * se arriva il segnale che la testa ha finito di stampare ma il tempo di attesa
+                 * non e' ancora scaduto, aspetto che scada il tempo di attesa;
+                 * se il tempo di attesa e' scaduto ma la testa sta ancora stampando, aspetto che
+                 * la testa finisca di stampare (dal signal IOSignaler);
+                 */
+                bool isMarkInProgress = true;
+                QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+                    canContinue = false;
+                    errorCatched = true;
+                    if (localEventLoop.isRunning())
+                        localEventLoop.quit();
+                });
+                QMetaObject::Connection c1 = connect(ioSignaler.data(), &IOSignaler::markInProgressOffSignal, [&]() {
+                    isMarkInProgress = false;
+                    if (localEventLoop.isRunning() && !waitTimeTimer.isActive())
+                        localEventLoop.quit();
+                });
+                QMetaObject::Connection c2 = connect(ioSignaler.data(), &IOSignaler::statusSignal, [&](auto dIn, auto dOut, auto aIn) {
+                    if (localEventLoop.isRunning()) {
+                        Q_UNUSED(dOut);
+                        Q_UNUSED(aIn);
+                        isMarkInProgress = dIn.value(IOType::MARK_IN_PROGRESS).getValue();
+                        if (!isMarkInProgress && !waitTimeTimer.isActive())
+                            localEventLoop.quit();
+                    }
+                });
+                QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+                    isStopByUser = true;
+                    canContinue = false;
+                    traceInfo() << "Stop richiesto dall'utente";
+                    localEventLoop.quit();
+                });
+                QMetaObject::Connection c4 = connect(&waitTimeTimer, &QTimer::timeout, [&]() {
+                    if (!isMarkInProgress)
+                        localEventLoop.quit();
+                });
+                QMetaObject::Connection cp = connect(this, &Worker::pauseRequestSignal, [&]() {
+                    isPauseByUser = true;
+                    showDialogAsync("Info pause", QString("Attesa completamento Stacked tile prima della pausa"));
+                    traceInfo() << "Ricevuto segnalazione di pausa";
+                });
+
+                localEventLoop.exec();
+
+                qint64 tileTimeMeasureMs = tileMeasureTimer.elapsed();
+                updateTileTimeAsync(tileTimeMeasureMs);
+
+                QObject::disconnect(ce);
+                QObject::disconnect(c1);
+                QObject::disconnect(c2);
+                QObject::disconnect(c3);
+                QObject::disconnect(c4);
+                QObject::disconnect(cp);
+
+                qint64 printTimeMeasureMs = printMeasureTimer.elapsed();
+                qint64 estimatedResidualTimeMs = numberOfPointsRemains * printTimeMeasureMs / numberOfPointsPrinted;
+
+                updateEstimatedResidualTimeAsync(estimatedResidualTimeMs);
+                ++tileCounter;
+
+                // faccio svuotare la coda degli eventi (mi serve per controllare se e' stato premuto il pulsante stop)
+                qApp->processEvents();
+                if (!canContinue) {
+                    if (errorCatched)
+                        exitCause = ExitCause::ERROR_CATCHED;
+                    if (isStopByUser)
+                        exitCause = ExitCause::STOP_BY_USER;
+
+                    continue;
+                }
+
             }
 
-            if (!continueLoop)
-                break;
+            emit enablePauseSignal(false);
 
-            /*
-             * NOTE NIC 05/04/2019 - il funzionamento teorico e' il seguente:
-             * una volta inviato i punti alla testa, aspetto 2 eventi:
-             * 1. tempo attesa tile non scada
-             * 2. segnale che la testa ha finito di stampare
-             * se il tempo di attesa tile e' scaduto ma la testa sta ancora stampando,
-             * faccio partire un terzo timer con intervallo di 100ms, che interroga lo stato della testa
-             * se arriva il segnale che la testa ha finito di stampare ma il tempo di attesa
-             * non e' ancora scaduto, aspetto che scada il tempo di attesa
-             * Se nessuna delle due condizioni e' soddisfatta, si occupera' il timer di 100ms
-             * a interrompere l'eventLoop
-             */
-            bool isMarkInProgress = true;
-            QMetaObject::Connection ce = connect(this, &Worker::errorsSignal, [&]() {
-                hasErrors = true;
-                if (localEventLoop.isRunning())
-                    localEventLoop.quit();
-            });
-            QMetaObject::Connection c1 = connect(ioSignaler.data(), &IOSignaler::markInProgressOffSignal, [&]() {
-                isMarkInProgress = false;
-                if (localEventLoop.isRunning() && !waitTimeTimer.isActive())
-                    localEventLoop.quit();
-            });
-            QMetaObject::Connection c2 = connect(ioSignaler.data(), &IOSignaler::statusSignal, [&](auto dIn, auto dOut, auto aIn) {
-                if (localEventLoop.isRunning()) {
-                    Q_UNUSED(dOut);
-                    Q_UNUSED(aIn);
-                    isMarkInProgress = dIn.value(IOType::MARK_IN_PROGRESS).getValue();
-                    int rTime = waitTimeTimer.remainingTime();
-                    if (!isMarkInProgress && !waitTimeTimer.isActive())
-                        localEventLoop.quit();
+            if (canContinue) {
+                /* NOTE NIC 01/08/2019 - rimozione tile stampato
+                 * il tile corrente lo rimuovo da quelli in lista se posso continuare a stampare oppure
+                 * ho completato il tile prima della pausa (se richiesta dall'utente)
+                 */
+
+                /* TODO NIC 01/08/2019 - ripresa stampa in caso di errore
+                 * in ottica futura, la ripresa della stampa in caso di errore dovrebbe venire a gratis;
+                 * e' necessario pero' abilitare il pulsante resume anche in caso di stampa in errore;
+                 */
+                printStatus.removeTileY(colIndex);
+                if (isPauseByUser) {
+                    canContinue = false;
+                    exitCause = ExitCause::PAUSE_BY_USER;
                 }
-            });
-            QMetaObject::Connection c3 = connect(this, &Worker::stopRequest, [&]() {
-                continueLoop = false;
-                traceInfo() << "Stop richiesto dall'utente";
-                localEventLoop.quit();
-            });
-            QMetaObject::Connection c4 = connect(&waitTimeTimer, &QTimer::timeout, [&]() {
-                if (!isMarkInProgress)
-                    localEventLoop.quit();
-            });
+            }
 
-            int rTime = waitTimeTimer.remainingTime();
-            localEventLoop.exec();
+            if (!canContinue)
+                continue;
 
-            qint64 tileTimeMeasureMs = tileMeasureTimer.elapsed();
-            updateTileTimeAsync(tileTimeMeasureMs);
-
-            QObject::disconnect(ce);
-            QObject::disconnect(c1);
-            QObject::disconnect(c2);
-            QObject::disconnect(c3);
-            QObject::disconnect(c4);
-
-            qint64 printTimeMeasureMs = printMeasureTimer.elapsed();
-            qint64 estimatedResidualTimeMs = numberOfPointsRemains * printTimeMeasureMs / numberOfPointsPrinted;
-
-            updateEstimatedResidualTimeAsync(estimatedResidualTimeMs);
-            updateStatusAsync(QString("Tile stampati: %1").arg(++tileCounter));
-
-            if (!continueLoop)
-                break;
-
-            // faccio svuotare la coda degli eventi (mi serve per controllare se e' stato premuto il pulsante stop)
-            qApp->processEvents();
-            if (hasToStop)
-                continueLoop = false;
-
-            if (hasErrors)
-                return false;
-
+            qint64 stackedTileMeasureMs = stackedTileMeasureTimer.elapsed();
+            updateStackedTimeAsync(stackedTileMeasureMs);
         }
 
-        qint64 stackedTileMeasureMs = stackedTileMeasureTimer.elapsed();
-        updateStackedTimeAsync(stackedTileMeasureMs);
-
         if (!canContinue)
-            break;
+            continue;
 
     }
 
+    emit enablePauseSignal(false);
+
+    if (exitCause == ExitCause::NOT_VALID)
+        exitCause = ExitCause::PROCESS_COMPLETED_CORRECTLY;
+
     traceExit;
-    return exitCorrectly;
+    return exitCause;
 
 }
 
@@ -1288,8 +1462,6 @@ bool Worker::afterProcess() {
 
     updateStatusAsync("Detach devices");
     DeviceFactoryInstance.detachManagers();
-
-    emit finished();
 
     updateStatusAsync("End");
     traceExit;
@@ -1566,9 +1738,8 @@ bool Worker::getPulseEnergy(float& energyJoule) {
 
 TestFrameLogic::TestFrameLogic(QObject* parent) :
     QObject(parent),
-    workerThread(nullptr),
-    isProcessStopped(false),
-    isLaserInitialized(false) {
+    motionBean(), laserParametersChanged(false), hasErrors(false), machineStatus(MachineStatus::STATUS_NAN),
+    isProcessStopped(false), isLaserInitialized(false) {
 
 #ifdef FLAG_IPG_YLPN_LASER_PRESENT
     QTimer::singleShot(1000, this, &TestFrameLogic::initIpgYLPNLaser);
@@ -1585,31 +1756,40 @@ void TestFrameLogic::startWork() {
     traceEnter;
 
     traceInfo() << "*** START PROCESS ***";
-    qPtr->ui->pbStartProcess->setEnabled(false);
-    qPtr->ui->pbStopProcess->setEnabled(true);
+    //qPtr->ui->pbStartProcess->setEnabled(false);
+    //qPtr->ui->pbStopProcess->setEnabled(true);
+    //qPtr->ui->pbPauseProcess->setEnabled(false);
 
     qPtr->updatePrintConfiguration();
 
-    PrintConfiguration printConfiguration = qPtr->currentConfiguration;
-
+    PrintConfiguration printConfiguration = this->currentConfiguration;
     QWeakPointer<ErrorManager> errorManager = DeviceFactoryInstance.getErrorManager();
 
-    workerThread = new NamedThread(WORKER_THREAD_NAME);
+    NamedThread::Ptr workerThread = new NamedThread(WORKER_THREAD_NAME);
     Worker::Ptr worker = new Worker();
     worker->setPrintConfiguration(printConfiguration);
+    worker->setPrintStatus(PrintStatus()); // <-- questo rende il pause status non valido
     worker->tfl = this;
 
     connect(workerThread, &QThread::started, worker, &Worker::startProcess);
-    connect(worker, &Worker::finished, workerThread, &QThread::quit);
-    connect(worker, &Worker::finished, worker, &Worker::deleteLater);
+
+    connect(worker, &Worker::enablePauseSignal, this, &TestFrameLogic::enablePauseSignal);
     connect(errorManager.data(), &ErrorManager::hasErrors, worker, &Worker::hasErrorsSignal);
     connect(errorManager.data(), &ErrorManager::hasFatals, worker, &Worker::hasFatalsSignal);
-    connect(this, &TestFrameLogic::stopRequest, worker, &Worker::stopRequest);
-    connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
-    connect(workerThread, &QThread::destroyed, [&]() {
-        this->qPtr->ui->pbStartProcess->setEnabled(true);
-        this->qPtr->ui->pbStopProcess->setEnabled(false);
+    connect(this, &TestFrameLogic::stopRequestSignal, worker, &Worker::stopRequestSignal);
+    connect(this, &TestFrameLogic::pauseRequestSignal, worker, &Worker::pauseRequestSignal);
+
+    connect(worker, &Worker::finishedSignal, this, [&, worker]() {
+        this->printStatus = worker->getPrintStatus();
+        worker->deleteLater(); // <--- lambda expression 1
     });
+    connect(worker, &Worker::finishedSignal, workerThread, &QThread::quit);
+//    connect(worker, &Worker::finishedSignal, worker, &Worker::deleteLater); // non agganciare questo segnale, viene chiamato delateLater sopra
+    connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
+    //connect(workerThread, &QThread::destroyed, [&]() {
+    //    this->qPtr->ui->pbStartProcess->setEnabled(true);
+    //    this->qPtr->ui->pbStopProcess->setEnabled(false);
+    //});
 
     worker->moveToThread(workerThread);
     workerThread->start();
@@ -1619,9 +1799,69 @@ void TestFrameLogic::startWork() {
 }
 
 void TestFrameLogic::stopWork() {
+
     traceEnter;
-    emit stopRequest();
+
+    if (this->machineStatus == MachineStatus::PAUSE) {
+        QSharedPointer<MachineStatusNotifier> machineStatusNotifier = DeviceFactoryInstance.instanceMachineStatusNotifier();
+        machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
+    }
+    emit stopRequestSignal();
     traceExit;
+
+}
+
+void TestFrameLogic::resumeWork() {
+
+    traceEnter;
+    traceInfo() << "*** RESUME PROCESS ***";
+
+    qPtr->ui->pbPauseProcess->setEnabled(false);
+
+    PrintConfiguration printConfiguration = this->currentConfiguration;
+    QWeakPointer<ErrorManager> errorManager = DeviceFactoryInstance.getErrorManager();
+    PrintStatus printStatus = this->printStatus;
+
+    NamedThread::Ptr workerThread = new NamedThread(WORKER_THREAD_NAME);
+    Worker::Ptr worker = new Worker();
+    worker->setPrintConfiguration(printConfiguration);
+    worker->setPrintStatus(printStatus);
+    worker->tfl = this;
+
+    connect(workerThread, &QThread::started, worker, &Worker::startProcess);
+
+    connect(worker, &Worker::enablePauseSignal, this, &TestFrameLogic::enablePauseSignal);
+    connect(errorManager.data(), &ErrorManager::hasErrors, worker, &Worker::hasErrorsSignal);
+    connect(errorManager.data(), &ErrorManager::hasFatals, worker, &Worker::hasFatalsSignal);
+    connect(this, &TestFrameLogic::stopRequestSignal, worker, &Worker::stopRequestSignal);
+    connect(this, &TestFrameLogic::pauseRequestSignal, worker, &Worker::pauseRequestSignal);
+
+    connect(worker, &Worker::finishedSignal, this, [&, worker]() {
+        this->printStatus = worker->getPrintStatus();
+        worker->deleteLater(); // lambda expression 2
+    });
+    connect(worker, &Worker::finishedSignal, workerThread, &QThread::quit);
+//    connect(worker, &Worker::finishedSignal, worker, &Worker::deleteLater); // non agganciare questo segnale, viene chiamato delateLater sopra
+
+    connect(workerThread, &QThread::finished, workerThread, &QThread::deleteLater);
+    //connect(workerThread, &QThread::destroyed, [&]() {
+    //    this->qPtr->ui->pbStartProcess->setEnabled(true);
+    //    this->qPtr->ui->pbStopProcess->setEnabled(false);
+    //});
+
+    worker->moveToThread(workerThread);
+    workerThread->start();
+
+    traceExit;
+
+}
+
+void TestFrameLogic::pauseWork() {
+
+    traceEnter;
+    emit pauseRequestSignal();
+    traceExit;
+
 }
 
 void TestFrameLogic::changeGuideLaserState() {
@@ -1776,8 +2016,7 @@ void TestFrameLogic::initIpgYLPNLaser() {
 
 TestFrame::TestFrame(QWidget *parent) :
     QFrame(parent),
-    ui(new Ui::TestFrame), dPtr(new TestFrameLogic()),
-    laserParametersChanged(false), hasErrors(false), machineStatus(MachineStatus::STATUS_NAN) {
+    ui(new Ui::TestFrame), dPtr(new TestFrameLogic()) {
 
     traceEnter;
 
@@ -1801,7 +2040,7 @@ TestFrame::~TestFrame() {
 void TestFrame::updateMotionBean(const MotionBean& b) {
 
     traceEnter;
-    this->motionBean = b;
+    dPtr->motionBean = b;
     this->updateUi();
     traceExit;
 
@@ -1810,7 +2049,7 @@ void TestFrame::updateMotionBean(const MotionBean& b) {
 void TestFrame::updateHasErrors(bool hasErrors) {
 
     traceEnter;
-    this->hasErrors = hasErrors;
+    dPtr->hasErrors = hasErrors;
     this->updateUi();
     traceExit;
 
@@ -1819,7 +2058,7 @@ void TestFrame::updateHasErrors(bool hasErrors) {
 void TestFrame::updateMachineStatus(const MachineStatus& s) {
 
     traceEnter;
-    this->machineStatus = s;
+    dPtr->machineStatus = s;
     this->updateUi();
     traceExit;
 
@@ -1879,7 +2118,7 @@ void TestFrame::showPopup(const QString& err, const QString& descr) {
 void TestFrame::updatePrintConfiguration() {
 
     traceEnter;
-    PrintConfiguration& pc = this->currentConfiguration;
+    PrintConfiguration& pc = dPtr->currentConfiguration;
 
     // percorso file
     pc.setFilePath(ui->leFilePath->text());
@@ -1896,8 +2135,8 @@ void TestFrame::updatePrintConfiguration() {
     pc.setLaserFrequency(ui->sbLaserFrequency->value());
 
     // scelta algoritmo
-    pc.setIsRandomAlgorithm(ui->cbRandomChoice->isChecked());
-    pc.setIsNeighborhoodAlgorithm(ui->cbNHChoice->isChecked());
+    pc.setIsRandomAlgorithm(ui->rbRandomChoice->isChecked());
+    pc.setIsNeighborhoodAlgorithm(ui->rbNHChoice->isChecked());
 
     // configurazione random
     pc.setRandomPointsPerTile(ui->sbRPointsPerTile->value());
@@ -1905,9 +2144,9 @@ void TestFrame::updatePrintConfiguration() {
 
     // configurazione neighborhood
     pc.setNeighborhoodMinDistanceUm(ui->sbNHMinDistance->value());
+    pc.setNeighborhoodIsShuffleRowTiles(ui->rbNHShuffleRowTiles->isChecked());
+    pc.setNeighborhoodIsReverseY(ui->rbNHReverseY->isChecked());
     pc.setNeighborhoodIsShuffleStackedTiles(ui->cbNHShuffleStackedTiles->isChecked());
-    pc.setNeighborhoodIsShuffleRowTiles(ui->cbNHShuffleRowTiles->isChecked());
-    pc.setNeighborhoodIsTopBottomOrder(ui->cbNHTopBottomOrder->isChecked());
 
     // scelta del punto di stampa
     pc.setPointShape(static_cast<PointShapeEnum>(pointShapeGroup->checkedId()));
@@ -1948,9 +2187,9 @@ void TestFrame::updatePrintConfiguration() {
 
     // CONFIGURAZIONE NEIGHBORHOOD
     stringList << "Neighborhood min distance um: " << QString::number(pc.getNeighborhoodMinDistanceUm()) << "\r\n";
-    stringList << "Neighborhood is shuffle stacked tiles: " << QString::number(pc.getNeighborhoodIsShuffleStackedTiles()) << "\r\n";
     stringList << "Neighborhood is shuffle row tiles: " << QString::number(pc.getNeighborhoodIsShuffleRowTiles()) << "\r\n";
-    stringList << "Neighborhood is top bottom order: " << QString::number(pc.getNeighborhoodIsTopBottomOrder()) << "\r\n";
+    stringList << "Neighborhood is reverse Y: " << QString::number(pc.getNeighborhoodIsReverseY()) << "\r\n";
+    stringList << "Neighborhood is shuffle stacked tiles: " << QString::number(pc.getNeighborhoodIsShuffleStackedTiles()) << "\r\n";
 
     // SCELTA DEL PUNTO DI STAMPA
     stringList << "Point shape: " << getStringFromPointShapeEnum(pc.getPointShape()) << "\r\n";
@@ -1979,6 +2218,8 @@ void TestFrame::restorePrintConfiguration() {
 
     traceEnter;
 
+    PrintConfiguration currentConfiguration = dPtr->currentConfiguration;
+
     ui->sbTileSize->setValue(currentConfiguration.getTileSizeMm());
     ui->dsbAngleMrad->setValue(currentConfiguration.getAngleMRad());
     ui->dsbOffsetX->setValue(currentConfiguration.getOffsetXmm());
@@ -1989,16 +2230,17 @@ void TestFrame::restorePrintConfiguration() {
     ui->sbWaitTimeYMovement->setValue(currentConfiguration.getWaitTimeAfterYMovementMs());
     ui->sbLaserFrequency->setValue(currentConfiguration.getLaserFrequency());
 
-    ui->cbRandomChoice->setChecked(currentConfiguration.getIsRandomAlgorithm());
-    ui->cbNHChoice->setChecked(currentConfiguration.getIsNeighborhoodAlgorithm());
+    ui->rbRandomChoice->setChecked(currentConfiguration.getIsRandomAlgorithm());
+    ui->rbNHChoice->setChecked(currentConfiguration.getIsNeighborhoodAlgorithm());
 
     ui->sbRPointsPerTile->setValue(currentConfiguration.getRandomPointsPerTile());
     ui->cbRShuffleRowTiles->setChecked(currentConfiguration.getRandomIsShuffleRowTiles());
 
     ui->sbNHMinDistance->setValue(currentConfiguration.getNeighborhoodMinDistanceUm());
+    ui->rbNHNormal->setChecked(!currentConfiguration.getNeighborhoodIsShuffleRowTiles() && !currentConfiguration.getNeighborhoodIsReverseY());
+    ui->rbNHShuffleRowTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleRowTiles());
+    ui->rbNHReverseY->setChecked(currentConfiguration.getNeighborhoodIsReverseY());
     ui->cbNHShuffleStackedTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleStackedTiles());
-    ui->cbNHShuffleRowTiles->setChecked(currentConfiguration.getNeighborhoodIsShuffleRowTiles());
-    ui->cbNHTopBottomOrder->setChecked(currentConfiguration.getNeighborhoodIsTopBottomOrder());
 
     switch (currentConfiguration.getPointShape()) {
     case PointShapeEnum::POINT:
@@ -2056,7 +2298,7 @@ void TestFrame::saveConfiguration() {
 
         QScopedPointer<IAbstractJsonParser> parser(new ConfigurationJsonParser());
         QByteArray res;
-        if (parser->encodeJson(&this->currentConfiguration, res) != JSON_PARSER_NO_ERROR) {
+        if (parser->encodeJson(&dPtr->currentConfiguration, res) != JSON_PARSER_NO_ERROR) {
             traceWarn() << "Errore nel parser del file";
             DialogAlert diag;
             diag.setupLabels("Errore parsing file", QString("Il file di configurazione non ' valido").arg(filePath));
@@ -2108,7 +2350,7 @@ void TestFrame::loadConfiguration() {
             return;
         }
 
-        this->currentConfiguration = pc;
+        dPtr->currentConfiguration = pc;
 
         restorePrintConfiguration();
         updatePrintConfiguration();
@@ -2121,10 +2363,20 @@ void TestFrame::loadConfiguration() {
 void TestFrame::updateUi() {
 
     traceEnter;
-    bool isStartEnabled = !hasErrors && !motionBean.getNeedResetAxis() && dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::IDLE;
-    bool isStopEnabled = !hasErrors && !motionBean.getNeedResetAxis() && dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::PRINTING;
+    bool isStartEnabled = !dPtr->hasErrors && !dPtr->motionBean.getNeedResetAxis() && dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::IDLE;
+    bool isStopEnabled = !dPtr->hasErrors && !dPtr->motionBean.getNeedResetAxis() && (
+                (dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::PRINTING) ||
+                (dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::PAUSE) ||
+                (dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::STOP_RESUMABLE)
+                );
+    bool isResumeEnabled = !dPtr->hasErrors && !dPtr->motionBean.getNeedResetAxis() && (
+                (dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::PAUSE) ||
+                (dPtr->machineStatusReceiver->getCurrentStatus() == MachineStatus::STOP_RESUMABLE)
+                );
+
     this->ui->pbStartProcess->setEnabled(isStartEnabled);
     this->ui->pbStopProcess->setEnabled(isStopEnabled);
+    this->ui->pbResumeProcess->setEnabled(isResumeEnabled);
     traceExit;
 
 }
@@ -2134,7 +2386,6 @@ void TestFrame::setupUi() {
     traceEnter;
 
     ui->setupUi(this);
-
 
     ui->tabWidget->tabBar()->installEventFilter(this);
     ui->tabWidget->setCurrentIndex(0);
@@ -2181,11 +2432,27 @@ void TestFrame::setupUi() {
     ui->dsbAngleMrad->setDecimals(3);
     ui->dsbAngleMrad->setSingleStep(TEST_FRAME_ANGLE_STEP);
 
-    ui->pbStopProcess->setEnabled(false);
+    ui->rbRandomChoice->setChecked(false);
+    ui->rbNHChoice->setChecked(true);
+    drillingAlgorithm = new QButtonGroup(this);
+    drillingAlgorithm->addButton(ui->rbRandomChoice);
+    drillingAlgorithm->addButton(ui->rbNHChoice);
 
+    ui->rbNHNormal->setChecked(true);
+    ui->rbNHShuffleRowTiles->setChecked(false);
+    ui->rbNHReverseY->setChecked(false);
+    nhRowTilesOrder = new QButtonGroup(this);
+    nhRowTilesOrder->addButton(ui->rbNHNormal);
+    nhRowTilesOrder->addButton(ui->rbNHShuffleRowTiles);
+    nhRowTilesOrder->addButton(ui->rbNHReverseY);
+
+    ui->pbStartProcess->setEnabled(false);
+    ui->pbStopProcess->setEnabled(false);
+    ui->pbPauseProcess->setEnabled(false);
+    ui->pbResumeProcess->setEnabled(false);
 
     // point shape tab
-    pointShapeGroup =  new QButtonGroup(this);
+    pointShapeGroup = new QButtonGroup(this);
     ui->sbPointPulses->setRange(TEST_FRAME_PULSES_MIN, TEST_FRAME_PULSES_MAX);
 
     ui->sbCirclePointsNumberSides->setRange(TEST_FRAME_CIRCLE_NUM_SIDES_MIN, TEST_FRAME_CIRCLE_NUM_SIDES_MAX);
@@ -2256,29 +2523,35 @@ void TestFrame::setupSignalsAndSlots() {
     connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, this, &TestFrame::updateMotionBean);
 
     connect(dPtr->machineStatusReceiver.data(), &PROGRAM_NAMESPACE::MachineStatusReceiver::statusChanged, this, &TestFrame::updateMachineStatus);
+    connect(dPtr, &TestFrameLogic::enablePauseSignal, this, [&](bool enable) {
+        this->ui->pbPauseProcess->setEnabled(enable);
+    });
 
     connect(ui->pbStartProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::startWork);
     connect(ui->pbStopProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::stopWork);
+    connect(ui->pbPauseProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::pauseWork);
+    connect(ui->pbResumeProcess, &QPushButton::clicked, dPtr, &TestFrameLogic::resumeWork);
+
 
     // signals/slots della tab laser
     connect(ui->sbLaserPower, static_cast<void (MDSpinBox::*)(int)>(&MDSpinBox::valueChanged), [&](int value) {
         this->ui->hsLaserPower->setValue(value);
-        laserParametersChanged = true;
+        dPtr->laserParametersChanged = true;
         this->updateTabLaserLabel(true);
     });
     connect(ui->hsLaserPower, &QSlider::valueChanged, [&](int value) {
         this->ui->sbLaserPower->setValue(value);
-        laserParametersChanged = true;
+        dPtr->laserParametersChanged = true;
         this->updateTabLaserLabel(true);
     });
     connect(ui->sbLaserFrequency, static_cast<void (MDSpinBox::*)(int)>(&MDSpinBox::valueChanged), [&](int value) {
         this->ui->hsLaserFrequency->setValue(value);
-        laserParametersChanged = true;
+        dPtr->laserParametersChanged = true;
         this->updateTabLaserLabel(true);
     });
     connect(ui->hsLaserFrequency, &QSlider::valueChanged, [&](int value) {
         this->ui->sbLaserFrequency->setValue(value);
-        laserParametersChanged = true;
+        dPtr->laserParametersChanged = true;
         this->updateTabLaserLabel(true);
     });
     connect(ui->cbLaserPulseWidth, static_cast<void (MDComboBox::*)(int)>(&MDComboBox::currentIndexChanged), [&](int index) {
@@ -2288,7 +2561,7 @@ void TestFrame::setupSignalsAndSlots() {
         ui->sbLaserFrequency->setValue(currentMode.nominalFrequency);
         ui->hsLaserFrequency->setRange(currentMode.minFrequency, currentMode.maxFrequency);
         ui->hsLaserFrequency->setValue(currentMode.nominalFrequency);
-        laserParametersChanged = true;
+        dPtr->laserParametersChanged = true;
         this->updateTabLaserLabel(true);
     });
 
@@ -2301,7 +2574,7 @@ void TestFrame::setupSignalsAndSlots() {
         laserConfiguration.setCurrentPower(power);
         laserConfiguration.setCurrentModeIndex(modeIndex);
         laserConfiguration.setCurrentFrequency(frequency);
-        laserParametersChanged = false;
+        dPtr->laserParametersChanged = false;
         this->updateTabLaserLabel(false);
 
     });
@@ -2323,7 +2596,7 @@ void TestFrame::setupSignalsAndSlots() {
             ui->hsLaserFrequency->setValue(currentFrequency);
         }
 
-        laserParametersChanged = false;
+        dPtr->laserParametersChanged = false;
         this->updateTabLaserLabel(false);
 
     });
@@ -2379,7 +2652,7 @@ bool TestFrame::eventFilter(QObject* object, QEvent* event) {
         if (event->type() == QEvent::Wheel || event->type() == QEvent::KeyPress)
             return true;
 
-        if (this->laserParametersChanged) {
+        if (dPtr->laserParametersChanged) {
 
             if (event->type() == QEvent::MouseButtonPress) {
 
@@ -2413,7 +2686,7 @@ bool TestFrame::eventFilter(QObject* object, QEvent* event) {
                                 ui->hsLaserFrequency->setValue(currentFrequency);
 
                             }
-                            laserParametersChanged = false;
+                            dPtr->laserParametersChanged = false;
                             this->updateTabLaserLabel(false);
 
                         }
@@ -2452,7 +2725,7 @@ JsonParserError ConfigurationJsonParser::encodeJson(PrintConfiguration::ConstPtr
     jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_MIN_DISTANCE_UM_KEY] = obj->getNeighborhoodMinDistanceUm();
     jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_STACKED_TILES_KEY] = obj->getNeighborhoodIsShuffleStackedTiles();
     jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_SHUFFLE_ROW_TILES_KEY] = obj->getNeighborhoodIsShuffleRowTiles();
-    jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_TOP_BOTTOM_ORDER_KEY] = obj->getNeighborhoodIsTopBottomOrder();
+    jsonObj[CONFIGURATION_JSON_NEIGHBORHOOD_IS_REVERSE_Y_KEY] = obj->getNeighborhoodIsReverseY();
     jsonObj[CONFIGURATION_JSON_POINT_SHAPE_KEY] = getStringFromPointShapeEnum(obj->getPointShape());
     jsonObj[CONFIGURATION_JSON_NUMBER_OF_PULSES_KEY] = obj->getNumberOfPulses();
     jsonObj[CONFIGURATION_JSON_CIRCLE_POINTS_RADIUS_UM_KEY] = obj->getCirclePointsRadiusUm();
@@ -2578,9 +2851,9 @@ JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, Pri
         return JSON_PARSER_ERROR_KEY_NOT_FOUND;
     }
 
-    QJsonValue neighborhoodIsTopBottomOrder = jsonObj.value(CONFIGURATION_JSON_NEIGHBORHOOD_IS_TOP_BOTTOM_ORDER_KEY);
-    if (neighborhoodIsTopBottomOrder.isUndefined()) {
-        traceErr() << "Chiave neighborhoodIsTopBottomOrder non presente nel file json";
+    QJsonValue neighborhoodIsReverseY = jsonObj.value(CONFIGURATION_JSON_NEIGHBORHOOD_IS_REVERSE_Y_KEY);
+    if (neighborhoodIsReverseY.isUndefined()) {
+        traceErr() << "Chiave neighborhoodIsReverseY non presente nel file json";
         return JSON_PARSER_ERROR_KEY_NOT_FOUND;
     }
 
@@ -2657,7 +2930,7 @@ JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, Pri
     obj->setNeighborhoodMinDistanceUm(neighborhoodMinDistanceUm.toInt());
     obj->setNeighborhoodIsShuffleStackedTiles(neighborhoodIsShuffleStackedTiles.toBool());
     obj->setNeighborhoodIsShuffleRowTiles(neighborhoodIsShuffleRowTiles.toBool());
-    obj->setNeighborhoodIsTopBottomOrder(neighborhoodIsTopBottomOrder.toBool());
+    obj->setNeighborhoodIsReverseY(neighborhoodIsReverseY.toBool());
 
     obj->setPointShape(getPointShapeEnumFromString(pointShape.toString()));
 

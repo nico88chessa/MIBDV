@@ -100,6 +100,8 @@ enum class MotionStopCode : int {
 enum class MachineStatus : int {
     STATUS_NAN = -1,
     IDLE,
+    STOP_RESUMABLE,
+    PAUSE,
     PRINTING
 };
 
