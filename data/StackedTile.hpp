@@ -154,7 +154,7 @@ public:
 
         }
 
-        traceInfo() << list.size();
+        traceInfo() << "Stacked tile con" << list.size() << " tiles";
 
     }
 

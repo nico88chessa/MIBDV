@@ -1,6 +1,7 @@
 SET(ITEMS
     AbstractProcessor
     RowTileProcessor
+    ResumeRowTileProcessor
     )
 
 FOREACH(ITEM ${ITEMS})

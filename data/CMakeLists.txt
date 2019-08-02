@@ -13,6 +13,8 @@ SET(ITEMS
     Point
     PointSet
     Tile
+    GridTile
+    GridRow
     Grid
     BoundingBox
     StackedTile

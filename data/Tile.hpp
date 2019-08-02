@@ -89,6 +89,10 @@ public:
         return this->pointSet.size();
     }
 
+    bool isEmpty() const {
+        return size() == 0;
+    }
+
 };
 
 using TileI = Tile<int>;

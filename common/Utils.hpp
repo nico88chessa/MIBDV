@@ -197,6 +197,8 @@ public:
         QString descr = "";
         switch (status) {
         case MachineStatus::IDLE: descr = tr("Idle"); break;
+        case MachineStatus::STOP_RESUMABLE: descr = tr("Stop resumable"); break;
+        case MachineStatus::PAUSE: descr = tr("Pause"); break;
         case MachineStatus::PRINTING: descr = tr("Printing"); break;
         }
         return descr;

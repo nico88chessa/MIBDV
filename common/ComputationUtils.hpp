@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <random>
+#include <ctime>
 
 #include <PointSet.hpp>
 #include <Tile.hpp>
@@ -32,7 +33,9 @@ public:
     template <typename T>
     static PointSet<T> shufflePointSet(const PointSet<T>& other) {
         PointSet<T> temp = other;
-        auto rng = std::default_random_engine{};
+        std::srand(std::time(0));
+        int randomInt = std::rand();
+        auto rng = std::default_random_engine(randomInt);
         std::shuffle(temp.set.begin(), temp.set.end(), rng);
         return temp;
     }
@@ -83,7 +86,9 @@ public:
     template <typename T>
     static QList<T> shuffleList(const QList<T>& other) {
         QList<T> temp = other;
-        auto rng = std::default_random_engine{};
+        std::srand(std::time(0));
+        int randomInt = std::rand();
+        auto rng = std::default_random_engine(randomInt);
         std::shuffle(temp.begin(), temp.end(), rng);
         return temp;
     }
@@ -96,9 +101,19 @@ public:
     }
 
     template <typename T>
-    static GridRow<T> fromTopToBottom(const QVector<Tile<T>>& row) {
+    static GridRow<T> shuffleRowTile(const GridRow<T>& other) {
+        GridRow<T> temp(other);
+        std::srand(std::time(0));
+        int randomInt = std::rand();
+        auto rng = std::default_random_engine(randomInt);
+        std::shuffle(temp.tileList.begin(), temp.tileList.end(), rng);
+        return temp;
+    }
+
+    template <typename T>
+    static GridRow<T> reverseYOrder(const GridRow<T>& row) {
         GridRow<T> tilesInRow = row;
-        std::sort(tilesInRow.begin(), tilesInRow.end(), [](const Tile<T>& l, const Tile<T>& r) -> bool {
+        std::sort(tilesInRow.tileList.begin(), tilesInRow.tileList.end(), [](const GridTile<T>& l, const GridTile<T>& r) -> bool {
             auto&& lMin = l.getBoundingBox().getMin();
             auto&& rMin = r.getBoundingBox().getMin();
             if (lMin.getX() < rMin.getX())
