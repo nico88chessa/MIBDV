@@ -67,7 +67,7 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         if (isMotorXOff != oldStatus.getAxisAMotorOff())
             emit axisXMotorOffSignal();
 
-        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+        if (!(this->machineStatusR->getCurrentStatus() == MachineStatus::PRINTING))
             this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR), ErrorType::WARNING));
         else
             this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_X_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_X_MOTOR_OFF_DESCR), ErrorType::ERROR));
@@ -189,7 +189,7 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         if (isMotorYOff != oldStatus.getAxisBMotorOff())
             emit axisYMotorOffSignal();
 
-        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+        if (!(this->machineStatusR->getCurrentStatus() == MachineStatus::PRINTING))
             this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::WARNING));
         else
             this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Y_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Y_MOTOR_OFF_DESCR), ErrorType::ERROR));
@@ -263,7 +263,7 @@ void GalilCNMotionAnalizer::analizeImpl(const GalilCNStatusBean& newStatus) {
         if (isMotorZOff != oldStatus.getAxisCMotorOff())
             emit axisZMotorOffSignal();
 
-        if (this->machineStatusR->getCurrentStatus() == MachineStatus::IDLE)
+        if (!(this->machineStatusR->getCurrentStatus() == MachineStatus::PRINTING))
             this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR), ErrorType::WARNING));
         else
             this->errorSignaler->addError(Error(DeviceKey::MOTION_ANALIZER, GALIL_CN_MA_AXIS_Z_MOTOR_OFF, tr(GALIL_CN_MA_AXIS_Z_MOTOR_OFF_DESCR), ErrorType::ERROR));

@@ -895,14 +895,14 @@ ExitCause Worker::process() {
 
                         localEventLoop.quit();
                     }
-                    QObject::disconnect(c1);
+//                    QObject::disconnect(c1);
                 }
             });
             QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
                 if (localEventLoop.isRunning()) {
                     if (sc == MotionStopCode::MOTION_STOP_CORRECTLY) {
                         res = MOTION_MANAGER_MOTION_X_STOP_CORRECTLY;
-                        canContinue = false;
+                        canContinue = true;
                     } else
                         res = MOTION_MANAGER_MOTION_X_STOP_ERROR;
 
@@ -1067,16 +1067,16 @@ ExitCause Worker::process() {
                             } else
                                 res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
 
+                            localEventLoop.quit();
                         }
-                        localEventLoop.quit();
-                        QObject::disconnect(c1);
+//                        QObject::disconnect(c1);
                     }
                 });
                 QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
                     if (localEventLoop.isRunning()) {
                         if (sc == MotionStopCode::MOTION_STOP_CORRECTLY) {
                             res = MOTION_MANAGER_MOTION_Y_STOP_CORRECTLY;
-                            canContinue = false;
+                            canContinue = true;
                         } else
                             res = MOTION_MANAGER_MOTION_Y_STOP_ERROR;
 
@@ -1802,7 +1802,7 @@ void TestFrameLogic::stopWork() {
 
     traceEnter;
 
-    if (this->machineStatus == MachineStatus::PAUSE) {
+    if (this->machineStatus == MachineStatus::PAUSE || this->machineStatus == MachineStatus::STOP_RESUMABLE) {
         QSharedPointer<MachineStatusNotifier> machineStatusNotifier = DeviceFactoryInstance.instanceMachineStatusNotifier();
         machineStatusNotifier->setCurrentStatus(MachineStatus::IDLE);
     }

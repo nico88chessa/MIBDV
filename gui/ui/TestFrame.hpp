@@ -101,7 +101,7 @@ private:
 
     static constexpr int TEST_FRAME_PULSES_MIN = 1;
     static constexpr int TEST_FRAME_PULSES_MAX = 20000;
-    static constexpr int TEST_FRAME_CIRCLE_RADIUS_MIN = 50;
+    static constexpr int TEST_FRAME_CIRCLE_RADIUS_MIN = 10;
     static constexpr int TEST_FRAME_CIRCLE_RADIUS_MAX = 100000; // TODO NIC 13/05/2019 - rimettere 2000
     static constexpr int TEST_FRAME_CIRCLE_RADIUS_STEP = 1;
     static constexpr int TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MIN = 1;
