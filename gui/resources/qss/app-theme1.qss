@@ -53,6 +53,27 @@ QWidget:!enabled {
     color: white;
 }
 
+#top #pbSettings {
+    qproperty-icon: url(":/icons/white/settings");
+}
+
+#top #pbErrorState[ErrorType="FATAL"] {
+    qproperty-icon: url(":/icons/white/sentiment_very_dissatisfied");
+}
+
+#top #pbErrorState[ErrorType="ERROR"] {
+    qproperty-icon: url(":/icons/white/error");
+}
+
+#top #pbErrorState[ErrorType="WARNING"] {
+    qproperty-icon: url(":/icons/white/warning");
+}
+
+#top #pbErrorState,
+#top #pbErrorState[ErrorType="INFO"] {
+    qproperty-icon: url(":/icons/white/sentiment_very_satisfied");
+}
+
 #lTitle {
     background-color: transparent;
     background-clip: border;
@@ -66,8 +87,6 @@ QWidget:!enabled {
 #left #listItem {
     background-color: transparent;
 }
-
-
 
 /*
  * M O T I O N   F R A M E
@@ -123,6 +142,7 @@ QWidget:!enabled {
     background-color: rgba(255, 255, 255, 12%);
     color: rgba(255 255 255 30%);
 }*/
+
 
 
 /*
@@ -192,6 +212,7 @@ QTabWidget {
     background-color: purple;
     color: white;
 }
+
 
 
 /*

@@ -261,8 +261,6 @@ void MainWindow::setupStyleSheets() const {
 
     traceEnter;
 
-    ui->top->layout()->setAlignment(Qt::AlignBottom);
-
     // TODO NIC 23/10/2018 - gestire fogli di stile
     QApplication* app = static_cast<QApplication*>(QApplication::instance());
     app->setStyleSheet(styleSheet());

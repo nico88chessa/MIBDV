@@ -293,6 +293,14 @@ QPushButton[type="topbar"] {
     background-color: transparent;
 }
 
+QPushButton[type="topbar"]:hover {
+    background-color: rgb(0,33,113);
+}
+
+QPushButton[type="topbar"]:pressed {
+    background-color: rgb(84,114,211)
+}
+
 
 
 /*
@@ -390,36 +398,60 @@ MDListWidget::item {
 }
 
 MDListWidget::item:hover {
-    background-color: #5472d3;
+    background-color: rgba(0,0,0,4%);
 }
 
 MDListWidget::item:selected {
-    background-color: #5472d3;
+    background-color: rgba(0, 0, 0, 8%);
+    color: #0d47a1;
+}
+
+MDListWidget::item:pressed {
+    background-color: rgba(0, 0, 0, 16%);
     color: red;
 }
 
-.MDListWidget MDCustomItem {
+MDListWidget MDCustomItem {
     color: rgba(0, 0, 0, 60%);
+    padding: 20px;
+    background-clip: content;
 }
 
-.MDListWidget MDCustomItem[objectName="alertItem"] {
-    qproperty-iconPath: url(:/icons/black-theme/add_alert);
+MDListWidget MDCustomItem:pressed {
+    background-color: rgba(0, 0, 0, 60%);
+    color: red;
 }
 
-.MDListWidget MDCustomItem[objectName="ioItem"] {
-    qproperty-iconPath: url(:/icons/black-theme/input);
+MDListWidget MDCustomItem:hover {
+    color: yellow;
 }
 
-.MDListWidget MDCustomItem[objectName="motionItem"] {
-    qproperty-iconPath: url(:/icons/black-theme/pan_tool);
+MDCustomItem:hover {
+    color: yellow;
 }
 
-.MDListWidget MDCustomItem[objectName="foriItem"] {
-    qproperty-iconPath: url(:/icons/black-theme/pan_tool);
+MDListWidget #alertItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/add_alert);
 }
 
-.MDListWidget MDCustomItem[objectName="fileExplorerItem"] {
-    qproperty-iconPath: url(:/icons/black-theme/add_alert);
+MDListWidget #alertItem:selected {
+    qproperty-iconPath: url(:/icons/0d47a1/add_alert);
+}
+
+MDListWidget #ioItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/input);
+}
+
+MDListWidget #motionItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/pan_tool);
+}
+
+MDListWidget #foriItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/pan_tool);
+}
+
+MDListWidget #fileExplorerItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/add_alert);
 }
 
 
