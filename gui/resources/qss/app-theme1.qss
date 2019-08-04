@@ -1,0 +1,242 @@
+/*************************
+ tilde ~
+ color scheme
+ primary:           #0d47a1 - rgb(13,71,161)
+ primary-dark:      #002171 - rgb(0,33,113)
+ primary-light:     #5472d3 - rgb(84,114,211)
+ secondary:         #ffa726 - rgb(255, 167, 38)
+ secondary-dark:    #c77800 - rgb(199, 120, 0)
+ secondary-light:   #ffd95b - rgb(255, 217, 91)
+
+ high-emphasis-text: rgba(0, 0, 0, 87%)
+ medium-emphasis-text: rgba(0, 0, 0, 60%)
+ disabled-text: rgba(0, 0, 0, 38%)
+ disabled-background: rgba(0, 0, 0, 12%)
+
+ info-color:       #B00020 - rgb(176,0,32)        da sistemare
+ info-text-color:  #FFFFFF - rgb(255,255,255)     da sistemare
+ warning-color:       #B00020 - rgb(176,0,32)     da sistemare
+ warning-text-color:  #FFFFFF - rgb(255,255,255)  da sistemare
+ error-color:       #B00020 - rgb(176,0,32)       da sistemare
+ error-text-color:  #FFFFFF - rgb(255,255,255)    da sistemare
+ fatal-color:       #B00020 - rgb(176,0,32)       da sistemare
+ fatal-text-color:  #FFFFFF - rgb(255,255,255)    da sistemare
+ *************************/
+
+QMainWindow {
+    background-color: white;
+}
+
+QWidget {
+    color: rgba(0, 0, 0, 60%);
+}
+
+QWidget:hover {
+    color: rgba(0, 0, 0, 87%);
+}
+
+QWidget:!enabled {
+/*    color: rgba(0, 0, 0, 38%);*/
+}
+
+#content {
+    background-color: white;
+}
+
+#top {
+    background-color: #0d47a1;
+    color: white;
+/*    border-bottom-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 0, 0, 255), stop:1 rgba(0, 0, 0, 0%));*/
+}
+
+#top QWidget {
+    color: white;
+}
+
+#top #pbSettings {
+    qproperty-icon: url(":/icons/white/settings");
+}
+
+#top #pbErrorState[ErrorType="FATAL"] {
+    qproperty-icon: url(":/icons/white/sentiment_very_dissatisfied");
+}
+
+#top #pbErrorState[ErrorType="ERROR"] {
+    qproperty-icon: url(":/icons/white/error");
+}
+
+#top #pbErrorState[ErrorType="WARNING"] {
+    qproperty-icon: url(":/icons/white/warning");
+}
+
+#top #pbErrorState,
+#top #pbErrorState[ErrorType="INFO"] {
+    qproperty-icon: url(":/icons/white/sentiment_very_satisfied");
+}
+
+#lTitle {
+    background-color: transparent;
+    background-clip: border;
+}
+
+#left {
+    background-color: transparent;
+    border-right-color: lightGray;
+}
+
+#left #listItem {
+    background-color: transparent;
+}
+
+/*
+ * M O T I O N   F R A M E
+ */
+
+#stackedWidget {
+    background-color: #0d47a1;
+}
+
+#tabMotion {
+    background-color: transparent;
+}
+
+#tabMotion #pbMoveX, #tabMotion #pbMoveY, #tabMotion #pbMoveZ,
+#tabMotion #pbStopX, #tabMotion #pbStopY, #tabMotion #pbStopZ {
+    background-color: none;
+    background-repeat: none;
+    background-position: center center;
+}
+
+#tabMotion #pbMoveX,
+#tabMotion #pbMoveY,
+#tabMotion #pbMoveZ {
+    background-image: url(:/icons/ffa726/play_circle_filled);
+}
+
+#tabMotion #pbMoveX:!enabled, #tabMotion #pbMoveY:!enabled, #tabMotion #pbMoveZ:!enabled {
+    background-image: url(:/icons/disabled/play_circle_filled);
+}
+
+#tabMotion #pbStopX, #tabMotion #pbStopY, #tabMotion #pbStopZ {
+    background-image: url(:/icons/ffa726/pause_circle_filled);
+}
+
+#tabMotion #pbStopX:hover,
+#tabMotion #pbStopY:hover,
+#tabMotion #pbStopZ:hover {
+    background-image: url(:/icons/ffa726/pause_circle_filled_light);
+}
+
+#tabMotion #pbStopX:pressed,
+#tabMotion #pbStopY:pressed,
+#tabMotion #pbStopZ:pressed {
+    background-image: url(:/icons/ffa726/pause_circle_filled_dark);
+}
+
+#tabMotion #pbStopX:!enabled, #tabMotion #pbStopY:!enabled, #tabMotion #pbStopZ:!enabled {
+    background-image: url(:/icons/disabled/pause_circle_filled);
+}
+
+/*#tabMotion #pbStopAxes:!enabled,
+#tabMotion #pbResetAxes:!enabled {
+    background-color: rgba(255, 255, 255, 12%);
+    color: rgba(255 255 255 30%);
+}*/
+
+
+
+/*
+ * I O   F R A M E
+ */
+
+.IOFrame QFrame {
+    background-color: transparent;
+}
+
+QTabWidget {
+    background-color: transparent;
+}
+
+#saDigitalIOContents,
+#saAnalogIOContents {
+    background-color: transparent;
+}
+
+/*.IOFrame #saDigitalIO QWidget {
+    min-height: 40px;
+}*/
+
+
+
+/*
+ * F I L E   E X P L O R E R   F R A M E
+ */
+
+.FileExplorerFrame #top {
+    border-bottom-color: transparent;
+    background-color: transparent;
+}
+
+.FileExplorerFrame #content {
+    background-color: pink;
+}
+
+.FileExplorerFrame #lvExplorer {
+    background-color: transparent;
+    border-right-color: gray;
+}
+
+.FileExplorerFrame #top #pbDelete,
+.FileExplorerFrame #top #pbRename {
+    background-color: yellow;
+}
+
+.FileExplorerFrame #top #pbDelete:!enabled,
+.FileExplorerFrame #top #pbRename:!enabled {
+    background-color: lightgray;
+}
+
+.FileExplorerFrame #top #pbDelete {
+    qproperty-icon: url(:/icons/black-theme/delete_forever);
+}
+
+.FileExplorerFrame #top #pbRename {
+    qproperty-icon: url(:/icons/black-theme/rename);
+}
+
+.FileExplorerFrame MDFileExplorerWidget::item:hover {
+    background-color: green;
+}
+
+.FileExplorerFrame MDFileExplorerWidget::item:selected {
+    background-color: purple;
+    color: white;
+}
+
+
+
+/*
+ * A L E R T   F R A M E
+ */
+
+.AlertFrame #lvAlerts {
+    background-color: transparent;
+}
+
+/*
+.AlertFrame #lvAlerts::item:hover {
+}
+*/
+
+
+
+/*
+ * M D T W O L I N E I T E M   ( C O M P A C T )
+ */
+
+.MDTwoLineItem {
+    background-color: white;
+    background-clip: border;
+    color: black;
+    qproperty-secondaryLabelColor: gray;
+}

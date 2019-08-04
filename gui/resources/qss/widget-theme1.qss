@@ -1,12 +1,18 @@
 /*************************
  tilde ~
  color scheme
- primary:           #2e7d32 - rgb(46,125,50)
- primary-dark:      #005005 - rgb(0,80,5)
- primary-light:     #60ad5e - rgb(96,173,94)
- secondary:         #757575 - rgb(117,117,117)
- secondary-dark:    #494949 - rgb(73,73,73)
- secondary-light:   #a4a4a4 - rgb(164,164,164)
+ primary:           #0d47a1 - rgb(13,71,161)
+ primary-dark:      #002171 - rgb(0,33,113)
+ primary-light:     #5472d3 - rgb(84,114,211)
+ secondary:         #ffa726 - rgb(255, 167, 38)
+ secondary-dark:    #c77800 - rgb(199, 120, 0)
+ secondary-light:   #ffd95b - rgb(255, 217, 91)
+
+ high-emphasis-text: rgba(0, 0, 0, 87%)
+ medium-emphasis-text: rgba(0, 0, 0, 60%)
+ disabled-text: rgba(0, 0, 0, 38%)
+ disabled-background: rgba(0, 0, 0, 12%)
+
  info-color:       #B00020 - rgb(176,0,32)        da sistemare
  info-text-color:  #FFFFFF - rgb(255,255,255)     da sistemare
  warning-color:       #B00020 - rgb(176,0,32)     da sistemare
@@ -16,21 +22,6 @@
  fatal-color:       #B00020 - rgb(176,0,32)       da sistemare
  fatal-text-color:  #FFFFFF - rgb(255,255,255)    da sistemare
  *************************/
-
-QMainWindow {
-    background-color: white;
-}
-
-QWidget {
-    font-family: Roboto;
-    color: black;
-}
-
-QWidget:!enabled {
-/*    color: rgba(0, 0, 0, 38%);*/
-}
-
-
 
 /*
  *  M D L I N E E D I T
@@ -91,7 +82,7 @@ QWidget:!enabled {
  */
 
 .MDDoubleSpinBox {
-    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    qproperty-labelFocusColor: rgba(13, 71, 161, 87%);
     background-color: transparent;
     border-bottom-color: rgba(0, 0, 0, 42%);
     color: rgba(0, 0, 0, 54%);
@@ -99,11 +90,12 @@ QWidget:!enabled {
 
 .MDDoubleSpinBox:hover {
     border-bottom-color: rgba(0, 0, 0, 87%);
+    color: rgba(0, 0, 0, 87%);
 }
 
 .MDDoubleSpinBox:focus:!read-only {
     color: rgba(0, 0, 0, 87%);
-    border-bottom-color: rgba(46, 125, 50, 100%);
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 .MDDoubleSpinBox:disabled {
@@ -246,14 +238,67 @@ QSlider::add-page:vertical {
  */
 
 .QPushButton {
-    qproperty-focusPolicy: NoFocus;
     border-color: transparent;
     color: white;
-    background-color: green;
+    background-color: #ffa726;
+}
+
+.QPushButton:hover {
+    background-color: rgb(255, 217, 91);
+}
+
+.QPushButton:pressed {
+    background-color: rgb(199, 120, 0);
+}
+
+.QPushButton:!enabled {
+    background-color: rgba(0, 0, 0, 12%);
+    color: rgba(0, 0, 0, 38%);
 }
 
 .QPushButton::on {
     color: red;
+}
+
+
+
+/*
+ * Q P U S H B U T T O N - F L O A T I N G
+ */
+
+QPushButton[type="floating"] {
+    background-color: #ffa726;
+}
+
+QPushButton[type="floating"]:hover {
+    background-color: #ffd95b;
+}
+
+QPushButton[type="floating"]:disabled {
+    background-color: rgb(0,0,0,38%);
+}
+
+QPushButton[type="floating"]:pressed {
+    background-color: #c77800;
+}
+
+
+
+/*
+ * Q P U S H B U T T O N - T O P B A R
+ */
+
+QPushButton[type="topbar"] {
+    color: white;
+    background-color: transparent;
+}
+
+QPushButton[type="topbar"]:hover {
+    background-color: rgb(0,33,113);
+}
+
+QPushButton[type="topbar"]:pressed {
+    background-color: rgb(84,114,211)
 }
 
 
@@ -292,43 +337,45 @@ QCheckBox::indicator::checked {
     image: url(:/icons/black-theme/check_box);
 }
 
+QCheckBox::indicator::unchecked[isDigitalIO = true] {
+    image: url(:/icons/0d47a1/panorama_fish_eye);
+}
+
+QCheckBox::indicator::checked[isDigitalIO = true] {
+    image: url(:/icons/0d47a1/lens);
+}
+
 
 
 /*
  * M D S W I T C H L I N E
  */
 
-MDSwitchLine {
-/*    border: 1px solid red;*/
-/*    background-color: yellow;*/
-/*    border: 1px solid red;*/
-/*    qproperty-circleColor: transparent; */
-/*    qproperty-circleOnColor: green; */
-/*    qproperty-circleBorderColor: black; */
-    qproperty-imageLeftPadding: 0;
-    qproperty-imageRightPadding: 0;
-    qproperty-imageWidth: 48;
-    qproperty-imageHeight: 48;
-    qproperty-imageOnEnable: url(:/icons/black-theme/lens);
+.MDSwitchLine {
+    qproperty-imageOnEnable: url(:/icons/0d47a1/lens);
     qproperty-imageOnDisable: url(:/icons/disabled/lens);
-    qproperty-imageOffEnable: url(:/icons/black-theme/panorama_fish_eye);
+    qproperty-imageOffEnable: url(:/icons/0d47a1/panorama_fish_eye);
     qproperty-imageOffDisable: url(:/icons/disabled/panorama_fish_eye);
 }
 
-MDSwitchLine:!enabled {
+.MDSwitchLine:!enabled {
     color: rgba(0, 0, 0, 38%);
 }
 
 .MDSwitchLine::indicator {
-    /*border: 1px solid blue;*/
+/*    border: 1px solid red;*/
+}
+
+.MDSwitchLine:hover {
+/*    background-color: blue;*/
 }
 
 .MDSwitchLine::indicator:unchecked {
-    image: url(:/icons/black-theme/toggle_off);
+    image: url(:/icons/0d47a1/toggle_off);
 }
 
 .MDSwitchLine::indicator:checked {
-    image: url(:/icons/black-theme/toggle_on);
+    image: url(:/icons/0d47a1/toggle_on);
 }
 
 .MDSwitchLine::indicator:!enabled:unchecked {
@@ -347,14 +394,64 @@ MDSwitchLine:!enabled {
 
 MDListWidget::item {
     /*icon: url(:/mibdv/prova);*/
+    color: red;
 }
 
 MDListWidget::item:hover {
-    background-color: red;
+    background-color: rgba(0,0,0,4%);
 }
 
 MDListWidget::item:selected {
-    background-color: green;
+    background-color: rgba(0, 0, 0, 8%);
+    color: #0d47a1;
+}
+
+MDListWidget::item:pressed {
+    background-color: rgba(0, 0, 0, 16%);
+    color: red;
+}
+
+MDListWidget MDCustomItem {
+    color: rgba(0, 0, 0, 60%);
+    padding: 20px;
+    background-clip: content;
+}
+
+MDListWidget MDCustomItem:pressed {
+    background-color: rgba(0, 0, 0, 60%);
+    color: red;
+}
+
+MDListWidget MDCustomItem:hover {
+    color: yellow;
+}
+
+MDCustomItem:hover {
+    color: yellow;
+}
+
+MDListWidget #alertItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/add_alert);
+}
+
+MDListWidget #alertItem:selected {
+    qproperty-iconPath: url(:/icons/0d47a1/add_alert);
+}
+
+MDListWidget #ioItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/input);
+}
+
+MDListWidget #motionItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/pan_tool);
+}
+
+MDListWidget #foriItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/pan_tool);
+}
+
+MDListWidget #fileExplorerItem {
+    qproperty-iconPath: url(:/icons/medium-emphasis/add_alert);
 }
 
 .MDListWidget MDCustomItem[objectName="alertItem"] {
@@ -384,35 +481,64 @@ MDListWidget::item:selected {
  */
 
 QTabBar {
-    background-color: transparent;
+    background-color: #0d47a1;
 }
 
 QTabWidget {
+    background-color: #0d47a1;
 }
 
 QTabWidget::pane {
-    background-color: transparent;
+    background-color: white;
 }
 
 QTabWidget::tab-bar {
+    background-color: #0d47a1;
 }
 
 QTabBar::tab {
-    background-color: transparent;
-    color: darkgray;
+    background-color: #0d47a1;
+    color: white;
 }
 
-QTabBar::tab:selected, QTabBar::tab:hover {
-    background: transparent;
-    color: black;
+QTabBar::tab:hover {
+    background-color: #0d47a1;
+    border-bottom-color: #ffd95b;
 }
 
 QTabBar::tab:selected {
-    border-bottom-color: green;
+    border-bottom-color: #ffa726;
 }
 
 QTabBar::tab:!selected {
-    /*margin-top: 2px;*/
+    color: #5472d3;
+}
+
+QTabBar::tab:!selected:hover {
+    background-color: #5472d3;
+    color: white;
+}
+
+
+
+/*
+ * Q S C R O L L B A R
+ */
+
+QScrollBar:vertical {
+    border-color: transparent;
+}
+
+QScrollBar::handle:vertical {
+    background: green;
+}
+
+QScrollBar::sub-page:vertical {
+    background-color: lightGray;
+}
+
+QScrollBar::add-page:vertical {
+    background-color: lightGray;
 }
 
 
@@ -443,47 +569,6 @@ QTreeView::branch {
     background-color: transparent;
     color: black;
     border-color: blue;
-}
-
-
-
-/*
- * F I L E   E X P L O R E R   F R A M E
- */
-
-.FileExplorerFrame #top {
-    border-bottom-color: transparent;
-    background-color: transparent;
-}
-
-.FileExplorerFrame #content {
-    background-color: pink;
-}
-
-.FileExplorerFrame #lvExplorer {
-    background-color: transparent;
-    border-right-color: gray;
-}
-
-.FileExplorerFrame #top #pbDelete,
-.FileExplorerFrame #top #pbRename {
-    background-color: yellow;
-    padding: 12px 0px 12px 16px;
-    qproperty-text: "";
-    qproperty-iconSize: 24px;
-}
-
-.FileExplorerFrame #top #pbDelete:!enabled,
-.FileExplorerFrame #top #pbRename:!enabled {
-    background-color: lightgray;
-}
-
-.FileExplorerFrame #top #pbDelete {
-    qproperty-icon: url(:/icons/black-theme/delete_forever);
-}
-
-.FileExplorerFrame #top #pbRename {
-    qproperty-icon: url(:/icons/black-theme/rename);
 }
 
 

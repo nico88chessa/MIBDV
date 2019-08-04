@@ -1,7 +1,8 @@
 SET(ITEMS
-    geometry
+    widget-geometry
     app-geometry
-    theme1
+    widget-theme1
+    app-theme1
     )
 
 FOREACH(ITEM ${ITEMS})
