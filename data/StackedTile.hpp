@@ -107,6 +107,9 @@ public:
                     // controllo dove si trova il punto corrente rispetto alla buonding box attuale (bounding box per righe)
                     POINT_POSITION pos = currentBB.getPointPosition(point);
 
+                    // un punto lo posso inserire sse si trova, rispetto alla bounding box attuale:
+                    // 1. in alto (spostamento lungo l'asse y)
+                    // 2. a destra (spostamento lungo l'asse x)
                     if (!(pos == POINT_POSITION::MIDDLE_RIGHT ||
                           pos == POINT_POSITION::TOP_RIGHT ||
                           pos == POINT_POSITION::TOP_MIDDLE)) {
@@ -121,21 +124,20 @@ public:
                         points.removeAt(i);
 
                         // e verifico come aggiornare la bounding box;
-                        // se mi sposto alla bounfing box lungo la x, devo aggiornare anche il minimo
-                        // (altrimenti i punti verrebbero inseriti "a forma di L";
-                        // se mi sposto alla bounding box lungo la y, allora aggiorno la
-                        // bounding box normalmente
+                        // se mi sposto in x rispetto la bounding box (ovvero a destra), devo aggiornare anche il minimo
+                        // sull'asse x (altrimenti i punti verrebbero inseriti "a forma di L";
+                        // se mi sposto in y rispetto la bounding box, allora aggiorno la bounding box normalmente
 
-//                        if (point.getX() >= currentBB.getMax().getX()) {
                         if (pos == POINT_POSITION::TOP_RIGHT ||
-                            pos == POINT_POSITION::MIDDLE_RIGHT ||
-                            pos == POINT_POSITION::BOTTOM_RIGHT) {
+                            pos == POINT_POSITION::MIDDLE_RIGHT/* ||
+                            pos == POINT_POSITION::BOTTOM_RIGHT*/) {
 
                             currentBB.setMin(PointI(point.getX(), point.getY()));
                             currentBB.setMax(point + PointI(minDistanceXum, minDistanceYum));
 
                         } else {
 
+                            // se sono qui, significa che mi sono spostato in alto (TOP_MIDDLE)
                             int xPadding = point.getX() >= currentBB.getMax().getX() ? minDistanceXum : 0;
                             int yPadding = point.getY() >= currentBB.getMax().getY() ? minDistanceYum : 0;
                             currentBB.updateBoundingBox(point+PointI(xPadding, yPadding));

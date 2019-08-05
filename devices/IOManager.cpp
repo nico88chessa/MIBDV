@@ -51,7 +51,7 @@ bool IOManager::setDigitalOutput(IOType type) {
     bool isInvertLogic = digitalOutputs.value(type).getInvertLogic();
     bool value = isInvertLogic ? false : true;
 
-    traceInfo() << "Imposto uscita digitale" << channel << "del device" << Utils::getStringFromDeviceKey(deviceToUse) << "a" << value;
+    traceInfo() << "Imposto uscita digitale" << Utils::getStringFromIOType(type) << "channel:" << channel << "del device" << Utils::getStringFromDeviceKey(deviceToUse) << "a" << value;
 
     bool result = false;
     switch (deviceToUse) {
@@ -84,7 +84,7 @@ bool IOManager::unsetDigitalOutput(IOType type) {
     bool isInvertLogic = digitalOutputs.value(type).getInvertLogic();
     bool value = isInvertLogic ? true : false;
 
-    traceInfo() << "Imposto uscita digitale" << channel << "del device" << Utils::getStringFromDeviceKey(deviceToUse) << "a" << value;
+    traceInfo() << "Imposto uscita digitale" << Utils::getStringFromIOType(type) << "channel:" << channel << "del device" << Utils::getStringFromDeviceKey(deviceToUse) << "a" << value;
 
     bool result = false;
     switch (deviceToUse) {
