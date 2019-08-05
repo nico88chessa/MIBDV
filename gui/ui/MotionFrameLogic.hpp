@@ -50,9 +50,6 @@ private slots:
     void homeAxes();
     void stopAxes();
 
-    void airOn();
-    void airOff();
-
 };
 
 #endif // MOTIONFRAMELOGIC_HPP

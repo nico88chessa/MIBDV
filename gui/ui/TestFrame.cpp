@@ -337,7 +337,6 @@ ExitCause Worker::process() {
     bool isStopByUser = false;
     bool isPauseByUser = false;
     bool errorCatched = false;
-    bool isResumePrint = printStatus.isValid();
 
     // controllo che la macchina sia in Start
     {
@@ -547,6 +546,7 @@ ExitCause Worker::process() {
     if (hasToStop) return ExitCause::STOP_BY_USER;
 
 
+    bool isResumePrint = printStatus.isValid();
     if (!isResumePrint) {
 
         // lancio il thread di esecuzione dei punti (da nuovo)
@@ -832,6 +832,14 @@ ExitCause Worker::process() {
             continue;
         }
 
+        if (row.getTileList().isEmpty()) {
+            traceErr() << "Tile list vuota; qualche problema nel file processor";
+            showDialogAsync("Error", "Tile list vuota; qualche problema nel file processor");
+            canContinue = false;
+            exitCause = ExitCause::INTERNAL_ERROR;
+            continue;
+        }
+
         int rowIndex = row.getTileList().at(0).getRowIndex();
         printStatus.setRowIndex(rowIndex);
         if (printStatus.getTileYToPrint().isEmpty()) {
@@ -895,7 +903,6 @@ ExitCause Worker::process() {
 
                         localEventLoop.quit();
                     }
-//                    QObject::disconnect(c1);
                 }
             });
             QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisXMotionStopSignal), [&](MotionStopCode sc) {
@@ -986,6 +993,7 @@ ExitCause Worker::process() {
 
             if (tile.isEmpty()) {
                 traceInfo() << "Il tile non contiene punti, vado al successivo";
+                printStatus.removeTileY(colIndex);
                 continue;
             }
 
@@ -1069,7 +1077,6 @@ ExitCause Worker::process() {
 
                             localEventLoop.quit();
                         }
-//                        QObject::disconnect(c1);
                     }
                 });
                 QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisYMotionStopSignal), [&](MotionStopCode sc) {
@@ -1364,6 +1371,7 @@ ExitCause Worker::process() {
             updateStackedTimeAsync(stackedTileMeasureMs);
         }
 
+        traceInfo() << "Completata la stampa della riga:" << rowIndex;
         if (!canContinue)
             continue;
 
