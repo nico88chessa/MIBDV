@@ -8,6 +8,7 @@
 #include <data/GalilPLCStatusBean.hpp>
 #include "AbstractPLC.hpp"
 
+
 namespace PROGRAM_NAMESPACE {
 
 class GalilPLCController : public AbstractPLC<GalilPLCStatusBean, int> {
@@ -34,7 +35,7 @@ private:
 
 public:
     GalilPLCController();
-    virtual ~GalilPLCController();
+    virtual ~GalilPLCController() override;
     int getRecord(GalilPLCStatusBean& status);
 
     void setupController(const QString& ipAddress,
@@ -42,16 +43,16 @@ public:
                          int numDigitalInput,
                          int numDigitalOutput,
                          int numAnalogInput);
-    virtual bool connect();
-    virtual int getDigitalInput(int input, int& inputStatus);
-    virtual int getDigitalOutput(int output, int& outputStatus);
-    virtual int getAnalogInput(int analogInput, anlType& analogInputStatus);
-    virtual int setDigitalOutput(int output, bool value);
+    virtual bool connect() override;
+    virtual int getDigitalInput(int input, int& inputStatus) override;
+    virtual int getDigitalOutput(int output, int& outputStatus) override;
+    virtual int getAnalogInput(int analogInput, anlType& analogInputStatus) override;
+    virtual int setDigitalOutput(int output, bool value) override;
     int getTCCode(int& tcCode);
     virtual bool isConnected() override;
-    virtual GalilPLCStatusBean getStatus();
-    virtual bool isError(int errorCode) { return errorCode != G_NO_ERROR; }
-    virtual QString decodeError(const int& errorCode);
+    virtual GalilPLCStatusBean getStatus() override;
+    virtual bool isError(int errorCode) override { return errorCode != G_NO_ERROR; }
+    virtual QString decodeError(const int& errorCode) override;
     int getKeepAliveTimeMs(unsigned int* timeMs, unsigned int* newValue = nullptr); // 10 min valore default
 
 private:
@@ -63,21 +64,6 @@ private:
     inline void writeErrorIfExists(int errorCode);
     int getInputs(int bank, int& bankStatus);
 
-};
-
-// type traits
-
-template <>
-struct isPLC<GalilPLCController> {
-    static constexpr bool value = true;
-    using statusType = GalilPLCStatusBean;
-    using errorType = int;
-};
-
-template <>
-struct isDevice<GalilPLCController> {
-    static constexpr bool value = true;
-    using statusType = GalilPLCStatusBean;
 };
 
 }

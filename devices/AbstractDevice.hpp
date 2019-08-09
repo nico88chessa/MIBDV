@@ -2,8 +2,10 @@
 #define ABSTRACTDEVICE_HPP
 
 #include <exception>
+#include <type_traits>
 
 #include <configure.h>
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -14,6 +16,7 @@ class NoStatusException : public std::exception {
         return "No status exception: status is not available from device";
     }
 };
+
 
 class IAbstractDevice {
 public:
@@ -27,13 +30,14 @@ public:
 
 };
 
+
 template <typename S>
 class AbstractDevice : public IAbstractDevice {
 public:
     using Ptr = AbstractDevice*;
     using ConstPtr = const AbstractDevice*;
 
-    using status = S;
+    using Status = S;
 
 public:
     virtual S getStatus() = 0;
@@ -43,16 +47,18 @@ public:
 
 // type traits
 
-template <typename T>
+template <typename T, typename = void>
 struct isDevice {
     static constexpr bool value = false;
-    using statusType = T;
 };
 
 template <typename T>
-struct isDevice<AbstractDevice<T> > {
+struct isDevice<
+        T,
+        std::enable_if_t<std::is_base_of<AbstractDevice<typename T::Status>, T>::value>
+        > {
     static constexpr bool value = true;
-    using statusType = T;
+    using statusType = typename T::Status;
 };
 
 }

@@ -1,11 +1,13 @@
 #ifndef ABSTRACTCN_HPP
 #define ABSTRACTCN_HPP
 
+#include <type_traits>
 #include <QString>
 
 #include <configure.h>
 #include <Types.hpp>
 #include "AbstractDevice.hpp"
+
 
 namespace PROGRAM_NAMESPACE {
 
@@ -16,6 +18,8 @@ class AbstractCN : public AbstractDevice<S> {
 public:
     using Ptr = AbstractCN*;
     using ConstPtr = const AbstractCN*;
+
+    using ErrorType = E;
 
 public:
     virtual E getDigitalInput(int input, int& inputStatus) = 0;
@@ -49,24 +53,23 @@ public:
 
 // type traits
 
-template <typename T>
+template <typename T, typename = void>
 struct isCN {
     static constexpr bool value = false;
     using statusType = void*;
     using errorType = void*;
 };
 
-template <typename S, typename E>
-struct isCN<AbstractCN<S, E>> {
+template <typename T>
+struct isCN<
+        T,
+        std::enable_if_t<
+            isDevice<T>::value && std::is_base_of_v<AbstractCN<typename T::Status, typename T::ErrorType>, T>
+        >
+        > {
     static constexpr bool value = true;
-    using statusType = S;
-    using errorType = E;
-};
-
-template <typename S, typename E>
-struct isDevice<AbstractCN<S, E> > {
-    static constexpr bool value = true;
-    using statusType = S;
+    using statusType = typename T::Status;
+    using errorType = typename T::ErrorType;
 };
 
 }
