@@ -129,6 +129,8 @@ public:
             return IOType::START_SCAN;
         if (str.compare("STOP_SCAN", Qt::CaseInsensitive)==0)
             return IOType::STOP_SCAN;
+        if (str.compare("YELLOW_LIGHT", Qt::CaseInsensitive)==0)
+            return IOType::YELLOW_LIGHT;
         if (str.compare("RED_LIGHT", Qt::CaseInsensitive)==0)
             return IOType::RED_LIGHT;
         if (str.compare("GREEN_LIGHT", Qt::CaseInsensitive)==0)
@@ -196,6 +198,7 @@ public:
 
         QString descr = "";
         switch (status) {
+        case MachineStatus::STATUS_NAN: descr = tr("Status NAN"); break;
         case MachineStatus::IDLE: descr = tr("Idle"); break;
         case MachineStatus::STOP_RESUMABLE: descr = tr("Stop resumable"); break;
         case MachineStatus::PAUSE: descr = tr("Pause"); break;

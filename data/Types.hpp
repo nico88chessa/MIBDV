@@ -76,10 +76,6 @@ enum class IOType : int {
     COMPRESSED_AIR_1,                       // digital output
     COMPRESSED_AIR_2,                       // digital output
     SUCTION,                                // digital output
-    BRUSH_1,                                // digital output
-    BRUSH_2,                                // digital output
-    ENABLE_AIR_FOR_FLUID,                   // digital output
-    ENABLE_FLUID,                           // digital output
     POWER_SCAN,                             // digital output
     START_SCAN,                             // digital output
     STOP_SCAN,                              // digital output

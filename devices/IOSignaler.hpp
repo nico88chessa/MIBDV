@@ -57,8 +57,8 @@ public:
         traceEnter;
 
         static_assert(isConnectedDeviceInspector<I>::value, "Il tipo deve essere un ConnectedDeviceInspector");
-        using statusT = isConnectedDeviceInspector<I>::status;
-        using typeT = isConnectedDeviceInspector<I>::type;
+        using statusT = typename isConnectedDeviceInspector<I>::status;
+        using typeT = typename isConnectedDeviceInspector<I>::type;
 
         static_assert(isCN<typeT>::value || isPLC<typeT>::value, "Il device deve essere un CN o un PLC");
 

@@ -20,7 +20,7 @@ public:
     using ConstPtr = const ConnectedDeviceInspector*;
     using type = T;
     using statusType = typename isDevice<T>::statusType;
-    using Dev = typename AbstractDevice<statusType>;
+    using Dev = AbstractDevice<statusType>;
     using DevPtr = typename Dev::Ptr;
 
 protected:
