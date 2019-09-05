@@ -61,6 +61,8 @@ void MainWindow::setupUi() {
 
     this->setWindowFlags(Qt::FramelessWindowHint);
     this->setFixedSize(this->width(), this->height());
+    QString title = QString("%1 %2").arg(PROJECT_UI_NAME).arg(APPLICATION_VERSION);
+    ui->lTitle->setText(title);
 
     this->setupUiPanels();
 

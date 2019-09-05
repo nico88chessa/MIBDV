@@ -61,6 +61,7 @@ IOSignaler::IOSignaler(QObject *parent) : QObject(parent),
     DigitalInputSet dInMap = settings.getDigitalInputs();
     DigitalOutputSet dOutMap = settings.getDigitalOutputs();
     AnalogInputSet aInMap = settings.getAnalogInputs();
+    int analogIOBufferSize = settings.getMachineAnalogIOBufferSize();
 
     for (auto&& dIn: dInMap.values()) {
         if (dIn.getChannel() == DIGITAL_INPUT_CHANNEL_NONE)
@@ -79,6 +80,7 @@ IOSignaler::IOSignaler(QObject *parent) : QObject(parent),
         if (aIn.getChannel() == ANALOG_INPUT_CHANNEL_NONE)
             continue;
         analogInputStatus.insertMulti(aIn.getElementType(), aIn);
+        analogInputBufferStatus.insertMulti(aIn.getElementType(), AnalogInputBufferValues(aIn, analogIOBufferSize));
     }
 
     int refreshTimeMs = settings.getMachineIORefreshIntervalMs();
@@ -271,8 +273,10 @@ void IOSignaler::process() {
 
     traceEnter;
 
-    if (this->needSignaler)
+    if (this->needSignaler) {
         emit statusSignal(digitalInputStatus, digitalOutputStatus, analogInputStatus);
+        emit statusSignal(digitalInputStatus, digitalOutputStatus, analogInputBufferStatus);
+    }
 
     needSignaler = false;
 
@@ -459,15 +463,23 @@ void IOSignaler::updateStatus(const GalilPLCStatusBean& status) {
             }
             ++aisIt;
         }
-    //
-    //    QList<AnalogInputValue>&& values = analogInputStatus.values(aInKey);
-    //    for (auto&& aIn: values) {
-    //        if (aIn.getDevice() == DeviceKey::GALIL_PLC) {
-    //            analogReal value = status.getAnalogInput(aIn.getChannel());
-    //            value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
-    //            aIn.setValue(value);
-    //        }
-    //    }
+
+    }
+
+
+    for (auto&& aInKey: analogInputBufferStatus.keys()) {
+
+        AnalogInputBufferStatus::iterator aibsIt = analogInputBufferStatus.find(aInKey);
+        while (aibsIt != analogInputBufferStatus.end() && aibsIt.key() == aInKey) {
+            auto& aIn = aibsIt.value();
+            if (aIn.getDevice() == DeviceKey::GALIL_PLC) {
+                analogReal value = status.getAnalogInput(aIn.getChannel());
+                value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
+                aIn.addValue(value);
+            }
+            ++aibsIt;
+        }
+
     }
 
     this->analizeIO();

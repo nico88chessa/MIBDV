@@ -188,6 +188,7 @@ void Settings::loadValuesFromFile() {
     machineCNType = Utils::getDeviceKeyFromString(settings.value(MACHINE_CN_TYPE, Utils::getStringFromDeviceKey(MACHINE_CN_TYPE_DFLT)).value<QString>());
     machinePLCType = Utils::getDeviceKeyFromString(settings.value(MACHINE_PLC_TYPE, Utils::getStringFromDeviceKey(MACHINE_PLC_TYPE_DFLT)).value<QString>());
     machineIORefreshIntervalMs = settings.value(MACHINE_IO_REFRESH_INTERVAL_MS, MACHINE_IO_REFRESH_INTERVAL_MS_DFLT).value<int>();
+    machineAnalogIOBufferSize = settings.value(MACHINE_ANALOG_IO_BUFFER_SIZE, MACHINE_ANALOG_IO_BUFFER_SIZE_DLFT).value<int>();
 
     // se il cn e' di tipo galil, carico i parametri del galil)
     if (DeviceKey::GALIL_CN == machineCNType) {
@@ -364,6 +365,7 @@ void Settings::writeValuesToFile() {
     settings.setValue(MACHINE_CN_TYPE, Utils::getStringFromDeviceKey(machineCNType));
     settings.setValue(MACHINE_PLC_TYPE, Utils::getStringFromDeviceKey(machinePLCType));
     settings.setValue(MACHINE_IO_REFRESH_INTERVAL_MS, machineIORefreshIntervalMs);
+    settings.setValue(MACHINE_ANALOG_IO_BUFFER_SIZE, machineAnalogIOBufferSize);
 
     // se il cn e' di tipo galil, carico i parametri del galil)
     if (DeviceKey::GALIL_CN == machineCNType) {

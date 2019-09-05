@@ -15,6 +15,7 @@
 #include <DigitalInputValue.hpp>
 #include <DigitalOutputValue.hpp>
 #include <AnalogInputValue.hpp>
+#include <AnalogInputBufferValues.hpp>
 
 #include <Error.hpp>
 #include <Types.hpp>
@@ -79,12 +80,16 @@ void registerMetatypes() {
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputValue>("mibdv::DigitalOutputValue");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputValue>("AnalogInputValue");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputValue>("mibdv::AnalogInputValue");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputBufferValues>("AnalogInputBufferValues");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputBufferValues>("mibdv::AnalogInputBufferValues");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputStatus>("DigitalInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalInputStatus>("mibdv::DigitalInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("DigitalOutputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::DigitalOutputStatus>("mibdv::DigitalOutputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("AnalogInputStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputStatus>("mibdv::AnalogInputStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputBufferStatus>("AnalogInputBufferStatus");
+    qRegisterMetaType<PROGRAM_NAMESPACE::AnalogInputBufferStatus>("mibdv::AnalogInputBufferStatus");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("MotionStopCode");
     qRegisterMetaType<PROGRAM_NAMESPACE::MotionStopCode>("mibdv::MotionStopCode");
     qRegisterMetaType<PROGRAM_NAMESPACE::MachineStatus>("MachineStatus");
@@ -105,7 +110,9 @@ static constexpr char* MAIN_THREAD_NAME = "Main";
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 
     using namespace PROGRAM_NAMESPACE;
-    traceInfo() << "START APPLICATIVO" << APPLICATION_NAME;
+    traceInfo() << "Avvio applicazione:" << APPLICATION_NAME;
+    traceInfo() << "Organizzazione:" << ORGANIZATION;
+    traceInfo() << "Versione:" << APPLICATION_VERSION;
 
     /*
     bool test2 = hasMachineStatusReceiver<Prova>::value;

@@ -13,6 +13,7 @@
 #include <DigitalInputValue.hpp>
 #include <DigitalOutputValue.hpp>
 #include <AnalogInputValue.hpp>
+#include <AnalogInputBufferValues.hpp>
 
 #include <ErrorHandler.hpp>
 #include <MachineStatusHandler.hpp>
@@ -34,6 +35,7 @@ private:
     DigitalInputStatus digitalInputStatus;
     DigitalOutputStatus digitalOutputStatus;
     AnalogInputStatus analogInputStatus;
+    AnalogInputBufferStatus analogInputBufferStatus;
 
 private:
     DigitalInputStatus digitalInputLastValues; // usati solamente per i signals
@@ -120,6 +122,13 @@ signals:
             const DigitalInputStatus& digitalInputs,
             const DigitalOutputStatus& digitalOutputs,
             const AnalogInputStatus& analogInputs);
+
+    void statusSignal(
+            const DigitalInputStatus& digitalInputs,
+            const DigitalOutputStatus& digitalOutputs,
+            const AnalogInputBufferStatus& analogInputs);
+
+
     void processStartedSignal();
     void processStoppedSignal();
 

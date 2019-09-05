@@ -20,6 +20,7 @@ SET(ITEMS
     StackedTile
     Filter
     FilterStream
+    NumericBuffer
     )
 
 FOREACH(ITEM ${ITEMS})

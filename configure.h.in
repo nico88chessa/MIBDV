@@ -12,6 +12,7 @@ namespace PROGRAM_NAMESPACE {
 
 static constexpr char APPLICATION_NAME[] = "@PROJECT_NAME@";
 static constexpr char APPLICATION_VERSION[] = "@MIBDV_VERSION@";
+static constexpr char PROJECT_UI_NAME[] = "@PROJECT_UI_NAME@";
 static constexpr char ORGANIZATION[] = "@ORGANIZATION@";
 
 static constexpr char LOG_PATH[] = "@LOG_PATH@";

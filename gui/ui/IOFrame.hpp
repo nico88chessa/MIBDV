@@ -33,6 +33,7 @@ private:
     PROGRAM_NAMESPACE::DigitalInputStatus digitalInputStatus;
     PROGRAM_NAMESPACE::DigitalOutputStatus digitalOutputStatus;
     PROGRAM_NAMESPACE::AnalogInputStatus analogInputStatus;
+    PROGRAM_NAMESPACE::AnalogInputBufferStatus analogInputBufferStatus;
 
     PROGRAM_NAMESPACE::DigitalInputSet digitalInputs;
     PROGRAM_NAMESPACE::DigitalOutputSet digitalOutputs;
@@ -56,9 +57,16 @@ private slots:
     void updateUI();
 
 public slots:
+    //void updateDigitalIOStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& iStatus,
+    //                           const PROGRAM_NAMESPACE::DigitalOutputStatus& oStatus,
+    //                           const PROGRAM_NAMESPACE::AnalogInputStatus& aiStatus);
+    //
     void updateDigitalIOStatus(const PROGRAM_NAMESPACE::DigitalInputStatus& iStatus,
                                const PROGRAM_NAMESPACE::DigitalOutputStatus& oStatus,
-                               const PROGRAM_NAMESPACE::AnalogInputStatus& aiStatus);
+                               const PROGRAM_NAMESPACE::AnalogInputBufferStatus& aibStatus);
+
+
+
 
 };
 

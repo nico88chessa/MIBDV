@@ -31,6 +31,7 @@ class AnalogInput;
 class DigitalInputValue;
 class DigitalOutputValue;
 class AnalogInputValue;
+class AnalogInputBufferValues;
 class IOSignaler;
 class MotionAnalizer;
 class DeviceConnectionWatcher;
@@ -109,6 +110,7 @@ using AnalogInputSet = QMap<IOType, AnalogInput>;
 using DigitalInputStatus = QMap<IOType, DigitalInputValue>;
 using DigitalOutputStatus = QMap<IOType, DigitalOutputValue>;
 using AnalogInputStatus = QMap<IOType, AnalogInputValue>;
+using AnalogInputBufferStatus = QMap<IOType, AnalogInputBufferValues>;
 
 template <DeviceKey>
 struct deviceKeyTraits {

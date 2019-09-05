@@ -198,11 +198,17 @@ void IOFrame::setupSignalsAndSlots() {
 
     traceEnter;
 
-    connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
+//    connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
+//        QMetaObject::invokeMethod(this, "updateDigitalIOStatus", Qt::QueuedConnection,
+//                                  Q_ARG(const DigitalInputStatus&, a),
+//                                  Q_ARG(const DigitalOutputStatus&, b),
+//                                  Q_ARG(const AnalogInputStatus&, c));
+//    });
+    connect(dPtr->ioSignaler.data(), static_cast<void (IOSignaler::*)(const DigitalInputStatus&, const DigitalOutputStatus&, const AnalogInputBufferStatus&)>(&IOSignaler::statusSignal), [&](auto a, auto b, auto c) {
         QMetaObject::invokeMethod(this, "updateDigitalIOStatus", Qt::QueuedConnection,
                                   Q_ARG(const DigitalInputStatus&, a),
                                   Q_ARG(const DigitalOutputStatus&, b),
-                                  Q_ARG(const AnalogInputStatus&, c));
+                                  Q_ARG(const AnalogInputBufferStatus&, c));
     });
 
     auto&& digitalIOSA = ui->saDigitalIOContents;
@@ -262,11 +268,19 @@ void IOFrame::updateUI() {
 
     }
 
-    for (auto&& analogInput: analogInputStatus) {
+//    for (auto&& analogInput: analogInputStatus) {
+
+//        auto&& widget = glAnalogIO->findChild<MDDoubleSpinBox*>(analogInput.getName(), Qt::FindDirectChildrenOnly);
+//        if (widget)
+//            widget->setValue(analogInput.getValue());
+
+//    }
+
+    for (auto&& analogInput: analogInputBufferStatus) {
 
         auto&& widget = glAnalogIO->findChild<MDDoubleSpinBox*>(analogInput.getName(), Qt::FindDirectChildrenOnly);
         if (widget)
-            widget->setValue(analogInput.getValue());
+            widget->setValue(analogInput.getAverage());
 
     }
 
@@ -274,15 +288,29 @@ void IOFrame::updateUI() {
 
 }
 
+//void IOFrame::updateDigitalIOStatus(const DigitalInputStatus& iStatus,
+//                                    const DigitalOutputStatus& oStatus,
+//                                    const AnalogInputStatus& aiStatus) {
+
+//    traceEnter;
+//    this->digitalInputStatus = iStatus;
+//    this->digitalOutputStatus = oStatus;
+//    this->analogInputStatus = aiStatus;
+//    this->updateUI();
+//    traceExit;
+
+//}
+
 void IOFrame::updateDigitalIOStatus(const DigitalInputStatus& iStatus,
                                     const DigitalOutputStatus& oStatus,
-                                    const AnalogInputStatus& aiStatus) {
+                                    const AnalogInputBufferStatus& aibStatus) {
 
     traceEnter;
     this->digitalInputStatus = iStatus;
     this->digitalOutputStatus = oStatus;
-    this->analogInputStatus = aiStatus;
+    this->analogInputBufferStatus = aibStatus;
     this->updateUI();
     traceExit;
 
 }
+

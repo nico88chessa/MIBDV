@@ -115,6 +115,7 @@ public:
     DeviceKey getMachineCNType() const { return machineCNType; }
     DeviceKey getMachinePLCType() const { return machinePLCType; }
     int getMachineIORefreshIntervalMs() const { return machineIORefreshIntervalMs; }
+    int getMachineAnalogIOBufferSize() const { return machineAnalogIOBufferSize; }
 
     QString getUiSpoolPath() const { return uiSpoolPath; }
     QString getMarkingConfigurationPath() const { return markingConfigurationPath; }
@@ -177,6 +178,7 @@ private:
     DeviceKey machineCNType;
     DeviceKey machinePLCType;
     int machineIORefreshIntervalMs;
+    int machineAnalogIOBufferSize;
 
     // UI
     QString uiSpoolPath;

@@ -673,7 +673,15 @@ void MotionFrame::setupSignalsAndSlots() {
                                   Q_ARG(const MotionBean&, motionBean));
     });
 
-    connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
+//    connect(dPtr->ioSignaler.data(), &IOSignaler::statusSignal, [&](auto a, auto b, auto c) {
+//        Q_UNUSED(b);
+//        Q_UNUSED(c);
+//        QMetaObject::invokeMethod(this, "updateDigitalInputStatus", Qt::QueuedConnection,
+//                                  Q_ARG(const DigitalInputStatus&, a));
+
+//    });
+    connect(dPtr->ioSignaler.data(), static_cast<void (IOSignaler::*)(const DigitalInputStatus&, const DigitalOutputStatus&, const AnalogInputBufferStatus&)>(&IOSignaler::statusSignal),
+            [&](auto a, auto b, auto c) {
         Q_UNUSED(b);
         Q_UNUSED(c);
         QMetaObject::invokeMethod(this, "updateDigitalInputStatus", Qt::QueuedConnection,
