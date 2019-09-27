@@ -93,7 +93,9 @@ void Settings::loadValuesFromFile() {
         auto invertLogic = settings.value(DIGITAL_INPUT_INVERT_LOGIC).value<bool>();
         auto isAlarm = settings.value(DIGITAL_INPUT_IS_ALARM).value<bool>();
         auto isAlarmInverted = settings.value(DIGITAL_INPUT_IS_ALARM_INVERTED).value<bool>();
-        DigitalInput input(name, channel, invertLogic, device, isAlarm, isAlarmInverted, type);
+        auto alarmOnState = Utils::getMachineStatusFromString(settings.value(DIGITAL_INPUT_ALARM_ON_MACHINE_STATUS).value<QString>());
+
+        DigitalInput input(name, channel, invertLogic, device, isAlarm, isAlarmInverted, type, alarmOnState);
         this->digitalInputs.insertMulti(static_cast<IOType>(type), input);
     }
     settings.endArray();
@@ -131,6 +133,7 @@ void Settings::loadValuesFromFile() {
         auto type = Utils::getIOTypeFromString(settings.value(DIGITAL_INPUT_TYPE).value<QString>());
         auto invertLogic = settings.value(DIGITAL_OUTPUT_INVERT_LOGIC).value<bool>();
         auto isAlarm = settings.value(DIGITAL_OUTPUT_IS_ALARM).value<bool>();
+
         DigitalOutput output(name, channel, invertLogic, device, isAlarm, type);
         this->digitalOutputs[static_cast<IOType>(type)] = output;
     }
@@ -178,7 +181,9 @@ void Settings::loadValuesFromFile() {
         auto lowerLimit = settings.value(ANALOG_INPUT_LOWER_LIMIT).value<analogReal>();
         auto upperLimit = settings.value(ANALOG_INPUT_UPPER_LIMIT).value<analogReal>();
         auto hysteresys = settings.value(ANALOG_INPUT_HYSTERESIS).value<analogReal>();
-        AnalogInput aInput(name, channel, device, isAlarm, gain, offset, unit, lowerLimit, upperLimit, hysteresys);
+        auto alarmOnState = Utils::getMachineStatusFromString(settings.value(ANALOG_INPUT_ALARM_ON_MACHINE_STATUS).value<QString>());
+
+        AnalogInput aInput(name, channel, device, isAlarm, gain, offset, unit, lowerLimit, upperLimit, hysteresys, alarmOnState);
         this->analogInputs.insertMulti(analogInputs.constEnd(), IOType::GENERIC_ANALOG_INPUT, aInput);
     }
     settings.endArray();
@@ -323,6 +328,7 @@ void Settings::writeValuesToFile() {
         settings.setValue(DIGITAL_INPUT_DEVICE, Utils::getStringFromDeviceKey(input.getDevice()));
         settings.setValue(DIGITAL_INPUT_IS_ALARM, input.getIsAlarm());
         settings.setValue(DIGITAL_INPUT_IS_ALARM_INVERTED, input.getIsAlarmInverted());
+        settings.setValue(DIGITAL_INPUT_ALARM_ON_MACHINE_STATUS, Utils::getStringFromMachineStatus(input.getAlarmOnMachineStatus()));
     }
     settings.endArray();
 
@@ -342,8 +348,10 @@ void Settings::writeValuesToFile() {
     settings.endArray();
 
     // lettura input analogici
+    settings.remove(Settings::ARRAY_ANALOG_INPUT);
+
     if (analogInputs.isEmpty()) {
-        settings.remove(Settings::ARRAY_ANALOG_INPUT);
+
         settings.beginWriteArray(Settings::ARRAY_ANALOG_INPUT);
         i=0;
         settings.setArrayIndex(i++);
@@ -359,7 +367,29 @@ void Settings::writeValuesToFile() {
         settings.setValue(ANALOG_INPUT_LOWER_LIMIT, sample.getLowerLimit());
         settings.setValue(ANALOG_INPUT_UPPER_LIMIT, sample.getUpperLimit());
         settings.setValue(ANALOG_INPUT_HYSTERESIS, sample.getHysteresys());
+        settings.setValue(ANALOG_INPUT_ALARM_ON_MACHINE_STATUS, Utils::getStringFromMachineStatus(sample.getAlarmOnMachineStatus()));
         settings.endArray();
+
+    } else {
+
+        i=0;
+        settings.beginWriteArray(Settings::ARRAY_ANALOG_INPUT);
+        for (AnalogInput ai: analogInputs) {
+            settings.setArrayIndex(i++);
+            settings.setValue(ANALOG_INPUT_NAME, ai.getName());
+            settings.setValue(ANALOG_INPUT_CHANNEL, ai.getChannel());
+            settings.setValue(ANALOG_INPUT_DEVICE, Utils::getStringFromDeviceKey(ai.getDevice()));
+            settings.setValue(ANALOG_INPUT_IS_ALARM, ai.getIsAlarm());
+            settings.setValue(ANALOG_INPUT_GAIN, ai.getGain());
+            settings.setValue(ANALOG_INPUT_OFFSET, ai.getOffset());
+            settings.setValue(ANALOG_INPUT_UNIT, ai.getUnit());
+            settings.setValue(ANALOG_INPUT_LOWER_LIMIT, ai.getLowerLimit());
+            settings.setValue(ANALOG_INPUT_UPPER_LIMIT, ai.getUpperLimit());
+            settings.setValue(ANALOG_INPUT_HYSTERESIS, ai.getHysteresys());
+            settings.setValue(ANALOG_INPUT_ALARM_ON_MACHINE_STATUS, Utils::getStringFromMachineStatus(ai.getAlarmOnMachineStatus()));
+        }
+        settings.endArray();
+
     }
 
     settings.setValue(MACHINE_CN_TYPE, Utils::getStringFromDeviceKey(machineCNType));

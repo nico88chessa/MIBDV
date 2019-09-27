@@ -10,15 +10,15 @@ using namespace PROGRAM_NAMESPACE;
 
 /* NOTE NIC 19/07/2019 - gestione ErrorId per il generic input
  *
- * bit 16 = 1 -> codice dell'applicativo A
- * bit 15 = 1 -> indico un generic input G
- * bit 08 - 14 -> riservato per il deviceKey D
- * bit 0 - 7 -> riservato per il channel del device C
- * quindi: 0000000A GDDDDDDD CCCCCCCC
+ * bit 16 = 1 ->  codice dell'applicativo A
+ * bit 15 - 12 -> riservato per il deviceKey D
+ * bit 11 - 8 ->  riservato per il IOType T (GenericInput, GenericAnalogInput, ...)
+ * bit 0 - 7 ->   riservato per il channel del device C
+ * quindi: 0000000A DDDDTTTT CCCCCCCC
  */
 
-static constexpr ErrorID IO_SIGNALER_GENERIC_INPUT_MASK = 0x01 << 15;
-static constexpr ErrorID IO_SIGNALER_GENERIC_INPUT_DEVICE_KEY_SHIFT_MASK = 8;
+static constexpr ErrorID IO_SIGNALER_GENERIC_IOTYPE_SHIFT_MASK = 8;
+static constexpr ErrorID IO_SIGNALER_GENERIC_INPUT_DEVICE_KEY_SHIFT_MASK = 12;
 
 static constexpr ErrorID IO_SIGNALER_POWER = PROGRAM_ERR_START_CODE + 1;
 static constexpr ErrorID IO_SIGNALER_CYCLE = PROGRAM_ERR_START_CODE + 2;
@@ -33,7 +33,8 @@ static constexpr ErrorID IO_SIGNALER_DISTANCE_SENSOR_FAULT = PROGRAM_ERR_START_C
 static constexpr ErrorID IO_SIGNALER_DEPRESSURE_SENSOR_FAULT = PROGRAM_ERR_START_CODE + 11;
 static constexpr ErrorID IO_SIGNALER_PRESSURE_1_SENSOR_FAULT = PROGRAM_ERR_START_CODE + 12;
 static constexpr ErrorID IO_SIGNALER_PRESSURE_2_SENSOR_FAULT = PROGRAM_ERR_START_CODE + 13;
-static constexpr ErrorID IO_SIGNALER_GENERIC_INPUT = PROGRAM_ERR_START_CODE + IO_SIGNALER_GENERIC_INPUT_MASK;
+static constexpr ErrorID IO_SIGNALER_GENERIC_DIGITAL_INPUT = PROGRAM_ERR_START_CODE + (0x01 << IO_SIGNALER_GENERIC_IOTYPE_SHIFT_MASK);
+static constexpr ErrorID IO_SIGNALER_GENERIC_ANALOG_INPUT = PROGRAM_ERR_START_CODE + (0x02 << IO_SIGNALER_GENERIC_IOTYPE_SHIFT_MASK);
 
 static constexpr char IO_SIGNALER_POWER_DESCR[] = QT_TRANSLATE_NOOP("mibdv" , "Power off");
 static constexpr char IO_SIGNALER_CYCLE_DESCR[] = QT_TRANSLATE_NOOP("mibdv" , "Cycle not enabled");
@@ -49,6 +50,7 @@ static constexpr char IO_SIGNALER_DEPRESSURE_SENSOR_FAULT_DESCR[] = QT_TRANSLATE
 static constexpr char IO_SIGNALER_PRESSURE_1_SENSOR_FAULT_DESCR[] = QT_TRANSLATE_NOOP("mibdv" , "Pressure 1 sensor fault");
 static constexpr char IO_SIGNALER_PRESSURE_2_SENSOR_FAULT_DESCR[] = QT_TRANSLATE_NOOP("mibdv" , "Pressure 2 sensor fault");
 static constexpr char IO_SIGNALER_GENERIC_INPUT_DESCR[] = QT_TRANSLATE_NOOP("mibdv" , "Errore input: ");
+static constexpr char IO_SIGNALER_GENERIC_ANALOG_INPUT_DESCR[] = QT_TRANSLATE_NOOP("mibdv" , "Errore input analogico: ");
 
 
 
@@ -166,91 +168,110 @@ void IOSignaler::analizeIO() {
          * la logica dipende dal parametro invertLogic;
          * quindi l'allarme e' attivo quando input e inverted sono uno negato dell'altro
          */
-        bool showAlarm = dIn.getValue() == !dIn.getIsAlarmInverted();
+        bool isAlarmActive = dIn.getValue() == !dIn.getIsAlarmInverted();
 
-        if (showAlarm) {
+        if (isAlarmActive) {
             ErrorID errorId;
             QString errorDescr;
-            bool isAlarm = false;
+
+            /* NOTE NIC 29/09/2019 - gestione errore a seconda del MachineStatus;
+             * se nel file di configurazione il parametro AlarmOnMachineStatus dell'ingresso in esame e' STATUS_NAN.
+             * tale ingresso non verra' mai promosso ad Error ma rimarra' Warning
+             */
+            bool isError = (dIn.getAlarmOnMachineStatus() > MachineStatus::STATUS_NAN) && (machineStatus >= dIn.getAlarmOnMachineStatus());
+
             switch (dIn.getElementType()) {
             case IOType::POWER:
                 errorId = IO_SIGNALER_POWER;
                 errorDescr = IO_SIGNALER_POWER_DESCR;
-                isAlarm = machineStatus == MachineStatus::PRINTING;
                 break;
             case IOType::CYCLE:
                 errorId = IO_SIGNALER_CYCLE;
                 errorDescr = IO_SIGNALER_CYCLE_DESCR;
-                isAlarm = machineStatus == MachineStatus::PRINTING;
                 break;
             case IOType::EMERGENCY_MUSHROOM:
                 errorId = IO_SIGNALER_EMERGENCY_MUSHROOM;
                 errorDescr = IO_SIGNALER_EMERGENCY_MUSHROOM_DESCR;
-                isAlarm = true;
                 break;
             case IOType::DOOR_OPEN:
                 errorId = IO_SIGNALER_DOOR_OPEN;
                 errorDescr = IO_SIGNALER_DOOR_OPEN_DESCR;
-                isAlarm = !digitalInputStatus.value(IOType::MAINTENANCE).getValue();
+                isError = isError && !digitalInputStatus.value(IOType::MAINTENANCE).getValue();
                 break;
             case IOType::MAINTENANCE:
                 errorId = IO_SIGNALER_MAINTENANCE;
                 errorDescr = IO_SIGNALER_MAINTENANCE_DESCR;
-                isAlarm = false;
                 break;
             case IOType::WATER_ALARM:
                 errorId = IO_SIGNALER_WATER_ALARM;
                 errorDescr = IO_SIGNALER_WATER_ALARM_DESCR;
-                isAlarm = true;
                 break;
             case IOType::MARK_IN_PROGRESS:
                 errorId = IO_SIGNALER_MARK_IN_PROGRESS;
                 errorDescr = IO_SIGNALER_MARK_IN_PROGRESS_DESCR;
-                isAlarm = false;
                 break;
             case IOType::SCANNER_READY:
                 errorId = IO_SIGNALER_SCANNER_READY;
                 errorDescr = IO_SIGNALER_SCANNER_READY_DESCR;
-                isAlarm = false;
                 break;
             case IOType::SCANNER_ERROR:
                 errorId = IO_SIGNALER_SCANNER_ERROR;
                 errorDescr = IO_SIGNALER_SCANNER_ERROR_DESCR;
-                isAlarm = true;
                 break;
             case IOType::DISTANCE_SENSOR_FAULT:
                 errorId = IO_SIGNALER_DISTANCE_SENSOR_FAULT;
                 errorDescr = IO_SIGNALER_DISTANCE_SENSOR_FAULT_DESCR;
-                isAlarm = true;
                 break;
             case IOType::DEPRESSURE_SENSOR_FAULT:
                 errorId = IO_SIGNALER_DEPRESSURE_SENSOR_FAULT;
                 errorDescr = IO_SIGNALER_DEPRESSURE_SENSOR_FAULT_DESCR;
-                isAlarm = true;
                 break;
             case IOType::PRESSURE_1_SENSOR_FAULT:
                 errorId = IO_SIGNALER_PRESSURE_1_SENSOR_FAULT;
                 errorDescr = IO_SIGNALER_PRESSURE_1_SENSOR_FAULT_DESCR;
-                isAlarm = true;
                 break;
             case IOType::PRESSURE_2_SENSOR_FAULT:
                 errorId = IO_SIGNALER_PRESSURE_2_SENSOR_FAULT;
                 errorDescr = IO_SIGNALER_PRESSURE_2_SENSOR_FAULT_DESCR;
-                isAlarm = true;
                 break;
             case IOType::GENERIC_INPUT:
                 errorId = buildGenericErrorId(dIn);
                 errorDescr = QString("%1%2").arg(IO_SIGNALER_GENERIC_INPUT_DESCR).arg(dIn.getName());
-                isAlarm = true;
                 break;
             }
 
             if (dIn.getElementType() == IOType::EMERGENCY_MUSHROOM)
                 errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, ErrorType::FATAL));
             else
-                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, isAlarm ? ErrorType::ERROR : ErrorType::WARNING));
+                errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, isError ? ErrorType::ERROR : ErrorType::WARNING));
         }
 
+    }
+
+    // da gestire gli errori analogi
+
+    // NOTE NIC 27/09/2019 - gestisco gli errori analogici bufferizzati
+    for (auto&& aIn: analogInputBufferStatus.values()) {
+
+        if (!aIn.getIsAlarm())
+            continue;
+
+        ErrorID errorId;
+        QString errorDescr;
+
+        bool isValid = isAnalogValueValid(aIn, aIn.getAverage());
+        if (!isValid) {
+            errorId = buildGenericErrorId(aIn);
+            errorDescr = QString("%1%2").arg(IO_SIGNALER_GENERIC_ANALOG_INPUT_DESCR).arg(aIn.getName());
+
+            /* NOTE NIC 29/09/2019 - gestione errore a seconda del MachineStatus;
+             * se nel file di configurazione il parametro AlarmOnMachineStatus dell'ingresso in esame e' STATUS_NAN.
+             * tale ingresso non verra' mai promosso ad Error ma rimarra' Warning
+             */
+            bool isError = (aIn.getAlarmOnMachineStatus() > MachineStatus::STATUS_NAN) && (machineStatus >= aIn.getAlarmOnMachineStatus());
+
+            errorSignaler->addError(Error(DeviceKey::IO_SIGNALER, errorId, errorDescr, isError ? ErrorType::ERROR : ErrorType::WARNING));
+        }
     }
 
     errorSignaler->notifyErrors();
@@ -261,11 +282,30 @@ void IOSignaler::analizeIO() {
 
 }
 
-ErrorID IOSignaler::buildGenericErrorId(const DigitalInputValue& dIn) const {
+ErrorID IOSignaler::buildGenericErrorId(const DigitalInput& dIn) const {
 
     traceEnter;
     traceExit;
-    return IO_SIGNALER_GENERIC_INPUT + (static_cast<int>(dIn.getDevice()) << IO_SIGNALER_GENERIC_INPUT_DEVICE_KEY_SHIFT_MASK) + dIn.getChannel();
+    return IO_SIGNALER_GENERIC_DIGITAL_INPUT + (static_cast<int>(dIn.getDevice()) << IO_SIGNALER_GENERIC_INPUT_DEVICE_KEY_SHIFT_MASK) + dIn.getChannel();
+
+}
+
+ErrorID IOSignaler::buildGenericErrorId(const AnalogInput& aIn) const {
+
+    traceEnter;
+    traceExit;
+    return IO_SIGNALER_GENERIC_ANALOG_INPUT + (static_cast<int>(aIn.getDevice()) << IO_SIGNALER_GENERIC_INPUT_DEVICE_KEY_SHIFT_MASK) + aIn.getChannel();
+}
+
+bool IOSignaler::isAnalogValueValid(const AnalogInput& input, analogReal value) {
+
+    traceEnter;
+    auto hys = input.getHysteresys();
+    auto lowerLimit = input.getLowerLimit();
+    auto upperLimit = input.getUpperLimit();
+
+    traceExit;
+    return ( value >= lowerLimit - hys ) && ( value <= upperLimit + hys);
 
 }
 

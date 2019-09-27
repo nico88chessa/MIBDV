@@ -96,7 +96,10 @@ public:
 private:
     void analizeIO();
 
-    ErrorID buildGenericErrorId(const DigitalInputValue& dIn) const;
+    ErrorID buildGenericErrorId(const DigitalInput& dIn) const;
+    ErrorID buildGenericErrorId(const AnalogInput& aIn) const;
+
+    static inline bool isAnalogValueValid(const AnalogInput& input, analogReal value);
 
 private slots:
     void process();

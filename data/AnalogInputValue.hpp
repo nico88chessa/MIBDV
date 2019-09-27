@@ -29,18 +29,20 @@ public:
             aIn.getLowerLimit(),
             aIn.getUpperLimit(),
             aIn.getHysteresys(),
+            aIn.getAlarmOnMachineStatus(),
             aIn.getElementType()) { }
 
     AnalogInputValue(QString name, int channel, DeviceKey device,
                      bool isAlarm, analogReal gain, analogReal offset,
                      QString unit, analogReal lowerLimit,
                      analogReal upperLimit, analogReal hysteresys,
+                     MachineStatus alarmOnMachineStatus,
                      IOType elementType = IOType::GENERIC_ANALOG_INPUT) :
         AnalogInput(
             name, channel, device,
             isAlarm, gain, offset,
             unit, lowerLimit,
-            upperLimit, hysteresys,
+            upperLimit, hysteresys, alarmOnMachineStatus,
             elementType), value(0) { }
 
     analogReal getValue() const { return value; }

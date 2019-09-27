@@ -124,6 +124,7 @@ constexpr char DIGITAL_INPUT_INVERT_LOGIC[] = "InvertLogic";
 constexpr char DIGITAL_INPUT_DEVICE[] = "Device";
 constexpr char DIGITAL_INPUT_IS_ALARM[] = "IsAlarm";
 constexpr char DIGITAL_INPUT_IS_ALARM_INVERTED[] = "IsAlarmInverted";
+constexpr char DIGITAL_INPUT_ALARM_ON_MACHINE_STATUS[] = "AlarmOnMachineStatus";
 
 constexpr char DIGITAL_OUTPUT_TYPE[] = "Type";
 constexpr char DIGITAL_OUTPUT_NAME[] = "Name";
@@ -142,6 +143,7 @@ constexpr char ANALOG_INPUT_UNIT[] = "Unit";
 constexpr char ANALOG_INPUT_LOWER_LIMIT[] = "LowerLimit";
 constexpr char ANALOG_INPUT_UPPER_LIMIT[] = "UpperLimit";
 constexpr char ANALOG_INPUT_HYSTERESIS[] = "Hysteresis";
+constexpr char ANALOG_INPUT_ALARM_ON_MACHINE_STATUS[] = "AlarmOnMachineStatus";
 
 constexpr char MACHINE_CN_TYPE[] = "Machine/CNType";
 constexpr char MACHINE_PLC_TYPE[] = "Machine/PLCType";

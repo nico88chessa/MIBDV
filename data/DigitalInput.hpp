@@ -22,15 +22,18 @@ private:
     bool isAlarm;
     bool isAlarmInverted;
     IOType elementType;
+    MachineStatus alarmOnMachineStatus;
 
 public:
     DigitalInput() :
-        DigitalInput("", DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, false, IOType::NOT_VALID) { }
+        DigitalInput("", DIGITAL_INPUT_CHANNEL_NONE, false, DeviceKey::NONE, false, false, IOType::NOT_VALID, MachineStatus::STATUS_NAN) { }
 
     DigitalInput(QString name, int channel, bool invertLogic,
-                 DeviceKey device, bool isAlarm, bool isAlarmInverted, IOType elementType) :
+                 DeviceKey device, bool isAlarm, bool isAlarmInverted, IOType elementType,
+                 MachineStatus alarmOnMachineStatus) :
         name(name), channel(channel), invertLogic(invertLogic),
-        device(device), isAlarm(isAlarm), isAlarmInverted(isAlarmInverted), elementType(elementType) { }
+        device(device), isAlarm(isAlarm), isAlarmInverted(isAlarmInverted), elementType(elementType),
+        alarmOnMachineStatus(alarmOnMachineStatus) { }
 
     inline QString getName() const { return name; }
     inline int getChannel() const { return channel; }
@@ -39,6 +42,7 @@ public:
     inline bool getIsAlarm() const { return isAlarm; }
     inline bool getIsAlarmInverted() const { return isAlarmInverted; }
     inline IOType getElementType() const { return elementType; }
+    MachineStatus getAlarmOnMachineStatus() const { return alarmOnMachineStatus; }
 
     friend inline bool operator==(const DigitalInput& l, const DigitalInput& r);
     friend inline bool operator<(const DigitalInput& l, const DigitalInput& r);

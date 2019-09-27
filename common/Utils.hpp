@@ -194,17 +194,32 @@ public:
 
     }
 
-    static inline QString getMachineStatusDescription(const MachineStatus& status) {
+    static inline QString getStringFromMachineStatus(const MachineStatus& status) {
 
         QString descr = "";
         switch (status) {
-        case MachineStatus::STATUS_NAN: descr = tr("Status NAN"); break;
-        case MachineStatus::IDLE: descr = tr("Idle"); break;
-        case MachineStatus::STOP_RESUMABLE: descr = tr("Stop resumable"); break;
-        case MachineStatus::PAUSE: descr = tr("Pause"); break;
-        case MachineStatus::PRINTING: descr = tr("Printing"); break;
+        case MachineStatus::STATUS_NAN: descr = tr("STATUS_NAN"); break;
+        case MachineStatus::IDLE: descr = tr("IDLE"); break;
+        case MachineStatus::STOP_RESUMABLE: descr = tr("STOP_RESUMABLE"); break;
+        case MachineStatus::PAUSE: descr = tr("PAUSE"); break;
+        case MachineStatus::PRINTING: descr = tr("PRINTING"); break;
         }
         return descr;
+
+    }
+
+    static inline MachineStatus getMachineStatusFromString(const QString& machineStatuStr) {
+
+        if (machineStatuStr.compare("IDLE", Qt::CaseInsensitive)==0)
+            return MachineStatus::IDLE;
+        if (machineStatuStr.compare("STOP_RESUMABLE", Qt::CaseInsensitive)==0)
+            return MachineStatus::STOP_RESUMABLE;
+        if (machineStatuStr.compare("PAUSE", Qt::CaseInsensitive)==0)
+            return MachineStatus::PAUSE;
+        if (machineStatuStr.compare("PRINTING", Qt::CaseInsensitive)==0)
+            return MachineStatus::PRINTING;
+
+        return MachineStatus::STATUS_NAN;
 
     }
 

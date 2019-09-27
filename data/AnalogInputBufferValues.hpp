@@ -31,20 +31,21 @@ public:
             aIn.getLowerLimit(),
             aIn.getUpperLimit(),
             aIn.getHysteresys(),
-            aIn.getElementType()
-            ), values(bufferSize) { }
+            aIn.getAlarmOnMachineStatus(),
+            aIn.getElementType()), values(bufferSize) { }
 
     AnalogInputBufferValues(QString name, int channel, DeviceKey device,
                      bool isAlarm, analogReal gain, analogReal offset,
                      QString unit, analogReal lowerLimit,
                      analogReal upperLimit, analogReal hysteresys,
+                     MachineStatus alarmOnMachineStatus,
                      IOType elementType = IOType::GENERIC_ANALOG_INPUT,
                      int bufferSize = AnalogBuffer::DEFAULT_SAMPLE_ARRAY_SIZE) :
         AnalogInput(
             name, channel, device,
             isAlarm, gain, offset,
             unit, lowerLimit,
-            upperLimit, hysteresys,
+            upperLimit, hysteresys, alarmOnMachineStatus,
             elementType), values(bufferSize) { }
 
     analogReal getAverage() const { return values.getAverage(); }

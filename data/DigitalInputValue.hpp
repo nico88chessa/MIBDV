@@ -26,11 +26,13 @@ public:
             dOut.getDevice(),
             dOut.getIsAlarm(),
             dOut.getIsAlarmInverted(),
-            dOut.getElementType()) { }
+            dOut.getElementType(),
+            dOut.getAlarmOnMachineStatus()) { }
 
     DigitalInputValue(QString name, int channel, bool invertLogic,
-                 DeviceKey device, bool isAlarm, bool isAlarmInverted, IOType elementType) :
-        DigitalInput(name, channel, invertLogic, device, isAlarm, isAlarmInverted, elementType), value(false) { }
+                 DeviceKey device, bool isAlarm, bool isAlarmInverted, IOType elementType,
+                 MachineStatus alarmOnMachineStatus) :
+        DigitalInput(name, channel, invertLogic, device, isAlarm, isAlarmInverted, elementType, alarmOnMachineStatus), value(false) { }
 
     bool getValue() const { return value; }
     void setValue(bool value) { this->value = value; }

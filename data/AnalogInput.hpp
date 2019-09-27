@@ -24,6 +24,7 @@ private:
     analogReal lowerLimit;
     analogReal upperLimit;
     analogReal hysteresys;
+    MachineStatus alarmOnMachineStatus;
     IOType elementType;
 
 public:
@@ -32,7 +33,7 @@ public:
             QString name, int channel, DeviceKey device,
             bool isAlarm, analogReal gain, analogReal offset,
             QString unit, analogReal lowerLimit,
-            analogReal upperLimit, analogReal hysteresys,
+            analogReal upperLimit, analogReal hysteresys, MachineStatus alarmOnMachineStatus,
             IOType elementType = IOType::GENERIC_ANALOG_INPUT);
 
     QString getName() const;
@@ -46,6 +47,7 @@ public:
     analogReal getUpperLimit() const;
     analogReal getHysteresys() const;
     IOType getElementType() const;
+    MachineStatus getAlarmOnMachineStatus() const;
 
     friend inline bool operator==(const AnalogInput& l, const AnalogInput& r);
     friend inline bool operator<(const AnalogInput& l, const AnalogInput& r);
