@@ -11,11 +11,11 @@
 
 static constexpr int MAINWINDOW_ITEM_ALERT_POSITION = 0;
 
-static constexpr char MAINWINDOW_MDCUSTOMITEM_ALERT_OBJECT_NAME[] = "alertItem";
-static constexpr char MAINWINDOW_MDCUSTOMITEM_IO_OBJECT_NAME[] = "ioItem";
-static constexpr char MAINWINDOW_MDCUSTOMITEM_MOTION_OBJECT_NAME[] = "motionItem";
-static constexpr char MAINWINDOW_MDCUSTOMITEM_FORI_OBJECT_NAME[] = "foriItem";
-static constexpr char MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER_OBJECT_NAME[] = "fileExplorerItem";
+//static constexpr char MAINWINDOW_MDCUSTOMITEM_ALERT_OBJECT_NAME[] = "alertItem";
+//static constexpr char MAINWINDOW_MDCUSTOMITEM_IO_OBJECT_NAME[] = "ioItem";
+//static constexpr char MAINWINDOW_MDCUSTOMITEM_MOTION_OBJECT_NAME[] = "motionItem";
+//static constexpr char MAINWINDOW_MDCUSTOMITEM_FORI_OBJECT_NAME[] = "foriItem";
+//static constexpr char MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER_OBJECT_NAME[] = "fileExplorerItem";
 
 static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY[] = "ErrorType";
 static constexpr char MAINWINDOW_PB_ERROR_STATE_ERROR_TYPE_PROPERTY_FATAL[] = "FATAL";
@@ -75,21 +75,31 @@ void MainWindow::setupSignalsAndSlots() const {
     connect(ui->pbRefreshStyle, &QPushButton::clicked, this, &MainWindow::setupStyleSheets);
 
     // left panel
-    auto&& listItem = ui->listItem;
-    connect(listItem, &MDListWidget::itemClicked, [&, listItem](QListWidgetItem* item) {
-        auto itemWidget = static_cast<MDCustomItem::Ptr>(listItem->itemWidget(item));
-        if (itemWidget == nullptr)
-            return;
-        QString text = itemWidget->text();
-        if (QString(MAINWINDOW_MDCUSTOMITEM_ALERT).compare(text) == 0)
-            ui->stackedWidget->setCurrentWidget(ui->pageAlert);
-        else if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
-            ui->stackedWidget->setCurrentWidget(ui->pageMotion);
-        else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
-            ui->stackedWidget->setCurrentWidget(ui->pageIO);
-        else if (QString(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER).compare(text) == 0)
-            ui->stackedWidget->setCurrentWidget(ui->pageFileExplorer);
+//    auto&& listItem = ui->listItem;
+//    connect(listItem, &MDListWidget::itemClicked, [&, listItem](QListWidgetItem* item) {
+//        auto itemWidget = static_cast<MDCustomItem::Ptr>(listItem->itemWidget(item));
+//        if (itemWidget == nullptr)
+//            return;
+//        QString text = itemWidget->text();
+//        if (QString(MAINWINDOW_MDCUSTOMITEM_ALERT).compare(text) == 0)
+//            ui->stackedWidget->setCurrentWidget(ui->pageAlert);
+//        else if (QString(MAINWINDOW_MDCUSTOMITEM_MOTION).compare(text) == 0)
+//            ui->stackedWidget->setCurrentWidget(ui->pageMotion);
+//        else if (QString(MAINWINDOW_MDCUSTOMITEM_IO).compare(text) == 0)
+//            ui->stackedWidget->setCurrentWidget(ui->pageIO);
+//        else if (QString(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER).compare(text) == 0)
+//            ui->stackedWidget->setCurrentWidget(ui->pageFileExplorer);
 
+//    });
+
+    connect(ui->leftFrame, &LeftFrame::pageItemChanged, [&](const PageItem& page) {
+        switch (page) {
+        case PageItem::ALERT_PAGE: ui->stackedWidget->setCurrentWidget(ui->pageAlert); break;
+        case PageItem::IO_PAGE: ui->stackedWidget->setCurrentWidget(ui->pageIO); break;
+        case PageItem::MOTION_PAGE: ui->stackedWidget->setCurrentWidget(ui->pageMotion); break;
+        case PageItem::FILE_EXPLORER_PAGE: ui->stackedWidget->setCurrentWidget(ui->pageFileExplorer); break;
+        case PageItem::INVALID_PAGE: break;
+        };
     });
 
     // top panel
@@ -106,7 +116,8 @@ void MainWindow::setupSignalsAndSlots() const {
     }, Qt::AutoConnection);
 
     connect(ui->pbErrorState, &QPushButton::clicked, [&]() {
-        ui->listItem->setCurrentRow(MAINWINDOW_ITEM_ALERT_POSITION);
+//        ui->listItem->setCurrentRow(MAINWINDOW_ITEM_ALERT_POSITION);
+        ui->leftFrame->setPageItem(PageItem::ALERT_PAGE);
         ui->stackedWidget->setCurrentWidget(ui->pageAlert);
     });
 
@@ -138,36 +149,36 @@ void MainWindow::setupUiLeftPanel() {
 
     traceEnter;
 
-    MDCustomItem::Ptr alert = new MDCustomItem;
-    alert->setObjectName(MAINWINDOW_MDCUSTOMITEM_ALERT_OBJECT_NAME);
-    alert->setText(MAINWINDOW_MDCUSTOMITEM_ALERT);
+//    MDCustomItem::Ptr alert = new MDCustomItem;
+//    alert->setObjectName(MAINWINDOW_MDCUSTOMITEM_ALERT_OBJECT_NAME);
+//    alert->setText(MAINWINDOW_MDCUSTOMITEM_ALERT);
 
-    MDCustomItem::Ptr io = new MDCustomItem;
-    io->setObjectName(MAINWINDOW_MDCUSTOMITEM_IO_OBJECT_NAME);
-    io->setText(MAINWINDOW_MDCUSTOMITEM_IO);
+//    MDCustomItem::Ptr io = new MDCustomItem;
+//    io->setObjectName(MAINWINDOW_MDCUSTOMITEM_IO_OBJECT_NAME);
+//    io->setText(MAINWINDOW_MDCUSTOMITEM_IO);
 
-    MDCustomItem::Ptr motion = new MDCustomItem;
-    motion->setObjectName(MAINWINDOW_MDCUSTOMITEM_MOTION_OBJECT_NAME);
-    motion->setText(MAINWINDOW_MDCUSTOMITEM_MOTION);
+//    MDCustomItem::Ptr motion = new MDCustomItem;
+//    motion->setObjectName(MAINWINDOW_MDCUSTOMITEM_MOTION_OBJECT_NAME);
+//    motion->setText(MAINWINDOW_MDCUSTOMITEM_MOTION);
 
-    MDCustomItem::Ptr fileExplorer = new MDCustomItem;
-    fileExplorer->setObjectName(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER_OBJECT_NAME);
-    fileExplorer->setText(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER);
+//    MDCustomItem::Ptr fileExplorer = new MDCustomItem;
+//    fileExplorer->setObjectName(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER_OBJECT_NAME);
+//    fileExplorer->setText(MAINWINDOW_MDCUSTOMITEM_FILE_EXPLORER);
 
 
-    QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
-    QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);
-    QListWidgetItem* motionItem = new QListWidgetItem(ui->listItem);
-    QListWidgetItem* fileExplorerItem = new QListWidgetItem(ui->listItem);
+//    QListWidgetItem* alertItem = new QListWidgetItem(ui->listItem);
+//    QListWidgetItem* ioItem = new QListWidgetItem(ui->listItem);
+//    QListWidgetItem* motionItem = new QListWidgetItem(ui->listItem);
+//    QListWidgetItem* fileExplorerItem = new QListWidgetItem(ui->listItem);
 
-    ui->listItem->addItem(alertItem);
-    ui->listItem->addItem(ioItem);
-    ui->listItem->addItem(motionItem);
-    ui->listItem->addItem(fileExplorerItem);
-    ui->listItem->setItemWidget(alertItem, alert);
-    ui->listItem->setItemWidget(ioItem, io);
-    ui->listItem->setItemWidget(motionItem, motion);
-    ui->listItem->setItemWidget(fileExplorerItem, fileExplorer);
+//    ui->listItem->addItem(alertItem);
+//    ui->listItem->addItem(ioItem);
+//    ui->listItem->addItem(motionItem);
+//    ui->listItem->addItem(fileExplorerItem);
+//    ui->listItem->setItemWidget(alertItem, alert);
+//    ui->listItem->setItemWidget(ioItem, io);
+//    ui->listItem->setItemWidget(motionItem, motion);
+//    ui->listItem->setItemWidget(fileExplorerItem, fileExplorer);
 
     traceExit;
 

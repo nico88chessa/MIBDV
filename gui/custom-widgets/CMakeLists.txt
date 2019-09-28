@@ -8,6 +8,7 @@ SET(ITEMS
     MDDoubleSpinBox
     MDBreadCrumb
     MDFileExplorerWidget
+    MDListItemWidget
     ItemDetailWidgetPrivate
     MDTwoLineItem
     ItemDetailWidget

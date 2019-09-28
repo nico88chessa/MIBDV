@@ -1,5 +1,7 @@
 SET(ITEMS
     MainWindow
+    LeftFrame
+    LeftFrameLogic
     UnmovableWindow
     AlertFrame
     AlertFrameLogic

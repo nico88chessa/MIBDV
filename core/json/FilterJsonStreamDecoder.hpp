@@ -38,21 +38,21 @@ private:
         POINTS,
         COORDINATE };
 
-    static constexpr char* NO_OBJECTS_KEY = "Nok";
-    static constexpr char* OBJECT_TO_SKIP_KEY = "ObjectToSkip";
-    static constexpr char* ROOT_KEY = "Root";
-    static constexpr char* NUMBER_OF_POINTS_KEY = "NumberOfPoints";
-    static constexpr char* BOUNDING_BOX_KEY = "BoundingBox";
-    static constexpr char* MIN_KEY = "Min";
-    static constexpr char* MAX_KEY = "Max";
-    static constexpr char* STRIPES_KEY = "Stripes";
-    static constexpr char* STRIPE_WIDTH_UM_KEY ="StripeWidthUm";
-    static constexpr char* STRIPE_SIZE_KEY = "Size";
-    static constexpr char* DATA_ARRAY_KEY = "Data";
-    static constexpr char* DATA_ARRAY_ELEMENT_KEY = "DataArrayElement";
-    static constexpr char* POINTS_KEY = "Points";
-    static constexpr char* COORDINATE_KEY = "Coordinate";
-    static constexpr char* POINT_COORDINATES_SEPARATOR = ",";
+    static constexpr const char* NO_OBJECTS_KEY = "Nok";
+    static constexpr const char* OBJECT_TO_SKIP_KEY = "ObjectToSkip";
+    static constexpr const char* ROOT_KEY = "Root";
+    static constexpr const char* NUMBER_OF_POINTS_KEY = "NumberOfPoints";
+    static constexpr const char* BOUNDING_BOX_KEY = "BoundingBox";
+    static constexpr const char* MIN_KEY = "Min";
+    static constexpr const char* MAX_KEY = "Max";
+    static constexpr const char* STRIPES_KEY = "Stripes";
+    static constexpr const char* STRIPE_WIDTH_UM_KEY ="StripeWidthUm";
+    static constexpr const char* STRIPE_SIZE_KEY = "Size";
+    static constexpr const char* DATA_ARRAY_KEY = "Data";
+    static constexpr const char* DATA_ARRAY_ELEMENT_KEY = "DataArrayElement";
+    static constexpr const char* POINTS_KEY = "Points";
+    static constexpr const char* COORDINATE_KEY = "Coordinate";
+    static constexpr const char* POINT_COORDINATES_SEPARATOR = ",";
 
 private:
     FilterStream::Ptr f;

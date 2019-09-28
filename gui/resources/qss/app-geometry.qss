@@ -53,6 +53,19 @@ QCheckBox[isDigitalIO = true] {
     border: none;
 }
 
+
+
+/*
+ * L E F T   F R A M E
+ */
+
+#leftFrame #lvMenu {
+    border: none;
+    padding: 8px 0px;
+}
+
+
+
 /*
  * M O T I O N   F R A M E
  */

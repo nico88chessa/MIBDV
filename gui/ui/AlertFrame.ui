@@ -32,7 +32,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabAlertFrame">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabAlert">
       <attribute name="title">
@@ -79,10 +79,7 @@
        <property name="spacing">
         <number>0</number>
        </property>
-       <item row="0" column="0">
-        <widget class="ErrorItemWidget" name="eiwSample" native="true"/>
-       </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -95,6 +92,25 @@
          </property>
         </spacer>
        </item>
+       <item row="0" column="0">
+        <widget class="ErrorItemWidget" name="eiwSample" native="true"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="MDListItemWidget" name="itemTest">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -106,6 +122,12 @@
    <class>ErrorItemWidget</class>
    <extends>QWidget</extends>
    <header>gui/custom-widgets/ErrorItemWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MDListItemWidget</class>
+   <extends>QFrame</extends>
+   <header>gui/custom-widgets/MDListItemWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
