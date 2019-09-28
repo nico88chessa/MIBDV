@@ -39,11 +39,11 @@ public:
      * non usare "focus" perche' va in conflitto con la property usata da Qt,
      * tant'e' che "focus" come property non funziona
      */
-    static constexpr char* FOCUS_PROPERTY_NAME = "focusCustom";
-    static constexpr char* IS_INFO_PROPERTY_NAME = "isInfo";
-    static constexpr char* IS_WARNING_PROPERTY_NAME = "isWarning";
-    static constexpr char* IS_ERROR_PROPERTY_NAME = "isError";
-    static constexpr char* IS_FATAL_PROPERTY_NAME = "isFatal";
+    static constexpr const char* FOCUS_PROPERTY_NAME = "focusCustom";
+    static constexpr const char* IS_INFO_PROPERTY_NAME = "isInfo";
+    static constexpr const char* IS_WARNING_PROPERTY_NAME = "isWarning";
+    static constexpr const char* IS_ERROR_PROPERTY_NAME = "isError";
+    static constexpr const char* IS_FATAL_PROPERTY_NAME = "isFatal";
 
 private:
     int deviceKey;

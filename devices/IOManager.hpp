@@ -93,7 +93,7 @@ private:
         auto plc = devices.value(deviceKey).staticCast<AbstractPLC<status, errorType>>();
         errorType e = plc->setDigitalOutput(channel, value);
         if (plc->isError(e)) {
-            traceErr() << "Errore nel setting dell'uscita digitale del CN";
+            traceErr() << "Errore nel setting dell'uscita digitale del PLC";
             return false;
         }
 

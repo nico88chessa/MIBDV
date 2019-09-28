@@ -32,7 +32,7 @@ private:
 
 public:
     explicit AlertItemModel(QObject* parent = Q_NULLPTR);
-    ~AlertItemModel();
+    virtual ~AlertItemModel() override;
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role) const override;

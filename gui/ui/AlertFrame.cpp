@@ -226,7 +226,7 @@ AlertFrame::AlertFrame(QWidget *parent) :
     ui->lvAlerts->setItemDelegate(delegate);
 
     ui->eiwSample->setError(Error(DeviceKey::GALIL_CN, 10, "ciao", ErrorType::ERROR));
-
+    ui->itemTest->setText("PROVA");
     this->setupSignalsAndSlots();
 
 //    constexpr int size = 2000;

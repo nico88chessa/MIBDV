@@ -117,8 +117,8 @@ public:
     using ConstPtr = const ItemDetailFilterWidget*;
 
 private:
-    static constexpr char* QLABEL_TYPE_KEY = "type";
-    static constexpr char* QLABEL_TYPE_VALUE = "subheader";
+    static constexpr const char* QLABEL_TYPE_KEY = "type";
+    static constexpr const char* QLABEL_TYPE_VALUE = "subheader";
 
 private:
     QGridLayout* gridLayout;

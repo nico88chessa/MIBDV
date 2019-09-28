@@ -442,9 +442,10 @@ QRadioButton::indicator {
 }
 
 .MDListWidget::item {
-    padding: 0px 16px 0px 16px;
+    padding: 0px;
     min-height: 48px;
-    background-clip: padding;
+    margin: 0px 16px 0px 16px;
+    background-clip: content;
     qproperty-focusPolicy: NoFocus;
 }
 
@@ -517,7 +518,7 @@ QScrollBar {
 
 QScrollBar:vertical {
     border-width: 2px;
-    border-style: solit;
+    border-style: solid;
 }
 
 QScrollBar::add-line:vertical {
@@ -715,4 +716,57 @@ QTreeView::branch:open:has-children:has-siblings  {
     qproperty-errorDescriptionLeft: 350;
     qproperty-errorDescriptionFontSize: 13;
     qproperty-errorDescriptionMaxRowCount: 2;
+}
+
+
+
+/*
+ * D I A L O G   A L E R T
+ */
+
+DialogAlert {
+    background-color: white;
+    border-width: 2px;
+    border-style: solid;
+}
+
+DialogAlert #lTitle {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 20px;
+    padding: 0px;
+    margin: 0px;
+    qproperty-geometry: rect(24 20 360 20); /*384-24=360*/
+}
+
+DialogAlert #lContent {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0px;
+    margin: 0px;
+    qproperty-geometry: rect(24 66 360 200); /*384-24=360*/
+    qproperty-alignment: 'AlignTop | AlignLeft';
+    qproperty-wordWrap: true;
+}
+
+
+
+/*
+ *  M D L I S T I T E M W I D G E T
+ */
+
+MDListItemWidget {
+    font-weight: 500;
+    border: 0px;
+    border-radius: 4px;
+    max-height: 24px;
+    min-height: 24px;
+    margin: 2px 8px;
+    padding: 8px 8px;
+    font-size: 16px;
+    qproperty-iconWidth: 24;
+    qproperty-iconHeight: 24;
+    qproperty-iconPaddingRight: 16;
+    qproperty-focusPolicy: NoFocus;
 }

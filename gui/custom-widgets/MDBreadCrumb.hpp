@@ -20,7 +20,7 @@ public:
     using ConstPtr = const MDBreadCrumbPrivate*;
 
 public:
-    static constexpr char* ROOT_NAME_DFLT = "Root";
+    static constexpr const char* ROOT_NAME_DFLT = "Root";
 
 private:
     QVector<Item> items;

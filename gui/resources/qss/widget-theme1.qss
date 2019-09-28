@@ -527,18 +527,19 @@ QTabBar::tab:!selected:hover {
 
 QScrollBar:vertical {
     border-color: transparent;
+    background: transparent;
 }
 
 QScrollBar::handle:vertical {
-    background: green;
+    background: rgb(255, 167, 38);
 }
 
 QScrollBar::sub-page:vertical {
-    background-color: lightGray;
+    background-color: rgba(0, 0, 0, 12%);
 }
 
 QScrollBar::add-page:vertical {
-    background-color: lightGray;
+    background-color: rgba(0, 0, 0, 12%);
 }
 
 
@@ -636,4 +637,76 @@ QTreeView::branch {
 
 DialogAlert {
     background-color: white;
+    background-clip: margin;
+    border-left-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 transparent,
+        stop:1 rgba(0, 0, 0, 26));
+    border-right-color: qlineargradient(x1:1, y1:0, x2:0, y2:0,
+        stop:0 transparent,
+        stop:1 rgba(0, 0, 0, 26));
+    border-top-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 transparent,
+        stop:1 rgba(0, 0, 0, 26));
+    border-bottom-color: qlineargradient(x1:0, y1:1, x2:0, y2:0,
+        stop:0 transparent,
+        stop:1 rgba(0, 0, 0, 26));
 }
+
+DialogAlert #lTitle {
+    color: rgba(0, 0, 0, 0.86);
+}
+
+DialogAlert #lContent {
+    color: rgba(0, 0, 0, 60%);
+}
+
+
+/*
+ *  M D L I S T I T E M W I D G E T
+ */
+
+.MDListItemWidget {
+    background-color: transparent;
+}
+
+MDListItemWidget[isHover="true"] {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+MDListItemWidget[isActive="true"] {
+    background-color: rgba(255, 167, 38, 12%);
+    color: rgb(255, 167, 38);
+}
+
+MDListItemWidget#MDLIW_ItemAlerts {
+    qproperty-iconPath: url(:/icons/medium-emphasis/add_alert);
+}
+
+MDListItemWidget#MDLIW_ItemAlerts[isActive="true"] {
+    qproperty-iconPath: url(:/icons/ffa726/add_alert);
+}
+
+MDListItemWidget#MDLIW_ItemIO {
+    qproperty-iconPath: url(:/icons/medium-emphasis/input);
+}
+
+MDListItemWidget#MDLIW_ItemIO[isActive="true"] {
+    qproperty-iconPath: url(:/icons/ffa726/input);
+}
+
+MDListItemWidget#MDLIW_ItemMotion {
+    qproperty-iconPath: url(:/icons/medium-emphasis/pan_tool);
+}
+
+MDListItemWidget#MDLIW_ItemMotion[isActive="true"] {
+    qproperty-iconPath: url(:/icons/ffa726/pan_tool);
+}
+
+MDListItemWidget#MDLIW_ItemFileExplorer {
+    qproperty-iconPath: url(:/icons/medium-emphasis/unarchive);
+}
+
+MDListItemWidget#MDLIW_ItemFileExplorer[isActive="true"] {
+    qproperty-iconPath: url(:/icons/ffa726/unarchive);
+}
+

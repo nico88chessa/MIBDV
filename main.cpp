@@ -17,6 +17,8 @@
 #include <AnalogInputValue.hpp>
 #include <AnalogInputBufferValues.hpp>
 
+#include <gui/ui/LeftFrameLogic.hpp>
+#include <gui/ui/LeftFrame.hpp>
 #include <Error.hpp>
 #include <Types.hpp>
 
@@ -100,12 +102,14 @@ void registerMetatypes() {
     qRegisterMetaType<PROGRAM_NAMESPACE::ErrorType>("mibdv::ErrorType");
     qRegisterMetaType<QList<PROGRAM_NAMESPACE::Error>>("QList<Error>");
     qRegisterMetaType<QList<PROGRAM_NAMESPACE::Error>>("mibdv::QList<Error>");
+    qRegisterMetaType<MenuItem>("MenuItem");
+    qRegisterMetaType<PageItem>("PageItem");
 
     traceExit;
 
 }
 
-static constexpr char* MAIN_THREAD_NAME = "Main";
+static constexpr const char* MAIN_THREAD_NAME = "Main";
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char** argv) {
 

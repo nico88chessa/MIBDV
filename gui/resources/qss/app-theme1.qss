@@ -88,6 +88,18 @@ QWidget:!enabled {
     background-color: transparent;
 }
 
+
+
+/*
+ * L E F T   F R  A M E
+ */
+
+#leftFrame #lvMenu {
+    background-color: transparent;
+}
+
+
+
 /*
  * M O T I O N   F R A M E
  */

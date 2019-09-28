@@ -16,11 +16,11 @@
 
 namespace PROGRAM_NAMESPACE {
 
-static constexpr char* FILTER_JSON_NUMBER_OF_POINTS_KEY = "NumberOfPoints";
-static constexpr char* FILTER_JSON_BOUNDING_BOX_OBJ_KEY = "BoundingBox";
-static constexpr char* FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY = "Min";
-static constexpr char* FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY = "Max";
-static constexpr char* FILTER_JSON_NUMBER_COORDINATE_KEY = "Coordinate";
+static constexpr const char* FILTER_JSON_NUMBER_OF_POINTS_KEY = "NumberOfPoints";
+static constexpr const char* FILTER_JSON_BOUNDING_BOX_OBJ_KEY = "BoundingBox";
+static constexpr const char* FILTER_JSON_BOUNDING_BOX_OBJ_MIN_KEY = "Min";
+static constexpr const char* FILTER_JSON_BOUNDING_BOX_OBJ_MAX_KEY = "Max";
+static constexpr const char* FILTER_JSON_NUMBER_COORDINATE_KEY = "Coordinate";
 
 class FilterJsonParser : public AbstractJsonParser<Filter> {
 public:
@@ -28,7 +28,7 @@ public:
     using ConstPtr = const FilterJsonParser*;
 
 private:
-    static constexpr char* POINT_COORDINATES_SEPARATOR = ",";
+    static constexpr const char* POINT_COORDINATES_SEPARATOR = ",";
 
 protected:
     virtual JsonParserError encodeJson(const Filter* obj, QByteArray& output) {
