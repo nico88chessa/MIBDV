@@ -111,6 +111,7 @@ private:
     double angleMRad;
     double offsetXmm;
     double offsetYmm;
+    double offsetZmm;
     float tileScaleXPercent;
     float tileScaleYPercent;
     int waitTimeMs;
@@ -160,6 +161,8 @@ public:
     void setOffsetXmm(double value) { offsetXmm = value; }
     double getOffsetYmm() const { return offsetYmm; }
     void setOffsetYmm(double value) { offsetYmm = value; }
+    double getOffsetZmm() const { return offsetZmm; }
+    void setOffsetZmm(double value) { offsetZmm = value; }
     float getTileScaleXPercent() const { return tileScaleXPercent; }
     void setTileScaleXPercent(float value) { tileScaleXPercent = value; }
     float getTileScaleYPercent() const { return tileScaleYPercent; }
@@ -211,7 +214,6 @@ public:
     void setCircleVectorNumberOfSides(int value) { circleVectorNumberOfSides = value; }
     int getCircleVectorPitch() const { return circleVectorPitch; }
     void setCircleVectorPitch(int value) { circleVectorPitch = value; }
-
 };
 
 
@@ -232,6 +234,7 @@ private:
     static constexpr char* CONFIGURATION_JSON_ANGLE_MRAD_KEY = "angleMRad";
     static constexpr char* CONFIGURATION_JSON_OFFSET_X_MM_KEY = "offsetXmm";
     static constexpr char* CONFIGURATION_JSON_OFFSET_Y_MM_KEY = "offsetYmm";
+    static constexpr char* CONFIGURATION_JSON_OFFSET_Z_MM_KEY = "offsetZmm";
     static constexpr char* CONFIGURATION_JSON_TILE_SCALE_X_PERCENT_KEY = "tileScaleXPercent";
     static constexpr char* CONFIGURATION_JSON_TILE_SCALE_Y_PERCENT_KEY = "tileScaleYPercent";
     static constexpr char* CONFIGURATION_JSON_WAIT_TIME_MS_KEY = "waitTimeMs";

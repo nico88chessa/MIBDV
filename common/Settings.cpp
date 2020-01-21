@@ -216,8 +216,19 @@ void Settings::loadValuesFromFile() {
         galilPLCIpAddress = settings.value(GALIL_PLC_IP_ADDRESS, GALIL_PLC_IP_ADDRESS_DFLT).value<QString>();
     }
 
+    // setup parte ui
     uiSpoolPath = settings.value(UI_SPOOL_PATH, UI_SPOOL_PATH_DFLT).value<QString>();
     markingConfigurationPath = settings.value(UI_MARKING_CONFIGURATION_PATH, UI_MARKING_CONFIGURATION_PATH_DFLT).value<QString>();
+    uiSwLimitsMinTileTimeMs = settings.value(UI_SW_LIMITS_MIN_TILE_TIME_MS, UI_SW_LIMITS_MIN_TILE_TIME_MS_DFLT).value<int>();
+
+    // controllo data
+    auto&& date = QDate::currentDate().toString("yy/MM/dd");
+    QString keyDflt = QString("%0%1%2%3%4%5") \
+            .arg(date.at(0)).arg(date.at(3)) \
+            .arg(date.at(6)).arg(date.at(1)) \
+            .arg(date.at(4)).arg(date.at(7));
+    uiSwIsaStatus = settings.value(UI_SW_ISA_STATUS, UI_SW_ISA_STATUS_DFLT).value<QString>();
+    uiSwIsaKey    = settings.value(UI_SW_ISA_KEY, keyDflt).value<QString>();
 
     traceDebug() << "axisXStepPerMm:" << axisXStepPerMm;
     traceDebug() << "axisXMinPosMm:" << axisXMinPosMm;
@@ -405,6 +416,9 @@ void Settings::writeValuesToFile() {
 
     settings.setValue(UI_SPOOL_PATH, uiSpoolPath);
     settings.setValue(UI_MARKING_CONFIGURATION_PATH, markingConfigurationPath);
+    settings.setValue(UI_SW_LIMITS_MIN_TILE_TIME_MS, uiSwLimitsMinTileTimeMs);
+    settings.setValue(UI_SW_ISA_KEY, uiSwIsaKey);
+    settings.setValue(UI_SW_ISA_STATUS, uiSwIsaStatus);
 
     settings.sync();
 
@@ -577,3 +591,7 @@ Settings& Settings::instance() {
     return instance;
 
 }
+
+
+
+

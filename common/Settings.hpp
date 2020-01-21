@@ -115,6 +115,9 @@ public:
     DeviceKey getMachineCNType() const { return machineCNType; }
     DeviceKey getMachinePLCType() const { return machinePLCType; }
     int getMachineIORefreshIntervalMs() const { return machineIORefreshIntervalMs; }
+    int getUiSwLimitsMinTileTimeMs() const { return uiSwLimitsMinTileTimeMs; }
+    QString getUiSwIsaKey() const { return uiSwIsaKey; }
+    QString getUiSwIsaStatus() const { return uiSwIsaStatus; }
 
     // WARNING NIC 03/04/2019 - variabili laser YLPN (da rifare)
     QString getIpgYLPNLaserIpAddress() const { return ipgYLPNLaserIpAddress; }
@@ -123,6 +126,7 @@ public:
     void setIpgYLPNLaserPort(const quint16& value) { ipgYLPNLaserPort = value; }
     QString getUiSpoolPath() const { return uiSpoolPath; }
     QString getMarkingConfigurationPath() const { return markingConfigurationPath; }
+
 
 private:
     // ASSE X
@@ -186,6 +190,10 @@ private:
     // UI
     QString uiSpoolPath;
     QString markingConfigurationPath;
+    int uiSwLimitsMinTileTimeMs;
+    QString uiSwIsaKey;
+    QString uiSwIsaStatus;
+
 
     // GALIL CN PARAMETERS
     int galilCNConnectionTimeoutMs;

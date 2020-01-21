@@ -6,6 +6,7 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QDir>
+#include <QCryptographicHash>
 
 #include <vector>
 #include <iostream>
@@ -34,11 +35,52 @@
 #include <core/json/FilterJsonStreamDecoder.hpp>
 
 
+
 using namespace PROGRAM_NAMESPACE;
 
 static constexpr const char* WORKER_THREAD_NAME = "WORKER_THREAD";
 static constexpr const char* ROWTILE_PROCESSOR_THREAD_NAME = "ROW_TILE_PROCESSOR_THREAD";
 static constexpr const char* RESUME_ROWTILE_PROCESSOR_THREAD_NAME = "RESUME_TILE_PROCESSOR_THREAD";
+
+static bool checkSWActive(const QString& status, const QString& key) {
+
+    traceEnter;
+    bool isSwActive = false;
+//    QSettings settings(settingsPath);
+//    QString validityEnabled = settings.value(PREF_VALIDITY_STATUS).toString();
+//    QString validityKey = settings.value(PREF_VALIDITY_KEY).toString();
+//    QString falseString = MD5::md5sum("false");
+
+    QString falseString = QCryptographicHash::hash(QByteArray("false"), QCryptographicHash::Algorithm::Md5).toHex();
+
+    if (status != falseString) {
+        QDate todayDate= QDate::currentDate();
+
+        QString validityDateString = QString("20%1%2/%3%4/%5%6")
+                               .arg(key.at(0))
+                               .arg(key.at(3))
+                               .arg(key.at(1))
+                               .arg(key.at(4))
+                               .arg(key.at(2))
+                               .arg(key.at(5));
+
+        QDate validityDate = QDate::fromString(validityDateString, "yyyy/MM/dd");
+
+        if (todayDate.daysTo(validityDate) > 0)
+            isSwActive = true;
+        else {
+            traceErr() << "SYSTEM IS NOT ACTIVE!!!";
+            isSwActive = false;
+        }
+        traceInfo() << QString("SYSTEM CONTROL ENABLED (%0 - %1)").arg(validityDate.toString()).arg(todayDate.toString());
+
+    }
+    else
+        isSwActive = true;
+
+    traceExit;
+    return isSwActive;
+}
 
 /*
  *  W O R K E R   T H R E A D
@@ -232,6 +274,7 @@ ExitCause Worker::process() {
     int frequencyHz = printConfiguration.getLaserFrequency() * 1000;
     double offsetXmm = printConfiguration.getOffsetXmm();
     double offsetYmm = printConfiguration.getOffsetYmm();
+    double offsetZmm = printConfiguration.getOffsetZmm();
     int tileSizeMm = printConfiguration.getTileSizeMm();
     int tileSizeUm = tileSizeMm * 1000;
     float tileScaleXUnit = printConfiguration.getTileScaleXPercent() * 0.01;
@@ -244,6 +287,7 @@ ExitCause Worker::process() {
     traceInfo() << "Frequency [Hz]: " << frequencyHz;
     traceInfo() << "OffsetXMm: " << offsetXmm;
     traceInfo() << "OffsetYMm: " << offsetYmm;
+    traceInfo() << "OffsetZMm: " << offsetZmm;
     traceInfo() << "Tile size [mm]: " << tileSizeMm;
     traceInfo() << "Tile size [um]: " << tileSizeUm;
     traceInfo() << "Scale Tile X [%]: " << this->printConfiguration.getTileScaleXPercent();
@@ -525,6 +569,83 @@ ExitCause Worker::process() {
 
     machineStatusNotifier->setCurrentStatus(MachineStatus::PRINTING);
     updateLastCommandExecute(PrintCommandExecuted::CYCLE);
+
+    // sposto l'asse z a fuoco correttamente
+    int offsetZUm = offsetZmm * 1000;
+    float offsetZMm = (float) offsetZUm * 0.001;
+    int res = this->motionManager->moveZ(offsetZMm);
+
+    if (motionManager->isErr(res)) {
+        QString descrErr = MotionManager::decodeError(res);
+        traceErr() << "Errore comando move asse Z - codice:" << res;
+        traceErr() << "Descrizione:" << descrErr;
+        showDialogAsync("Error move asse Z", QString("Descrizione errore: %1").arg(descrErr));
+        canContinue = false;
+        return ExitCause::INTERNAL_ERROR;
+
+    } else {
+
+        localTimer.setInterval(MOTION_CHECK_TIME_MS);
+
+        res = MOTION_MANAGER_NO_ERR;
+        canContinue = false;
+
+        QMetaObject::Connection ce = connect(this, &Worker::stopProcessByErrorSignal, [&]() {
+            errorCatched = true;
+            if (localEventLoop.isRunning())
+                localEventLoop.quit();
+        });
+        QMetaObject::Connection c1 = connect(motionAnalizer.data(), &IMotionAnalizer::motionBeanSignal, [&](const MotionBean& mb) {
+            if (localEventLoop.isRunning() && !localTimer.isActive()) {
+                if (!mb.getAxisZMoveInProgress()) {
+                    if (mb.getAxisZStopCode() == MotionStopCode::MOTION_STOP_CORRECTLY) {
+                        res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+                        canContinue = true;
+                    } else
+                        res = MOTION_MANAGER_MOTION_Z_STOP_ERROR;
+
+                    localEventLoop.quit();
+                }
+            }
+        });
+        QMetaObject::Connection c2 = connect(motionAnalizer.data(), static_cast<void (IMotionAnalizer::*)(MotionStopCode)>(&IMotionAnalizer::axisZMotionStopSignal), [&](MotionStopCode sc) {
+            if (localEventLoop.isRunning()) {
+                if (sc == MotionStopCode::MOTION_STOP_CORRECTLY) {
+                    res = MOTION_MANAGER_MOTION_Z_STOP_CORRECTLY;
+                    canContinue = true;
+                } else
+                    res = MOTION_MANAGER_MOTION_Z_STOP_ERROR;
+
+                localEventLoop.quit();
+            }
+        });
+        QMetaObject::Connection c3 = connect(this, &Worker::stopRequestSignal, [&]() {
+            isStopByUser = true;
+            traceInfo() << "Stop richiesto dall'utente";
+            localEventLoop.quit();
+        });
+
+        localTimer.start();
+        localEventLoop.exec();
+        localTimer.stop();
+        QObject::disconnect(ce);
+        QObject::disconnect(c1);
+        QObject::disconnect(c2);
+        QObject::disconnect(c3);
+
+        if (!canContinue) {
+            if (errorCatched)
+                return ExitCause::ERROR_CATCHED;
+            if (isStopByUser)
+                return ExitCause::STOP_BY_USER;
+            else {
+                traceErr() << "L'asse Z si e' fermato in modo anomalo";
+                showDialogAsync("Errore stop asse Z", QString("L'asse X si e' fermato in modo anomalo"));
+                return ExitCause::INTERNAL_ERROR;
+            }
+        }
+
+    }
 
 
     // decodifico l'header del file
@@ -1763,6 +1884,13 @@ void TestFrameLogic::startWork() {
 
     traceEnter;
 
+    auto&& settings = Settings::instance();
+
+    if (!checkSWActive(settings.getUiSwIsaStatus(), settings.getUiSwIsaKey())) {
+        qPtr->showPopup("SW Error", "Internal error: contact DV service.");
+        return;
+    }
+
     traceInfo() << "*** START PROCESS ***";
     //qPtr->ui->pbStartProcess->setEnabled(false);
     //qPtr->ui->pbStopProcess->setEnabled(true);
@@ -2136,6 +2264,7 @@ void TestFrame::updatePrintConfiguration() {
     pc.setAngleMRad(ui->dsbAngleMrad->value());
     pc.setOffsetXmm(ui->dsbOffsetX->value());
     pc.setOffsetYmm(ui->dsbOffsetY->value());
+    pc.setOffsetZmm(ui->dsbOffsetZ->value());
     pc.setTileScaleXPercent(ui->dsbScaleX->value());
     pc.setTileScaleYPercent(ui->dsbScaleY->value());
     pc.setWaitTimeMs(ui->sbTileTime->value());
@@ -2179,6 +2308,7 @@ void TestFrame::updatePrintConfiguration() {
     stringList << "Angle mrad: " << QString::number(pc.getAngleMRad()) << "\r\n";
     stringList << "Offset x mm: " << QString::number(pc.getOffsetXmm()) << "\r\n";
     stringList << "Offset y mm: " << QString::number(pc.getOffsetYmm()) << "\r\n";
+    stringList << "Offset z mm: " << QString::number(pc.getOffsetZmm()) << "\r\n";
     stringList << "Tile scale x percent: " << QString::number(pc.getTileScaleXPercent()) << "\r\n";
     stringList << "Tile scale y percent: " << QString::number(pc.getTileScaleYPercent()) << "\r\n";
     stringList << "Wait time ms: " << QString::number(pc.getWaitTimeMs()) << "\r\n";
@@ -2232,6 +2362,7 @@ void TestFrame::restorePrintConfiguration() {
     ui->dsbAngleMrad->setValue(currentConfiguration.getAngleMRad());
     ui->dsbOffsetX->setValue(currentConfiguration.getOffsetXmm());
     ui->dsbOffsetY->setValue(currentConfiguration.getOffsetYmm());
+    ui->dsbOffsetZ->setValue(currentConfiguration.getOffsetZmm());
     ui->dsbScaleX->setValue(currentConfiguration.getTileScaleXPercent());
     ui->dsbScaleY->setValue(currentConfiguration.getTileScaleYPercent());
     ui->sbTileTime->setValue(currentConfiguration.getWaitTimeMs());
@@ -2395,6 +2526,8 @@ void TestFrame::setupUi() {
 
     ui->setupUi(this);
 
+    auto&& settings = Settings::instance();
+
     ui->tabWidget->tabBar()->installEventFilter(this);
     ui->tabWidget->setCurrentIndex(0);
 
@@ -2412,7 +2545,8 @@ void TestFrame::setupUi() {
 
     ui->sbTileSize->setRange(TEST_FRAME_TILE_SIZE_MIN, TEST_FRAME_TILE_SIZE_MAX);
 
-    ui->sbTileTime->setRange(TEST_FRAME_WAIT_TIME_MS_MIN, TEST_FRAME_WAIT_TIME_MS_MAX);
+    int minTileTime = qMax(TEST_FRAME_WAIT_TIME_MS_MIN, settings.getUiSwLimitsMinTileTimeMs());
+    ui->sbTileTime->setRange(minTileTime, TEST_FRAME_WAIT_TIME_MS_MAX);
     ui->sbWaitTimeYMovement->setRange(TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MIN, TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MAX);
 
     ui->dsbOffsetX->setRange(TEST_FRAME_OFFSET_X_MIN, TEST_FRAME_OFFSET_X_MAX);
@@ -2422,6 +2556,10 @@ void TestFrame::setupUi() {
     ui->dsbOffsetY->setRange(TEST_FRAME_OFFSET_Y_MIN, TEST_FRAME_OFFSET_Y_MAX);
     ui->dsbOffsetY->setSingleStep(TEST_FRAME_DSB_STEP);
     ui->dsbOffsetY->setDecimals(3);
+
+    ui->dsbOffsetZ->setRange(TEST_FRAME_OFFSET_Z_MIN, TEST_FRAME_OFFSET_Z_MAX);
+    ui->dsbOffsetZ->setSingleStep(TEST_FRAME_DSB_STEP);
+    ui->dsbOffsetZ->setDecimals(3);
 
     ui->dsbScaleX->setRange(TEST_FRAME_SCALE_X_MIN, TEST_FRAME_SCALE_X_MAX);
     ui->dsbScaleX->setSingleStep(TEST_FRAME_DSB_SCALE_STEP);
@@ -2721,6 +2859,7 @@ JsonParserError ConfigurationJsonParser::encodeJson(PrintConfiguration::ConstPtr
     jsonObj[CONFIGURATION_JSON_ANGLE_MRAD_KEY] = obj->getAngleMRad();
     jsonObj[CONFIGURATION_JSON_OFFSET_X_MM_KEY] = obj->getOffsetXmm();
     jsonObj[CONFIGURATION_JSON_OFFSET_Y_MM_KEY] = obj->getOffsetYmm();
+    jsonObj[CONFIGURATION_JSON_OFFSET_Z_MM_KEY] = obj->getOffsetZmm();
     jsonObj[CONFIGURATION_JSON_TILE_SCALE_X_PERCENT_KEY] = obj->getTileScaleXPercent();
     jsonObj[CONFIGURATION_JSON_TILE_SCALE_Y_PERCENT_KEY] = obj->getTileScaleYPercent();
     jsonObj[CONFIGURATION_JSON_WAIT_TIME_MS_KEY] = obj->getWaitTimeMs();
@@ -2784,6 +2923,12 @@ JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, Pri
     QJsonValue offsetYmm = jsonObj.value(CONFIGURATION_JSON_OFFSET_Y_MM_KEY);
     if (offsetYmm.isUndefined()) {
         traceErr() << "Chiave offsetYmm non presente nel file json";
+        return JSON_PARSER_ERROR_KEY_NOT_FOUND;
+    }
+
+    QJsonValue offsetZmm = jsonObj.value(CONFIGURATION_JSON_OFFSET_Z_MM_KEY);
+    if (offsetZmm.isUndefined()) {
+        traceErr() << "Chiave offsetZmm non presente nel file json";
         return JSON_PARSER_ERROR_KEY_NOT_FOUND;
     }
 
@@ -2923,6 +3068,7 @@ JsonParserError ConfigurationJsonParser::decodeJson(const QByteArray& input, Pri
     obj->setAngleMRad(angleMRad.toDouble());
     obj->setOffsetXmm(offsetXmm.toDouble());
     obj->setOffsetYmm(offsetYmm.toDouble());
+    obj->setOffsetZmm(offsetZmm.toDouble());
     obj->setTileScaleXPercent(tileScaleXPercent.toDouble());
     obj->setTileScaleYPercent(tileScaleYPercent.toDouble());
     obj->setWaitTimeMs(waitTimeMs.toInt());

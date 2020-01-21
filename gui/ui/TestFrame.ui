@@ -167,7 +167,7 @@
            <widget class="MDDoubleSpinBox" name="dsbOffsetX">
             <property name="minimumSize">
              <size>
-              <width>300</width>
+              <width>250</width>
               <height>0</height>
              </size>
             </property>
@@ -179,73 +179,6 @@
             </property>
             <property name="label" stdset="0">
              <string>Offset X [mm]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="MDSpinBox" name="sbTileTime">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="label" stdset="0">
-             <string>Tile time [ms]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="MDSpinBox" name="sbTileSize">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="label" stdset="0">
-             <string>Tile size [mm]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="MDDoubleSpinBox" name="dsbScaleY">
-            <property name="label" stdset="0">
-             <string>Scale Y [%]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="MDDoubleSpinBox" name="dsbOffsetY">
-            <property name="minimumSize">
-             <size>
-              <width>300</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="label" stdset="0">
-             <string>Offset Y [mm]</string>
             </property>
            </widget>
           </item>
@@ -265,6 +198,73 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="1">
+           <widget class="MDDoubleSpinBox" name="dsbOffsetY">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="label" stdset="0">
+             <string>Offset Y [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="MDDoubleSpinBox" name="dsbScaleY">
+            <property name="label" stdset="0">
+             <string>Scale Y [%]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="MDSpinBox" name="sbTileSize">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="label" stdset="0">
+             <string>Tile size [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="MDSpinBox" name="sbTileTime">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="label" stdset="0">
+             <string>Tile time [ms]</string>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="1">
            <widget class="MDSpinBox" name="sbWaitTimeYMovement">
             <property name="label" stdset="0">
@@ -279,7 +279,23 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="1" column="2">
+           <widget class="MDDoubleSpinBox" name="dsbOffsetZ">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="label" stdset="0">
+             <string>Offset Z [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="3">
            <spacer name="verticalSpacer_9">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -435,7 +451,7 @@
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0">
+         <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -1033,6 +1049,7 @@
   <tabstop>dsbAngleMrad</tabstop>
   <tabstop>dsbOffsetX</tabstop>
   <tabstop>dsbOffsetY</tabstop>
+  <tabstop>dsbOffsetZ</tabstop>
   <tabstop>dsbScaleX</tabstop>
   <tabstop>dsbScaleY</tabstop>
   <tabstop>sbTileTime</tabstop>
@@ -1040,35 +1057,45 @@
   <tabstop>rbRandomChoice</tabstop>
   <tabstop>sbRPointsPerTile</tabstop>
   <tabstop>cbRShuffleRowTiles</tabstop>
-  <tabstop>sbPointPulses</tabstop>
-  <tabstop>sbCirclePointsRadius</tabstop>
-  <tabstop>sbCirclePointsNumberSides</tabstop>
-  <tabstop>sbCirclePointsPulses</tabstop>
-  <tabstop>hsLaserPower</tabstop>
+  <tabstop>rbNHChoice</tabstop>
+  <tabstop>sbNHMinDistance</tabstop>
+  <tabstop>rbNHNormal</tabstop>
   <tabstop>sbLaserPower</tabstop>
-  <tabstop>cbLaserPulseWidth</tabstop>
-  <tabstop>hsLaserFrequency</tabstop>
-  <tabstop>sbLaserFrequency</tabstop>
-  <tabstop>pbGuideLaser</tabstop>
-  <tabstop>pbReset</tabstop>
-  <tabstop>pbSet</tabstop>
-  <tabstop>rbPoint</tabstop>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>rbCircleVector</tabstop>
+  <tabstop>rbNHReverseY</tabstop>
+  <tabstop>cbNHShuffleStackedTiles</tabstop>
+  <tabstop>leStatus</tabstop>
+  <tabstop>leTileTimeMeasure</tabstop>
+  <tabstop>leStackTimeMeasure</tabstop>
+  <tabstop>leEstimatedResidualTime</tabstop>
+  <tabstop>pbStartProcess</tabstop>
+  <tabstop>pbResumeProcess</tabstop>
+  <tabstop>pbPauseProcess</tabstop>
+  <tabstop>pbStopProcess</tabstop>
   <tabstop>cbLaserInitialized</tabstop>
   <tabstop>cbGuideLaser</tabstop>
   <tabstop>leFilePath</tabstop>
   <tabstop>rbCirclePoints</tabstop>
-  <tabstop>leStackTimeMeasure</tabstop>
-  <tabstop>leTileTimeMeasure</tabstop>
-  <tabstop>leStatus</tabstop>
-  <tabstop>leEstimatedResidualTime</tabstop>
+  <tabstop>pbGuideLaser</tabstop>
+  <tabstop>sbLaserFrequency</tabstop>
+  <tabstop>hsLaserFrequency</tabstop>
+  <tabstop>pbReset</tabstop>
   <tabstop>sbCircleVectorRadius</tabstop>
   <tabstop>sbCircleVectorNumberSides</tabstop>
   <tabstop>sbCircleVectorNumberRevolutions</tabstop>
   <tabstop>sbCircleVectorPointsPitch</tabstop>
   <tabstop>pbSave</tabstop>
   <tabstop>pbLoad</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>rbCircleVector</tabstop>
+  <tabstop>pbSet</tabstop>
+  <tabstop>rbPoint</tabstop>
+  <tabstop>hsLaserPower</tabstop>
+  <tabstop>sbCirclePointsPulses</tabstop>
+  <tabstop>rbNHShuffleRowTiles</tabstop>
+  <tabstop>cbLaserPulseWidth</tabstop>
+  <tabstop>sbCirclePointsNumberSides</tabstop>
+  <tabstop>sbCirclePointsRadius</tabstop>
+  <tabstop>sbPointPulses</tabstop>
  </tabstops>
  <resources/>
  <connections/>

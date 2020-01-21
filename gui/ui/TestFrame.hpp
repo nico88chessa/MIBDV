@@ -85,6 +85,8 @@ private:
     static constexpr int TEST_FRAME_OFFSET_X_MAX = 1200;
     static constexpr int TEST_FRAME_OFFSET_Y_MIN = 0;
     static constexpr int TEST_FRAME_OFFSET_Y_MAX = 1200;
+    static constexpr int TEST_FRAME_OFFSET_Z_MIN = 0;
+    static constexpr int TEST_FRAME_OFFSET_Z_MAX = 100;
     static constexpr double TEST_FRAME_SCALE_X_DFLT = 100;
     static constexpr double TEST_FRAME_SCALE_X_MIN = 80;
     static constexpr double TEST_FRAME_SCALE_X_MAX = 120;
@@ -113,7 +115,6 @@ private:
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MIN = 1;
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MAX = TEST_FRAME_CIRCLE_RADIUS_MAX/20; // parametro da verificare
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_STEP = 1;
-
 
     static constexpr int TEST_FRAME_LASER_MIN_POWER = 0;
     static constexpr int TEST_FRAME_LASER_MAX_POWER = 100;
