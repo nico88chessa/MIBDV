@@ -284,6 +284,7 @@ static const int COMMAND_SET_POWER = 4024;
 static const int COMMAND_SET_EE = 4025;
 static const int COMMAND_SET_EM = 4026;
 static const int COMMAND_GET_LASER_STATUS = 4030;
+static const int COMMAND_GET_AIR_COOLED_LASER_STATUS = 4230;
 static const int COMMAND_GET_FIRST_WORK_LOG = 4052;
 static const int COMMAND_GET_FIRST_ERROR_LOG = 4053;
 static const int COMMAND_WRITE_BINARY_BLOCK = 4601;

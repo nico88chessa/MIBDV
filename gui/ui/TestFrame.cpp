@@ -811,9 +811,15 @@ ExitCause Worker::process() {
 
     updateLastCommandExecute(PrintCommandExecuted::LASER_ON);
 
-    if (!getPulseEnergy(energy)) {
-        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser";
-        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser" \
+//    if (!getPulseEnergy(energy)) {
+//        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser";
+//        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser" \
+//                                 "\nVedere il log per maggiori dettagli.");
+//        return ExitCause::INTERNAL_ERROR;
+//    }
+    if (!getPulseEnergyLaserAirCooled(energy)) {
+        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser air cooled";
+        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser air cooled" \
                                  "\nVedere il log per maggiori dettagli.");
         return ExitCause::INTERNAL_ERROR;
     }
@@ -1857,6 +1863,47 @@ bool Worker::getPulseEnergy(float& energyJoule) {
 
     traceExit;
     return true;
+
+}
+
+bool Worker::getPulseEnergyLaserAirCooled(float& energyJoule) {
+
+    traceEnter;
+
+    traceInfo() << "Interrogazione stato laser air cooled";
+
+    QScopedPointer<ipg::IpgSyncInterface> ipgInterface(new ipg::IpgSyncInterface());
+
+    Settings& settings = Settings::instance();
+
+    if (!ipgInterface->getIsConnected())
+        if (!ipgInterface->connectToLaser(settings.getIpgYLPNLaserIpAddress(), settings.getIpgYLPNLaserPort())) {
+            traceErr() << "Impossibile connettersi al laser IPG";
+//            showDialogAsync("Error", "Impossibile connettersi al laser IPG");
+            return false;
+        }
+
+    traceInfo() << "Connessione al laser air cooled avvenuta con successo";
+
+    ipg::IPG_USHORT executionCode = 0;
+
+    ipg::GetAirCooledLaserStatusOutput status;
+    if (!ipgInterface->getAirCooledLaserStatus(status, executionCode) || executionCode > 0) {
+        traceErr() << "Impossibile interrogare lo stato del laser air cooled";
+        if (executionCode > 0)
+            traceErr() << "Descrizion errore ipg: " << ipg::getExecOpCodeDescription(executionCode);
+//        showDialogAsync("Error", "Impossibile interrogare lo stato del laser");
+        return false;
+    }
+
+    energyJoule = status.getPulseEnergy() * 0.001;
+
+    ipgInterface->disconnectLaser();
+
+    traceExit;
+    return true;
+
+    traceExit;
 
 }
 

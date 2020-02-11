@@ -22,6 +22,7 @@ SET(ITEMS
     set_mode_index
     set_power
     set_ps_mode
+    get_air_cooled_laser_status
     )
 
 FOREACH(ITEM ${ITEMS})

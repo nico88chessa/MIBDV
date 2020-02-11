@@ -23,6 +23,7 @@ SET(ITEMS
     set_mode_index_marshaller
     set_power_marshaller
     set_ps_mode_marshaller
+    get_air_cooled_laser_status_marshaller
     )
 
 FOREACH(ITEM ${ITEMS})

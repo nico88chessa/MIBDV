@@ -42,10 +42,15 @@ public:
 
         traceEnter;
 
-        using statusT = isConnectedDeviceInspector<I>::status;
-        using analizerT = hasAnalizerTraits<statusT>::analizer;
+        // OLD
+        // using statusT = isConnectedDeviceInspector<I>::status;
+        // using analizerT = hasAnalizerTraits<statusT>::analizer;
+        //
+        // analizerT* analizer = new analizerT();
 
-        analizerT* analizer = new analizerT();
+        // Nic 2020/01/22 - versione piu compatta, stessa logica scritta sopra
+        auto analizer = new R();
+
         QObject::connect(inspector.data(), &I::statusSignal, [analizer](const QVariant& status) {
             QMetaObject::invokeMethod(analizer, "analize", Qt::QueuedConnection, Q_ARG(QVariant, status));
         });

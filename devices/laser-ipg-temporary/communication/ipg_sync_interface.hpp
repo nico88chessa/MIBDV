@@ -640,6 +640,25 @@ public:
 
     }
 
+    bool getAirCooledLaserStatus(GetAirCooledLaserStatusOutput& airCooledLaserStatus, IPG_USHORT& executionCode) {
+
+        using namespace PROGRAM_NAMESPACE;
+        executionCode = 0;
+        if (syncExecutor.isNull()) {
+            traceDebug() << "Ipg sync interface non e' stato inizializzato";
+            return false;
+        }
+
+        GetAirCooledLaserStatusInput input;
+        input.setCommand(COMMAND_GET_AIR_COOLED_LASER_STATUS);
+        if (syncExecutor->execute<GetAirCooledLaserStatusInput, GetAirCooledLaserStatusOutput, GetAirCooledLaserStatusMarshaller>(input, airCooledLaserStatus) > 0)
+            return false;
+
+        executionCode = airCooledLaserStatus.getExecutionCode();
+        return true;
+
+    }
+
     bool getIsConnected() const { return isConnected; }
 
     void setIsConnected(bool value) { isConnected = value; }

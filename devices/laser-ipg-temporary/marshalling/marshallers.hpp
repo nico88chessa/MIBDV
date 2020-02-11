@@ -22,5 +22,6 @@
 #include <laser-ipg-temporary/marshalling/set_ee_marshaller.hpp>
 #include <laser-ipg-temporary/marshalling/set_em_marshaller.hpp>
 #include <laser-ipg-temporary/marshalling/get_laser_status_marshaller.hpp>
+#include <laser-ipg-temporary/marshalling/get_air_cooled_laser_status_marshaller.hpp>
 
 #endif // MARSHALLERS_HPP

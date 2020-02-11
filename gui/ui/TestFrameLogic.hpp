@@ -345,6 +345,7 @@ private:
     bool setupLaserOn();
     bool setupLaserOff();
     bool getPulseEnergy(float& energyJoule);
+    bool getPulseEnergyLaserAirCooled(float& energyJoule);
 
 signals:
     void finishedSignal();
