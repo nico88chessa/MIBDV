@@ -454,7 +454,8 @@ void IOSignaler::updateStatus(const GalilPLCStatusBean& status) {
             auto& aIn = aisIt.value();
             if (aIn.getDevice() == DeviceKey::GALIL_PLC) {
                 analogReal value = status.getAnalogInput(aIn.getChannel());
-                value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
+//                value = value / GALIL_PLC_ANALOG_COUNT_MAX_VALUE * aIn.getGain() + aIn.getOffset();
+                value = value * aIn.getGain() + aIn.getOffset();
                 aIn.setValue(value);
             }
             ++aisIt;

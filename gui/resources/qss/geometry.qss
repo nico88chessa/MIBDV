@@ -365,7 +365,6 @@ QLabel {
 }
 
 .MDSwitchLine:hover {
-/*    background-color: blue;*/
 }
 
 .MDSwitchLine::indicator {
@@ -415,7 +414,6 @@ QLabel {
 QTabBar {
 /*    qproperty-drawBase: true;*/
     border: none;
-    background-color: transparent;
 }
 
 QTabWidget {
@@ -433,7 +431,6 @@ QTabWidget::tab-bar {
 QTabBar::tab {
     font-size: 14px;
     font-weight: 500;
-    background-color: transparent;
     background-origin: margin;
     min-width: 160px;
     min-height: 48px;
@@ -467,19 +464,18 @@ QScrollBar {
 
 
 QScrollBar:vertical {
-    border: 2px solid transparent;
+    /*border: 2px solid transparent;*/
+    border-width: 2px;
+    border-style: solid;
 }
 
 QScrollBar::handle:vertical {
-    background: green;
 }
 
 QScrollBar::sub-page:vertical {
-    background-color: lightGray;
 }
 
 QScrollBar::add-page:vertical {
-    background-color: lightGray;
 }
 
 QScrollBar::add-line:vertical {

@@ -262,6 +262,11 @@ void AlertFrame::setupUi() {
     traceEnter;
     ui->setupUi(this);
     ui->lvAlerts->setSelectionMode(QListView::NoSelection);
+
+    // TODO NIC 27/02/2020 - gestire tab
+#ifndef DEBUG_MODE
+    ui->tabAlertFrame->removeTab(1);
+#endif
     traceExit;
 
 }

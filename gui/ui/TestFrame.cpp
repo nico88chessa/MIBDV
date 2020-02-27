@@ -811,18 +811,18 @@ ExitCause Worker::process() {
 
     updateLastCommandExecute(PrintCommandExecuted::LASER_ON);
 
-//    if (!getPulseEnergy(energy)) {
-//        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser";
-//        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser" \
-//                                 "\nVedere il log per maggiori dettagli.");
-//        return ExitCause::INTERNAL_ERROR;
-//    }
-    if (!getPulseEnergyLaserAirCooled(energy)) {
-        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser air cooled";
-        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser air cooled" \
+    if (!getPulseEnergy(energy)) {
+        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser";
+        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser" \
                                  "\nVedere il log per maggiori dettagli.");
         return ExitCause::INTERNAL_ERROR;
     }
+//    if (!getPulseEnergyLaserAirCooled(energy)) {
+//        traceErr() << "Impossibile interrogare l'energia dell'impulso del laser air cooled";
+//        showDialogAsync("Error", "Impossibile interrogare l'energia dell'impulso del laser air cooled" \
+//                                 "\nVedere il log per maggiori dettagli.");
+//        return ExitCause::INTERNAL_ERROR;
+//    }
 #endif
     updateStatusAsync("Initalizing laser... OK");
 
@@ -1902,8 +1902,6 @@ bool Worker::getPulseEnergyLaserAirCooled(float& energyJoule) {
 
     traceExit;
     return true;
-
-    traceExit;
 
 }
 

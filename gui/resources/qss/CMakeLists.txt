@@ -2,6 +2,7 @@ SET(ITEMS
     geometry
     app-geometry
     theme1
+    theme-customer
     )
 
 FOREACH(ITEM ${ITEMS})

@@ -1,12 +1,12 @@
 /*************************
  tilde ~
  color scheme
- primary:           #2e7d32 - rgb(46,125,50)
- primary-dark:      #005005 - rgb(0,80,5)
- primary-light:     #60ad5e - rgb(96,173,94)
- secondary:         #757575 - rgb(117,117,117)
- secondary-dark:    #494949 - rgb(73,73,73)
- secondary-light:   #a4a4a4 - rgb(164,164,164)
+ primary:           #0d47a1 - rgb(13, 71, 161)
+ primary-dark:      #002171 - rgb(0, 33, 113)
+ primary-light:     #5472d3 - rgb(84, 114, 211)
+ secondary:         #ffa726 - rgb(255, 167, 38)
+ secondary-dark:    #c77800 - rgb(199, 120, 0)
+ secondary-light:   #ffd95b - rgb(255, 217, 91)
  info-color:       #B00020 - rgb(176,0,32)        da sistemare
  info-text-color:  #FFFFFF - rgb(255,255,255)     da sistemare
  warning-color:       #B00020 - rgb(176,0,32)     da sistemare
@@ -37,7 +37,7 @@ QWidget:!enabled {
  */
 
 .MDLineEdit {
-    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    qproperty-labelFocusColor: rgba(13, 71, 161, 87%);
     background-color: transparent;
     border-bottom-color: rgba(0, 0, 0, 42%);
     color: rgba(0, 0, 0, 54%);
@@ -49,7 +49,7 @@ QWidget:!enabled {
 
 .MDLineEdit:focus:!read-only {
     color: rgba(0, 0, 0, 87%);
-    border-bottom-color: rgba(46, 125, 50, 100%);
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 .MDLineEdit:disabled {
@@ -64,7 +64,7 @@ QWidget:!enabled {
  */
 
 .MDSpinBox {
-    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    qproperty-labelFocusColor: rgba(13, 71, 161, 87%);
     background-color: transparent;
     border-bottom-color: rgba(0, 0, 0, 42%);
     color: rgba(0, 0, 0, 54%);
@@ -76,7 +76,7 @@ QWidget:!enabled {
 
 .MDSpinBox:focus:!read-only {
     color: rgba(0, 0, 0, 87%);
-    border-bottom-color: rgba(46, 125, 50, 100%);
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 .MDSpinBox:disabled {
@@ -91,7 +91,7 @@ QWidget:!enabled {
  */
 
 .MDDoubleSpinBox {
-    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    qproperty-labelFocusColor: rgba(13, 71, 161, 87%);
     background-color: transparent;
     border-bottom-color: rgba(0, 0, 0, 42%);
     color: rgba(0, 0, 0, 54%);
@@ -103,7 +103,7 @@ QWidget:!enabled {
 
 .MDDoubleSpinBox:focus:!read-only {
     color: rgba(0, 0, 0, 87%);
-    border-bottom-color: rgba(46, 125, 50, 100%);
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 .MDDoubleSpinBox:disabled {
@@ -120,7 +120,7 @@ QWidget:!enabled {
 .MDComboBox {
     border-bottom-color: rgba(0, 0, 0, 42%);
     background-color: transparent;
-    qproperty-labelFocusColor: rgba(46, 125, 50, 87%);
+    qproperty-labelFocusColor: rgba(13, 71, 161, 87%);
     color: rgba(0, 0, 0, 54%);
 }
 
@@ -130,7 +130,7 @@ QWidget:!enabled {
 
 .MDComboBox:focus {
     color: rgba(0, 0, 0, 87%);
-    border-bottom-color: rgba(46, 125, 50, 100%);
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 .MDComboBox:disabled {
@@ -140,7 +140,7 @@ QWidget:!enabled {
 
 .MDComboBox:on {
     color: rgba(0, 0, 0, 87%);
-    border-bottom-color: rgba(46, 125, 50, 100%);
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 .MDComboBox::drop-down {
@@ -185,15 +185,15 @@ QWidget:!enabled {
  */
 
 QSlider::groove:horizontal {
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 QSlider::handle:horizontal {
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 QSlider::sub-page:horizontal {
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 QSlider::add-page:horizontal {
@@ -201,15 +201,15 @@ QSlider::add-page:horizontal {
 }
 
 QSlider::groove:vertical {
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 QSlider::handle:vertical {
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 QSlider::sub-page:vertical {
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 QSlider::add-page:vertical {
@@ -224,7 +224,7 @@ QSlider::add-page:vertical {
 
 .QComboBox {
     background-color: white;
-    border-bottom-color: green;
+    border-bottom-color: rgba(13, 71, 161);
 }
 
 .QComboBox QAbstractItemView {
@@ -249,11 +249,11 @@ QSlider::add-page:vertical {
     qproperty-focusPolicy: NoFocus;
     border-color: transparent;
     color: white;
-    background-color: green;
+    background-color: rgba(13, 71, 161);
 }
 
 .QPushButton::on {
-    color: red;
+    color: rgb(84, 114, 211);
 }
 
 .QPushButton::disabled {
@@ -354,11 +354,11 @@ MDListWidget::item {
 }
 
 MDListWidget::item:hover {
-    background-color: red;
+    background-color: rgba(13, 71, 161, 42%);
 }
 
 MDListWidget::item:selected {
-    background-color: green;
+    background-color: rgb(84, 114, 211);
 }
 
 .MDListWidget MDCustomItem[objectName="alertItem"] {
@@ -412,11 +412,32 @@ QTabBar::tab:selected, QTabBar::tab:hover {
 }
 
 QTabBar::tab:selected {
-    border-bottom-color: green;
+    border-bottom-color: rgba(13, 71, 161, 100%);
 }
 
 QTabBar::tab:!selected {
     /*margin-top: 2px;*/
+}
+
+
+/*
+ * Q S C R O L L B A R
+ */
+
+QScrollBar:vertical {
+    border-color: transparent;
+}
+
+QScrollBar::handle:vertical {
+    background-color: rgba(13, 71, 161, 100%);
+}
+
+QScrollBar::sub-page:vertical {
+    background: lightgray;
+}
+
+QScrollBar::add-page:vertical {
+    background: lightgray;
 }
 
 
@@ -440,13 +461,13 @@ QTreeView::branch {
  */
 
 .MDBreadCrumb {
-    background-color: rgba(255, 0, 0, 0.2);
+    background-color: transparent;
 }
 
 .MDBreadCrumb .QPushButton {
     background-color: transparent;
     color: black;
-    border-color: blue;
+    border-color: rgba(13, 71, 161, 100%);
 }
 
 
@@ -461,7 +482,7 @@ QTreeView::branch {
 }
 
 .FileExplorerFrame #content {
-    background-color: pink;
+    background-color: transparent;
 }
 
 .FileExplorerFrame #lvExplorer {
@@ -471,7 +492,7 @@ QTreeView::branch {
 
 .FileExplorerFrame #top #pbDelete,
 .FileExplorerFrame #top #pbRename {
-    background-color: yellow;
+    background-color: rgba(13, 71, 161, 42%);
     padding: 12px 0px 12px 16px;
     qproperty-text: "";
     qproperty-iconSize: 24px;

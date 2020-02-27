@@ -81,6 +81,11 @@ void FileExplorerFrame::setupUi() {
     this->ui->pbDelete->setEnabled(false);
     this->ui->pbRename->setEnabled(false);
 
+    // TODO NIC 27/02/2020 - abilitare pulsante e sistemare relativa dialog di rename
+#ifndef DEBUG_MODE
+    this->ui->pbRename->setVisible(false);
+#endif
+
     traceExit;
 
 }

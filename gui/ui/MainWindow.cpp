@@ -160,6 +160,13 @@ void MainWindow::setupUiPanels() {
 void MainWindow::setupUiTopPanel() {
 
     traceEnter;
+    ui->lTitle->setText(PROJECT_UI_NAME);
+
+    // TOOD NIC 27/02/2020 - rendere visibili e implementare funzionalita'
+#ifndef DEBUG_MODE
+    ui->pbRefreshStyle->setVisible(false);
+    ui->pb->setVisible(false);
+#endif
     // nothing to do
     traceExit;
 
@@ -314,9 +321,13 @@ void MainWindow::setupStyleSheets() const {
     appGeom.open(QFile::ReadOnly);
     QByteArray geomStr = appGeom.readAll();
 
-    QFile theme(QString(STYLESHEET_PATH)+"theme1.qss");
+    QFile theme(QString(STYLESHEET_PATH)+"theme-customer.qss");
     theme.open(QFile::ReadOnly);
     QByteArray themeStr = theme.readAll();
+
+//    QFile theme(QString(STYLESHEET_PATH)+"theme1.qss");
+//    theme.open(QFile::ReadOnly);
+//    QByteArray themeStr = theme.readAll();
 
     QString content = mdGeomStr + geomStr + themeStr;
 

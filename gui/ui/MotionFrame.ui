@@ -207,7 +207,7 @@
           <item>
            <widget class="QPushButton" name="pbResetAxes">
             <property name="text">
-             <string>Reset Axes</string>
+             <string>Reset</string>
             </property>
            </widget>
           </item>

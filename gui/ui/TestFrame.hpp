@@ -77,7 +77,7 @@ private:
     static constexpr int TEST_FRAME_TILE_SIZE_MAX = 200;
     static constexpr int TEST_FRAME_MIN_FREQUENCY = 0;
     static constexpr int TEST_FRAME_MAX_FREQUENCY = 3000;
-    static constexpr int TEST_FRAME_WAIT_TIME_MS_MIN = 60;
+    static constexpr int TEST_FRAME_WAIT_TIME_MS_MIN = 20;
     static constexpr int TEST_FRAME_WAIT_TIME_MS_MAX = 5000;
     static constexpr int TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MIN = 1000;
     static constexpr int TEST_FRAME_Y_MOVEMENTS_WAIT_TIME_MS_MAX = 10000;
@@ -110,7 +110,7 @@ private:
     static constexpr int TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_MAX = 2000;
     static constexpr int TEST_FRAME_CIRCLE_NUM_REVOLUTIONS_STEP = 1;
     static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_MIN = 3;
-    static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_MAX = 20; // TODO NIC 13/05/2019 - rimettere 10
+    static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_MAX = 100; // TODO NIC 13/05/2019 - rimettere 10
     static constexpr int TEST_FRAME_CIRCLE_NUM_SIDES_STEP = 1;
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MIN = 1;
     static constexpr int TEST_FRAME_CIRCLE_POINTS_PITCH_MAX = TEST_FRAME_CIRCLE_RADIUS_MAX/20; // parametro da verificare

@@ -755,6 +755,11 @@ void MotionFrame::setupUi() {
     ui->cbAxisZForwardLimit->setVisible(checkLimitsAxisZ);
     ui->cbAxisZReverseLimit->setVisible(checkLimitsAxisZ);
 
+    // TODO NIC 27/02/2020 - gestire tab
+#ifndef DEBUG_MODE
+    ui->tabMotionFrame->removeTab(1);
+#endif
+
     traceExit;
 
 }

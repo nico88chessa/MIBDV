@@ -133,8 +133,8 @@ void MDBreadCrumb::updatePath(const QString& path) {
 
     QDir pathDir(path);
 
-    QString nativePath = pathDir.fromNativeSeparators(path);
-    QString nativeRoot = rootPath.fromNativeSeparators(path);
+    QString nativePath = QDir::fromNativeSeparators(pathDir.absolutePath());
+    QString nativeRoot = QDir::fromNativeSeparators(rootPath.absolutePath());
 
     if (currentPath.compare(nativePath) == 0)
         return;
@@ -143,7 +143,7 @@ void MDBreadCrumb::updatePath(const QString& path) {
     QList<Item> items;
 
     // verifico se rootPath e' padre di nativePath
-    while (pathDir.absolutePath().indexOf(rootPath.absolutePath()) != -1) {
+    while (nativePath.toLower().indexOf(nativeRoot.toLower()) != -1) {
 
         Item currentItem;
         if (pathDir == rootPath)
@@ -154,6 +154,7 @@ void MDBreadCrumb::updatePath(const QString& path) {
 
         items.push_front(currentItem);
         pathDir.cdUp();
+        nativePath = QDir::fromNativeSeparators(pathDir.absolutePath());
 
     }
 
