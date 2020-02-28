@@ -324,6 +324,11 @@ MDFileExplorerWidget {
     border-bottom-style: dotted;
 }
 
+.TestFrame #sbLaserPower,
+.TestFrame #sbLaserFrequency {
+    padding-right: 42px;
+}
+
 .TestFrame #frPoint {
     min-width: 400px;
 }

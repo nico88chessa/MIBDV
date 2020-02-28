@@ -152,7 +152,7 @@ QWidget:!enabled {
 }
 
 .MDComboBox::on QAbstractItemView {
-    border-color: green;
+    border-color: rgb(13, 71, 161);
 }
 
 .MDComboBox QAbstractItemView::item {
@@ -165,7 +165,7 @@ QWidget:!enabled {
 }
 
 .MDComboBox QAbstractItemView::item::selected {
-    color: green;
+    color: rgb(13, 71, 161);
 }
 
 .MDComboBox::down-arrow {
